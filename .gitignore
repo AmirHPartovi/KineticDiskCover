@@ -1,0 +1,30 @@
+# CMake build output
+/build/
+/cmake-build-*/
+CMakeUserPresets.json
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/CTestTestfile.cmake
+/Makefile
+
+# Compiled artifacts
+*.o
+*.a
+*.so
+*.dylib
+/kdc-solver
+/kdc-tests
+
+# Generated reports and solver results
+/results/
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local OS metadata
+.DS_Store
