@@ -63,6 +63,10 @@ kinetic objective (notably MinSum) can therefore take longer than one timeout
 in total. The configured per-subsolve timeout is recorded in each result.
 Batch artifacts are written beneath `results/batch/`, including per-run
 solutions, result metadata, convergence traces, master JSON/CSV, and a summary.
+The manual GitHub Actions pipeline defaults to the 302-instance public dataset
+in `data/instances/public_instance_set/`. It converts the repository's MDC
+files into the solver's canonical JSON format before solving and publishes
+batch results, tables, figures, and animations as workflow artifacts.
 
 For a strict wall-clock cap on each individual
 instance/algorithm/objective combination, use

@@ -1,14 +1,14 @@
 # .github/workflows/kdc_pipeline.yml
 # Manually run the KDC-Solver build, batch, reporting, and animation pipeline.
-# The workflow_dispatch inputs configure datasets, algorithms, modes,
-# and artifacts.
+# Inputs configure dataset, algorithms, modes, and artifacts.
 name: KDC-Solver Pipeline
 on: # yamllint disable-line rule:truthy
   workflow_dispatch:
     inputs:
       instances_dir:
         type: string
-        default: data/instances
+        description: "MDC directory (default: public real-world set)"
+        default: data/instances/public_instance_set
       algorithms:
         type: string
         default: all
@@ -31,7 +31,6 @@ on: # yamllint disable-line rule:truthy
       retention_days:
         type: string
         default: "30"
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -43,7 +42,6 @@ defaults:
     shell: bash
 env:
   PYTHONUNBUFFERED: "1"
-
 jobs:
   build:
     name: Build and test
@@ -81,7 +79,6 @@ jobs:
           name: kdc-solver-binaries
           path: build/kdc-solver
           retention-days: ${{ inputs.retention_days }}
-
   batch:
     name: Pre-flight and batch
     needs: build
@@ -115,8 +112,11 @@ jobs:
           PARALLEL: ${{ inputs.parallel }}
           THREADS: ${{ inputs.threads }}
         run: |
+          python scripts/prepare_real_instances.py \
+            --input "$INSTANCES_DIR" \
+            --output "$RUNNER_TEMP/kdc-instances"
           args=(
-            --instances "$INSTANCES_DIR"
+            --instances "$RUNNER_TEMP/kdc-instances"
             --output results/batch
             --algorithms "$ALGORITHMS"
             --modes "$MODES"
@@ -133,7 +133,6 @@ jobs:
             results/batch/
             results/preflight/
           retention-days: ${{ inputs.retention_days }}
-
   report:
     name: Build reports
     needs: batch
@@ -176,7 +175,6 @@ jobs:
             results/tables/
             results/figures/
           retention-days: ${{ inputs.retention_days }}
-
   animate:
     name: Animate best solutions
     needs: batch
@@ -208,9 +206,12 @@ jobs:
           MODES: ${{ inputs.modes }}
           DPI: ${{ inputs.dpi }}
         run: |
+          python scripts/prepare_real_instances.py \
+            --input "$INSTANCES_DIR" \
+            --output "$RUNNER_TEMP/kdc-instances"
           python scripts/animate_best.py \
             --batch results/batch \
-            --instances "$INSTANCES_DIR" \
+            --instances "$RUNNER_TEMP/kdc-instances" \
             --output results/animations \
             --mode "$MODES" \
             --dpi "$DPI"
@@ -220,7 +221,6 @@ jobs:
           name: animations
           path: results/animations/
           retention-days: ${{ inputs.retention_days }}
-
   summary:
     name: Pipeline summary
     needs: [build, batch, report, animate]
