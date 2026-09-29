@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -37,10 +38,12 @@ def main() -> int:
                         default="both")
     parser.add_argument("--parallel", action="store_true",
                         help="run work items concurrently")
-    parser.add_argument("--threads", type=int, default=1,
-                        help="parallel worker count")
-    parser.add_argument("--time-limit", type=float, default=10.0,
-                        help="maximum seconds per static/IP solve (default: 10)")
+    parser.add_argument(
+        "--threads", type=int, default=max(1, os.cpu_count() or 1),
+        help="parallel worker count (default: available CPU cores)"
+    )
+    parser.add_argument("--time-limit", type=float, default=60.0,
+                        help="maximum seconds per static/IP solve (default: 60)")
     parser.add_argument("--force", action="store_true",
                         help="run even if the preflight report is missing or failed")
     args = parser.parse_args()

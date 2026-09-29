@@ -71,8 +71,8 @@ void command_help(const std::string& command) {
         << "  --algorithms LIST    Comma-separated algorithm names (default: all)\n"
         << "  --modes MODE         minmax|minsum|both (default: both)\n"
         << "  --parallel           Run instances concurrently\n"
-        << "  --threads N          Number of worker threads (default: 1)\n"
-        << "  --time-limit SEC     Per static/IP solve timeout (default: 10)\n"
+        << "  --threads N          Worker threads (default: available CPU cores)\n"
+        << "  --time-limit SEC     Per static/IP solve timeout (default: 60)\n"
         << "  --no-verify          Skip solution verification\n"
         << "  --no-solutions       Do not save solution JSON files\n"
         << "  --no-traces          Do not save trace CSV files\n";
@@ -260,7 +260,7 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   config.dataset_dir = args.get("dataset");
   config.output_dir = args.get("output");
   config.parallel = args.has("parallel");
-  config.num_threads = args.get_int("threads", 1);
+  config.num_threads = args.get_int("threads", config.num_threads);
   const std::string mode = args.get("mode");
   if (mode == "both") {
     config.both_objectives = true;
@@ -417,7 +417,7 @@ int handle_batch(int argc, char** argv) {
   config.save_solutions = !args.has("no-solutions");
   config.save_traces = !args.has("no-traces");
   config.algorithm_names = split_csv(args.get("algorithms"));
-  config.per_ip_time_limit_sec = args.get_double("time-limit", 10.0);
+  config.per_ip_time_limit_sec = args.get_double("time-limit", 60.0);
   if (!std::isfinite(config.per_ip_time_limit_sec) ||
       config.per_ip_time_limit_sec <= 0.0) {
     throw std::invalid_argument("--time-limit must be positive");

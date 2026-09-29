@@ -6,6 +6,7 @@
 #include "kdc/types.hpp"
 
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace kdc {
@@ -40,11 +41,14 @@ struct BatchRunConfig {
   std::vector<ObjectiveType> objectives{ObjectiveType::MIN_MAX,
                                         ObjectiveType::MIN_SUM};
   bool parallel{false};
-  int num_threads{1};
+  int num_threads{[] {
+    const auto available = std::thread::hardware_concurrency();
+    return static_cast<int>(available == 0U ? 1U : available);
+  }()};
   bool verify_after{true};
   bool save_solutions{true};
   bool save_traces{true};
-  double per_ip_time_limit_sec{10.0};
+  double per_ip_time_limit_sec{60.0};
   double gap_target{0.01};
 };
 

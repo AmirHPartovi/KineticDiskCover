@@ -7,6 +7,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -17,9 +18,14 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 SOLVER = ROOT / "build" / "kdc-solver"
-ALGORITHMS = (
-    "branch-and-bound", "brute-force", "genetic", "greedy", "ip-kont",
-    "local-search", "lp-rounding", "nn", "primal-dual", "sa", "shifting",
+ALGORITHM_PHASES = (
+    ("nn", "greedy"),
+    ("lp-rounding", "primal-dual", "local-search", "sa", "genetic",
+     "shifting"),
+    ("ip-kont", "brute-force", "branch-and-bound"),
+)
+ALGORITHMS = tuple(
+    algorithm for phase in ALGORITHM_PHASES for algorithm in phase
 )
 OBJECTIVES = ("minmax", "minsum")
 CSV_COLUMNS = (
@@ -39,29 +45,25 @@ def safe_name(value: str) -> str:
     ).lstrip(".") or "unnamed"
 
 
-def _read_existing(output: Path, instance: str, algorithm: str,
-                   objective: str, run_timeout: float) -> dict | None:
-    result = output / "runs" / instance / algorithm / objective / "result.json"
-    if not result.is_file():
-        return None
-    try:
-        record = json.loads(result.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    if (record.get("time_limit_per_ip_sec") != run_timeout
-            or record.get("wall_time_sec", float("inf")) > run_timeout
-            or not record.get("result_json_path")):
-        return None
-    for field in ("result_json_path", "trace_csv_path"):
-        path = record.get(field)
-        if path and not Path(path).is_file():
-            return None
-    if record.get("feasible"):
-        solution = record.get("solution_json_path")
-        if not solution or not Path(solution).is_file():
-            return None
-    record["run_timeout_sec"] = run_timeout
-    return record
+def clear_previous_output(output: Path) -> None:
+    runs = output / "runs"
+    if runs.is_symlink() or runs.is_file():
+        runs.unlink()
+    elif runs.exists():
+        shutil.rmtree(runs)
+    for filename in ("master_results.json", "master_results.csv",
+                     "batch_summary.md"):
+        artifact = output / filename
+        if artifact.is_symlink() or not artifact.is_dir():
+            if artifact.exists() or artifact.is_symlink():
+                artifact.unlink()
+        elif artifact.exists():
+            shutil.rmtree(artifact)
+
+
+def order_algorithms(selected: set[str]) -> list[str]:
+    return [algorithm for phase in ALGORITHM_PHASES
+            for algorithm in phase if algorithm in selected]
 
 
 def _write_record_paths(record: dict, output: Path) -> None:
@@ -211,13 +213,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--algorithms", default="all")
     parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
                         default="both")
-    parser.add_argument("--threads", type=int, default=4)
-    parser.add_argument("--run-timeout", type=float, default=10.0,
-                        help="hard wall-clock limit for each combination")
-    parser.add_argument("--time-limit", type=float, default=10.0,
-                        help="limit for each static/IP subsolve")
-    parser.add_argument("--no-resume", action="store_true",
-                        help="rerun even combinations already within limits")
+    parser.add_argument(
+        "--threads", type=int, default=max(1, os.cpu_count() or 1),
+        help="parallel worker count (default: available CPU cores)"
+    )
+    parser.add_argument("--run-timeout", type=float, default=60.0,
+                        help="hard wall-clock limit per combination (default: 60)")
+    parser.add_argument("--time-limit", type=float, default=60.0,
+                        help="limit per static/IP subsolve (default: 60)")
     args = parser.parse_args(argv)
     if args.threads <= 0 or args.run_timeout <= 0 or args.time_limit <= 0:
         parser.error("--threads and timeout values must be positive")
@@ -231,54 +234,47 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("no canonical JSON instances found")
     requested = [value.strip() for value in args.algorithms.split(",")
                  if value.strip()]
-    algorithms = (list(ALGORITHMS) if not requested or
-                  any(value.lower() == "all" for value in requested)
-                  else requested)
-    unknown = set(algorithms) - set(ALGORITHMS)
+    selected = (set(ALGORITHMS) if not requested or
+                any(value.lower() == "all" for value in requested)
+                else set(requested))
+    unknown = selected - set(ALGORITHMS)
     if unknown:
         parser.error("unknown algorithms: " + ", ".join(sorted(unknown)))
+    algorithms = order_algorithms(selected)
     objectives = OBJECTIVES if args.modes == "both" else (args.modes,)
     output = Path(args.output)
     if not output.is_absolute():
         output = ROOT / output
+    clear_previous_output(output)
     output.mkdir(parents=True, exist_ok=True)
 
     records = []
-    pending = []
-    for path in instance_paths:
-        for algorithm in algorithms:
-            for objective in objectives:
-                existing = None if args.no_resume else _read_existing(
-                    output, str(json.loads(path.read_text()).get("name")
-                                or path.stem),
-                    algorithm, objective, args.time_limit,
-                )
-                if existing is not None:
-                    records.append(existing)
-                else:
-                    pending.append((path, algorithm, objective))
-    total = len(records) + len(pending)
+    total = len(instance_paths) * len(algorithms) * len(objectives)
     print(f"{len(instance_paths)} instances × {len(algorithms)} algorithms "
           f"× {len(objectives)} modes = {total} combinations; "
-          f"{len(records)} reusable, {len(pending)} to run; "
           f"{args.run_timeout:g}s hard timeout each.", flush=True)
-    complete = len(records)
+    complete = 0
     with ThreadPoolExecutor(max_workers=args.threads) as executor:
-        futures = {
-            executor.submit(
-                run_one, path, output, algorithm, objective,
-                args.run_timeout, args.time_limit,
-            ): (path, algorithm, objective)
-            for path, algorithm, objective in pending
-        }
-        for future in as_completed(futures):
-            record = future.result()
-            records.append(record)
-            complete += 1
-            if complete % 50 == 0 or complete == total:
-                print(f"Completed {complete}/{total} "
-                      f"({sum(bool(row['feasible']) for row in records)} "
-                      "feasible)", flush=True)
+        for phase in ALGORITHM_PHASES:
+            phase_algorithms = [algorithm for algorithm in algorithms
+                                if algorithm in phase]
+            futures = [
+                executor.submit(
+                    run_one, path, output, algorithm, objective,
+                    args.run_timeout, args.time_limit,
+                )
+                for path in instance_paths
+                for algorithm in phase_algorithms
+                for objective in objectives
+            ]
+            for future in as_completed(futures):
+                record = future.result()
+                records.append(record)
+                complete += 1
+                if complete % 50 == 0 or complete == total:
+                    print(f"Completed {complete}/{total} "
+                          f"({sum(bool(row['feasible']) for row in records)} "
+                          "feasible)", flush=True)
     write_outputs(records, output)
     print(f"Wrote results to {output}", flush=True)
     return 0

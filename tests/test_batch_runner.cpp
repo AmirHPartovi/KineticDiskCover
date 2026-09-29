@@ -68,6 +68,35 @@ TEST_CASE("BatchRunner: single instance single algorithm") {
   std::filesystem::remove_all(root);
 }
 
+TEST_CASE("BatchRunConfig: defaults to a 60-second IP limit") {
+  const kdc::BatchRunConfig config;
+  REQUIRE(config.per_ip_time_limit_sec == 60.0);
+  REQUIRE(config.num_threads >= 1);
+}
+
+TEST_CASE("BatchRunner: clears previous results but preserves other output files") {
+  const auto root = temporary_directory("kdc-batch-clean-");
+  write_instance(root / "instances");
+  auto config = one_run_config(root, "output");
+  const auto output = std::filesystem::path(config.output_dir);
+  const auto stale_run = output / "runs" / "old" / "nn" / "minmax";
+  std::filesystem::create_directories(stale_run);
+  std::ofstream(stale_run / "result.json") << "{\"stale\": true}\n";
+  std::ofstream(output / "master_results.json") << "[{\"stale\": true}]\n";
+  std::ofstream(output / "unrelated.txt") << "keep\n";
+
+  kdc::MockILPSolver mock;
+  kdc::BatchRunner::run(config, &mock);
+
+  REQUIRE_FALSE(std::filesystem::exists(stale_run));
+  REQUIRE(std::filesystem::exists(output / "unrelated.txt"));
+  std::ifstream result_input(output / "master_results.json");
+  const auto records = nlohmann::json::parse(result_input);
+  REQUIRE(records.size() == 1U);
+  REQUIRE(records.front().at("time_limit_per_ip_sec").get<double>() == 10.0);
+  std::filesystem::remove_all(root);
+}
+
 TEST_CASE("BatchRunner: multiple algorithms and modes") {
   const auto root = temporary_directory("kdc-batch-multiple-");
   write_instance(root / "instances");

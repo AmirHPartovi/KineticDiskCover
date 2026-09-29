@@ -56,7 +56,8 @@ python3 scripts/run_batch.py [--parallel --threads N] [--algorithms nn,greedy]
 ```
 
 The wrapper requires a passing pre-flight report unless `--force` is supplied.
-Each static/IP subsolve is limited to 10 seconds by default; override this
+Parallel runs use all available CPU cores by default. Each static/IP subsolve
+is limited to 60 seconds by default; override this
 with `--time-limit SEC`. Algorithms that perform multiple static solves per
 kinetic objective (notably MinSum) can therefore take longer than one timeout
 in total. The configured per-subsolve timeout is recorded in each result.
@@ -66,9 +67,11 @@ solutions, result metadata, convergence traces, master JSON/CSV, and a summary.
 For a strict wall-clock cap on each individual
 instance/algorithm/objective combination, use
 `python3 scripts/run_batch_limited.py --instances DIR --output results/batch
---algorithms all --modes both --threads 4 --run-timeout 10`. Each combination
-runs in its own process, timed-out combinations are recorded as failed, and
-already completed results within the same limit are reused on restart.
+--algorithms all --modes both`. It defaults to
+using all available CPU cores and applies a 60-second limit to each combination
+and static/IP subsolve. Faster, semi-exact, and exact algorithms run in
+successive phases; previous batch-owned result files are cleared before each
+run, and timed-out combinations are recorded as failed.
 
 Generate Markdown and CSV master, per-algorithm, per-instance, and per-family
 tables from the batch master JSON with:

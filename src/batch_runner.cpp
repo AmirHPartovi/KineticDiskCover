@@ -181,6 +181,24 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
             record.instance_name, algorithm, record.objective, error);
   return record;
 }
+
+std::size_t algorithm_phase(const std::string& algorithm) {
+  if (algorithm == "nn" || algorithm == "greedy") {
+    return 0U;
+  }
+  if (algorithm == "ip-kont" || algorithm == "brute-force" ||
+      algorithm == "branch-and-bound") {
+    return 2U;
+  }
+  return 1U;
+}
+
+void clear_previous_batch_output(const std::filesystem::path& output) {
+  for (const char* artifact : {"runs", "master_results.json",
+                               "master_results.csv", "batch_summary.md"}) {
+    std::filesystem::remove_all(output / artifact);
+  }
+}
 }  // namespace
 
 void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
@@ -236,57 +254,70 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   if (algorithms.empty()) {
     LOG_ERROR("BatchRunner: no registered algorithms selected");
   }
+  std::stable_sort(algorithms.begin(), algorithms.end(),
+                   [](const std::string& lhs, const std::string& rhs) {
+                     return algorithm_phase(lhs) < algorithm_phase(rhs);
+                   });
 
   struct WorkItem {
     std::filesystem::path instance_path;
     std::string algorithm;
     ObjectiveType objective;
   };
-  std::vector<WorkItem> work;
+  std::vector<std::vector<WorkItem>> phases(3U);
   for (const auto& path : instance_paths) {
     for (const auto& algorithm : algorithms) {
       for (const auto objective : config.objectives) {
-        work.push_back({path, algorithm, objective});
+        phases[algorithm_phase(algorithm)].push_back(
+            {path, algorithm, objective});
       }
     }
   }
 
+  const std::filesystem::path output(config.output_dir);
+  clear_previous_batch_output(output);
+
   std::vector<BatchRunRecord> records;
-  records.reserve(work.size());
-  if (config.parallel && !work.empty()) {
-    ThreadPool pool(config.num_threads);
-    std::vector<std::future<BatchRunRecord>> futures;
-    futures.reserve(work.size());
-    for (const auto& item : work) {
-      futures.push_back(pool.submit([item, config]() {
+  std::size_t total_work = 0U;
+  for (const auto& phase : phases) {
+    total_work += phase.size();
+  }
+  records.reserve(total_work);
+  for (const auto& phase : phases) {
+    if (config.parallel && !phase.empty()) {
+      ThreadPool pool(config.num_threads);
+      std::vector<std::future<BatchRunRecord>> futures;
+      futures.reserve(phase.size());
+      for (const auto& item : phase) {
+        futures.push_back(pool.submit([item, config]() {
+          try {
+            const Instance instance =
+                DatasetReader::read_json(item.instance_path.string());
+            KontSolver task_ilp;
+            return BatchRunner::run_single(instance, item.algorithm,
+                                           item.objective, &task_ilp, config);
+          } catch (const std::exception& error) {
+            return failed_instance_record(item.instance_path, item.algorithm,
+                                          item.objective, error.what(), config);
+          }
+        }));
+      }
+      for (auto& future : futures) {
+        records.push_back(future.get());
+      }
+      pool.wait_idle();
+    } else {
+      for (const auto& item : phase) {
         try {
           const Instance instance =
               DatasetReader::read_json(item.instance_path.string());
-          KontSolver task_ilp;
-          return BatchRunner::run_single(instance, item.algorithm,
-                                         item.objective, &task_ilp, config);
+          records.push_back(run_single(instance, item.algorithm,
+                                       item.objective, ilp, config));
         } catch (const std::exception& error) {
-          return failed_instance_record(item.instance_path, item.algorithm,
-                                        item.objective, error.what(), config);
+          records.push_back(failed_instance_record(
+              item.instance_path, item.algorithm, item.objective, error.what(),
+              config));
         }
-      }));
-    }
-    for (auto& future : futures) {
-      records.push_back(future.get());
-    }
-    pool.wait_idle();
-  } else {
-    for (const auto& item : work) {
-      try {
-        const Instance instance =
-            DatasetReader::read_json(item.instance_path.string());
-        records.push_back(run_single(instance, item.algorithm, item.objective,
-                                     ilp, config));
-      } catch (const std::exception& error) {
-        records.push_back(failed_instance_record(item.instance_path,
-                                                 item.algorithm,
-                                                 item.objective, error.what(),
-                                                 config));
       }
     }
   }
@@ -299,7 +330,6 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                               rhs.objective);
             });
 
-  const std::filesystem::path output(config.output_dir);
   std::filesystem::create_directories(output);
   save_master(records, (output / "master_results.json").string(),
               (output / "master_results.csv").string());
