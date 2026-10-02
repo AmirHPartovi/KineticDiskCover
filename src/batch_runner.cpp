@@ -182,12 +182,38 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
   return record;
 }
 
+std::string exact_reference_name(const std::string& requested) {
+  if (requested == "ip-kont" || requested == "branch-and-bound") {
+    return requested;
+  }
+#if defined(KDC_HAS_KONT)
+  return "ip-kont";
+#else
+  return "branch-and-bound";
+#endif
+}
+
+std::vector<std::string> default_benchmark_algorithms(
+    const std::string& requested_exact_reference) {
+  std::vector<std::string> algorithms = {"nn", "greedy", "primal-dual",
+                                         "local-search", "sa", "genetic",
+                                         "lp-rounding", "shifting"};
+  const std::string exact_reference =
+      requested_exact_reference.empty() || requested_exact_reference == "auto"
+          ? exact_reference_name(requested_exact_reference)
+          : requested_exact_reference;
+  if (std::find(algorithms.begin(), algorithms.end(), exact_reference) ==
+      algorithms.end()) {
+    algorithms.push_back(exact_reference);
+  }
+  return algorithms;
+}
+
 std::size_t algorithm_phase(const std::string& algorithm) {
   if (algorithm == "nn" || algorithm == "greedy") {
     return 0U;
   }
-  if (algorithm == "ip-kont" || algorithm == "brute-force" ||
-      algorithm == "branch-and-bound") {
+  if (algorithm == "ip-kont" || algorithm == "branch-and-bound") {
     return 2U;
   }
   return 1U;
@@ -202,7 +228,10 @@ void clear_previous_batch_output(const std::filesystem::path& output) {
 }  // namespace
 
 void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
-  if (!std::isfinite(config.per_ip_time_limit_sec) ||
+  if ((config.exact_reference != "auto" &&
+       config.exact_reference != "ip-kont" &&
+       config.exact_reference != "branch-and-bound") ||
+      !std::isfinite(config.per_ip_time_limit_sec) ||
       config.per_ip_time_limit_sec <= 0.0 ||
       !std::isfinite(config.gap_target) || config.gap_target < 0.0 ||
       config.gap_target >= 1.0 || config.num_threads <= 0) {
@@ -236,10 +265,22 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
 
   const auto registered = StaticSolverRegistry::list();
   std::vector<std::string> algorithms;
-  if (config.algorithm_names.empty()) {
-    algorithms = registered;
+  const bool wants_default_selection =
+      config.algorithm_names.empty() ||
+      std::any_of(config.algorithm_names.begin(), config.algorithm_names.end(),
+                  [](const std::string& value) {
+                    return value == "all" || value == "ALL";
+                  });
+
+  if (wants_default_selection) {
+    algorithms = default_benchmark_algorithms(config.exact_reference);
   } else {
     for (const auto& requested : config.algorithm_names) {
+      if (requested == "brute-force") {
+        LOG_WARN("BatchRunner: ignoring validation-only algorithm '{}'",
+                 requested);
+        continue;
+      }
       if (std::find(registered.begin(), registered.end(), requested) ==
           registered.end()) {
         LOG_WARN("BatchRunner: ignoring unregistered algorithm '{}'",

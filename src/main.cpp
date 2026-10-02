@@ -37,12 +37,14 @@ void usage() {
          "lp-rounding|primal-dual|local-search|sa|genetic|shifting]\n"
       << "  verify    --instance FILE --solution FILE\n"
       << "  benchmark --dataset DIR --output DIR --mode both|minmax|minsum "
-         "[--parallel] [--threads N]\n"
+         "[--parallel] [--threads N] [--exact-reference ip-kont|"
+         "branch-and-bound|auto]\n"
       << "  compare   --algorithms a,b --dataset DIR --output DIR "
          "[--mode static|minmax|minsum]\n"
       << "  preflight [--output FILE]\n"
       << "  batch     [--instances DIR] [--output DIR] [--algorithms LIST] "
-         "[--modes minmax|minsum|both] [--parallel] [--threads N]\n"
+         "[--modes minmax|minsum|both] [--parallel] [--threads N] "
+         "[--exact-reference ip-kont|branch-and-bound|auto]\n"
       << "  --help    Show this help message\n";
 }
 
@@ -53,9 +55,12 @@ void command_help(const std::string& command) {
     std::cout << "Usage: kdc-solver verify --instance FILE --solution FILE\n";
   } else if (command == "benchmark") {
     std::cout << "Usage: kdc-solver benchmark --dataset DIR --output DIR "
-                 "--mode both|minmax|minsum [--parallel] [--threads N]\n"
+                 "--mode both|minmax|minsum [--parallel] [--threads N] "
+                 "[--exact-reference ip-kont|branch-and-bound|auto]\n"
                  "  --parallel               Run instances concurrently\n"
-                 "  --threads N              Worker threads (default: 1)\n";
+                 "  --threads N              Worker threads (default: 1)\n"
+                 "  --exact-reference        Select the exact backend used in the\n"
+                 "                          benchmark reference slot\n";
   } else if (command == "compare") {
     std::cout << "Usage: kdc-solver compare --algorithms a,b --dataset DIR "
                  "--output DIR [--mode static|minmax|minsum]\n";
@@ -68,11 +73,13 @@ void command_help(const std::string& command) {
         << "  --instances DIR      Instance directory (default: "
            "data/instances)\n"
         << "  --output DIR         Output directory (default: results/batch)\n"
-        << "  --algorithms LIST    Comma-separated algorithm names (default: all)\n"
+        << "  --algorithms LIST    Comma-separated algorithm names (default: "
+           "main benchmark set)\n"
         << "  --modes MODE         minmax|minsum|both (default: both)\n"
         << "  --parallel           Run instances concurrently\n"
         << "  --threads N          Worker threads (default: available CPU cores)\n"
         << "  --time-limit SEC     Per static/IP solve timeout (default: 60)\n"
+        << "  --exact-reference    ip-kont|branch-and-bound|auto (default: auto)\n"
         << "  --no-verify          Skip solution verification\n"
         << "  --no-solutions       Do not save solution JSON files\n"
         << "  --no-traces          Do not save trace CSV files\n";
@@ -261,6 +268,7 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   config.output_dir = args.get("output");
   config.parallel = args.has("parallel");
   config.num_threads = args.get_int("threads", config.num_threads);
+  config.exact_reference = args.get("exact-reference", config.exact_reference);
   const std::string mode = args.get("mode");
   if (mode == "both") {
     config.both_objectives = true;
@@ -274,6 +282,12 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   }
   if (mode != "both" && mode != "minmax" && mode != "minsum") {
     throw std::invalid_argument("benchmark mode must be both, minmax, or minsum");
+  }
+  if (config.exact_reference != "auto" &&
+      config.exact_reference != "ip-kont" &&
+      config.exact_reference != "branch-and-bound") {
+    throw std::invalid_argument(
+        "--exact-reference must be ip-kont, branch-and-bound, or auto");
   }
   if (config.parallel && config.num_threads <= 0) {
     config.num_threads = static_cast<int>(
@@ -416,6 +430,7 @@ int handle_batch(int argc, char** argv) {
   config.verify_after = !args.has("no-verify");
   config.save_solutions = !args.has("no-solutions");
   config.save_traces = !args.has("no-traces");
+  config.exact_reference = args.get("exact-reference", config.exact_reference);
   config.algorithm_names = split_csv(args.get("algorithms"));
   config.per_ip_time_limit_sec = args.get_double("time-limit", 60.0);
   if (!std::isfinite(config.per_ip_time_limit_sec) ||
@@ -434,6 +449,12 @@ int handle_batch(int argc, char** argv) {
   if (config.objectives.empty()) {
     throw std::invalid_argument(
         "--modes must be minmax, minsum, or both");
+  }
+  if (config.exact_reference != "auto" &&
+      config.exact_reference != "ip-kont" &&
+      config.exact_reference != "branch-and-bound") {
+    throw std::invalid_argument(
+        "--exact-reference must be ip-kont, branch-and-bound, or auto");
   }
   if (config.parallel && config.num_threads <= 0) {
     config.num_threads = static_cast<int>(

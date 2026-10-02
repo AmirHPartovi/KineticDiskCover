@@ -33,9 +33,12 @@ def main() -> int:
     parser.add_argument("--output", default="results/batch",
                         help="batch output directory")
     parser.add_argument("--algorithms", default="",
-                        help="comma-separated solver names (default: all)")
+                        help="comma-separated solver names (default: main benchmark set)")
     parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
                         default="both")
+    parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
+                        default="auto",
+                        help="exact backend used in the reference slot (default: auto)")
     parser.add_argument("--parallel", action="store_true",
                         help="run work items concurrently")
     parser.add_argument(
@@ -68,6 +71,7 @@ def main() -> int:
         "--output", args.output,
         "--modes", args.modes,
         "--time-limit", str(args.time_limit),
+        "--exact-reference", args.exact_reference,
     ]
     requested_algorithms = [
         name.strip() for name in args.algorithms.split(",") if name.strip()

@@ -48,6 +48,7 @@ struct BatchRunConfig {
   bool verify_after{true};
   bool save_solutions{true};
   bool save_traces{true};
+  std::string exact_reference{"auto"};
   double per_ip_time_limit_sec{60.0};
   double gap_target{0.01};
 };

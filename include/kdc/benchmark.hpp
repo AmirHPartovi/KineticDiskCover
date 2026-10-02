@@ -17,6 +17,7 @@ struct BenchmarkConfig {
   ObjectiveType objective{ObjectiveType::MIN_MAX};
   int num_repeats{1};
   bool both_objectives{false};
+  std::string exact_reference{"auto"};
   bool measure_memory{true};
   bool verify_after{true};
   bool parallel{false};
