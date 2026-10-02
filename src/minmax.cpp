@@ -49,9 +49,12 @@ void validate_config(const MinMaxSolver::Config& config) {
   if (!std::isfinite(config.initial_ip_gap) ||
       !std::isfinite(config.final_ip_gap) ||
       !std::isfinite(config.time_limit_per_ip) ||
-      !std::isfinite(config.gap_target) || config.initial_ip_gap < 0.0 ||
-      config.final_ip_gap < 0.0 || config.time_limit_per_ip <= 0.0 ||
-      config.gap_target < 0.0) {
+      !std::isfinite(config.gap_target) ||
+      !std::isfinite(config.global_time_limit_sec) ||
+      config.initial_ip_gap < 0.0 || config.final_ip_gap < 0.0 ||
+      config.time_limit_per_ip <= 0.0 || config.gap_target < 0.0 ||
+      config.global_time_limit_sec <= 0.0 || config.max_iterations <= 0 ||
+      config.verify_every_n_iters < 0) {
     throw std::invalid_argument("MinMax configuration is invalid");
   }
 }
@@ -87,6 +90,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   const auto solve_start = std::chrono::steady_clock::now();
 
   Result result;
+  const auto global_deadline =
+      std::chrono::steady_clock::now() +
+      std::chrono::duration<double>(config.global_time_limit_sec);
   const StaticSolution initial_assignment = static_solver.solve(instance, 0.0);
   ++result.num_ip_solves;
   if (!initial_assignment.feasible) {
@@ -95,6 +101,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   double lower_bound =
       static_solver.provides_lower_bound() ? initial_assignment.lower_bound
                                            : 0.0;
+  result.certified_lower_bound =
+      static_solver.provides_lower_bound() ? lower_bound : 0.0;
+  result.heuristic_lower_bound = lower_bound;
 
   KineticSolution solution = KineticSolution::extend(
       instance,
@@ -109,7 +118,11 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   double current_gap = relative_gap(solution.peak_cost(), lower_bound);
   result.gap_trace.push_back(current_gap);
 
-  for (int iteration = 1; iteration <= 1000; ++iteration) {
+  for (int iteration = 1; iteration <= config.max_iterations; ++iteration) {
+    if (std::chrono::steady_clock::now() >= global_deadline) {
+      LOG_WARN("MinMax: global deadline reached after {} iterations", iteration - 1);
+      break;
+    }
     result.num_iterations = iteration;
     const double peak = solution.peak_cost();
     const double maximum_time = find_max_area_time(solution);
@@ -143,7 +156,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
     }
     if (static_solver.provides_lower_bound()) {
       lower_bound = std::max(lower_bound, assignment.lower_bound);
+      result.certified_lower_bound = lower_bound;
     }
+    result.heuristic_lower_bound = lower_bound;
     if (assignment.cost >= peak - 1e-9) {
       LOG_INFO("MinMax: no improvement at t_max, stopping");
       const double updated_gap = relative_gap(peak, lower_bound);
@@ -186,7 +201,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
     const double previous_peak = peak;
     solution = KineticSolution::combine(solution, candidate,
                                         ObjectiveType::MIN_MAX);
-    if (config.verify_after) {
+    if (config.verify_after &&
+        (config.verify_every_n_iters > 0 &&
+         iteration % config.verify_every_n_iters == 0)) {
       const VerificationReport report =
           Verifier::verify(instance, solution, 100, 1e-6);
       if (!report.all_ok()) {
@@ -215,6 +232,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   result.solution = std::move(solution);
   result.peak_cost = result.solution.peak_cost();
   result.lower_bound = lower_bound;
+  result.certified_lower_bound =
+      static_solver.provides_lower_bound() ? result.lower_bound : 0.0;
+  result.heuristic_lower_bound = result.lower_bound;
   result.gap = relative_gap(result.peak_cost, lower_bound);
   result.total_time_sec =
       std::chrono::duration<double>(finish - start).count();

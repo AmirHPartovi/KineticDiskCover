@@ -4,10 +4,52 @@
 
 #include <algorithm>
 #include <limits>
+#include <mutex>
+#include <sstream>
 #include <stdexcept>
+#include <unordered_map>
 #include <utility>
 
 namespace kdc {
+namespace {
+std::mutex& candidate_cache_mutex() {
+  static std::mutex value;
+  return value;
+}
+
+std::string instance_cache_key(const Instance& instance) {
+  std::ostringstream key;
+  key << "id=" << instance.id << ";name=" << instance.name << ";n=" << instance.n
+      << ";m=" << instance.m << ";T=" << instance.T_end << ";";
+  for (const auto& station : instance.stations) {
+    key << "station(" << station.id << "," << station.pos.x << ","
+        << station.pos.y << ");";
+  }
+  for (const auto& trajectory : instance.trajectories) {
+    key << "traj(" << trajectory.t_breaks.size() << ",";
+    for (const auto& time : trajectory.t_breaks) {
+      key << time << ";";
+    }
+    for (const auto& point : trajectory.waypoints) {
+      key << point.x << "," << point.y << ";";
+    }
+    key << ");";
+  }
+  return key.str();
+}
+
+std::string coverage_cache_key(const Instance& instance,
+                              const std::vector<CandidateDisk>& disks,
+                              double time) {
+  std::ostringstream key;
+  key << instance_cache_key(instance) << ";time=" << time << ";disks=";
+  for (const auto& disk : disks) {
+    key << disk.station_id << ":" << disk.supporting_point << ";";
+  }
+  return key.str();
+}
+}
+
 std::vector<CandidateDisk> CandidateSet::build(const Instance& instance) {
   LOG_DEBUG("CandidateSet::build: n={}, m={}", instance.n, instance.m);
   if (instance.n <= 0 || instance.m <= 0) {
@@ -28,6 +70,16 @@ std::vector<CandidateDisk> CandidateSet::build(const Instance& instance) {
     throw std::length_error("candidate count exceeds supported index range");
   }
 
+  static std::unordered_map<std::string, std::vector<CandidateDisk>> cache;
+  const std::string key = instance_cache_key(instance);
+  {
+    std::lock_guard<std::mutex> lock(candidate_cache_mutex());
+    const auto cached = cache.find(key);
+    if (cached != cache.end()) {
+      return cached->second;
+    }
+  }
+
   std::vector<CandidateDisk> disks;
   disks.reserve(n * m);
   std::vector<std::pair<Value, int>> distances;
@@ -46,6 +98,10 @@ std::vector<CandidateDisk> CandidateSet::build(const Instance& instance) {
           {static_cast<int>(station_index), distance.second});
     }
   }
+  {
+    std::lock_guard<std::mutex> lock(candidate_cache_mutex());
+    cache[key] = disks;
+  }
   LOG_INFO("CandidateSet::build: built {} disks", disks.size());
   return disks;
 }
@@ -63,6 +119,16 @@ CandidateSet::CoverageMatrix CandidateSet::build_coverage(
   if (disks.size() >
       static_cast<Index>(std::numeric_limits<int>::max())) {
     throw std::length_error("disk count exceeds supported index range");
+  }
+
+  static std::unordered_map<std::string, CoverageMatrix> coverage_cache;
+  const std::string key = coverage_cache_key(instance, disks, time);
+  {
+    std::lock_guard<std::mutex> lock(candidate_cache_mutex());
+    const auto cached = coverage_cache.find(key);
+    if (cached != coverage_cache.end()) {
+      return cached->second;
+    }
   }
 
   const auto point_count = static_cast<Index>(instance.n);
@@ -125,6 +191,10 @@ CandidateSet::CoverageMatrix CandidateSet::build_coverage(
             static_cast<int>(disk_index);
       }
     }
+  }
+  {
+    std::lock_guard<std::mutex> lock(candidate_cache_mutex());
+    coverage_cache[key] = coverage;
   }
   LOG_INFO("build_coverage: nnz={}", coverage.col_idx.size());
   return coverage;

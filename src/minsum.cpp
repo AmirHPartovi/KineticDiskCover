@@ -64,9 +64,12 @@ void validate_config(const MinSumSolver::Config& config) {
   if (!std::isfinite(config.initial_ip_gap) ||
       !std::isfinite(config.final_ip_gap) ||
       !std::isfinite(config.time_limit_per_ip) ||
-      !std::isfinite(config.gap_target) || config.initial_ip_gap < 0.0 ||
-      config.final_ip_gap < 0.0 || config.time_limit_per_ip <= 0.0 ||
-      config.gap_target < 0.0 || config.lb_num_samples <= 0) {
+      !std::isfinite(config.gap_target) ||
+      !std::isfinite(config.global_time_limit_sec) ||
+      config.initial_ip_gap < 0.0 || config.final_ip_gap < 0.0 ||
+      config.time_limit_per_ip <= 0.0 || config.gap_target < 0.0 ||
+      config.global_time_limit_sec <= 0.0 || config.lb_num_samples <= 0 ||
+      config.max_iterations <= 0 || config.verify_every_n_iters < 0) {
     throw std::invalid_argument("MinSum configuration is invalid");
   }
 }
@@ -385,6 +388,9 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
   }
   LOG_INFO("MinSum: start n={}, m={}", instance.n, instance.m);
   const auto start = std::chrono::high_resolution_clock::now();
+  const auto global_deadline =
+      std::chrono::steady_clock::now() +
+      std::chrono::duration<double>(config.global_time_limit_sec);
   Result result;
 
   const StaticSolution initial_assignment = static_solver.solve(instance, 0.0);
@@ -411,6 +417,9 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
   result.num_ip_solves += config.lb_num_samples + 1;
   double current_integral = solution.total_integral();
   lower_bound_integral = std::min(lower_bound_integral, current_integral);
+  result.certified_lower_bound_integral =
+      static_solver.provides_lower_bound() ? lower_bound_integral : 0.0;
+  result.heuristic_lower_bound_integral = lower_bound_integral;
   double current_gap = relative_gap(current_integral, lower_bound_integral);
   result.gap_trace.push_back(current_gap);
   const auto append_trace = [&](int iteration, double time) {
@@ -428,7 +437,12 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
     result.trace.push_back(row);
   };
   append_trace(0, 0.0);
-  for (int iteration = 1; iteration <= 1000; ++iteration) {
+  for (int iteration = 1; iteration <= config.max_iterations; ++iteration) {
+    if (std::chrono::steady_clock::now() >= global_deadline) {
+      LOG_WARN("MinSum: global deadline reached after {} iterations",
+               iteration - 1);
+      break;
+    }
     result.num_iterations = iteration;
     const auto contribution =
         find_max_contribution_interval(solution, lower_bound_samples);
@@ -455,7 +469,9 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
       lower_bound_integral = std::max(
           lower_bound_integral,
           std::min(trapezoid_integral(lower_bound_samples), current_integral));
+      result.certified_lower_bound_integral = lower_bound_integral;
     }
+    result.heuristic_lower_bound_integral = lower_bound_integral;
 
     if (assignment.cost >= solution.cost_at(midpoint) - 1e-9) {
       const double updated_gap =
@@ -504,7 +520,9 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
 
     KineticSolution combined = combine_integral(solution, candidate);
     local_improvement_integral(instance, combined);
-    if (config.verify_after) {
+    if (config.verify_after &&
+        (config.verify_every_n_iters > 0 &&
+         iteration % config.verify_every_n_iters == 0)) {
       const VerificationReport report =
           Verifier::verify(instance, combined, 100, 1e-6);
       if (!report.all_ok()) {
@@ -544,6 +562,9 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
   result.solution = std::move(solution);
   result.total_integral = result.solution.total_integral();
   result.lower_bound_integral = lower_bound_integral;
+  result.certified_lower_bound_integral =
+      static_solver.provides_lower_bound() ? lower_bound_integral : 0.0;
+  result.heuristic_lower_bound_integral = lower_bound_integral;
   result.gap = relative_gap(result.total_integral, lower_bound_integral);
   result.total_time_sec =
       std::chrono::duration<double>(finish - start).count();

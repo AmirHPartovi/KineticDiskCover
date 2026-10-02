@@ -38,6 +38,8 @@ struct BenchmarkResult {
   double peak_memory_mb{0.0};
   double objective_value{0.0};
   double lower_bound{0.0};
+  double certified_lower_bound{0.0};
+  double heuristic_lower_bound{0.0};
   double gap{0.0};
   int num_ip_solves{0};
   int num_iterations{0};

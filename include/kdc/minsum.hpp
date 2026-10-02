@@ -24,7 +24,10 @@ class MinSumSolver {
     double final_ip_gap{0.0001};
     double time_limit_per_ip{600.0};
     double gap_target{0.01};
-    int lb_num_samples{20};
+    double global_time_limit_sec{300.0};
+    int lb_num_samples{4};
+    int max_iterations{64};
+    int verify_every_n_iters{0};
     bool use_handovers{true};
     bool use_no_dup{true};
     bool use_partial_ext{true};
@@ -35,6 +38,8 @@ class MinSumSolver {
     KineticSolution solution;
     double total_integral{0.0};
     double lower_bound_integral{0.0};
+    double certified_lower_bound_integral{0.0};
+    double heuristic_lower_bound_integral{0.0};
     double gap{0.0};
     double total_time_sec{0.0};
     int num_ip_solves{0};

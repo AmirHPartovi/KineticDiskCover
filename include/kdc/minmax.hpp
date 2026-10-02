@@ -16,6 +16,9 @@ class MinMaxSolver {
     double final_ip_gap{0.0001};
     double time_limit_per_ip{600.0};
     double gap_target{0.01};
+    double global_time_limit_sec{300.0};
+    int max_iterations{64};
+    int verify_every_n_iters{0};
     bool use_handovers{true};
     bool use_no_dup{true};
     bool use_partial_ext{true};
@@ -27,6 +30,8 @@ class MinMaxSolver {
     KineticSolution solution;
     double peak_cost{0.0};
     double lower_bound{0.0};
+    double certified_lower_bound{0.0};
+    double heuristic_lower_bound{0.0};
     double gap{0.0};
     double total_time_sec{0.0};
     int num_ip_solves{0};
