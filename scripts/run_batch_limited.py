@@ -20,9 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SOLVER = ROOT / "build" / "kdc-solver"
 ALGORITHM_PHASES = (
     ("nn", "greedy"),
-    ("lp-rounding", "primal-dual", "local-search", "sa", "genetic",
-     "shifting"),
-    ("ip-kont", "brute-force", "branch-and-bound"),
+    ("primal-dual", "local-search", "sa", "genetic",
+     "lp-rounding", "shifting"),
+    ("ip-kont", "branch-and-bound"),
 )
 ALGORITHMS = tuple(
     algorithm for phase in ALGORITHM_PHASES for algorithm in phase
@@ -110,6 +110,7 @@ def run_one(instance_path: Path, output: Path, algorithm: str,
             "--algorithms", algorithm,
             "--modes", objective,
             "--time-limit", str(per_ip_timeout),
+            "--exact-reference", "auto",
         ]
         try:
             completed = subprocess.run(
@@ -213,6 +214,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--algorithms", default="all")
     parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
                         default="both")
+    parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
+                        default="auto",
+                        help="exact backend used in the reference slot")
     parser.add_argument(
         "--threads", type=int, default=max(1, os.cpu_count() or 1),
         help="parallel worker count (default: available CPU cores)"
@@ -237,6 +241,15 @@ def main(argv: list[str] | None = None) -> int:
     selected = (set(ALGORITHMS) if not requested or
                 any(value.lower() == "all" for value in requested)
                 else set(requested))
+    exact_reference = args.exact_reference
+    if exact_reference == "auto":
+        exact_reference = "ip-kont" if (ROOT / "build" / "kdc-solver").is_file() else "branch-and-bound"
+    if exact_reference == "ip-kont":
+        selected.discard("branch-and-bound")
+    else:
+        selected.discard("ip-kont")
+    selected.discard("brute-force")
+    selected.add(exact_reference)
     unknown = selected - set(ALGORITHMS)
     if unknown:
         parser.error("unknown algorithms: " + ", ".join(sorted(unknown)))

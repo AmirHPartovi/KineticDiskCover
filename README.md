@@ -48,11 +48,12 @@ The CLI check can also be run directly with
 written under `results/preflight/`; without a usable KONT backend, checks use
 `MockILPSolver` and report that fallback explicitly.
 
-Run all registered static solvers against every JSON instance in both
-objectives with:
+Run the main benchmark set (fast heuristics plus one exact reference backend)
+against every JSON instance in both objectives with:
 
 ```sh
-python3 scripts/run_batch.py [--parallel --threads N] [--algorithms nn,greedy]
+python3 scripts/run_batch.py [--parallel --threads N] [--algorithms all] \
+    [--exact-reference auto|ip-kont|branch-and-bound]
 ```
 
 The wrapper requires a passing pre-flight report unless `--force` is supplied.
@@ -108,7 +109,8 @@ kdc-solver solve --instance FILE [--mode minmax|minsum] [--algorithm NAME]
                   [--output FILE] [--time-limit SEC] [--gap TARGET]
                   [--no-handovers] [--no-dedup] [--no-partial]
 kdc-solver verify --instance FILE --solution FILE
-kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum
+kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum \
+                    [--exact-reference auto|ip-kont|branch-and-bound]
 ```
 
 The `solve` command defaults to the `minmax` objective and `ip-kont` static
