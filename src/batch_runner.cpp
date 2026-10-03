@@ -1,6 +1,7 @@
 #include "kdc/batch_runner.hpp"
 
 #include "kdc/benchmark.hpp"
+#include "kdc/exact_reference_selector.hpp"
 #include "kdc/io.hpp"
 #include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
@@ -49,6 +50,8 @@ Json record_json(const BatchRunRecord& record) {
               {"time_limit_per_ip_sec", record.time_limit_per_ip_sec},
               {"objective_value", record.objective_value},
               {"lower_bound", record.lower_bound},
+              {"certified_lower_bound", record.certified_lower_bound},
+              {"heuristic_lower_bound", record.heuristic_lower_bound},
               {"gap", record.gap},
               {"num_iterations", record.num_iterations},
               {"num_ip_solves", record.num_ip_solves},
@@ -186,11 +189,10 @@ std::string exact_reference_name(const std::string& requested) {
   if (requested == "ip-kont" || requested == "branch-and-bound") {
     return requested;
   }
-#if defined(KDC_HAS_KONT)
-  return "ip-kont";
-#else
-  return "branch-and-bound";
-#endif
+  const auto decision =
+      ExactReferenceSelector::resolve(requested, "data/instances",
+                                      "results/batch");
+  return decision.actual_backend == "KONT-COPT" ? "ip-kont" : "branch-and-bound";
 }
 
 std::vector<std::string> default_benchmark_algorithms(
@@ -241,6 +243,15 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
     throw std::invalid_argument("batch runner requires at least one objective");
   }
 
+  const auto exact_reference_decision =
+      ExactReferenceSelector::resolve(config.exact_reference,
+                                      config.instances_dir, config.output_dir);
+  if (config.exact_reference == "auto") {
+    LOG_INFO("BatchRunner: exact reference auto-selected '{}' (requested={}, manifest={})",
+             exact_reference_decision.actual_backend,
+             exact_reference_decision.requested_backend,
+             exact_reference_decision.manifest_path);
+  }
   LOG_INFO("BatchRunner: scanning {} for instances", config.instances_dir);
   const std::filesystem::path instances_dir(config.instances_dir);
   if (!std::filesystem::is_directory(instances_dir)) {

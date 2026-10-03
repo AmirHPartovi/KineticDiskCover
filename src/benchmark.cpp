@@ -102,6 +102,8 @@ Json result_to_json(const BenchmarkResult& result) {
               {"peak_memory_mb", result.peak_memory_mb},
               {"objective_value", result.objective_value},
               {"lower_bound", result.lower_bound},
+              {"certified_lower_bound", result.certified_lower_bound},
+              {"heuristic_lower_bound", result.heuristic_lower_bound},
               {"gap", result.gap},
               {"num_ip_solves", result.num_ip_solves},
               {"num_iterations", result.num_iterations},
@@ -121,6 +123,14 @@ BenchmarkResult result_from_json(const Json& json) {
   result.peak_memory_mb = json.at("peak_memory_mb").get<double>();
   result.objective_value = json.at("objective_value").get<double>();
   result.lower_bound = json.at("lower_bound").get<double>();
+  result.certified_lower_bound =
+      json.contains("certified_lower_bound")
+          ? json.at("certified_lower_bound").get<double>()
+          : result.lower_bound;
+  result.heuristic_lower_bound =
+      json.contains("heuristic_lower_bound")
+          ? json.at("heuristic_lower_bound").get<double>()
+          : result.lower_bound;
   result.gap = json.at("gap").get<double>();
   result.num_ip_solves = json.at("num_ip_solves").get<int>();
   result.num_iterations = json.at("num_iterations").get<int>();
@@ -160,6 +170,8 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
         MinMaxSolver::solve(instance, timed_solver, solver_config);
     benchmark.objective_value = result.peak_cost;
     benchmark.lower_bound = result.lower_bound;
+    benchmark.certified_lower_bound = result.certified_lower_bound;
+    benchmark.heuristic_lower_bound = result.heuristic_lower_bound;
     benchmark.gap = result.gap;
     benchmark.num_ip_solves = result.num_ip_solves;
     benchmark.num_iterations = result.num_iterations;
