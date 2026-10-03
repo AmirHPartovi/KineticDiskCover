@@ -589,7 +589,6 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
         MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
     run_config.verify_after = true;
     run_config.verify_each_iteration = false;
-    run_config.save_solutions = false;
     run_config.save_traces = false;
   } else if (run_config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     run_config.minsum_refinement_policy =

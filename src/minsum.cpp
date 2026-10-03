@@ -230,8 +230,8 @@ void apply_integral_handovers(const Instance& instance,
             continue;
           }
           const auto events = KineticCore::find_handovers_from(
-              instance, from, current_supports, current.t_start,
-              current.t_end, true, budget);
+              instance, from, current_supports, current.assigned_points,
+              current.t_start, current.t_end, true, budget);
           for (const auto& event : events) {
             if (budget != nullptr) {
               budget->checkpoint();
@@ -240,6 +240,9 @@ void apply_integral_handovers(const Instance& instance,
             if (!event.valid || event.from_station != from || to < 0 ||
                 to >= instance.m ||
                 current_supports[static_cast<Index>(to)] < 0 ||
+                event.point_id < 0 || event.point_id >= instance.n ||
+                current.assigned_points[
+                    static_cast<Index>(event.point_id)] != from ||
                 event.time <= current.t_start + kMinSumTolerance ||
                 event.time >= current.t_end - kMinSumTolerance ||
                 event.new_support_from < 0 ||
@@ -257,6 +260,7 @@ void apply_integral_handovers(const Instance& instance,
                 event.new_support_from;
             right.supporting_point[static_cast<Index>(to)] =
                 event.new_support_to;
+            right.assigned_points[static_cast<Index>(event.point_id)] = to;
             KineticSolution::compute_quadratic_coeffs(
                 instance, left.supporting_point, left, budget);
             KineticSolution::compute_quadratic_coeffs(
@@ -549,7 +553,8 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
         instance,
         StaticAssignment{initial_assignment.supporting_point,
                          initial_assignment.radius, initial_assignment.cost,
-                         initial_assignment.feasible},
+                         initial_assignment.feasible,
+                         initial_assignment.assigned_points},
         0.0, instance.T_end, true,
         config.use_handovers, ObjectiveType::MIN_SUM, &budget);
   } catch (const SolverBudgetExpired&) {
@@ -683,13 +688,15 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
     const KineticSolution forward = KineticSolution::extend(
         instance,
         StaticAssignment{assignment.supporting_point, assignment.radius,
-                         assignment.cost, assignment.feasible},
+                         assignment.cost, assignment.feasible,
+                         assignment.assigned_points},
         midpoint, instance.T_end, true,
         config.use_handovers, ObjectiveType::MIN_SUM, &budget);
     const KineticSolution backward = KineticSolution::extend(
         instance,
         StaticAssignment{assignment.supporting_point, assignment.radius,
-                         assignment.cost, assignment.feasible},
+                         assignment.cost, assignment.feasible,
+                         assignment.assigned_points},
         midpoint, 0.0, false, config.use_handovers,
         ObjectiveType::MIN_SUM, &budget);
     KineticSolution candidate = join_directions(backward, forward, midpoint);

@@ -89,27 +89,25 @@ std::vector<kdc::SupportChangeEvent> reference_support_changes(
 
 std::vector<kdc::HandoverEvent> reference_handovers(
     const kdc::Instance& instance, int from, int to,
-    const std::vector<int>& supports, double start, double end,
-    bool forward) {
+    const std::vector<int>& supports, const std::vector<int>& owners,
+    double start, double end, bool forward) {
   const int support_from = supports[static_cast<kdc::Index>(from)];
   const int support_to = supports[static_cast<kdc::Index>(to)];
-  const auto station = instance.stations[static_cast<kdc::Index>(from)].pos;
-  const double radius =
-      (station - instance.trajectories[
-                     static_cast<kdc::Index>(support_from)]
-                     .position(start))
-          .norm();
   std::vector<std::pair<double, int>> assigned;
+  const auto station_from =
+      instance.stations[static_cast<kdc::Index>(from)].pos;
   for (int point = 0; point < instance.n; ++point) {
-    const double distance =
-        (station - instance.trajectories[static_cast<kdc::Index>(point)]
-                       .position(start))
-            .norm();
-    if (distance <= radius + 1e-9) {
-      assigned.emplace_back(distance, point);
+    if (owners[static_cast<kdc::Index>(point)] != from) {
+      continue;
     }
+    const double distance =
+        (station_from - instance.trajectories[static_cast<kdc::Index>(point)]
+                            .position(start))
+            .norm();
+    assigned.emplace_back(distance, point);
   }
-  if (assigned.size() < 2U) {
+  if (assigned.size() < 2U || owners[static_cast<kdc::Index>(support_from)] != from ||
+      owners[static_cast<kdc::Index>(support_to)] != to) {
     return {};
   }
   std::sort(assigned.begin(), assigned.end(),
@@ -119,10 +117,32 @@ std::vector<kdc::HandoverEvent> reference_handovers(
             });
   const int second_support = assigned[1].second;
   std::vector<kdc::HandoverEvent> result;
+  const auto station_to =
+      instance.stations[static_cast<kdc::Index>(to)].pos;
+  const auto& transferred = instance.trajectories[
+      static_cast<kdc::Index>(support_from)];
+  const auto& receiver_support = instance.trajectories[
+      static_cast<kdc::Index>(support_to)];
   for (const auto& event : reference_support_changes(
-           instance, from, support_from, start, end, forward)) {
-    if (event.new_supporting_point == second_support) {
-      result.push_back({event.time, from, to, support_to, second_support,
+           instance, to, support_to, start, end, forward)) {
+    if (event.new_supporting_point != support_from) {
+      continue;
+    }
+    const auto velocity = [](const kdc::Trajectory& trajectory, double time) {
+      const auto segment =
+          static_cast<kdc::Index>(trajectory.segment_index(time));
+      return (trajectory.waypoints[segment + 1U] -
+              trajectory.waypoints[segment]) *
+             (1.0 / (trajectory.t_breaks[segment + 1U] -
+                     trajectory.t_breaks[segment]));
+    };
+    const auto difference_derivative =
+        2.0 * ((transferred.position(event.time) - station_to)
+                   .dot(velocity(transferred, event.time)) -
+               (receiver_support.position(event.time) - station_to)
+                   .dot(velocity(receiver_support, event.time)));
+    if ((forward ? 1.0 : -1.0) * difference_derivative < -1e-12) {
+      result.push_back({event.time, from, to, support_from, second_support,
                         support_to, true});
     }
   }
@@ -275,6 +295,7 @@ TEST_CASE("Events exactly at first, interior, and last breakpoints are retained"
 TEST_CASE("Precomputed handover sets match the reference derivation") {
   const auto instance = make_piecewise_instance();
   const std::vector<int> supports{0, 2};
+  const std::vector<int> owners{0, 0, 1};
   std::vector<kdc::HandoverEvent> expected_all_from;
   kdc::HandoverEvent expected_next;
   for (int from = 0; from < instance.m; ++from) {
@@ -283,9 +304,9 @@ TEST_CASE("Precomputed handover sets match the reference derivation") {
         continue;
       }
       const auto expected = reference_handovers(
-          instance, from, to, supports, 0.0, 1.0, true);
+          instance, from, to, supports, owners, 0.0, 1.0, true);
       const auto actual = kdc::KineticCore::find_handovers(
-          instance, from, to, supports, 0.0, 1.0, true);
+          instance, from, to, supports, owners, 0.0, 1.0, true);
       require_same_handovers(actual, expected);
       expected_all_from.insert(expected_all_from.end(), expected.begin(),
                                expected.end());
@@ -296,21 +317,21 @@ TEST_CASE("Precomputed handover sets match the reference derivation") {
     }
   }
   const auto all_from =
-      kdc::KineticCore::find_handovers_from(instance, 0, supports, 0.0, 1.0,
-                                            true);
+      kdc::KineticCore::find_handovers_from(instance, 0, supports, owners, 0.0,
+                                            1.0, true);
   std::vector<kdc::HandoverEvent> expected_from;
   for (int to = 0; to < instance.m; ++to) {
     if (to == 0) {
       continue;
     }
     const auto pair = reference_handovers(
-        instance, 0, to, supports, 0.0, 1.0, true);
+        instance, 0, to, supports, owners, 0.0, 1.0, true);
     expected_from.insert(expected_from.end(), pair.begin(), pair.end());
   }
   require_same_handovers(all_from, expected_from);
 
   const auto actual_next = kdc::KineticCore::find_next_handover(
-      instance, supports, 0.0, 1.0, true);
+      instance, supports, owners, 0.0, 1.0, true);
   REQUIRE(actual_next.valid == expected_next.valid);
   if (expected_next.valid) {
     require_same_handovers({actual_next}, {expected_next});
@@ -354,10 +375,11 @@ TEST_CASE("KineticCore finds support changes and resolves ties") {
 
 TEST_CASE("KineticCore selects assigned supports for handovers") {
   const auto instance = kdc::test::make_instance_linear(
-      {{kdc::Point(-4, 0), kdc::Point(-4, 0)},
-       {kdc::Point(-2, 0), kdc::Point(-6, 0)},
-       {kdc::Point(5, 0), kdc::Point(5, 0)}},
+      {{kdc::Point(2, 0), kdc::Point(2, 0)},
+       {kdc::Point(1, 0), kdc::Point(1, 0)},
+       {kdc::Point(7, 0), kdc::Point(1, 0)}},
       {{0, 0}, {10, 0}});
+  const std::vector<int> owners{0, 0, 1};
 
   SECTION("second furthest") {
     REQUIRE(kdc::KineticCore::second_furthest_assigned(
@@ -366,28 +388,29 @@ TEST_CASE("KineticCore selects assigned supports for handovers") {
 
   SECTION("handover simple") {
     const auto events = kdc::KineticCore::find_handovers(
-        instance, 0, 1, {0, 2}, 0.0, 1.0, true);
+        instance, 0, 1, {0, 2}, owners, 0.0, 1.0, true);
     REQUIRE(events.size() == 1U);
-    REQUIRE(kdc::test::near(events.front().time, 0.5));
+    REQUIRE(kdc::test::near(events.front().time, 5.0 / 6.0));
     REQUIRE(events.front().from_station == 0);
     REQUIRE(events.front().to_station == 1);
-    REQUIRE(events.front().point_id == 2);
+    REQUIRE(events.front().point_id == 0);
     REQUIRE(events.front().new_support_from == 1);
     REQUIRE(events.front().new_support_to == 2);
     REQUIRE(events.front().valid);
     const auto next =
-        kdc::KineticCore::find_next_handover(instance, {0, 2}, 0.0, 1.0,
-                                             true);
+        kdc::KineticCore::find_next_handover(instance, {0, 2}, owners, 0.0,
+                                             1.0, true);
     REQUIRE(next.valid);
-    REQUIRE(kdc::test::near(next.time, 0.5));
+    REQUIRE(kdc::test::near(next.time, 5.0 / 6.0));
   }
 
   SECTION("no handover if p3 == -1") {
     const auto one_point = kdc::test::make_instance_linear(
-        {{kdc::Point(0, 0), kdc::Point(0, 0)}},
+        {{kdc::Point(0, 0), kdc::Point(0, 0)},
+         {kdc::Point(10, 0), kdc::Point(10, 0)}},
         {{0, 0}, {10, 0}});
     REQUIRE(kdc::KineticCore::find_handovers(
-                one_point, 0, 1, {0, 0}, 0.0, 1.0, true)
+                one_point, 0, 1, {0, 1}, {0, 1}, 0.0, 1.0, true)
                 .empty());
   }
 }

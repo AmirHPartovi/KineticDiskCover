@@ -92,10 +92,12 @@ def _safe_name(name: object) -> str:
 def save_fig(fig: plt.Figure, name: str) -> tuple[Path, Path]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     stem = OUTPUT_DIR / name
-    fig.savefig(stem.with_suffix(".png"), dpi=FIGURE_DPI)
-    fig.savefig(stem.with_suffix(".pdf"))
+    png_path = Path(f"{stem}.png")
+    pdf_path = Path(f"{stem}.pdf")
+    fig.savefig(png_path, dpi=FIGURE_DPI)
+    fig.savefig(pdf_path)
     plt.close(fig)
-    return stem.with_suffix(".png"), stem.with_suffix(".pdf")
+    return png_path, pdf_path
 
 
 def annotate_best(ax: plt.Axes, df: pd.DataFrame, metric: str) -> None:
@@ -713,47 +715,60 @@ def convergence_trace_per_algorithm(
 
 
 def convergence_all_instances(df: pd.DataFrame,
-                              output: str | Path | None = None) -> str:
+                              output: str | Path | None = None) -> list[str]:
     instances = sorted(df.instance_name.unique())
     if not instances:
         instances = ["no_instances"]
-    columns = min(3, len(instances))
-    rows = int(math.ceil(len(instances) / columns))
-    fig, axes = plt.subplots(rows, columns,
-                             figsize=(6 * columns, 4 * rows), squeeze=False)
-    for ax, instance in zip(axes.flat, instances):
-        subset = df[df.instance_name == instance]
-        for index, (algorithm, objective) in enumerate(
-            subset[["algorithm_name", "objective"]].drop_duplicates().itertuples(
-                index=False, name=None
-            )
-        ):
-            trace = _read_trace(df, instance, algorithm, objective)
-            if trace.empty:
-                continue
-            color = ALGORITHM_PALETTE[index % len(ALGORITHM_PALETTE)]
-            ax.plot(trace["iter"], np.maximum(trace["gap"], 1e-12),
-                    marker=OBJECTIVE_MARKERS.get(objective, "o"),
-                    color=color, label=f"{algorithm} ({objective})")
-        ax.set_title(str(instance))
-        ax.set_xlabel("Iteration")
-        ax.set_ylabel("Relative optimality gap")
-        ax.set_yscale("log")
-        if ax.get_legend_handles_labels()[0]:
-            ax.legend(fontsize=7)
-        else:
-            ax.legend(handles=[
-                plt.Line2D([], [], marker="o", color="gray", label="No traces")
-            ])
-        ax.grid(True, which="both", alpha=0.25)
-    for ax in axes.flat[len(instances):]:
-        ax.set_visible(False)
-    fig.suptitle("Convergence traces across instances")
-    save_fig(fig, "F2_convergence_grid")
-    _remember("F2_convergence_grid", "Per-instance overlay of MinMax and MinSum "
-              "convergence traces.", "Compare convergence behavior across the "
-              "full dataset.")
-    return "F2_convergence_grid"
+    page_size = 24
+    names = []
+    page_count = int(math.ceil(len(instances) / page_size))
+    for page_index, start in enumerate(range(0, len(instances), page_size), 1):
+        page_instances = instances[start:start + page_size]
+        columns = min(3, len(page_instances))
+        rows = int(math.ceil(len(page_instances) / columns))
+        fig, axes = plt.subplots(rows, columns,
+                                 figsize=(6 * columns, 4 * rows), squeeze=False)
+        for ax, instance in zip(axes.flat, page_instances):
+            subset = df[df.instance_name == instance]
+            for index, (algorithm, objective) in enumerate(
+                subset[["algorithm_name", "objective"]].drop_duplicates().itertuples(
+                    index=False, name=None
+                )
+            ):
+                trace = _read_trace(df, instance, algorithm, objective)
+                if trace.empty:
+                    continue
+                color = ALGORITHM_PALETTE[index % len(ALGORITHM_PALETTE)]
+                ax.plot(trace["iter"], np.maximum(trace["gap"], 1e-12),
+                        marker=OBJECTIVE_MARKERS.get(objective, "o"),
+                        color=color, label=f"{algorithm} ({objective})")
+            ax.set_title(str(instance))
+            ax.set_xlabel("Iteration")
+            ax.set_ylabel("Relative optimality gap")
+            ax.set_yscale("log")
+            if ax.get_legend_handles_labels()[0]:
+                ax.legend(fontsize=7)
+            else:
+                ax.legend(handles=[
+                    plt.Line2D([], [], marker="o", color="gray", label="No traces")
+                ])
+            ax.grid(True, which="both", alpha=0.25)
+        for ax in axes.flat[len(page_instances):]:
+            ax.set_visible(False)
+        name = ("F2_convergence_grid" if page_count == 1 else
+                f"F2_convergence_grid_{page_index:03d}")
+        fig.suptitle(
+            "Convergence traces across instances"
+            if page_count == 1 else
+            f"Convergence traces across instances "
+            f"(page {page_index}/{page_count})"
+        )
+        save_fig(fig, name)
+        _remember(name, "Per-instance overlay of MinMax and MinSum "
+                  "convergence traces.", "Compare convergence behavior across "
+                  "the full dataset.")
+        names.append(name)
+    return names
 
 
 def runtime_ecdf(df: pd.DataFrame, output: str | Path | None = None) -> str:
@@ -895,6 +910,12 @@ def write_report(df: pd.DataFrame, output: str | Path,
         f"- Algorithms: {df.algorithm_name.nunique() if not df.empty else 0}",
         f"- n range: {_range_text(df, 'n')}",
         f"- m range: {_range_text(df, 'm')}",
+        "- Plot-level comparison subset: records with `feasible == true` and "
+        "`verified == true`, with finite plotted metrics. Failed and timed-out "
+        "records remain represented in the separate raw result integrity report.",
+        "- Gap values are empirical/result-schema quantities; they are not "
+        "theoretical approximation guarantees or certified gaps unless "
+        "explicitly identified as `certified_gap` in raw records.",
         "",
         "## Summary statistics",
         "",
@@ -1108,7 +1129,7 @@ def generate_figures(df: pd.DataFrame, output: str | Path,
             convergence_trace_per_algorithm(df, instance_name=str(instance))
             for instance in sorted(df.instance_name.unique())
         ),
-        "F2": lambda: names.append(convergence_all_instances(df)),
+        "F2": lambda: names.extend(convergence_all_instances(df)),
         "G1": lambda: names.append(summary_dashboard(df)),
         "D3": lambda: names.extend(_produce_extra_figures(
             df, fixed_m, fixed_n

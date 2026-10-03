@@ -227,3 +227,34 @@ TEST_CASE("MinSum solver verifies a moving instance") {
     REQUIRE(result.gap_trace[index] <= result.gap_trace[index - 1U] + 1e-9);
   }
 }
+
+TEST_CASE("MinSum NN extension transfers ownership at receiver entry") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(2.0, 0.0), kdc::Point(2.0, 0.0)},
+       {kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(7.0, 0.0), kdc::Point(1.0, 0.0)}},
+      {{0.0, 0.0}, {10.0, 0.0}});
+  kdc::NNStaticSolver nn_with_handover;
+  kdc::NNStaticSolver nn_without_handover;
+  kdc::MinSumSolver::Config with_config;
+  with_config.gap_target = 1e9;
+  with_config.max_iterations = 1;
+  kdc::MinSumSolver::Config without_config = with_config;
+  without_config.use_handovers = false;
+
+  const auto with_handover =
+      kdc::MinSumSolver::solve(instance, nn_with_handover, with_config);
+  const auto without_handover =
+      kdc::MinSumSolver::solve(instance, nn_without_handover, without_config);
+
+  REQUIRE(with_handover.solution.is_well_formed());
+  REQUIRE(with_handover.verified);
+  REQUIRE(with_handover.verification_kind ==
+          kdc::VerificationKind::CERTIFIED_CONTINUOUS);
+  REQUIRE(with_handover.solution.intervals.size() >= 2U);
+  REQUIRE(with_handover.solution.intervals.front().assigned_points[0] == 0);
+  REQUIRE(with_handover.solution.intervals.back().assigned_points[0] == 1);
+  REQUIRE(with_handover.solution.intervals.back().supporting_point[0] == 1);
+  REQUIRE(with_handover.total_integral <
+          without_handover.total_integral - 1e-8);
+}

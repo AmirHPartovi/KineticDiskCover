@@ -95,6 +95,17 @@ def test_radius_at_time():
     assert animate_best.radius_at(solution, 0, 0.5) == 1.0
 
 
+def test_interval_boundary_uses_post_handover_ownership():
+    instance = sample_instance()
+    solution = sample_solution(instance)
+    first = solution["intervals"][0]
+    second = dict(first, t_start=0.5, t_end=1.0, assigned_points=[0])
+    first["t_end"] = 0.5
+    solution["intervals"].append(second)
+
+    assert animate_best._interval_at(solution, 0.5) is second
+
+
 def test_cost_at_time():
     instance = sample_instance()
     solution = sample_solution(instance)
@@ -144,6 +155,61 @@ def test_animation_generation_smoke(tmp_path):
     assert len(created) == 1
     assert created[0].is_file()
     assert created[0].stat().st_size > 10_000
+
+
+def test_generates_one_animation_per_verified_algorithm(tmp_path):
+    batch, instances = make_animation_inputs(tmp_path)
+    records = json.loads((batch / "master_results.json").read_text())
+    original = records[0]
+    greedy_solution = (
+        batch / "runs" / "sample" / "greedy" / "minmax" / "solution.json"
+    )
+    greedy_solution.parent.mkdir(parents=True)
+    greedy_solution.write_text(
+        (batch / "runs" / "sample" / "nn" / "minmax" / "solution.json")
+        .read_text()
+    )
+    greedy_record = dict(original)
+    greedy_record["algorithm_name"] = "greedy"
+    greedy_record["solution_json_path"] = str(greedy_solution)
+    records.append(greedy_record)
+    (batch / "master_results.json").write_text(json.dumps(records))
+
+    created = animate_best.run(
+        batch, instances, tmp_path / "animations", "minmax",
+        fps=2, frames=5, dpi=70, all_algorithms=True,
+    )
+
+    assert len(created) == 2
+    assert {path.parent.name for path in created} == {"nn", "greedy"}
+    assert all(path.is_file() for path in created)
+
+
+def test_algorithm_filter_limits_generated_animations(tmp_path):
+    batch, instances = make_animation_inputs(tmp_path)
+    records = json.loads((batch / "master_results.json").read_text())
+    greedy_solution = (
+        batch / "runs" / "sample" / "greedy" / "minmax" / "solution.json"
+    )
+    greedy_solution.parent.mkdir(parents=True)
+    greedy_solution.write_text(
+        (batch / "runs" / "sample" / "nn" / "minmax" / "solution.json")
+        .read_text()
+    )
+    greedy_record = dict(records[0])
+    greedy_record["algorithm_name"] = "greedy"
+    greedy_record["solution_json_path"] = str(greedy_solution)
+    records.append(greedy_record)
+    (batch / "master_results.json").write_text(json.dumps(records))
+
+    created = animate_best.run(
+        batch, instances, tmp_path / "animations", "minmax",
+        fps=2, frames=5, dpi=70, all_algorithms=True, algorithm="greedy",
+    )
+
+    assert len(created) == 1
+    assert created[0].parent.name == "greedy"
+    assert created[0].is_file()
 
 
 def test_skips_instance_without_verified_run(tmp_path, caplog):

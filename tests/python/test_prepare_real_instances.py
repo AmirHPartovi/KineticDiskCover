@@ -40,6 +40,21 @@ def test_converts_public_mdc_to_solver_instance(tmp_path):
     }
 
 
+def test_converts_legacy_center_coordinate_key(tmp_path):
+    source = tmp_path / "legacy.mdc"
+    source.write_text(json.dumps({
+        "name": "legacy",
+        "moving_points": [
+            {"start": {"coord": [1, 2]}, "end": {"coord": [3, 4]}},
+        ],
+        "centers": [{"center": [5, 6]}],
+    }))
+
+    converted = prepare_real_instances.convert_instance(source, 0)
+
+    assert converted["stations"] == [{"id": 0, "x": 5.0, "y": 6.0}]
+
+
 def test_converts_full_public_dataset(tmp_path):
     source = ROOT / "data" / "instances" / "public_instance_set"
     output = tmp_path / "canonical"

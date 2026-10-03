@@ -35,6 +35,12 @@ TEST_CASE("SolutionSerializer: round-trip minmax solution") {
   const auto loaded = kdc::SolutionSerializer::load_json(instance, path.string());
 
   REQUIRE(loaded.intervals.size() == result.solution.intervals.size());
+  for (kdc::Index index = 0; index < loaded.intervals.size(); ++index) {
+    REQUIRE(loaded.intervals[index].assigned_points ==
+            result.solution.intervals[index].assigned_points);
+    REQUIRE(loaded.intervals[index].supporting_point ==
+            result.solution.intervals[index].supporting_point);
+  }
   REQUIRE(kdc::test::near(loaded.peak_cost(), result.solution.peak_cost(),
                           1e-6));
   REQUIRE(kdc::test::near(loaded.total_integral(),
@@ -54,6 +60,34 @@ TEST_CASE("SolutionSerializer: round-trip minsum solution") {
 
   REQUIRE(kdc::test::near(loaded.total_integral(),
                           result.solution.total_integral(), 1e-6));
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("SolutionSerializer: round-trip handover ownership intervals") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(2.0, 0.0), kdc::Point(2.0, 0.0)},
+       {kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(7.0, 0.0), kdc::Point(1.0, 0.0)}},
+      {{0.0, 0.0}, {10.0, 0.0}});
+  const kdc::StaticAssignment assignment{
+      {0, 2}, {2.0, 3.0}, 13.0 * std::acos(-1.0), true, {0, 0, 1}};
+  const auto solution = kdc::KineticSolution::extend(
+      instance, assignment, 0.0, 1.0, true, true,
+      kdc::ObjectiveType::MIN_SUM);
+  const auto path = temporary_path("-handover.json");
+
+  kdc::SolutionSerializer::save_json(instance, solution, path.string());
+  const auto loaded = kdc::SolutionSerializer::load_json(instance, path.string());
+
+  REQUIRE(loaded.intervals.size() == 2U);
+  REQUIRE(loaded.intervals[0].assigned_points ==
+          std::vector<int>{0, 0, 1});
+  REQUIRE(loaded.intervals[1].assigned_points ==
+          std::vector<int>{1, 0, 1});
+  REQUIRE(loaded.intervals[0].supporting_point ==
+          std::vector<int>{0, 2});
+  REQUIRE(loaded.intervals[1].supporting_point ==
+          std::vector<int>{1, 2});
   std::filesystem::remove(path);
 }
 

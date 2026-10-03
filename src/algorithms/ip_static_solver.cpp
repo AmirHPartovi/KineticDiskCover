@@ -42,6 +42,7 @@ StaticSolution IPStaticSolver::solve(const Instance& instance, double time) {
   StaticSolution solution;
   solution.supporting_point = assignment.supporting_point;
   solution.radius = assignment.radius;
+  solution.assigned_points = assignment.assigned_points;
   solution.cost = assignment.cost;
   solution.feasible = assignment.feasible;
   solution.lower_bound =

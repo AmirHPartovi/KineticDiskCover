@@ -3,6 +3,30 @@
 `kdc-solver` is a C++17 project scaffold for kinetic discrepancy correction
 models. Its optimization backend is KONT, which uses the COPT-compatible API.
 
+## Reproducible experiment pipeline
+
+Run the end-to-end research workflow from any current working directory with:
+
+```bash
+bash scripts/run_experiment.sh
+```
+
+The orchestrator snapshots or converts the dataset, runs preflight and the FAST
+benchmark, validates raw records, generates tables and PNG/PDF figures, then
+uses the selected exact backend for separate animation solves. Each run is
+stored under `results/experiments/<EXPERIMENT_ID>/` with stage logs, a complete
+manifest, integrity checks, and reports. Use `bash scripts/run_experiment.sh --help`
+for dataset, algorithm, objective, time-limit, backend, animation,
+skip, and resume options. Resume requires the same dataset fingerprint and
+benchmark configuration.
+
+FAST keeps the existing low-serialization profile. Exact animations are made
+only when the exact-reference result is feasible, continuously verified, and
+marked `OPTIMAL`; feasible or timed-out results remain reported but are not
+animated as exact. Figure summaries may filter to feasible, verified records;
+the raw integrity report retains timeout and failure counts. Empirical ratios
+are not theoretical approximation guarantees.
+
 ## Prerequisites
 
 * CMake 3.20 or newer.
@@ -197,13 +221,16 @@ the solver lower bound and status.
 `kdc::KineticCore` provides stable quadratic roots, support-change and
 handover event detection across piecewise-linear trajectories, second-furthest
 assigned-support selection, and derivative-based resolution for equidistant
-supports.
+supports. Static assignments include an explicit point-to-station ownership
+map. Handover events transfer the source's owned support only when it enters
+the receiving station's current disk; each kinetic interval serializes the
+resulting ownership map alongside its supporting points.
 
 `kdc::KineticSolution` stores piecewise quadratic cost intervals and evaluates
 costs, integrals, peak values/times, and structural consistency. It can extend
 a stationary assignment across kinetic support and handover events, combine
-two interval solutions under either objective, and truncate an extension at an
-integral intersection.
+two interval solutions using their pointwise lower envelope, and truncate
+non-MinSum extensions at a cumulative-integral crossing.
 
 `kdc::MinMaxSolver` iteratively solves stationary IPs at the current peak time,
 extends and combines the resulting kinetic assignments, tracks a monotone
@@ -216,8 +243,12 @@ Stop conditions include the global deadline, iteration cap, stagnation
 patience, and negligible objective improvement. The optional `sampled`
 (`CERTIFIED_BOUND`) policy performs sampled static solves to guide refinement,
 but their trapezoidal integral is heuristic, not a certified continuous-time
-lower bound. Select the policy with `--minsum-refinement-policy adaptive|sampled`
-for solve, batch, or benchmark commands.
+lower bound. MinSum combines candidates by splitting intervals at roots where
+their quadratic instantaneous area costs cross, then selecting the cheaper
+candidate at each time; candidate generation remains heuristic and does not
+certify global optimality. Select the policy with
+`--minsum-refinement-policy adaptive|sampled` for solve, batch, or benchmark
+commands.
 
 `kdc::StaticSolverRegistry` provides the `nn`, `greedy`, `lp-rounding`,
 `primal-dual`, `local-search`, `sa`, `genetic`, and `shifting` heuristics and

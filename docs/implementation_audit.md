@@ -91,6 +91,14 @@ nonnegative-cost bound zero as the independent certified integral lower
 bound, and neither emits a certified gap because the kinetic solver does not
 prove global optimality. Timeout never establishes optimality.
 
+MinSum candidate combination splits every common kinetic interval at the
+real roots of the candidates' instantaneous quadratic area-cost difference,
+then selects the lower-cost candidate on each resulting open interval before
+integrating. MinSum candidate generation retains the full kinetic extension;
+it is not truncated by a cumulative-integral crossing. Thus the lower-envelope
+combination is pointwise correct, while the set of generated candidates and
+the stopping policy remain heuristic.
+
 ### Verification and continuous feasibility
 
 `Verifier::verify` now delegates to `verify_continuous`; the requested sample
@@ -138,17 +146,27 @@ including cached duration, start position, velocity, and affine origin.
 Support-event construction uses those segment velocities and evaluates each
 shared segment start once instead of deriving velocity from trajectory
 positions at both ends. `find_next_event` reuses that precompute across
-stations; handover searches determine the second assigned support and support
-events once per source station rather than once per station pair. Integral
-handover refinement uses the grouped source-station search. No event-result
-cache is used, avoiding incomplete cache keys or unbounded event storage.
+stations. Static assignments now carry a point-to-station ownership map;
+static solver outputs are converted into a disjoint ownership partition whose
+assigned points remain within their owning disks and whose supports are owned
+by the corresponding station.
 
-`KineticSolution::extend` reuses one query geometry for initial assignment
-ownership, uses precomputed affine segments for probe positions, derivatives,
-and cost coefficients, and finds the next trajectory breakpoint through one
-sorted instance-wide breakpoint list. There is no profiler-backed benchmark
-in the test suite establishing the relative costs of remaining kinetic
-operations.
+Handover detection considers only points owned by the source. It transfers the
+source's current support when that point enters the receiving station's
+current disk, recomputes both stations' supports from the post-transfer owner
+partition, and rejects transitions whose recomputed total instantaneous disk
+area exceeds the pre-transfer area beyond tolerance. Kinetic extension updates
+the owner map at the event and recomputes supports from the resulting
+partition. MinSum integral handover refinement uses the same event detector
+and additionally requires a strict reduction in the interval integral.
+Serialized solution intervals retain the owner map, and both animation paths
+use it directly rather than infer an owner from overlapping disk geometry.
+
+`KineticSolution::extend` uses precomputed affine segments for probe positions,
+derivatives, and cost coefficients, and finds the next trajectory breakpoint
+through one sorted instance-wide breakpoint list. There is no
+profiler-backed benchmark in the test suite establishing the relative costs
+of remaining kinetic operations.
 
 ### Exact reference and algorithm selection
 

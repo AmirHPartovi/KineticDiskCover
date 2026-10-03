@@ -213,6 +213,8 @@ KineticSolution KineticSolution::extend(
       init_assignment.supporting_point.size() !=
           static_cast<Index>(instance.m) ||
       init_assignment.radius.size() != static_cast<Index>(instance.m) ||
+      init_assignment.assigned_points.size() !=
+          static_cast<Index>(instance.n) ||
       instance.n < 0 || instance.m < 0 ||
       instance.trajectories.size() != static_cast<Index>(instance.n) ||
       instance.stations.size() != static_cast<Index>(instance.m)) {
@@ -220,6 +222,7 @@ KineticSolution KineticSolution::extend(
   }
 
   std::vector<int> supports = init_assignment.supporting_point;
+  std::vector<int> owners = init_assignment.assigned_points;
   for (const int support : supports) {
     if (budget != nullptr) {
       budget->checkpoint();
@@ -228,12 +231,20 @@ KineticSolution KineticSolution::extend(
       throw std::out_of_range("initial supporting point is invalid");
     }
   }
-  std::vector<int> owners(static_cast<Index>(instance.n), -1);
-  std::vector<Value> owner_radii(static_cast<Index>(instance.n),
-                                 std::numeric_limits<Value>::infinity());
   const auto precomputed = CandidateSet::precompute(instance, budget);
   const auto initial_geometry =
       CandidateSet::build_geometry(instance, *precomputed, t_start, budget);
+  std::vector<bool> station_has_points(static_cast<Index>(instance.m), false);
+  for (int point_id = 0; point_id < instance.n; ++point_id) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    const int owner = owners[static_cast<Index>(point_id)];
+    if (owner < 0 || owner >= instance.m) {
+      throw std::invalid_argument("initial assignment has an invalid owner");
+    }
+    station_has_points[static_cast<Index>(owner)] = true;
+  }
   for (int station_id = 0; station_id < instance.m; ++station_id) {
     if (budget != nullptr) {
       budget->checkpoint();
@@ -243,29 +254,26 @@ KineticSolution KineticSolution::extend(
         init_assignment.radius[station_index] < 0.0) {
       throw std::invalid_argument("initial assignment has an invalid radius");
     }
-    for (int point_id = 0; point_id < instance.n; ++point_id) {
-      if (budget != nullptr) {
-        budget->checkpoint();
-      }
-      const Index point_index = static_cast<Index>(point_id);
-      const Value radius =
-          init_assignment.radius[station_index] + kIntervalTolerance;
-      const Value distance_squared = initial_geometry.distance_squared(
-          station_index, point_index, static_cast<Index>(instance.n));
-      if (distance_squared <= radius * radius &&
-          init_assignment.radius[station_index] < owner_radii[point_index]) {
-        owner_radii[point_index] = init_assignment.radius[station_index];
-        owners[point_index] = station_id;
-      }
-    }
-  }
-  for (const int owner : owners) {
-    if (budget != nullptr) {
-      budget->checkpoint();
-    }
-    if (owner == -1) {
+    const int support = supports[station_index];
+    if ((support < 0 && station_has_points[station_index]) ||
+        (support >= 0 &&
+         owners[static_cast<Index>(support)] != station_id)) {
       throw std::invalid_argument(
-          "initial assignment does not cover every point at t_start");
+          "initial support and explicit ownership do not agree");
+    }
+    for (int point_id = 0; point_id < instance.n; ++point_id) {
+      if (owners[static_cast<Index>(point_id)] != station_id) {
+        continue;
+      }
+      const Value distance_squared = initial_geometry.distance_squared(
+          station_index, static_cast<Index>(point_id),
+          static_cast<Index>(instance.n));
+      const Value radius = init_assignment.radius[station_index];
+      if (distance_squared >
+          radius * radius + 2e-9 * radius + 1e-18) {
+        throw std::invalid_argument(
+            "initial ownership assigns a point outside its disk");
+      }
     }
   }
   KineticSolution solution;
@@ -313,6 +321,103 @@ KineticSolution KineticSolution::extend(
       if (distance_squared > farthest_distance[station_index]) {
         farthest_distance[station_index] = distance_squared;
         supports[station_index] = point_id;
+      }
+    }
+    if (use_handovers) {
+      bool transferred = false;
+      for (int station_from = 0; station_from < instance.m && !transferred;
+           ++station_from) {
+        if (budget != nullptr) {
+          budget->checkpoint();
+        }
+        const int support_from =
+            supports[static_cast<Index>(station_from)];
+        if (support_from < 0) {
+          continue;
+        }
+        std::vector<int> source_points;
+        for (int point_id = 0; point_id < instance.n; ++point_id) {
+          if (owners[static_cast<Index>(point_id)] == station_from) {
+            source_points.push_back(point_id);
+          }
+        }
+        const int second_support = KineticCore::second_furthest_assigned(
+            instance, station_from, source_points, current_time, budget);
+        if (second_support < 0) {
+          continue;
+        }
+        const Point source_station =
+            instance.stations[static_cast<Index>(station_from)].pos;
+        const Value source_radius_squared =
+            (precomputed->position(static_cast<Index>(support_from),
+                                   current_time) -
+             source_station)
+                .norm2();
+        const Value second_radius_squared =
+            (precomputed->position(static_cast<Index>(second_support),
+                                   current_time) -
+             source_station)
+                .norm2();
+        const Value source_tolerance =
+            64.0 * std::numeric_limits<Value>::epsilon() *
+            std::max(source_radius_squared, second_radius_squared);
+        if (second_radius_squared >=
+            source_radius_squared - source_tolerance) {
+          continue;
+        }
+        for (int station_to = 0; station_to < instance.m; ++station_to) {
+          if (budget != nullptr) {
+            budget->checkpoint();
+          }
+          const int support_to = supports[static_cast<Index>(station_to)];
+          if (station_to == station_from || support_to < 0) {
+            continue;
+          }
+          const Point receiver_station =
+              instance.stations[static_cast<Index>(station_to)].pos;
+          const Value receiving_radius_squared =
+              (precomputed->position(static_cast<Index>(support_to),
+                                     current_time) -
+               receiver_station)
+                  .norm2();
+          const Value transferred_distance_squared =
+              (precomputed->position(static_cast<Index>(support_from),
+                                     current_time) -
+               receiver_station)
+                  .norm2();
+          const Value receiver_tolerance =
+              64.0 * std::numeric_limits<Value>::epsilon() *
+              std::max(transferred_distance_squared,
+                       receiving_radius_squared);
+          bool receiver_accepts =
+              transferred_distance_squared <
+              receiving_radius_squared - receiver_tolerance;
+          if (!receiver_accepts &&
+              std::abs(transferred_distance_squared -
+                       receiving_radius_squared) <= receiver_tolerance) {
+            const Value relative_derivative =
+                distance_derivative(instance, *precomputed, station_to,
+                                    support_from, current_time, forward) -
+                distance_derivative(instance, *precomputed, station_to,
+                                    support_to, current_time, forward);
+            const Value derivative_tolerance =
+                64.0 * std::numeric_limits<Value>::epsilon() *
+                std::max(1.0, std::abs(relative_derivative));
+            receiver_accepts =
+                direction * relative_derivative < -derivative_tolerance;
+          }
+          if (receiver_accepts) {
+            owners[static_cast<Index>(support_from)] = station_to;
+            transferred = true;
+            break;
+          }
+        }
+      }
+      if (transferred) {
+        if (++event_count > 100000U) {
+          throw std::runtime_error("kinetic extension exceeded event limit");
+        }
+        continue;
       }
     }
 
@@ -370,7 +475,7 @@ KineticSolution KineticSolution::extend(
     HandoverEvent handover_event;
     if (use_handovers) {
       handover_event = KineticCore::find_next_handover(
-          instance, supports, current_time, t_end, forward, budget);
+          instance, supports, owners, current_time, t_end, forward, budget);
       if (handover_event.valid &&
           direction * (handover_event.time - current_time) > 0.0 &&
           direction * (handover_event.time - next_time) < 0.0) {
@@ -460,21 +565,6 @@ KineticSolution KineticSolution::combine(const KineticSolution& s1,
     }
     const auto& interval1 = interval_at(s1, midpoint);
     const auto& interval2 = interval_at(s2, midpoint);
-    if (objective_type == ObjectiveType::MIN_SUM) {
-      const auto integral = [](const SolutionInterval& interval, Value lo,
-                               Value hi) {
-        return (interval.a / 3.0) * (hi * hi * hi - lo * lo * lo) +
-               (interval.b / 2.0) * (hi * hi - lo * lo) +
-               interval.c * (hi - lo);
-      };
-      const auto& selected =
-          integral(interval1, start, end) <= integral(interval2, start, end)
-              ? interval1
-              : interval2;
-      append_interval(result, selected, start, end);
-      continue;
-    }
-
     std::vector<Value> partitions{start, end};
     const auto roots = KineticCore::solve_quadratic(
         interval1.a - interval2.a, interval1.b - interval2.b,
@@ -540,54 +630,12 @@ KineticSolution KineticSolution::partial_extend(
                              current.intervals.back().t_end);
   KineticSolution result;
   result.objective = objective_type;
-  if (end <= start) {
+  if (objective_type == ObjectiveType::MIN_SUM) {
+    result = new_solution;
+    result.objective = objective_type;
     return result;
   }
-
-  if (objective_type == ObjectiveType::MIN_SUM) {
-    std::vector<Value> breakpoints{start, end};
-    const auto add_overlap_breakpoints =
-        [&breakpoints, start, end](const KineticSolution& solution) {
-          for (const auto& interval : solution.intervals) {
-            if (interval.t_start > start && interval.t_start < end) {
-              breakpoints.push_back(interval.t_start);
-            }
-            if (interval.t_end > start && interval.t_end < end) {
-              breakpoints.push_back(interval.t_end);
-            }
-          }
-        };
-    add_overlap_breakpoints(new_solution);
-    add_overlap_breakpoints(current);
-    std::sort(breakpoints.begin(), breakpoints.end());
-    breakpoints.erase(
-        std::unique(breakpoints.begin(), breakpoints.end(),
-                    [](Value lhs, Value rhs) {
-                      return std::abs(lhs - rhs) <= kIntervalTolerance;
-                    }),
-        breakpoints.end());
-    for (Index index = 0; index + 1U < breakpoints.size(); ++index) {
-      if (budget != nullptr) {
-        budget->checkpoint();
-      }
-      const Value lo = breakpoints[index];
-      const Value hi = breakpoints[index + 1U];
-      const Value midpoint = lo + (hi - lo) / 2.0;
-      const auto& new_interval = interval_at(new_solution, midpoint);
-      const auto& current_interval = interval_at(current, midpoint);
-      const auto integrate = [](const SolutionInterval& interval, Value from,
-                                Value to) {
-        return (interval.a / 3.0) * (to * to * to - from * from * from) +
-               (interval.b / 2.0) * (to * to - from * from) +
-               interval.c * (to - from);
-      };
-      if (integrate(new_interval, lo, hi) >
-          integrate(current_interval, lo, hi) + kIntervalTolerance) {
-        break;
-      }
-      append_interval(result, new_interval, lo, hi);
-    }
-    result.remove_duplicates();
+  if (end <= start) {
     return result;
   }
 

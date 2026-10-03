@@ -66,12 +66,23 @@ def main() -> int:
                         help="remove the project's build/ directory first")
     parser.add_argument("--kont-root", default=os.environ.get("KONT_ROOT", ""),
                         help="KONT installation root (defaults to KONT_ROOT)")
+    parser.add_argument("--build-jobs", type=int,
+                        default=min(4, max(1, os.cpu_count() or 1)),
+                        help="maximum parallel build jobs (default: up to 4)")
     args = parser.parse_args()
+    if args.build_jobs <= 0:
+        parser.error("--build-jobs must be positive")
 
     if args.clean and BUILD.exists():
         shutil.rmtree(BUILD)
     BUILD.mkdir(parents=True, exist_ok=True)
     RESULTS.mkdir(parents=True, exist_ok=True)
+    REPORT.write_text(
+        "# Pre-flight report\n\n"
+        "The current pre-flight attempt did not finish. See `00_preflight_summary.md` "
+        "and the pipeline log for stage details.\n",
+        encoding="utf-8",
+    )
 
     status = {"configure": "FAIL", "build": "SKIPPED", "tests": "SKIPPED"}
     passed_tests = 0
@@ -87,12 +98,14 @@ def main() -> int:
     if configure.returncode == 0:
         status["configure"] = "PASS"
         build = run(["cmake", "--build", str(BUILD), "--parallel",
-                     str(max(1, os.cpu_count() or 1))], ROOT)
+                     str(args.build_jobs)], ROOT)
         status["build"] = "PASS" if build.returncode == 0 else "FAIL"
 
         if build.returncode == 0:
+            test_command = ["ctest", "--output-on-failure"]
+            print("+", " ".join(test_command), flush=True)
             test = subprocess.run(
-                ["ctest", "--output-on-failure"], cwd=BUILD, text=True,
+                test_command, cwd=BUILD, text=True,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
             print(test.stdout, end="", flush=True)
             passed_tests, failed_tests = test_counts(test.stdout)
