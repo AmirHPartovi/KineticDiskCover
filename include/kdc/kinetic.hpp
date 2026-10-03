@@ -45,16 +45,19 @@ class KineticCore {
 
   static std::vector<HandoverEvent> find_handovers(
       const Instance& instance, int station_from, int station_to,
-      const std::vector<int>& current_supports, double t_start, double t_end,
+      const std::vector<int>& current_supports,
+      const std::vector<int>& assigned_points, double t_start, double t_end,
       bool forward, SolverBudget* budget = nullptr);
   static std::vector<HandoverEvent> find_handovers_from(
       const Instance& instance, int station_from,
-      const std::vector<int>& current_supports, double t_start, double t_end,
+      const std::vector<int>& current_supports,
+      const std::vector<int>& assigned_points, double t_start, double t_end,
       bool forward, SolverBudget* budget = nullptr);
 
   static HandoverEvent find_next_handover(
       const Instance& instance, const std::vector<int>& current_supports,
-      double t_start, double t_end, bool forward,
+      const std::vector<int>& assigned_points, double t_start, double t_end,
+      bool forward,
       SolverBudget* budget = nullptr);
 
   static int second_furthest_assigned(

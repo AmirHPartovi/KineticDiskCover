@@ -128,8 +128,8 @@ def _interval_at(solution: dict[str, Any], time: float) -> dict[str, Any]:
     intervals = solution.get("intervals", [])
     if not intervals:
         raise ValueError("solution has no intervals")
-    for interval in intervals:
-        if time <= float(interval["t_end"]) + 1e-12:
+    for index, interval in enumerate(intervals):
+        if time < float(interval["t_end"]) or index + 1 == len(intervals):
             if time >= float(interval["t_start"]) - 1e-12:
                 return interval
     return intervals[-1]
@@ -243,6 +243,12 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     algorithm = str(record["algorithm_name"])
     stations = instance["stations"]
     trajectories = instance["trajectories"]
+    for interval in solution.get("intervals", []):
+        owners = interval.get("assigned_points")
+        if not isinstance(owners, list) or len(owners) != len(trajectories):
+            raise ValueError("solution assigned_points must match point count")
+        if any(int(owner) < 0 or int(owner) >= len(stations) for owner in owners):
+            raise ValueError("solution contains an invalid assigned station")
     times, costs, integrals = _frame_values(instance, solution, frames)
     colors = [STATION_COLORS(index % 10) for index in range(len(stations))]
 
@@ -263,10 +269,14 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
 
     point_scatter = scene.scatter([], [], s=35, edgecolors="black",
                                   linewidths=0.3, zorder=4, label="Moving points")
-    scene.scatter([station["x"] for station in stations],
-                  [station["y"] for station in stations],
-                  marker="^", s=110, color=colors, edgecolors="black",
-                  linewidths=0.5, zorder=5, label="Stations")
+    station_legend_handles = []
+    for index, station in enumerate(stations):
+        station_legend_handles.append(
+            scene.scatter([station["x"]], [station["y"]],
+                          marker="^", s=110, color=colors[index],
+                          edgecolors="black", linewidths=0.5, zorder=5,
+                          label=f"Station {index}")
+        )
     disks = []
     for index, station in enumerate(stations):
         patch = Circle((station["x"], station["y"]), 0.0,
@@ -282,6 +292,13 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     support_markers = [
         scene.scatter([], [], marker="o", s=75, facecolors="none",
                       edgecolors=colors[index], linewidths=1.5, zorder=6)
+        for index in range(len(stations))
+    ]
+    support_labels = [
+        scene.text(0.0, 0.0, "", color=colors[index], fontsize=8,
+                   ha="left", va="bottom", zorder=7,
+                   bbox={"facecolor": "white", "alpha": 0.75,
+                         "edgecolor": "none", "pad": 1})
         for index in range(len(stations))
     ]
 
@@ -338,21 +355,22 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     )
     gap_pct = float(record.get("gap", 0.0) or 0.0) * 100.0
     runtime = float(record.get("wall_time_sec", 0.0) or 0.0)
-    right_text = scene.text(
-        0.98, 0.97,
+    figure.text(
+        0.98, 0.91,
         f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
         f"final_integral = {float(summary.get('total_integral', final_integral)):.3f}\n"
         f"gap = {gap_pct:.2f}%\nruntime = {runtime:.3f} s",
-        transform=scene.transAxes, va="top", ha="right",
+        transform=figure.transFigure, va="top", ha="right", fontsize=8,
         bbox={"facecolor": "white", "alpha": 0.78, "edgecolor": "none"},
     )
-    del right_text
     figure.suptitle(
         f"Instance {instance_name} | n={len(trajectories)}, m={len(stations)}\n"
         f"Algorithm: {algorithm} | Objective: {mode}",
         fontsize=13,
     )
-    scene.legend(loc="lower right", fontsize=8)
+    figure.legend(handles=station_legend_handles, loc="center",
+                  bbox_to_anchor=(0.5, 0.85),
+                  ncol=max(1, len(station_legend_handles)), fontsize=8)
 
     def update(frame_index: int):
         time = float(times[frame_index])
@@ -363,18 +381,9 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         if positions.size:
             point_scatter.set_offsets(positions)
             interval = _interval_at(solution, time)
-            point_colors = []
-            for position in positions:
-                covering = []
-                for station_index in range(len(stations)):
-                    radius = radius_at(solution, station_index, time, instance)
-                    station = stations[station_index]
-                    if np.linalg.norm(position - [station["x"], station["y"]]) \
-                            <= radius + 1e-8:
-                        covering.append(station_index)
-                point_colors.append(
-                    colors[covering[0]] if covering else "#7f7f7f"
-                )
+            point_colors = [
+                colors[int(owner)] for owner in interval["assigned_points"]
+            ]
             point_scatter.set_color(point_colors)
             for station_index, patch in enumerate(disks):
                 radius = radius_at(solution, station_index, time, instance)
@@ -398,6 +407,15 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
                     support_markers[station_index].set_offsets(
                         np.empty((0, 2))
                     )
+                if 0 <= support < len(positions):
+                    support_labels[station_index].set_position(
+                        tuple(positions[support])
+                    )
+                    support_labels[station_index].set_text(
+                        f"S{station_index}:P{support}"
+                    )
+                else:
+                    support_labels[station_index].set_text("")
         time_indicator.set_xdata([time, time])
         left_text.set_text(
             f"t = {time:.3f}\n"
@@ -407,7 +425,7 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         )
         return [
             point_scatter, time_indicator, left_text, *disks,
-            *support_links, *support_markers,
+            *support_links, *support_markers, *support_labels,
         ]
 
     movie = animation.FuncAnimation(
@@ -437,7 +455,9 @@ def _safe_filename(value: str) -> str:
 
 def run(batch_dir: str | Path, instances_dir: str | Path,
         output_dir: str | Path, mode: str = "minmax", fps: int = 30,
-        frames: int = 200, dpi: int = 150, top_n: int = 0) -> list[Path]:
+        frames: int = 200, dpi: int = 150, top_n: int = 0,
+        all_algorithms: bool = False,
+        algorithm: str | None = None) -> list[Path]:
     batch_path = Path(batch_dir)
     with (batch_path / "master_results.json").open(encoding="utf-8") as source:
         records = json.load(source)
@@ -447,6 +467,13 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
     if dataframe.empty:
         LOGGER.warning("master_results.json contains no records")
         return []
+    if algorithm is not None:
+        dataframe = dataframe[
+            dataframe["algorithm_name"].astype(str).str.casefold()
+            == algorithm.casefold()
+        ]
+        if dataframe.empty:
+            raise ValueError(f"No results found for algorithm {algorithm!r}")
     modes = ("minmax", "minsum") if mode == "both" else (mode,)
     instances = sorted(dataframe["instance_name"].astype(str).unique())
     if top_n > 0:
@@ -460,23 +487,57 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
             continue
         instance = load_instance(instance_path)
         for objective in modes:
-            record = select_best(dataframe, instance_name, objective)
-            if record is None:
+            if all_algorithms:
+                eligible = dataframe[
+                    (dataframe["instance_name"].astype(str) == instance_name)
+                    & (dataframe["objective"].astype(str).str.lower()
+                       == objective.lower())
+                ]
+                algorithms = sorted(
+                    eligible["algorithm_name"].astype(str).unique()
+                )
+                selected_records = [
+                    select_best(eligible, instance_name, objective)
+                    if len(algorithms) == 1 else
+                    select_best(
+                        eligible[
+                            eligible["algorithm_name"].astype(str) == algorithm
+                        ],
+                        instance_name,
+                        objective,
+                    )
+                    for algorithm in algorithms
+                ]
+                selected_records = [
+                    record for record in selected_records if record is not None
+                ]
+            else:
+                record = select_best(dataframe, instance_name, objective)
+                selected_records = [] if record is None else [record]
+            if not selected_records:
                 LOGGER.warning(
                     "No feasible verified %s result for %s; skipping",
                     objective, instance_name,
                 )
                 continue
-            solution_path = _solution_path(batch_path, record)
-            if not solution_path.is_file():
-                LOGGER.warning(
-                    "Solution JSON is missing for %s / %s / %s: %s",
-                    instance_name, record.algorithm_name, objective, solution_path,
+            for record in selected_records:
+                algorithm_output = (
+                    output / _safe_filename(str(record["algorithm_name"]))
+                    if all_algorithms else output
                 )
-                continue
-            solution = load_solution(solution_path, instance)
-            created.append(make_animation(instance, solution, record, output,
-                                          objective, fps, frames, dpi))
+                solution_path = _solution_path(batch_path, record)
+                if not solution_path.is_file():
+                    LOGGER.warning(
+                        "Solution JSON is missing for %s / %s / %s: %s",
+                        instance_name, record.algorithm_name, objective,
+                        solution_path,
+                    )
+                    continue
+                solution = load_solution(solution_path, instance)
+                created.append(
+                    make_animation(instance, solution, record, algorithm_output,
+                                   objective, fps, frames, dpi)
+                )
     return created
 
 
@@ -491,6 +552,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--frames", type=int, default=200)
     parser.add_argument("--dpi", type=int, default=150)
     parser.add_argument("--top-n", type=int, default=0)
+    parser.add_argument(
+        "--all-algorithms", action="store_true",
+        help="animate the best verified result for each algorithm instead of "
+        "only the overall best result",
+    )
+    parser.add_argument(
+        "--algorithm",
+        help="restrict animation generation to this algorithm",
+    )
     args = parser.parse_args(argv)
     if args.fps <= 0 or args.frames < 2 or args.dpi <= 0 or args.top_n < 0:
         parser.error("--fps/--dpi must be positive, --frames >= 2, --top-n >= 0")
@@ -498,7 +568,8 @@ def main(argv: list[str] | None = None) -> int:
                         format="%(levelname)s: %(message)s")
     try:
         files = run(args.batch, args.instances, args.output, args.mode,
-                    args.fps, args.frames, args.dpi, args.top_n)
+                    args.fps, args.frames, args.dpi, args.top_n,
+                        args.all_algorithms, args.algorithm)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         LOGGER.error("%s", error)
         return 1

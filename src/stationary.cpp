@@ -12,6 +12,153 @@
 #include <vector>
 
 namespace kdc {
+StaticAssignment StationarySolver::assign_points_to_disks(
+    const Instance& instance, double time,
+    const std::vector<int>& supporting_points,
+    const std::vector<double>& radii, SolverBudget* budget) {
+  if (!std::isfinite(time) || time < 0.0 || time > instance.T_end ||
+      instance.n < 0 || instance.m < 0 ||
+      static_cast<Index>(instance.n) != instance.trajectories.size() ||
+      static_cast<Index>(instance.m) != instance.stations.size() ||
+      supporting_points.size() != static_cast<Index>(instance.m) ||
+      radii.size() != static_cast<Index>(instance.m)) {
+    throw std::invalid_argument("static ownership received invalid dimensions");
+  }
+
+  const auto precomputed = CandidateSet::precompute(instance, budget);
+  const StaticGeometry geometry =
+      CandidateSet::build_geometry(instance, *precomputed, time, budget);
+  const Index point_count = static_cast<Index>(instance.n);
+  const Index station_count = static_cast<Index>(instance.m);
+  StaticAssignment assignment;
+  assignment.supporting_point.assign(station_count, -1);
+  assignment.radius.assign(station_count, 0.0);
+  assignment.assigned_points.assign(point_count, -1);
+  std::vector<Value> disk_radius_squared(station_count, 0.0);
+  std::vector<Value> owned_radius_squared(station_count, 0.0);
+
+  for (Index station = 0; station < station_count; ++station) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    const int support = supporting_points[station];
+    const Value radius = radii[station];
+    if (!std::isfinite(radius) || radius < 0.0 || support < -1 ||
+        support >= instance.n) {
+      throw std::invalid_argument("static ownership received invalid disks");
+    }
+    if (support < 0) {
+      continue;
+    }
+    const Index point = static_cast<Index>(support);
+    disk_radius_squared[station] = radius * radius;
+    const Value distance_squared =
+        geometry.distance_squared(station, point, point_count);
+    if (distance_squared >
+        disk_radius_squared[station] + 2e-9 * radius + 1e-18) {
+      throw std::invalid_argument(
+          "static supporting point lies outside its disk");
+    }
+    if (assignment.assigned_points[point] < 0) {
+      assignment.assigned_points[point] = static_cast<int>(station);
+      owned_radius_squared[station] = distance_squared;
+    }
+  }
+
+  for (Index point = 0; point < point_count; ++point) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    if (assignment.assigned_points[point] >= 0) {
+      continue;
+    }
+    int best_station = -1;
+    Value best_increment = std::numeric_limits<Value>::infinity();
+    Value best_distance_squared = 0.0;
+    for (Index station = 0; station < station_count; ++station) {
+      if (budget != nullptr) {
+        budget->checkpoint();
+      }
+      if (supporting_points[station] < 0) {
+        continue;
+      }
+      const Value distance_squared =
+          geometry.distance_squared(station, point, point_count);
+      const Value radius = radii[station];
+      if (distance_squared >
+          disk_radius_squared[station] + 2e-9 * radius + 1e-18) {
+        continue;
+      }
+      const Value increment =
+          std::max(owned_radius_squared[station], distance_squared) -
+          owned_radius_squared[station];
+      if (increment < best_increment ||
+          (increment == best_increment &&
+           (best_station < 0 ||
+            station < static_cast<Index>(best_station)))) {
+        best_station = static_cast<int>(station);
+        best_increment = increment;
+        best_distance_squared = distance_squared;
+      }
+    }
+    if (best_station >= 0) {
+      assignment.assigned_points[point] = best_station;
+      owned_radius_squared[static_cast<Index>(best_station)] =
+          std::max(owned_radius_squared[static_cast<Index>(best_station)],
+                   best_distance_squared);
+    }
+  }
+
+  assignment.feasible = true;
+  for (Index station = 0; station < station_count; ++station) {
+    int support = -1;
+    Value farthest_squared = -1.0;
+    for (Index point = 0; point < point_count; ++point) {
+      if (budget != nullptr) {
+        budget->checkpoint();
+      }
+      if (assignment.assigned_points[point] != static_cast<int>(station)) {
+        continue;
+      }
+      const Value distance_squared =
+          geometry.distance_squared(station, point, point_count);
+      if (distance_squared > farthest_squared ||
+          (distance_squared == farthest_squared &&
+           (support < 0 || static_cast<int>(point) < support))) {
+        support = static_cast<int>(point);
+        farthest_squared = distance_squared;
+      }
+    }
+    if (support >= 0) {
+      assignment.supporting_point[station] = support;
+      assignment.radius[station] = std::sqrt(farthest_squared);
+    }
+  }
+  assignment.feasible = true;
+  for (Index point = 0; point < point_count; ++point) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    const int owner = assignment.assigned_points[point];
+    if (owner < 0 || owner >= instance.m) {
+      assignment.feasible = false;
+      continue;
+    }
+    const Index station = static_cast<Index>(owner);
+    const Value distance_squared =
+        geometry.distance_squared(station, point, point_count);
+    const Value radius = assignment.radius[station];
+    if (distance_squared > radius * radius + 2e-9 * radius + 1e-18) {
+      assignment.feasible = false;
+    }
+  }
+  const Value pi = std::acos(-1.0);
+  for (const Value radius : assignment.radius) {
+    assignment.cost += pi * radius * radius;
+  }
+  return assignment;
+}
+
 StaticAssignment StationarySolver::solve_nn(const Instance& instance,
                                             double time,
                                             SolverBudget* budget) {
@@ -69,9 +216,8 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
               return lhs < rhs;
             });
 
-  StaticAssignment assignment;
-  assignment.supporting_point.assign(station_count, -1);
-  assignment.radius.assign(station_count, 0.0);
+  std::vector<int> supporting_points(station_count, -1);
+  std::vector<Value> radii(station_count, 0.0);
   std::vector<bool> covered(point_count, false);
   for (const Index point_index : order) {
     if (budget != nullptr) {
@@ -86,13 +232,11 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
     }
     const auto station_index = static_cast<Index>(nearest);
     const Value distance_squared = nearest_distance_squared[point_index];
-    if (distance_squared >=
-        assignment.radius[station_index] * assignment.radius[station_index]) {
-      assignment.supporting_point[station_index] =
-          static_cast<int>(point_index);
-      assignment.radius[station_index] = std::sqrt(distance_squared);
+    if (distance_squared >= radii[station_index] * radii[station_index]) {
+      supporting_points[station_index] = static_cast<int>(point_index);
+      radii[station_index] = std::sqrt(distance_squared);
     }
-    const Value coverage_radius = assignment.radius[station_index];
+    const Value coverage_radius = radii[station_index];
     const Value radius_squared = coverage_radius * coverage_radius;
     const Value tolerance = 2e-9 * coverage_radius + 1e-18;
     for (Index other_point = 0; other_point < point_count; ++other_point) {
@@ -106,11 +250,10 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
     }
   }
 
-  const Value squared_radius_sum =
-      std::inner_product(assignment.radius.begin(), assignment.radius.end(),
-                         assignment.radius.begin(), 0.0);
-  assignment.cost = std::acos(-1.0) * squared_radius_sum;
+  StaticAssignment assignment = assign_points_to_disks(
+      instance, time, supporting_points, radii, budget);
   assignment.feasible =
+      assignment.feasible &&
       std::all_of(covered.begin(), covered.end(), [](bool value) {
         return value;
       });
@@ -263,29 +406,9 @@ StaticAssignment StationarySolver::solve_ip(
     }
   }
 
-  const Value pi = std::acos(-1.0);
-  for (const Value radius : assignment.radius) {
-    assignment.cost += pi * radius * radius;
-  }
-  assignment.feasible = true;
-  for (Index point_index = 0;
-       point_index < geometry.point_positions.size(); ++point_index) {
-    bool covered = false;
-    for (Index station_index = 0;
-         station_index < static_cast<Index>(instance.m); ++station_index) {
-      const Value radius = assignment.radius[station_index];
-      if (geometry.distance_squared(station_index, point_index,
-                                    static_cast<Index>(instance.n)) <=
-          radius * radius + 2e-9 * radius + 1e-18) {
-        covered = true;
-        break;
-      }
-    }
-    if (!covered) {
-      assignment.feasible = false;
-      break;
-    }
-  }
+  assignment = assign_points_to_disks(instance, time,
+                                      assignment.supporting_point,
+                                      assignment.radius, budget);
   if (!assignment.feasible) {
     throw std::runtime_error(
         "IP solver returned a solution that does not cover all points");

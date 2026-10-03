@@ -15,6 +15,7 @@
 #include "kdc/sanity_check.hpp"
 #include "kdc/stats.hpp"
 #include "kdc/static_solver_registry.hpp"
+#include "kdc/verify.hpp"
 
 #include <cmath>
 #include <algorithm>
@@ -619,6 +620,45 @@ int handle_calibrate(int argc, char** argv) {
             << " manifest=" << decision.manifest_path << '\n';
   return 0;
 }
+
+int handle_verify(int argc, char** argv) {
+  const kdc::CliArgs args = kdc::CliArgs::parse(argc, argv);
+  if (args.has("help")) {
+    command_help("verify");
+    return 0;
+  }
+  const std::string instance_path = args.get("instance");
+  const std::string solution_path = args.get("solution");
+  if (instance_path.empty() || solution_path.empty()) {
+    std::cerr << "error: verify requires --instance and --solution\n";
+    command_help("verify");
+    return 1;
+  }
+
+  const kdc::Instance instance =
+      kdc::DatasetReader::read_json(instance_path);
+  const kdc::KineticSolution solution =
+      kdc::SolutionSerializer::load_json(instance, solution_path);
+  const kdc::VerificationReport report =
+      kdc::Verifier::verify_continuous(instance, solution);
+  std::cout << "verified="
+            << (report.all_ok() ? "true" : "false")
+            << " verification_kind="
+            << kdc::verification_kind_to_string(report.kind)
+            << " coverage_ok=" << (report.coverage_ok ? "true" : "false")
+            << " supporting_points_ok="
+            << (report.supporting_points_ok ? "true" : "false")
+            << " cost_consistent_ok="
+            << (report.cost_consistent_ok ? "true" : "false")
+            << " integral_consistent_ok="
+            << (report.integral_consistent_ok ? "true" : "false")
+            << " assignment_consistent_ok="
+            << (report.assignment_consistent_ok ? "true" : "false") << '\n';
+  for (const auto& error : report.errors) {
+    std::cerr << "verification error: " << error << '\n';
+  }
+  return report.all_ok() ? 0 : 1;
+}
 }
 
 int main(int argc, char** argv) {
@@ -693,6 +733,14 @@ int main(int argc, char** argv) {
       return handle_solve(argc, argv);
     } catch (const std::exception& error) {
       LOG_ERROR("solve failed: {}", error.what());
+      return 1;
+    }
+  }
+  if (command == "verify") {
+    try {
+      return handle_verify(argc, argv);
+    } catch (const std::exception& error) {
+      LOG_ERROR("verify failed: {}", error.what());
       return 1;
     }
   }

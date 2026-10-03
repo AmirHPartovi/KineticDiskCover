@@ -221,13 +221,16 @@ the solver lower bound and status.
 `kdc::KineticCore` provides stable quadratic roots, support-change and
 handover event detection across piecewise-linear trajectories, second-furthest
 assigned-support selection, and derivative-based resolution for equidistant
-supports.
+supports. Static assignments include an explicit point-to-station ownership
+map. Handover events transfer the source's owned support only when it enters
+the receiving station's current disk; each kinetic interval serializes the
+resulting ownership map alongside its supporting points.
 
 `kdc::KineticSolution` stores piecewise quadratic cost intervals and evaluates
 costs, integrals, peak values/times, and structural consistency. It can extend
 a stationary assignment across kinetic support and handover events, combine
-two interval solutions under either objective, and truncate an extension at an
-integral intersection.
+two interval solutions using their pointwise lower envelope, and truncate
+non-MinSum extensions at a cumulative-integral crossing.
 
 `kdc::MinMaxSolver` iteratively solves stationary IPs at the current peak time,
 extends and combines the resulting kinetic assignments, tracks a monotone
@@ -240,8 +243,12 @@ Stop conditions include the global deadline, iteration cap, stagnation
 patience, and negligible objective improvement. The optional `sampled`
 (`CERTIFIED_BOUND`) policy performs sampled static solves to guide refinement,
 but their trapezoidal integral is heuristic, not a certified continuous-time
-lower bound. Select the policy with `--minsum-refinement-policy adaptive|sampled`
-for solve, batch, or benchmark commands.
+lower bound. MinSum combines candidates by splitting intervals at roots where
+their quadratic instantaneous area costs cross, then selecting the cheaper
+candidate at each time; candidate generation remains heuristic and does not
+certify global optimality. Select the policy with
+`--minsum-refinement-policy adaptive|sampled` for solve, batch, or benchmark
+commands.
 
 `kdc::StaticSolverRegistry` provides the `nn`, `greedy`, `lp-rounding`,
 `primal-dual`, `local-search`, `sa`, `genetic`, and `shifting` heuristics and

@@ -161,7 +161,8 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       instance,
       StaticAssignment{initial_assignment.supporting_point,
                        initial_assignment.radius, initial_assignment.cost,
-                       initial_assignment.feasible},
+                       initial_assignment.feasible,
+                       initial_assignment.assigned_points},
       0.0, instance.T_end, true,
       config.use_handovers, ObjectiveType::MIN_MAX, &budget);
   if (!solution.is_well_formed()) {
@@ -235,13 +236,15 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       const KineticSolution forward = KineticSolution::extend(
           instance,
           StaticAssignment{assignment.supporting_point, assignment.radius,
-                           assignment.cost, assignment.feasible},
+                           assignment.cost, assignment.feasible,
+                           assignment.assigned_points},
           maximum_time, instance.T_end, true,
           config.use_handovers, ObjectiveType::MIN_MAX, &budget);
       const KineticSolution backward = KineticSolution::extend(
           instance,
           StaticAssignment{assignment.supporting_point, assignment.radius,
-                           assignment.cost, assignment.feasible},
+                           assignment.cost, assignment.feasible,
+                           assignment.assigned_points},
           maximum_time, 0.0, false,
           config.use_handovers, ObjectiveType::MIN_MAX, &budget);
       KineticSolution candidate = join_directions(

@@ -3,7 +3,8 @@
 
 Solution files are expected to contain ``intervals`` with ``t_start``,
 ``t_end``, ``supporting_point`` (or ``supporting_points``), and quadratic cost
-coefficients ``a``, ``b``, ``c``. The file may contain one solution or a
+coefficients ``a``, ``b``, ``c``, and one ``assigned_points`` station id per
+trajectory. The file may contain one solution or a
 ``solutions``/``minmax``/``minsum`` mapping for both modes.
 """
 
@@ -28,7 +29,6 @@ from matplotlib.patches import Circle
 import numpy as np
 
 
-STATION_COLOR = "#2ca02c"
 POINT_COLORS = (
     "#1f77b4", "#ff7f0e", "#d62728", "#9467bd", "#8c564b",
     "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
@@ -79,8 +79,8 @@ class SolutionData:
         return self.intervals[-1].end
 
     def interval_at(self, time: float) -> Interval:
-        for interval in self.intervals:
-            if time <= interval.end + 1e-12:
+        for index, interval in enumerate(self.intervals):
+            if time < interval.end or index + 1 == len(self.intervals):
                 return interval
         return self.intervals[-1]
 
@@ -270,16 +270,6 @@ def load_solution(path: Path, mode: str, end_time: float) -> SolutionData:
     return SolutionData(mode, intervals, _lower_bound(data, mode))
 
 
-def covering_station(
-    point: tuple[float, float], stations: list[tuple[float, float]],
-    radii: list[float],
-) -> int | None:
-    for index, (station, radius) in enumerate(zip(stations, radii)):
-        if math.dist(point, station) <= radius + 1e-8:
-            return index
-    return None
-
-
 def animate_mode(
     instance_path: Path,
     solution_path: Path,
@@ -292,8 +282,14 @@ def animate_mode(
     solution = load_solution(solution_path, mode, end_time)
     if len(solution.intervals[0].supports) != len(stations):
         raise ValueError("solution station count does not match instance")
-    if len(solution.intervals[0].assigned_points) not in {0, len(trajectories)}:
-        raise ValueError("solution assigned_points must be empty or match point count")
+    for interval in solution.intervals:
+        if len(interval.assigned_points) != len(trajectories):
+            raise ValueError(
+                "solution assigned_points must match the point count"
+            )
+        if any(owner < 0 or owner >= len(stations)
+               for owner in interval.assigned_points):
+            raise ValueError("solution contains an invalid assigned station")
     for interval in solution.intervals:
         if len(interval.supports) != len(stations):
             raise ValueError("supporting_point length differs between intervals")
@@ -324,22 +320,27 @@ def animate_mode(
     for trajectory in trajectories:
         scene.plot(trajectory.x, trajectory.y, linestyle="--",
                    color="gray", alpha=0.55, linewidth=1.0)
+    station_colors = [
+        POINT_COLORS[index % len(POINT_COLORS)]
+        for index in range(len(stations))
+    ]
+    for station_index, station in enumerate(stations):
+        scene.scatter([station[0]], [station[1]], marker="^",
+                      color=station_colors[station_index], s=90,
+                      label=f"Station {station_index}", zorder=4)
     if stations:
-        scene.scatter([station[0] for station in stations],
-                      [station[1] for station in stations],
-                      marker="^", color=STATION_COLOR, s=90, label="Stations",
-                      zorder=4)
+        scene.legend(loc="best", fontsize=8)
 
     disks = [
-        Circle(station, 0.0, facecolor=STATION_COLOR, edgecolor=STATION_COLOR,
-               alpha=0.3, linewidth=1.0)
-        for station in stations
+        Circle(station, 0.0, facecolor=station_colors[index],
+               edgecolor=station_colors[index], alpha=0.3, linewidth=1.0)
+        for index, station in enumerate(stations)
     ]
     for disk in disks:
         scene.add_patch(disk)
     point_artists = [
         scene.plot([], [], marker="o", linestyle="", markersize=5,
-                   color=POINT_COLORS[index % len(POINT_COLORS)],
+                   color=station_colors[0] if station_colors else "#1f77b4",
                    markeredgecolor="black", markeredgewidth=0.25,
                    zorder=5)[0]
         for index in range(len(trajectories))
@@ -375,7 +376,6 @@ def animate_mode(
     def update(frame_index: int) -> list[Any]:
         time = float(times[frame_index])
         interval = solution.interval_at(time)
-        radii: list[float] = []
         for station_index, support in enumerate(interval.supports):
             if support == -1:
                 radius = 0.0
@@ -385,28 +385,27 @@ def animate_mode(
                 radius = math.dist(
                     stations[station_index], trajectories[support].position(time)
                 )
-            radii.append(radius)
             disks[station_index].set_radius(radius)
 
         point_positions: list[tuple[float, float]] = []
         for point_index, trajectory in enumerate(trajectories):
             point = trajectory.position(time)
             point_positions.append(point)
-            owner: int | None = None
-            if len(interval.assigned_points) == len(trajectories):
-                assigned_owner = interval.assigned_points[point_index]
-                if 0 <= assigned_owner < len(stations):
-                    owner = assigned_owner
-            if owner is None:
-                owner = covering_station(point, stations, radii)
-            color = (STATION_COLOR if owner is None else
-                     POINT_COLORS[owner % len(POINT_COLORS)])
+            owner = interval.assigned_points[point_index]
+            color = station_colors[owner]
             point_artists[point_index].set_data([point[0]], [point[1]])
             point_artists[point_index].set_color(color)
 
         value = solution.cost(time)
         integral = solution.integral(time)
-        time_text.set_text(f"t = {time:.4f}    cost = {value:.6g}")
+        support_ids = " ".join(
+            f"S{station}=P{point}"
+            for station, point in enumerate(interval.supports)
+        )
+        time_text.set_text(
+            f"t = {time:.4f}    cost = {value:.6g}\n"
+            f"supports: {support_ids}"
+        )
         annotation.set_text(
             f"Mode: {MODE_LABELS[mode]}    Integral to t: {integral:.6g}"
         )

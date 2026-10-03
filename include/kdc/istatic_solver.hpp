@@ -2,6 +2,7 @@
 
 #include "kdc/solver_budget.hpp"
 #include "kdc/result_status.hpp"
+#include "kdc/stationary.hpp"
 #include "kdc/types.hpp"
 
 #include <limits>
@@ -9,6 +10,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <stdexcept>
 #include <vector>
 
 namespace kdc {
@@ -26,6 +28,7 @@ struct StaticSolution {
   double solve_time_sec{0.0};
   std::string solver_name;
   bool time_limited{false};
+  std::vector<int> assigned_points;
 };
 
 inline void set_static_result_status(StaticSolution& solution,
@@ -108,6 +111,32 @@ class IStaticSolver {
       if (budget.expired()) {
         throw SolverBudgetExpired();
       }
+      if (solution.feasible && solution.assigned_points.empty()) {
+        const StaticAssignment assignment =
+            StationarySolver::assign_points_to_disks(
+                instance, time, solution.supporting_point, solution.radius,
+                &budget);
+        if (!assignment.feasible) {
+          throw std::runtime_error(
+              "static solver returned a feasible but uncovered assignment");
+        }
+        solution.supporting_point = assignment.supporting_point;
+        solution.radius = assignment.radius;
+        solution.cost = assignment.cost;
+        solution.assigned_points = assignment.assigned_points;
+        if (solution.exact_solver &&
+            solution.bound_status == BoundStatus::CERTIFIED &&
+            solution.lower_bound >
+                solution.cost +
+                    1e-9 * std::max(1.0, std::abs(solution.cost))) {
+          throw std::runtime_error(
+              "ownership normalization contradicts the certified lower bound");
+        }
+        set_static_result_status(solution, solution.bound_status,
+                                 solution.optimality_status,
+                                 solution.exact_solver);
+      }
+      budget.checkpoint();
       return solution;
     } catch (...) {
       active_budget_ = previous;

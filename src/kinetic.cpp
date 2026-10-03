@@ -8,6 +8,7 @@
 #include <cmath>
 #include <iterator>
 #include <limits>
+#include <numeric>
 #include <stdexcept>
 #include <utility>
 
@@ -238,41 +239,145 @@ std::vector<SupportChangeEvent> support_changes_impl(
   return events;
 }
 
-int second_support_impl(const Instance& instance,
-                        const InstancePrecompute& precompute,
-                        int station_id, int current_support, Value time,
-                        SolverBudget* budget) {
-  const Point station =
-      precompute.stations[static_cast<Index>(station_id)].pos;
-  const Value radius =
-      (station - precompute.position(static_cast<Index>(current_support), time))
-          .norm();
-  const Value threshold = radius + kTimeEpsilon;
-  const Value threshold_squared = threshold * threshold;
-  std::vector<std::pair<Value, int>> assigned_distances;
-  assigned_distances.reserve(static_cast<Index>(instance.n));
-  for (int point_id = 0; point_id < instance.n; ++point_id) {
-    if (budget != nullptr) {
-      budget->checkpoint();
-    }
-    const Value distance_squared =
-        (station - precompute.position(static_cast<Index>(point_id), time))
-            .norm2();
-    if (distance_squared <= threshold_squared) {
-      assigned_distances.emplace_back(distance_squared, point_id);
+std::vector<int> points_owned_by(const std::vector<int>& owners,
+                                 int station_id) {
+  std::vector<int> points;
+  for (Index point = 0; point < owners.size(); ++point) {
+    if (owners[point] == station_id) {
+      points.push_back(static_cast<int>(point));
     }
   }
-  if (assigned_distances.size() < 2U) {
-    return -1;
+  return points;
+}
+
+void validate_owners(const Instance& instance,
+                     const std::vector<int>& owners) {
+  if (owners.size() != static_cast<Index>(instance.n)) {
+    throw std::invalid_argument(
+        "assigned_points size must match the number of points");
   }
-  std::sort(assigned_distances.begin(), assigned_distances.end(),
-            [](const auto& lhs, const auto& rhs) {
-              if (lhs.first != rhs.first) {
-                return lhs.first > rhs.first;
-              }
-              return lhs.second < rhs.second;
-            });
-  return assigned_distances[1].second;
+  for (const int owner : owners) {
+    if (owner < 0 || owner >= instance.m) {
+      throw std::out_of_range("assigned point owner is outside the instance");
+    }
+  }
+}
+
+bool enters_receiving_disk(const InstancePrecompute& precompute,
+                           int station_id, int candidate, int support,
+                           Value time, bool forward) {
+  const Point station = precompute.stations[static_cast<Index>(station_id)].pos;
+  const Point point =
+      precompute.position(static_cast<Index>(candidate), time);
+  const Point support_position =
+      precompute.position(static_cast<Index>(support), time);
+  const Value candidate_rate =
+      2.0 * (point - station)
+                .dot(precompute.velocity(static_cast<Index>(candidate), time));
+  const Value support_rate =
+      2.0 * (support_position - station)
+                .dot(precompute.velocity(static_cast<Index>(support), time));
+  const Value derivative = candidate_rate - support_rate;
+  const Value tolerance =
+      64.0 * std::numeric_limits<Value>::epsilon() *
+      std::max(std::abs(candidate_rate), std::abs(support_rate));
+  return (forward ? 1.0 : -1.0) * derivative < -tolerance;
+}
+
+HandoverEvent make_nonincreasing_handover(
+    const Instance& instance, const InstancePrecompute& precompute,
+    const std::vector<int>& owners, int station_from, int station_to,
+    int point_id, Value time, bool forward) {
+  if (point_id < 0 || point_id >= instance.n || station_from < 0 ||
+      station_from >= instance.m || station_to < 0 ||
+      station_to >= instance.m || station_from == station_to ||
+      owners.size() != static_cast<Index>(instance.n) ||
+      owners[static_cast<Index>(point_id)] != station_from) {
+    return {};
+  }
+  std::vector<Value> before_radii_squared(static_cast<Index>(instance.m), 0.0);
+  std::vector<Value> after_radii_squared(static_cast<Index>(instance.m), 0.0);
+  std::vector<int> before_supports(static_cast<Index>(instance.m), -1);
+  std::vector<int> after_supports(static_cast<Index>(instance.m), -1);
+  std::vector<Value> before_tie_breakers(static_cast<Index>(instance.m), 0.0);
+  std::vector<Value> after_tie_breakers(static_cast<Index>(instance.m), 0.0);
+  const Value direction = forward ? 1.0 : -1.0;
+
+  for (int current_point = 0; current_point < instance.n; ++current_point) {
+    const int owner = owners[static_cast<Index>(current_point)];
+    const Index owner_index = static_cast<Index>(owner);
+    const Point position =
+        precompute.position(static_cast<Index>(current_point), time);
+    const Value before_distance_squared =
+        (position - instance.stations[owner_index].pos).norm2();
+    const Value before_rate =
+        2.0 * (position - instance.stations[owner_index].pos)
+                  .dot(precompute.velocity(static_cast<Index>(current_point),
+                                           time, !forward));
+    const Value before_tie_breaker = -direction * before_rate;
+    const Value before_tolerance =
+        64.0 * std::numeric_limits<Value>::epsilon() *
+        std::max({1.0, before_distance_squared,
+                  before_radii_squared[owner_index]});
+    if (before_supports[owner_index] < 0 ||
+        before_distance_squared >
+            before_radii_squared[owner_index] + before_tolerance ||
+        (std::abs(before_distance_squared -
+                  before_radii_squared[owner_index]) <= before_tolerance &&
+         before_tie_breaker > before_tie_breakers[owner_index])) {
+      before_radii_squared[owner_index] = before_distance_squared;
+      before_supports[owner_index] = current_point;
+      before_tie_breakers[owner_index] = before_tie_breaker;
+    }
+
+    const int new_owner =
+        current_point == point_id ? station_to : owner;
+    const Index new_owner_index = static_cast<Index>(new_owner);
+    const Value after_distance_squared =
+        (position - instance.stations[new_owner_index].pos).norm2();
+    const Value after_rate =
+        2.0 * (position - instance.stations[new_owner_index].pos)
+                  .dot(precompute.velocity(static_cast<Index>(current_point),
+                                           time, forward));
+    const Value after_tie_breaker = direction * after_rate;
+    const Value after_tolerance =
+        64.0 * std::numeric_limits<Value>::epsilon() *
+        std::max({1.0, after_distance_squared,
+                  after_radii_squared[new_owner_index]});
+    if (after_supports[new_owner_index] < 0 ||
+        after_distance_squared >
+            after_radii_squared[new_owner_index] + after_tolerance ||
+        (std::abs(after_distance_squared -
+                  after_radii_squared[new_owner_index]) <= after_tolerance &&
+         after_tie_breaker > after_tie_breakers[new_owner_index])) {
+      after_radii_squared[new_owner_index] = after_distance_squared;
+      after_supports[new_owner_index] = current_point;
+      after_tie_breakers[new_owner_index] = after_tie_breaker;
+    }
+  }
+  if (before_supports[static_cast<Index>(station_from)] != point_id ||
+      after_supports[static_cast<Index>(station_from)] < 0 ||
+      after_supports[static_cast<Index>(station_to)] < 0) {
+    return {};
+  }
+
+  const Value pi = std::acos(-1.0);
+  const Value before_area =
+      std::accumulate(before_radii_squared.begin(),
+                      before_radii_squared.end(), 0.0) *
+      pi;
+  const Value after_area =
+      std::accumulate(after_radii_squared.begin(), after_radii_squared.end(),
+                      0.0) *
+      pi;
+  const Value tolerance =
+      1e-9 * std::max({1.0, std::abs(before_area), std::abs(after_area)});
+  if (after_area > before_area + tolerance) {
+    return {};
+  }
+  return {time, station_from, station_to, point_id,
+          after_supports[static_cast<Index>(station_from)],
+          after_supports[static_cast<Index>(station_to)], true};
 }
 }
 
@@ -453,7 +558,8 @@ int KineticCore::second_furthest_assigned(
 
 std::vector<HandoverEvent> KineticCore::find_handovers(
     const Instance& instance, int station_from, int station_to,
-    const std::vector<int>& current_supports, Value t_start, Value t_end,
+    const std::vector<int>& current_supports,
+    const std::vector<int>& assigned_points, Value t_start, Value t_end,
     bool forward, SolverBudget* budget) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   LOG_DEBUG("find_handovers: y1={}, y2={}", station_from, station_to);
@@ -466,6 +572,7 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
     throw std::invalid_argument(
         "current_supports size must match the number of stations");
   }
+  validate_owners(instance, assigned_points);
   const int support_from =
       current_supports[static_cast<Index>(station_from)];
   const int support_to =
@@ -473,24 +580,34 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
   validate_station_support(instance, station_from, support_from);
   validate_station_support(instance, station_to, support_to);
 
-  const auto precomputed = CandidateSet::precompute(instance, budget);
-  const int second_support = second_support_impl(
-      instance, *precomputed, station_from, support_from, t_start, budget);
-  if (second_support == -1) {
+  if (assigned_points[static_cast<Index>(support_from)] != station_from ||
+      assigned_points[static_cast<Index>(support_to)] != station_to) {
+    throw std::invalid_argument(
+        "handover supports must belong to their respective stations");
+  }
+  const auto source_points = points_owned_by(assigned_points, station_from);
+  if (source_points.size() < 2U) {
     return {};
   }
 
+  const auto precomputed = CandidateSet::precompute(instance, budget);
   const auto support_events = support_changes_impl(
-      instance, *precomputed, station_from, support_from, t_start, t_end,
-      forward, budget, false, second_support);
+      instance, *precomputed, station_to, support_to, t_start, t_end,
+      forward, budget, false, support_from);
   std::vector<HandoverEvent> handovers;
   for (const auto& event : support_events) {
     if (budget != nullptr) {
       budget->checkpoint();
     }
-    if (event.new_supporting_point == second_support) {
-      handovers.push_back({event.time, station_from, station_to, support_to,
-                           second_support, support_to, true});
+    if (event.new_supporting_point == support_from &&
+        enters_receiving_disk(*precomputed, station_to, support_from,
+                              support_to, event.time, forward)) {
+      const auto handover = make_nonincreasing_handover(
+          instance, *precomputed, assigned_points, station_from, station_to,
+          support_from, event.time, forward);
+      if (handover.valid) {
+        handovers.push_back(handover);
+      }
     }
   }
   return handovers;
@@ -498,7 +615,8 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
 
 std::vector<HandoverEvent> KineticCore::find_handovers_from(
     const Instance& instance, int station_from,
-    const std::vector<int>& current_supports, Value t_start, Value t_end,
+    const std::vector<int>& current_supports,
+    const std::vector<int>& assigned_points, Value t_start, Value t_end,
     bool forward, SolverBudget* budget) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   validate_instance_shapes(instance);
@@ -509,18 +627,19 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     throw std::invalid_argument(
         "current_supports size must match the number of stations");
   }
+  validate_owners(instance, assigned_points);
   const int support_from =
       current_supports[static_cast<Index>(station_from)];
   validate_station_support(instance, station_from, support_from);
-  const auto precomputed = CandidateSet::precompute(instance, budget);
-  const int second_support = second_support_impl(
-      instance, *precomputed, station_from, support_from, t_start, budget);
-  if (second_support == -1) {
+  if (assigned_points[static_cast<Index>(support_from)] != station_from) {
+    throw std::invalid_argument(
+        "handover source support must belong to its station");
+  }
+  const auto source_points = points_owned_by(assigned_points, station_from);
+  if (source_points.size() < 2U) {
     return {};
   }
-  const auto support_events = support_changes_impl(
-      instance, *precomputed, station_from, support_from, t_start, t_end,
-      forward, budget, false, second_support);
+  const auto precomputed = CandidateSet::precompute(instance, budget);
   std::vector<HandoverEvent> handovers;
   for (int station_to = 0; station_to < instance.m; ++station_to) {
     if (budget != nullptr) {
@@ -533,13 +652,26 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     const int support_to =
         current_supports[static_cast<Index>(station_to)];
     validate_station_support(instance, station_to, support_to);
+    if (assigned_points[static_cast<Index>(support_to)] != station_to) {
+      throw std::invalid_argument(
+          "handover receiver support must belong to its station");
+    }
+    const auto support_events = support_changes_impl(
+        instance, *precomputed, station_to, support_to, t_start, t_end,
+        forward, budget, false, support_from);
     for (const auto& event : support_events) {
       if (budget != nullptr) {
         budget->checkpoint();
       }
-      if (event.new_supporting_point == second_support) {
-        handovers.push_back({event.time, station_from, station_to, support_to,
-                             second_support, support_to, true});
+      if (event.new_supporting_point == support_from &&
+          enters_receiving_disk(*precomputed, station_to, support_from,
+                                support_to, event.time, forward)) {
+        const auto handover = make_nonincreasing_handover(
+            instance, *precomputed, assigned_points, station_from, station_to,
+            support_from, event.time, forward);
+        if (handover.valid) {
+          handovers.push_back(handover);
+        }
       }
     }
   }
@@ -548,13 +680,15 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
 
 HandoverEvent KineticCore::find_next_handover(
     const Instance& instance, const std::vector<int>& current_supports,
-    Value t_start, Value t_end, bool forward, SolverBudget* budget) {
+    const std::vector<int>& assigned_points, Value t_start, Value t_end,
+    bool forward, SolverBudget* budget) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   validate_instance_shapes(instance);
   if (current_supports.size() != static_cast<Index>(instance.m)) {
     throw std::invalid_argument(
         "current_supports size must match the number of stations");
   }
+  validate_owners(instance, assigned_points);
   HandoverEvent nearest;
   const auto precomputed = CandidateSet::precompute(instance, budget);
   for (int station_from = 0; station_from < instance.m; ++station_from) {
@@ -567,14 +701,14 @@ HandoverEvent KineticCore::find_next_handover(
     const int support_from =
         current_supports[static_cast<Index>(station_from)];
     validate_station_support(instance, station_from, support_from);
-    const int second_support = second_support_impl(
-        instance, *precomputed, station_from, support_from, t_start, budget);
-    if (second_support < 0) {
+    if (assigned_points[static_cast<Index>(support_from)] != station_from) {
+      throw std::invalid_argument(
+          "handover source support must belong to its station");
+    }
+    const auto source_points = points_owned_by(assigned_points, station_from);
+    if (source_points.size() < 2U) {
       continue;
     }
-    const auto support_events = support_changes_impl(
-        instance, *precomputed, station_from, support_from, t_start, t_end,
-        forward, budget, true, second_support);
     for (int station_to = 0; station_to < instance.m; ++station_to) {
       if (budget != nullptr) {
         budget->checkpoint();
@@ -586,20 +720,30 @@ HandoverEvent KineticCore::find_next_handover(
       const int support_to =
           current_supports[static_cast<Index>(station_to)];
       validate_station_support(instance, station_to, support_to);
-      if (support_events.empty()) {
-        continue;
+      if (assigned_points[static_cast<Index>(support_to)] != station_to) {
+        throw std::invalid_argument(
+            "handover receiver support must belong to its station");
       }
-      const HandoverEvent handover{
-          support_events.front().time, station_from, station_to, support_to,
-          second_support, support_to, true};
-      if (budget != nullptr) {
-        budget->checkpoint();
-      }
-      if (handover.valid &&
-          (!nearest.valid ||
-           (forward && handover.time < nearest.time) ||
-           (!forward && handover.time > nearest.time))) {
-        nearest = handover;
+      const auto support_events = support_changes_impl(
+          instance, *precomputed, station_to, support_to, t_start, t_end,
+          forward, budget, false, support_from);
+      for (const auto& event : support_events) {
+        if (!enters_receiving_disk(*precomputed, station_to, support_from,
+                                   support_to, event.time, forward)) {
+          continue;
+        }
+        const auto handover = make_nonincreasing_handover(
+            instance, *precomputed, assigned_points, station_from, station_to,
+            support_from, event.time, forward);
+        if (budget != nullptr) {
+          budget->checkpoint();
+        }
+        if (handover.valid &&
+            (!nearest.valid ||
+             (forward && handover.time < nearest.time) ||
+             (!forward && handover.time > nearest.time))) {
+          nearest = handover;
+        }
       }
     }
   }
