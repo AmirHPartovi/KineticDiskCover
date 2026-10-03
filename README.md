@@ -3,6 +3,30 @@
 `kdc-solver` is a C++17 project scaffold for kinetic discrepancy correction
 models. Its optimization backend is KONT, which uses the COPT-compatible API.
 
+## Reproducible experiment pipeline
+
+Run the end-to-end research workflow from any current working directory with:
+
+```bash
+bash scripts/run_experiment.sh
+```
+
+The orchestrator snapshots or converts the dataset, runs preflight and the FAST
+benchmark, validates raw records, generates tables and PNG/PDF figures, then
+uses the selected exact backend for separate animation solves. Each run is
+stored under `results/experiments/<EXPERIMENT_ID>/` with stage logs, a complete
+manifest, integrity checks, and reports. Use `bash scripts/run_experiment.sh --help`
+for dataset, algorithm, objective, time-limit, backend, animation,
+skip, and resume options. Resume requires the same dataset fingerprint and
+benchmark configuration.
+
+FAST keeps the existing low-serialization profile. Exact animations are made
+only when the exact-reference result is feasible, continuously verified, and
+marked `OPTIMAL`; feasible or timed-out results remain reported but are not
+animated as exact. Figure summaries may filter to feasible, verified records;
+the raw integrity report retains timeout and failure counts. Empirical ratios
+are not theoretical approximation guarantees.
+
 ## Prerequisites
 
 * CMake 3.20 or newer.

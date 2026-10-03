@@ -92,10 +92,12 @@ def _safe_name(name: object) -> str:
 def save_fig(fig: plt.Figure, name: str) -> tuple[Path, Path]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     stem = OUTPUT_DIR / name
-    fig.savefig(stem.with_suffix(".png"), dpi=FIGURE_DPI)
-    fig.savefig(stem.with_suffix(".pdf"))
+    png_path = Path(f"{stem}.png")
+    pdf_path = Path(f"{stem}.pdf")
+    fig.savefig(png_path, dpi=FIGURE_DPI)
+    fig.savefig(pdf_path)
     plt.close(fig)
-    return stem.with_suffix(".png"), stem.with_suffix(".pdf")
+    return png_path, pdf_path
 
 
 def annotate_best(ax: plt.Axes, df: pd.DataFrame, metric: str) -> None:
@@ -895,6 +897,12 @@ def write_report(df: pd.DataFrame, output: str | Path,
         f"- Algorithms: {df.algorithm_name.nunique() if not df.empty else 0}",
         f"- n range: {_range_text(df, 'n')}",
         f"- m range: {_range_text(df, 'm')}",
+        "- Plot-level comparison subset: records with `feasible == true` and "
+        "`verified == true`, with finite plotted metrics. Failed and timed-out "
+        "records remain represented in the separate raw result integrity report.",
+        "- Gap values are empirical/result-schema quantities; they are not "
+        "theoretical approximation guarantees or certified gaps unless "
+        "explicitly identified as `certified_gap` in raw records.",
         "",
         "## Summary statistics",
         "",

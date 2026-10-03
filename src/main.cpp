@@ -102,6 +102,7 @@ void command_help(const std::string& command) {
         << "  --minsum-refinement-policy adaptive|sampled (default: adaptive)\n"
         << "  --no-verify          Skip solution verification\n"
         << "  --verify-each-iteration  Verify every accepted iteration\n"
+        << "  --save-solutions     Retain solutions (opt-in for FAST profile)\n"
         << "  --no-solutions       Do not save solution JSON files\n"
         << "  --no-traces          Do not save trace CSV files\n";
   }

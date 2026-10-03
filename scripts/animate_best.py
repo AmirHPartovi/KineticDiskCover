@@ -274,6 +274,16 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
                        alpha=0.15, linewidth=1.5)
         scene.add_patch(patch)
         disks.append(patch)
+    support_links = [
+        scene.plot([], [], color=colors[index], linewidth=1.2, alpha=0.75,
+                   label="Active support links" if index == 0 else None)[0]
+        for index in range(len(stations))
+    ]
+    support_markers = [
+        scene.scatter([], [], marker="o", s=75, facecolors="none",
+                      edgecolors=colors[index], linewidths=1.5, zorder=6)
+        for index in range(len(stations))
+    ]
 
     span_x = max(all_x) - min(all_x) if all_x else 1.0
     span_y = max(all_y) - min(all_y) if all_y else 1.0
@@ -286,6 +296,22 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     scene.set_aspect("equal", adjustable="box")
 
     curve.plot(times, costs, color="#1f77b4", label="cost(t)")
+    previous_supports: list[int] | None = None
+    support_change_legend_added = False
+    for interval in solution.get("intervals", []):
+        supports = interval.get(
+            "supporting_point", interval.get("supporting_points", [])
+        )
+        normalized = [int(value) for value in supports]
+        if previous_supports is not None and normalized != previous_supports:
+            curve.axvline(
+                float(interval["t_start"]), color="#9467bd",
+                linestyle=":", linewidth=1, alpha=0.8,
+                label="Support changes" if not support_change_legend_added
+                else "_nolegend_",
+            )
+            support_change_legend_added = True
+        previous_supports = normalized
     time_indicator = curve.axvline(times[0], color="#d62728",
                                    linestyle="-", label="Current time")
     summary = solution.get("summary", {})
@@ -353,6 +379,25 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
             for station_index, patch in enumerate(disks):
                 radius = radius_at(solution, station_index, time, instance)
                 patch.set_radius(radius)
+                supports = interval.get(
+                    "supporting_point", interval.get("supporting_points", [])
+                )
+                support = int(supports[station_index])
+                if 0 <= support < len(positions):
+                    station = stations[station_index]
+                    support_position = positions[support]
+                    support_links[station_index].set_data(
+                        [station["x"], support_position[0]],
+                        [station["y"], support_position[1]],
+                    )
+                    support_markers[station_index].set_offsets(
+                        support_position.reshape(1, 2)
+                    )
+                else:
+                    support_links[station_index].set_data([], [])
+                    support_markers[station_index].set_offsets(
+                        np.empty((0, 2))
+                    )
         time_indicator.set_xdata([time, time])
         left_text.set_text(
             f"t = {time:.3f}\n"
@@ -360,7 +405,10 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
             f"integral up to now = "
             f"{integral_at(time, times, costs, integrals):.3f}"
         )
-        return [point_scatter, time_indicator, left_text, *disks]
+        return [
+            point_scatter, time_indicator, left_text, *disks,
+            *support_links, *support_markers,
+        ]
 
     movie = animation.FuncAnimation(
         figure, update, frames=frames, interval=1000.0 / fps,
