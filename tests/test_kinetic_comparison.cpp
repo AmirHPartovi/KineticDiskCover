@@ -12,6 +12,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -37,19 +38,32 @@ TEST_CASE("Kinetic comparison: MinMax records are verified") {
   const std::string instance_path =
       write_temp_instance(kdc::test::make_dummy_instance(5, 2, 17U));
   config.instance_paths = {instance_path};
+  config.num_repeats = 2;
   auto kont = std::make_unique<kdc::KontSolver>();
   std::vector<kdc::KineticComparisonResult> results;
 
   kdc::AlgorithmComparator::compare_kinetic(config, kont.get(), "minmax",
                                              results);
 
-  REQUIRE(results.size() == 1U);
-  REQUIRE(results.front().objective == "minmax");
-  REQUIRE(results.front().algorithm_name == "nn");
-  REQUIRE(results.front().n == 5);
-  REQUIRE(results.front().m == 2);
-  REQUIRE(results.front().objective_value >= 0.0);
-  REQUIRE(results.front().verified);
+  REQUIRE(results.size() == 3U);
+  std::vector<kdc::KineticComparisonResult> heuristic_runs;
+  std::size_t exact_runs = 0U;
+  for (const auto& result : results) {
+    if (result.algorithm_name == "nn") {
+      heuristic_runs.push_back(result);
+    }
+    if (result.algorithm_category == "exact_reference") {
+      ++exact_runs;
+    }
+  }
+  REQUIRE(heuristic_runs.size() == 2U);
+  REQUIRE(exact_runs == 1U);
+  REQUIRE(heuristic_runs[0].objective == "minmax");
+  REQUIRE(heuristic_runs[0].n == 5);
+  REQUIRE(heuristic_runs[0].m == 2);
+  REQUIRE(heuristic_runs[0].objective_value >= 0.0);
+  REQUIRE(heuristic_runs[0].verified);
+  REQUIRE(heuristic_runs[0].seed != heuristic_runs[1].seed);
   std::filesystem::remove(instance_path);
 }
 
@@ -64,9 +78,14 @@ TEST_CASE("Kinetic comparison: MinSum records can be saved") {
 
   kdc::AlgorithmComparator::compare_kinetic(config, kont.get(), "minsum",
                                              results);
-  REQUIRE(results.size() == 1U);
-  REQUIRE(results.front().objective == "minsum");
-  REQUIRE(results.front().verified);
+  REQUIRE(results.size() == 2U);
+  const auto heuristic = std::find_if(
+      results.begin(), results.end(), [](const auto& result) {
+        return result.algorithm_name == "nn";
+      });
+  REQUIRE(heuristic != results.end());
+  REQUIRE(heuristic->objective == "minsum");
+  REQUIRE(heuristic->verified);
 
   const auto json_path = temporary_path("-results.json");
   const auto csv_path = temporary_path("-results.csv");

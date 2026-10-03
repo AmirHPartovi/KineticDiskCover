@@ -531,6 +531,25 @@ ILPResult solve_with_kont(const Eigen::VectorXd& costs,
 KontSolver::KontSolver() = default;
 KontSolver::~KontSolver() = default;
 
+bool KontSolver::probe_native_backend() {
+  Eigen::VectorXd costs(1);
+  costs[0] = 1.0;
+  Eigen::SparseMatrix<double> constraints(1, 1);
+  constraints.insert(0, 0) = 1.0;
+  Eigen::VectorXd rhs(1);
+  rhs[0] = 1.0;
+  KontSolver solver;
+  try {
+    const ILPResult result =
+        solver.solve(costs, constraints, rhs, {0}, 5.0, 0.0);
+    return result.status == ILPResult::Status::OPTIMAL &&
+           result.solver_message.find("Exact fallback") == std::string::npos;
+  } catch (const std::exception& error) {
+    LOG_WARN("KONT/COPT runtime probe failed: {}", error.what());
+    return false;
+  }
+}
+
 ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
                             const Eigen::SparseMatrix<double>& matrix,
                             const Eigen::VectorXd& rhs,

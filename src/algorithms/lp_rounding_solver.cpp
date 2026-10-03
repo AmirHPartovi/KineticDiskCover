@@ -2,6 +2,7 @@
 
 #include "kdc/candidate.hpp"
 #include "kdc/logging.hpp"
+#include "kdc/profiling.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -63,23 +64,33 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
         "LP-rounding solver received inconsistent instance dimensions");
   }
   LOG_DEBUG("LPRounding::solve t={:.6f} trials={}", time, config_.num_trials);
+  ScopedPhaseTimer model_timer(ProfilePhase::MODEL_BUILD);
+  ScopedPhaseTimer build_timer(ProfilePhase::LP_ILP_BUILD);
   const auto started = Clock::now();
   if (instance.n == 0) {
     StaticSolution result = empty_solution(instance.m, name(), true);
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return result;
   }
   if (instance.m == 0) {
     StaticSolution result = empty_solution(instance.m, name(), false);
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return result;
   }
 
-  const std::vector<CandidateDisk> disks = CandidateSet::build(instance);
+  const auto precomputed =
+      CandidateSet::precompute(instance, active_budget());
+  const auto& disks = precomputed->candidates;
+  const StaticGeometry geometry = CandidateSet::build_geometry(
+      instance, *precomputed, time, active_budget());
   const CandidateSet::CoverageMatrix coverage =
-      CandidateSet::build_coverage(instance, disks, time);
+      CandidateSet::build_coverage(instance, disks, geometry, active_budget());
   const Index disk_count = disks.size();
   const Index point_count = static_cast<Index>(instance.n);
   const double pi = std::acos(-1.0);
@@ -88,14 +99,12 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
   std::vector<std::vector<int>> points_of_disk(disk_count);
   for (Index disk_id = 0; disk_id < disk_count; ++disk_id) {
     const CandidateDisk& disk = disks[disk_id];
-    const Point position =
-        instance.trajectories[static_cast<Index>(disk.supporting_point)]
-            .position(time);
-    const double radius =
-        (instance.stations[static_cast<Index>(disk.station_id)].pos - position)
-            .norm();
+    const double radius_squared = geometry.distance_squared(
+        static_cast<Index>(disk.station_id),
+        static_cast<Index>(disk.supporting_point), point_count);
+    const double radius = std::sqrt(radius_squared);
     radii[disk_id] = radius;
-    costs[static_cast<Eigen::Index>(disk_id)] = pi * radius * radius;
+    costs[static_cast<Eigen::Index>(disk_id)] = pi * radius_squared;
   }
   for (Index point = 0; point < point_count; ++point) {
     const int begin = coverage.row_ptr[point];
@@ -121,8 +130,14 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
   }
   matrix.setFromTriplets(entries.begin(), entries.end());
   const Eigen::VectorXd rhs = Eigen::VectorXd::Ones(instance.n);
-  const ILPResult lp =
-      ilp_->solve(costs, matrix, rhs, {}, config_.lp_time_limit_sec, 0.0);
+  build_timer.stop();
+  model_timer.stop();
+  const ILPResult lp = [&]() {
+    KDC_PROFILE_PHASE(ProfilePhase::LP_ILP_SOLVE);
+    return ilp_->solve(costs, matrix, rhs, {},
+                       effective_time_limit(config_.lp_time_limit_sec), 0.0);
+  }();
+  check_budget();
   if (lp.status != ILPResult::Status::OPTIMAL &&
       lp.status != ILPResult::Status::FEASIBLE) {
     LOG_WARN("LPRounding: LP solve returned unusable status {}",
@@ -130,6 +145,14 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
     StaticSolution result = empty_solution(instance.m, name(), false);
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(
+        result, BoundStatus::NONE,
+        lp.status == ILPResult::Status::INFEASIBLE
+            ? OptimalityStatus::INFEASIBLE
+            : (lp.status == ILPResult::Status::TIME_LIMIT
+                   ? OptimalityStatus::TIME_LIMIT
+                   : OptimalityStatus::FAILED),
+        false);
     return result;
   }
   if (lp.x.size() != disk_count ||
@@ -147,6 +170,9 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
     probabilities[disk_id] = std::clamp(value, 0.0, 1.0);
   }
   const double lp_lower_bound = lp.lower_bound;
+  const BoundStatus lp_bound_status =
+      lp.status == ILPResult::Status::OPTIMAL ? BoundStatus::CERTIFIED
+                                              : BoundStatus::HEURISTIC;
 
   std::mt19937 random(config_.seed);
   std::uniform_real_distribution<double> uniform(0.0, 1.0);
@@ -155,6 +181,7 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
   std::vector<double> best_radius(static_cast<Index>(instance.m), 0.0);
 
   for (int trial = 0; trial < config_.num_trials; ++trial) {
+    check_budget();
     std::vector<bool> uncovered(point_count, true);
     int num_uncovered = instance.n;
     std::vector<bool> selected(disk_count, false);
@@ -172,6 +199,7 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
     }
 
     while (num_uncovered > 0) {
+      check_budget();
       Index best_disk = disk_count;
       double best_key = -std::numeric_limits<double>::infinity();
       for (Index disk_id = 0; disk_id < disk_count; ++disk_id) {
@@ -242,6 +270,8 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
     result.lower_bound = lp_lower_bound;
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, lp_bound_status,
+                             OptimalityStatus::FAILED, false);
     return result;
   }
   StaticSolution result;
@@ -254,6 +284,8 @@ StaticSolution LPRoundingSolver::solve(const Instance& instance, double time) {
   result.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - started).count();
   result.solver_name = name();
+  set_static_result_status(result, lp_bound_status,
+                           OptimalityStatus::FEASIBLE, false);
   LOG_INFO("LPRounding: cost={:.9f} LB={:.9f} ratio={:.4f}", result.cost,
            result.lower_bound,
            result.cost / std::max(result.lower_bound, 1e-12));

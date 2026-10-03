@@ -32,11 +32,13 @@ StaticSolution IPStaticSolver::solve(const Instance& instance, double time) {
     throw std::invalid_argument("ilp_ is null");
   }
   const auto start = std::chrono::steady_clock::now();
+  check_budget();
   double lower_bound = 0.0;
   ILPResult::Status status = ILPResult::Status::ERROR;
   const StaticAssignment assignment = StationarySolver::solve_ip(
-      instance, time, *ilp_, config_.time_limit_sec, config_.gap_target,
-      &lower_bound, &status);
+      instance, time, *ilp_, effective_time_limit(config_.time_limit_sec),
+      config_.gap_target, &lower_bound, &status, active_budget());
+  check_budget();
   StaticSolution solution;
   solution.supporting_point = assignment.supporting_point;
   solution.radius = assignment.radius;
@@ -45,6 +47,34 @@ StaticSolution IPStaticSolver::solve(const Instance& instance, double time) {
   solution.lower_bound =
       status == ILPResult::Status::INFEASIBLE ? 0.0 : lower_bound;
   solution.upper_bound = assignment.cost;
+  solution.time_limited = status == ILPResult::Status::TIME_LIMIT;
+  BoundStatus bound_status = BoundStatus::NONE;
+  if (status == ILPResult::Status::OPTIMAL ||
+      status == ILPResult::Status::FEASIBLE ||
+      status == ILPResult::Status::TIME_LIMIT) {
+    bound_status = std::isfinite(lower_bound) ? BoundStatus::CERTIFIED
+                                              : BoundStatus::NONE;
+  }
+  OptimalityStatus optimality_status = OptimalityStatus::FAILED;
+  switch (status) {
+    case ILPResult::Status::OPTIMAL:
+      optimality_status = OptimalityStatus::OPTIMAL;
+      break;
+    case ILPResult::Status::FEASIBLE:
+      optimality_status = OptimalityStatus::FEASIBLE;
+      break;
+    case ILPResult::Status::TIME_LIMIT:
+      optimality_status = OptimalityStatus::TIME_LIMIT;
+      break;
+    case ILPResult::Status::INFEASIBLE:
+      optimality_status = OptimalityStatus::INFEASIBLE;
+      break;
+    case ILPResult::Status::UNBOUNDED:
+    case ILPResult::Status::ERROR:
+      optimality_status = OptimalityStatus::FAILED;
+      break;
+  }
+  set_static_result_status(solution, bound_status, optimality_status, true);
   solution.solve_time_sec =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - start)
           .count();

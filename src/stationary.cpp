@@ -2,6 +2,7 @@
 
 #include "kdc/candidate.hpp"
 #include "kdc/logging.hpp"
+#include "kdc/profiling.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -12,7 +13,8 @@
 
 namespace kdc {
 StaticAssignment StationarySolver::solve_nn(const Instance& instance,
-                                            double time) {
+                                            double time,
+                                            SolverBudget* budget) {
   LOG_DEBUG("NN: t={}", time);
   if (!std::isfinite(time) || time < 0.0 || time > instance.T_end) {
     throw std::out_of_range("stationary solve time is outside [0, T_end]");
@@ -24,39 +26,45 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
         "stationary solve received inconsistent instance dimensions");
   }
 
+  const auto precomputed = CandidateSet::precompute(instance, budget);
+  const StaticGeometry geometry =
+      CandidateSet::build_geometry(instance, *precomputed, time, budget);
   const auto point_count = static_cast<Index>(instance.n);
   const auto station_count = static_cast<Index>(instance.m);
-  std::vector<Point> points;
-  points.reserve(point_count);
-  for (const auto& trajectory : instance.trajectories) {
-    points.push_back(trajectory.position(time));
-  }
 
   std::vector<int> nearest_station(point_count, -1);
-  std::vector<Value> nearest_distance(point_count, 0.0);
+  std::vector<Value> nearest_distance_squared(point_count, 0.0);
   for (Index point_index = 0; point_index < point_count; ++point_index) {
-    Value best_distance = std::numeric_limits<Value>::infinity();
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    Value best_distance_squared = std::numeric_limits<Value>::infinity();
     int best_station = -1;
     for (Index station_index = 0; station_index < station_count;
          ++station_index) {
-      const Value distance =
-          (points[point_index] - instance.stations[station_index].pos).norm();
-      if (distance < best_distance) {
-        best_distance = distance;
+      if (budget != nullptr) {
+        budget->checkpoint();
+      }
+      const Value distance_squared =
+          geometry.distance_squared(station_index, point_index, point_count);
+      if (distance_squared < best_distance_squared) {
+        best_distance_squared = distance_squared;
         best_station = static_cast<int>(station_index);
       }
     }
     nearest_station[point_index] = best_station;
-    nearest_distance[point_index] =
-        best_station < 0 ? 0.0 : best_distance;
+    nearest_distance_squared[point_index] =
+        best_station < 0 ? 0.0 : best_distance_squared;
   }
 
   std::vector<Index> order(point_count);
   std::iota(order.begin(), order.end(), 0U);
   std::sort(order.begin(), order.end(),
-            [&nearest_distance](Index lhs, Index rhs) {
-              if (nearest_distance[lhs] != nearest_distance[rhs]) {
-                return nearest_distance[lhs] > nearest_distance[rhs];
+            [&nearest_distance_squared](Index lhs, Index rhs) {
+              if (nearest_distance_squared[lhs] !=
+                  nearest_distance_squared[rhs]) {
+                return nearest_distance_squared[lhs] >
+                       nearest_distance_squared[rhs];
               }
               return lhs < rhs;
             });
@@ -66,6 +74,9 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
   assignment.radius.assign(station_count, 0.0);
   std::vector<bool> covered(point_count, false);
   for (const Index point_index : order) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
     if (covered[point_index]) {
       continue;
     }
@@ -74,15 +85,22 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
       continue;
     }
     const auto station_index = static_cast<Index>(nearest);
-    if (nearest_distance[point_index] >= assignment.radius[station_index]) {
+    const Value distance_squared = nearest_distance_squared[point_index];
+    if (distance_squared >=
+        assignment.radius[station_index] * assignment.radius[station_index]) {
       assignment.supporting_point[station_index] =
           static_cast<int>(point_index);
-      assignment.radius[station_index] = nearest_distance[point_index];
+      assignment.radius[station_index] = std::sqrt(distance_squared);
     }
     const Value coverage_radius = assignment.radius[station_index];
-    const Point station = instance.stations[station_index].pos;
+    const Value radius_squared = coverage_radius * coverage_radius;
+    const Value tolerance = 2e-9 * coverage_radius + 1e-18;
     for (Index other_point = 0; other_point < point_count; ++other_point) {
-      if ((points[other_point] - station).norm() <= coverage_radius + 1e-9) {
+      if (budget != nullptr) {
+        budget->checkpoint();
+      }
+      if (geometry.distance_squared(station_index, other_point, point_count) <=
+          radius_squared + tolerance) {
         covered[other_point] = true;
       }
     }
@@ -107,7 +125,7 @@ StaticAssignment StationarySolver::solve_nn(const Instance& instance,
 StaticAssignment StationarySolver::solve_ip(
     const Instance& instance, double time, ILPSolver& solver,
     double time_limit_sec, double gap_target, double* out_lower_bound,
-    ILPResult::Status* out_status) {
+    ILPResult::Status* out_status, SolverBudget* budget) {
   LOG_DEBUG("IP: t={}, time_limit={}, gap={}", time, time_limit_sec,
             gap_target);
   if (!std::isfinite(time) || time < 0.0 || time > instance.T_end) {
@@ -124,19 +142,18 @@ StaticAssignment StationarySolver::solve_ip(
   Eigen::SparseMatrix<double> constraints;
   Eigen::VectorXd rhs = Eigen::VectorXd::Ones(instance.n);
   std::vector<int> integer_vars;
-  std::vector<CandidateDisk> disks;
-  std::vector<Point> points;
+  ScopedPhaseTimer model_timer(ProfilePhase::MODEL_BUILD);
+  ScopedPhaseTimer build_timer(ProfilePhase::LP_ILP_BUILD);
+  const auto precomputed = CandidateSet::precompute(instance, budget);
+  const auto& disks = precomputed->candidates;
+  const StaticGeometry geometry =
+      CandidateSet::build_geometry(instance, *precomputed, time, budget);
   if (instance.n > 0 && instance.m > 0) {
-    disks = CandidateSet::build(instance);
     const auto coverage =
-        CandidateSet::build_coverage(instance, disks, time);
+        CandidateSet::build_coverage(instance, disks, geometry, budget);
     costs.resize(static_cast<Eigen::Index>(disks.size()));
     constraints.resize(instance.n, static_cast<int>(disks.size()));
     integer_vars.reserve(disks.size());
-    points.reserve(static_cast<Index>(instance.n));
-    for (const auto& trajectory : instance.trajectories) {
-      points.push_back(trajectory.position(time));
-    }
 
     std::vector<Eigen::Triplet<double>> entries;
     entries.reserve(coverage.col_idx.size());
@@ -156,11 +173,11 @@ StaticAssignment StationarySolver::solve_ip(
     const Value pi = std::acos(-1.0);
     for (Index disk_index = 0; disk_index < disks.size(); ++disk_index) {
       const auto& disk = disks[disk_index];
-      const Point station =
-          instance.stations[static_cast<Index>(disk.station_id)].pos;
-      const Value radius =
-          (station - points[static_cast<Index>(disk.supporting_point)]).norm();
-      costs[static_cast<Eigen::Index>(disk_index)] = pi * radius * radius;
+      const Value radius_squared = geometry.distance_squared(
+          static_cast<Index>(disk.station_id),
+          static_cast<Index>(disk.supporting_point),
+          static_cast<Index>(instance.n));
+      costs[static_cast<Eigen::Index>(disk_index)] = pi * radius_squared;
       integer_vars.push_back(static_cast<int>(disk_index));
     }
   } else {
@@ -168,8 +185,22 @@ StaticAssignment StationarySolver::solve_ip(
     constraints.resize(instance.n, 0);
   }
 
-  const ILPResult result = solver.solve(costs, constraints, rhs, integer_vars,
-                                        time_limit_sec, gap_target);
+  if (budget != nullptr) {
+    budget->checkpoint();
+  }
+  build_timer.stop();
+  model_timer.stop();
+  const double effective_limit =
+      budget == nullptr ? time_limit_sec
+                        : budget->limit_seconds(time_limit_sec);
+  if (effective_limit <= 0.0) {
+    throw SolverBudgetExpired();
+  }
+  const ILPResult result = [&]() {
+    KDC_PROFILE_PHASE(ProfilePhase::LP_ILP_SOLVE);
+    return solver.solve(costs, constraints, rhs, integer_vars, effective_limit,
+                        gap_target);
+  }();
   if (out_status != nullptr) {
     *out_status = result.status;
   }
@@ -197,6 +228,13 @@ StaticAssignment StationarySolver::solve_ip(
       empty.feasible = true;
       return empty;
     }
+    if (result.status == ILPResult::Status::TIME_LIMIT) {
+      StaticAssignment interrupted;
+      interrupted.supporting_point.assign(static_cast<Index>(instance.m), -1);
+      interrupted.radius.assign(static_cast<Index>(instance.m), 0.0);
+      interrupted.feasible = false;
+      return interrupted;
+    }
     throw std::runtime_error(
         "IP solver returned no valid incumbent solution vector");
   }
@@ -214,10 +252,9 @@ StaticAssignment StationarySolver::solve_ip(
         continue;
       }
       const int support = disks[disk_index].supporting_point;
-      const Value radius =
-          (instance.stations[station_index].pos -
-           points[static_cast<Index>(support)])
-              .norm();
+      const Value radius = std::sqrt(geometry.distance_squared(
+          station_index, static_cast<Index>(support),
+          static_cast<Index>(instance.n)));
       if (radius > largest_radius) {
         largest_radius = radius;
         assignment.supporting_point[station_index] = support;
@@ -231,12 +268,15 @@ StaticAssignment StationarySolver::solve_ip(
     assignment.cost += pi * radius * radius;
   }
   assignment.feasible = true;
-  for (const Point& point : points) {
+  for (Index point_index = 0;
+       point_index < geometry.point_positions.size(); ++point_index) {
     bool covered = false;
     for (Index station_index = 0;
          station_index < static_cast<Index>(instance.m); ++station_index) {
-      if ((point - instance.stations[station_index].pos).norm() <=
-          assignment.radius[station_index] + 1e-9) {
+      const Value radius = assignment.radius[station_index];
+      if (geometry.distance_squared(station_index, point_index,
+                                    static_cast<Index>(instance.n)) <=
+          radius * radius + 2e-9 * radius + 1e-18) {
         covered = true;
         break;
       }

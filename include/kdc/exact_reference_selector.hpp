@@ -2,12 +2,20 @@
 
 #include <filesystem>
 #include <string>
+#include <vector>
 
 namespace kdc {
 struct ExactReferenceDecision {
   std::string requested_backend{};
   std::string actual_backend{};
   std::string manifest_path{};
+  std::string selected_backend{};
+  std::string selection_rule{};
+  std::vector<std::string> calibration_instances;
+  std::vector<std::string> successful_runs;
+  std::vector<std::string> rejected_runs;
+  double ip_kont_median_runtime_sec{-1.0};
+  double branch_and_bound_median_runtime_sec{-1.0};
   bool uses_kont{false};
   bool valid{false};
 };

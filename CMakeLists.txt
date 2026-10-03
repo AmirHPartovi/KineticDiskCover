@@ -1,6 +1,32 @@
 cmake_minimum_required(VERSION 3.20)
 project(kdc-solver VERSION 1.0.0 LANGUAGES CXX)
 
+execute_process(
+  COMMAND git rev-parse HEAD
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  OUTPUT_VARIABLE KDC_GIT_COMMIT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
+)
+if(NOT KDC_GIT_COMMIT)
+  set(KDC_GIT_COMMIT "unknown")
+endif()
+execute_process(
+  COMMAND git status --porcelain
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  OUTPUT_VARIABLE KDC_GIT_STATUS
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
+)
+if(KDC_GIT_STATUS)
+  set(KDC_GIT_DIRTY "true")
+else()
+  set(KDC_GIT_DIRTY "false")
+endif()
+string(TOUPPER "${CMAKE_BUILD_TYPE}" KDC_BUILD_TYPE_UPPER)
+set(KDC_RECORDED_COMPILER_FLAGS
+    "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${KDC_BUILD_TYPE_UPPER}}")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -107,6 +133,12 @@ list(REMOVE_ITEM KDC_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 add_library(kdc-core ${KDC_SOURCES})
 target_link_libraries(kdc-core PUBLIC Eigen3::Eigen nlohmann_json::nlohmann_json spdlog::spdlog)
 target_include_directories(kdc-core PUBLIC include)
+target_compile_definitions(kdc-core PRIVATE
+  KDC_GIT_COMMIT="${KDC_GIT_COMMIT}"
+  KDC_GIT_DIRTY="${KDC_GIT_DIRTY}"
+  KDC_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+  KDC_COMPILER_FLAGS="${KDC_RECORDED_COMPILER_FLAGS}"
+)
 if(KDC_HAS_COPT_CPP_API)
   target_link_libraries(kdc-core PUBLIC ${KONT_LIBRARY})
   target_include_directories(kdc-core PUBLIC ${KONT_INCLUDE_DIR})

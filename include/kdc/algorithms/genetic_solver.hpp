@@ -24,6 +24,7 @@ class GeneticSolver final : public IStaticSolver {
   std::string name() const override { return "genetic"; }
   bool is_exact() const override { return false; }
   bool provides_lower_bound() const override { return true; }
+  void set_seed(unsigned seed) override { config_.seed = seed; }
 
  private:
   struct Individual {

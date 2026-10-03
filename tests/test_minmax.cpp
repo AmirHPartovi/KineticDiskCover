@@ -37,6 +37,9 @@ TEST_CASE("MinMax solver produces a verified kinetic solution") {
 
   SECTION("small") {
     REQUIRE(result.verified);
+    REQUIRE(result.verification_kind ==
+            kdc::VerificationKind::CERTIFIED_CONTINUOUS);
+    REQUIRE(result.verification_time_sec >= 0.0);
     REQUIRE(result.solution.is_well_formed());
     REQUIRE(result.num_ip_solves >= 1);
     REQUIRE(result.num_iterations >= 1);

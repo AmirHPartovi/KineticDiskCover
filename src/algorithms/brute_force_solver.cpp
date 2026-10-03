@@ -78,12 +78,16 @@ StaticSolution BruteForceSolver::solve(const Instance& instance,
     solution.feasible = true;
     solution.lower_bound = 0.0;
     solution.upper_bound = 0.0;
+    set_static_result_status(solution, BoundStatus::CERTIFIED,
+                             OptimalityStatus::OPTIMAL, true);
     return solution;
   }
   if (instance.m == 0) {
     solution.feasible = false;
     solution.lower_bound = 0.0;
     solution.upper_bound = std::numeric_limits<double>::infinity();
+    set_static_result_status(solution, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, true);
     return solution;
   }
 
@@ -96,6 +100,8 @@ StaticSolution BruteForceSolver::solve(const Instance& instance,
       solution.feasible = false;
       solution.lower_bound = 0.0;
       solution.upper_bound = std::numeric_limits<double>::infinity();
+      set_static_result_status(solution, BoundStatus::NONE,
+                               OptimalityStatus::FAILED, true);
       return solution;
     }
     total_assignments *= static_cast<std::uint64_t>(instance.m);
@@ -125,6 +131,7 @@ StaticSolution BruteForceSolver::solve(const Instance& instance,
   std::uint64_t best_code = 0U;
   bool completed = true;
   for (std::uint64_t code = 0U; code < total_assignments; ++code) {
+    check_budget();
     const double elapsed =
         std::chrono::duration<double>(std::chrono::steady_clock::now() - start)
             .count();
@@ -150,6 +157,10 @@ StaticSolution BruteForceSolver::solve(const Instance& instance,
     solution.feasible = false;
     solution.lower_bound = 0.0;
     solution.upper_bound = std::numeric_limits<double>::infinity();
+    set_static_result_status(
+        solution, completed ? BoundStatus::NONE : BoundStatus::CERTIFIED,
+        completed ? OptimalityStatus::FAILED : OptimalityStatus::TIME_LIMIT,
+        true);
     return solution;
   }
   if (best_assignment.empty()) {
@@ -184,6 +195,11 @@ StaticSolution BruteForceSolver::solve(const Instance& instance,
   solution.feasible = true;
   solution.upper_bound = solution.cost;
   solution.lower_bound = completed ? solution.cost : 0.0;
+  solution.time_limited = !completed;
+  set_static_result_status(
+      solution, BoundStatus::CERTIFIED,
+      completed ? OptimalityStatus::OPTIMAL : OptimalityStatus::TIME_LIMIT,
+      true);
   LOG_INFO("BruteForce: cost={:.9f} total={} t={:.4f}s", solution.cost,
            total_assignments, solution.solve_time_sec);
   return solution;
