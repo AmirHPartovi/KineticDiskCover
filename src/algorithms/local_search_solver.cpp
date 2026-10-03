@@ -152,6 +152,8 @@ StaticSolution LocalSearchSolver::solve(const Instance& instance, double time) {
     result.upper_bound = 0.0;
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return result;
   }
   if (instance.m == 0) {
@@ -159,6 +161,8 @@ StaticSolution LocalSearchSolver::solve(const Instance& instance, double time) {
     result.upper_bound = std::numeric_limits<double>::infinity();
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return result;
   }
 
@@ -175,7 +179,7 @@ StaticSolution LocalSearchSolver::solve(const Instance& instance, double time) {
   }
 
   const StaticAssignment nearest =
-      StationarySolver::solve_nn(instance, time);
+      StationarySolver::solve_nn(instance, time, active_budget());
   State current;
   current.assignment.assign(static_cast<Index>(instance.n), -1);
   for (int point = 0; point < instance.n; ++point) {
@@ -203,6 +207,7 @@ StaticSolution LocalSearchSolver::solve(const Instance& instance, double time) {
   int restarts = 0;
   while (iterations < config_.max_iterations &&
          restarts < config_.max_restarts) {
+    check_budget();
     const std::vector<Move> moves =
         enumerate_moves(current, distances, instance.n, instance.m);
     std::vector<Move> improving;
@@ -272,6 +277,8 @@ StaticSolution LocalSearchSolver::solve(const Instance& instance, double time) {
   result.upper_bound = result.cost;
   result.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - started).count();
+  set_static_result_status(result, BoundStatus::CERTIFIED,
+                           OptimalityStatus::FEASIBLE, false);
   LOG_INFO("LocalSearch: cost={:.9f} LB={:.9f} iters={} restarts={}",
            result.cost, result.lower_bound, iterations, restarts);
   return result;

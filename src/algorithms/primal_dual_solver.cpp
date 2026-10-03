@@ -46,6 +46,8 @@ StaticSolution PrimalDualSolver::solve(const Instance& instance, double time) {
     solution.upper_bound = 0.0;
     solution.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(solution, BoundStatus::HEURISTIC,
+                             OptimalityStatus::FEASIBLE, false);
     return solution;
   }
   if (instance.m == 0) {
@@ -53,12 +55,18 @@ StaticSolution PrimalDualSolver::solve(const Instance& instance, double time) {
     solution.upper_bound = std::numeric_limits<double>::infinity();
     solution.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(solution, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return solution;
   }
 
-  const std::vector<CandidateDisk> disks = CandidateSet::build(instance);
+  const auto precomputed =
+      CandidateSet::precompute(instance, active_budget());
+  const auto& disks = precomputed->candidates;
+  const StaticGeometry geometry = CandidateSet::build_geometry(
+      instance, *precomputed, time, active_budget());
   const CandidateSet::CoverageMatrix coverage =
-      CandidateSet::build_coverage(instance, disks, time);
+      CandidateSet::build_coverage(instance, disks, geometry, active_budget());
   const Index disk_count = disks.size();
   const Index point_count = static_cast<Index>(instance.n);
   const double pi = std::acos(-1.0);
@@ -77,13 +85,10 @@ StaticSolution PrimalDualSolver::solve(const Instance& instance, double time) {
   std::vector<double> costs(disk_count, 0.0);
   for (Index disk_id = 0; disk_id < disk_count; ++disk_id) {
     const CandidateDisk& disk = disks[disk_id];
-    const Point position =
-        instance.trajectories[static_cast<Index>(disk.supporting_point)]
-            .position(time);
-    const double radius =
-        (instance.stations[static_cast<Index>(disk.station_id)].pos - position)
-            .norm();
-    costs[disk_id] = pi * radius * radius;
+    const double radius_squared = geometry.distance_squared(
+        static_cast<Index>(disk.station_id),
+        static_cast<Index>(disk.supporting_point), point_count);
+    costs[disk_id] = pi * radius_squared;
   }
 
   std::vector<double> dual(point_count, 0.0);
@@ -93,6 +98,7 @@ StaticSolution PrimalDualSolver::solve(const Instance& instance, double time) {
   std::vector<bool> point_covered(point_count, false);
   int uncovered_count = instance.n;
   while (uncovered_count > 0) {
+    check_budget();
     Index point = point_count;
     for (Index candidate = 0; candidate < point_count; ++candidate) {
       if (!point_covered[candidate]) {
@@ -213,6 +219,11 @@ StaticSolution PrimalDualSolver::solve(const Instance& instance, double time) {
                              : std::numeric_limits<double>::infinity();
   solution.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - started).count();
+  set_static_result_status(
+      solution, BoundStatus::HEURISTIC,
+      solution.feasible ? OptimalityStatus::FEASIBLE
+                        : OptimalityStatus::FAILED,
+      false);
   LOG_INFO("PrimalDual: cost={:.9f} LB={:.9f} ratio={:.4f} |D|={}",
            solution.cost, solution.lower_bound,
            solution.cost / std::max(solution.lower_bound, 1e-12),

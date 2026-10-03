@@ -11,6 +11,7 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -36,6 +37,7 @@ kdc::BatchRunConfig one_run_config(const std::filesystem::path& root,
   config.instances_dir = (root / "instances").string();
   config.output_dir = (root / output_name).string();
   config.algorithm_names = {"nn"};
+  config.profile = kdc::BenchmarkProfile::DEBUG;
   config.objectives = {kdc::ObjectiveType::MIN_MAX};
   config.per_ip_time_limit_sec = 10.0;
   return config;
@@ -61,10 +63,20 @@ TEST_CASE("BatchRunner: single instance single algorithm") {
   std::ifstream result_input(config.output_dir + "/master_results.json");
   const auto records = nlohmann::json::parse(result_input);
   REQUIRE(records.is_array());
-  REQUIRE(records.size() == 1U);
-  REQUIRE(records.front().at("feasible").get<bool>());
-  REQUIRE(records.front().at("time_limit_per_ip_sec").get<double>() == 10.0);
-  REQUIRE(records.front().at("solution_json_path").get<std::string>() != "");
+  REQUIRE(records.size() == 2U);
+  REQUIRE(records.back().at("algorithm_name") == "nn");
+  REQUIRE(records.back().at("feasible").get<bool>());
+  REQUIRE(records.back().at("bound_status").get<std::string>() ==
+          "CERTIFIED");
+  REQUIRE(records.back().at("optimality_status").get<std::string>() ==
+          "FEASIBLE");
+  REQUIRE_FALSE(records.back().at("exact_solver").get<bool>());
+  REQUIRE(records.back().at("minsum_refinement_policy").get<std::string>() ==
+          "HEURISTIC_ADAPTIVE");
+  REQUIRE(records.back().at("upper_bound").is_number());
+  REQUIRE(records.back().at("certified_gap").is_null());
+  REQUIRE(records.back().at("time_limit_per_ip_sec").get<double>() == 10.0);
+  REQUIRE(records.back().at("solution_json_path").get<std::string>() != "");
   std::filesystem::remove_all(root);
 }
 
@@ -92,8 +104,9 @@ TEST_CASE("BatchRunner: clears previous results but preserves other output files
   REQUIRE(std::filesystem::exists(output / "unrelated.txt"));
   std::ifstream result_input(output / "master_results.json");
   const auto records = nlohmann::json::parse(result_input);
-  REQUIRE(records.size() == 1U);
-  REQUIRE(records.front().at("time_limit_per_ip_sec").get<double>() == 10.0);
+  REQUIRE(records.size() == 2U);
+  REQUIRE(records.back().at("algorithm_name") == "nn");
+  REQUIRE(records.back().at("time_limit_per_ip_sec").get<double>() == 10.0);
   std::filesystem::remove_all(root);
 }
 
@@ -102,24 +115,50 @@ TEST_CASE("BatchRunner: multiple algorithms and modes") {
   write_instance(root / "instances");
   auto config = one_run_config(root, "output");
   config.algorithm_names = {"nn", "greedy", "ip-kont"};
+  config.exact_reference = "ip-kont";
   config.objectives = {kdc::ObjectiveType::MIN_MAX,
                        kdc::ObjectiveType::MIN_SUM};
+  config.minsum_refinement_policy =
+      kdc::MinSumRefinementPolicy::CERTIFIED_BOUND;
   kdc::MockILPSolver mock;
   kdc::BatchRunner::run(config, &mock);
 
   std::ifstream input(config.output_dir + "/master_results.json");
   const auto records = nlohmann::json::parse(input);
   REQUIRE(records.size() == 6U);
+  std::map<std::string, int> exact_count_by_objective;
+  std::map<std::string, std::string> exact_status_by_objective;
   for (const auto& record : records) {
     REQUIRE(record.at("result_json_path").get<std::string>() != "");
     REQUIRE(std::filesystem::exists(
         record.at("result_json_path").get<std::string>()));
+    if (record.at("objective") == "minsum") {
+      REQUIRE(record.at("minsum_refinement_policy").get<std::string>() ==
+              "CERTIFIED_BOUND");
+    }
+    if (record.at("algorithm_category") == "exact_reference") {
+      ++exact_count_by_objective[record.at("objective").get<std::string>()];
+      exact_status_by_objective[record.at("objective").get<std::string>()] =
+          record.at("optimality_status").get<std::string>();
+    }
+    if (record.at("algorithm_category") == "heuristic") {
+      REQUIRE(record.at("optimality_status").get<std::string>() != "OPTIMAL");
+      REQUIRE(record.at("certified_gap").is_null());
+    }
     REQUIRE(std::filesystem::exists(record.at("trace_csv_path").get<std::string>()));
     const auto trace =
         kdc::TraceWriter::read_csv(
             record.at("trace_csv_path").get<std::string>());
     if (record.at("feasible").get<bool>()) {
       REQUIRE_FALSE(trace.empty());
+    }
+    for (const auto& record : records) {
+      if (record.at("algorithm_category") == "heuristic" &&
+          !record.at("empirical_ratio_to_exact").is_null()) {
+        REQUIRE(exact_status_by_objective[record.at("objective")
+                                              .get<std::string>()] ==
+                "OPTIMAL");
+      }
     }
     for (const auto& row : trace) {
       REQUIRE(row.objective_value >= row.lower_bound - 1e-9);
@@ -129,6 +168,8 @@ TEST_CASE("BatchRunner: multiple algorithms and modes") {
           record.at("solution_json_path").get<std::string>()));
     }
   }
+  REQUIRE(exact_count_by_objective["minmax"] == 1);
+  REQUIRE(exact_count_by_objective["minsum"] == 1);
   std::ifstream csv(config.output_dir + "/master_results.csv");
   std::string header;
   std::getline(csv, header);
@@ -153,12 +194,15 @@ TEST_CASE("BatchRunner: parallel matches sequential") {
   std::ifstream par_input(parallel.output_dir + "/master_results.json");
   const auto seq = nlohmann::json::parse(seq_input);
   const auto par = nlohmann::json::parse(par_input);
-  REQUIRE(seq.size() == 1U);
-  REQUIRE(par.size() == 1U);
-  REQUIRE(kdc::test::near(seq[0].at("objective_value").get<double>(),
-                          par[0].at("objective_value").get<double>(), 1e-6));
-  REQUIRE(kdc::test::near(seq[0].at("gap").get<double>(),
-                          par[0].at("gap").get<double>(), 1e-6));
+  REQUIRE(seq.size() == 2U);
+  REQUIRE(par.size() == 2U);
+  REQUIRE(seq.back().at("algorithm_name") == "nn");
+  REQUIRE(par.back().at("algorithm_name") == "nn");
+  REQUIRE(kdc::test::near(seq.back().at("objective_value").get<double>(),
+                          par.back().at("objective_value").get<double>(), 1e-6));
+  REQUIRE(kdc::test::near(seq.back().at("gap").get<double>(),
+                          par.back().at("gap").get<double>(), 1e-6));
+  REQUIRE(seq.back().at("seed") == par.back().at("seed"));
   std::filesystem::remove_all(root);
 }
 
@@ -184,11 +228,12 @@ TEST_CASE("BatchRunner: records errors and keeps processing") {
 
   std::ifstream input(config.output_dir + "/master_results.json");
   const auto records = nlohmann::json::parse(input);
-  REQUIRE(records.size() == 1U);
-  REQUIRE_FALSE(records[0].at("error_message").get<std::string>().empty());
-  REQUIRE_FALSE(records[0].at("feasible").get<bool>());
+  REQUIRE(records.size() == 2U);
+  REQUIRE(records.back().at("algorithm_name") == "nn");
+  REQUIRE_FALSE(records.back().at("error_message").get<std::string>().empty());
+  REQUIRE_FALSE(records.back().at("feasible").get<bool>());
   REQUIRE(std::filesystem::exists(
-      records[0].at("result_json_path").get<std::string>()));
+      records.back().at("result_json_path").get<std::string>()));
   std::ifstream summary(config.output_dir + "/batch_summary.md");
   const std::string contents((std::istreambuf_iterator<char>(summary)),
                              std::istreambuf_iterator<char>());

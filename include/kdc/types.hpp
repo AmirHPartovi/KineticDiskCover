@@ -1,6 +1,8 @@
 #pragma once
 #include <cmath>
 #include <cstddef>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <stdexcept>
 #include <utility>
@@ -10,6 +12,13 @@ namespace kdc {
 using Index = std::size_t;
 using Value = double;
 using Vector = std::vector<Value>;
+
+struct InstancePrecompute;
+
+struct InstancePrecomputeCache {
+  std::mutex mutex;
+  std::shared_ptr<const InstancePrecompute> value;
+};
 
 struct Point {
   Value x{0.0};
@@ -73,5 +82,7 @@ struct Instance {
   Value T_end{1.0};
   std::vector<Station> stations;
   std::vector<Trajectory> trajectories;
+  mutable std::shared_ptr<InstancePrecomputeCache> precompute_cache{
+      std::make_shared<InstancePrecomputeCache>()};
 };
 }

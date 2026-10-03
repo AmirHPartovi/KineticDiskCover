@@ -27,7 +27,8 @@ struct CellResult {
 CellResult solve_cell(const Instance& parent,
                       const std::vector<int>& point_ids, double time,
                       ILPSolver* ilp,
-                      const ShiftingStrategySolver::Config& config) {
+                      const ShiftingStrategySolver::Config& config,
+                      SolverBudget* budget) {
   Instance subinstance;
   subinstance.id = parent.id;
   subinstance.name = parent.name;
@@ -47,10 +48,18 @@ CellResult solve_cell(const Instance& parent,
     ip_config.gap_target = config.cell_ip_gap;
     ip_config.time_limit_sec = config.cell_ip_time_limit_sec;
     IPStaticSolver solver(ilp, ip_config);
-    local = solver.solve(subinstance, time);
+    local = budget == nullptr
+                ? solver.solve(subinstance, time)
+                : solver.solve_with_budget(
+                      subinstance, time, *budget,
+                      config.cell_ip_time_limit_sec);
   } else {
     NNStaticSolver solver;
-    local = solver.solve(subinstance, time);
+    local = budget == nullptr
+                ? solver.solve(subinstance, time)
+                : solver.solve_with_budget(
+                      subinstance, time, *budget,
+                      config.cell_ip_time_limit_sec);
   }
   CellResult result;
   result.support = std::move(local.supporting_point);
@@ -110,6 +119,8 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
     result.upper_bound = 0.0;
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return result;
   }
   if (instance.m == 0) {
@@ -117,6 +128,8 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
     result.upper_bound = std::numeric_limits<double>::infinity();
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return result;
   }
 
@@ -163,12 +176,15 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
   // Keeping the best solution from every coarser resolution makes quality
   // monotone in l while still considering all shifts at the requested scale.
   for (int resolution = 1; resolution <= config_.l; ++resolution) {
+    check_budget();
     const double cell_width_x =
         width_x > 0.0 ? width_x / static_cast<double>(resolution) : 1.0;
     const double cell_width_y =
         width_y > 0.0 ? width_y / static_cast<double>(resolution) : 1.0;
     for (int shift_x = 0; shift_x < resolution; ++shift_x) {
+      check_budget();
       for (int shift_y = 0; shift_y < resolution; ++shift_y) {
+        check_budget();
         std::map<std::pair<int, int>, std::vector<int>> cells;
         const double offset_x =
             static_cast<double>(shift_x) * cell_width_x /
@@ -190,7 +206,8 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
         bool feasible = true;
         for (const auto& cell : cells) {
           const CellResult local =
-              solve_cell(instance, cell.second, time, ilp_, config_);
+              solve_cell(instance, cell.second, time, ilp_, config_,
+                         active_budget());
           if (!local.feasible) {
             feasible = false;
             break;
@@ -227,6 +244,8 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
   if (!std::isfinite(best_cost)) {
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::FAILED, false);
     return result;
   }
   double lower_bound = 0.0;
@@ -245,6 +264,8 @@ StaticSolution ShiftingStrategySolver::solve(const Instance& instance,
   LOG_INFO("Shifting: cost={:.9f} LB={:.9f} ratio={:.4f} l={}",
            result.cost, result.lower_bound,
            result.cost / std::max(result.lower_bound, 1e-12), config_.l);
+  set_static_result_status(result, BoundStatus::CERTIFIED,
+                           OptimalityStatus::FEASIBLE, false);
   return result;
 }
 }

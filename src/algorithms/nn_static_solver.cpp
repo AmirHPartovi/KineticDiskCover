@@ -11,7 +11,7 @@ StaticSolution NNStaticSolver::solve(const Instance& instance, double time) {
             instance.m);
   const auto start = std::chrono::steady_clock::now();
   const StaticAssignment assignment =
-      StationarySolver::solve_nn(instance, time);
+      StationarySolver::solve_nn(instance, time, active_budget());
   StaticSolution solution;
   solution.supporting_point = assignment.supporting_point;
   solution.radius = assignment.radius;
@@ -19,6 +19,10 @@ StaticSolution NNStaticSolver::solve(const Instance& instance, double time) {
   solution.feasible = assignment.feasible;
   solution.lower_bound = 0.0;
   solution.upper_bound = assignment.cost;
+  set_static_result_status(solution, BoundStatus::CERTIFIED,
+                           assignment.feasible ? OptimalityStatus::FEASIBLE
+                                               : OptimalityStatus::FAILED,
+                           false);
   solution.solve_time_sec =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - start)
           .count();

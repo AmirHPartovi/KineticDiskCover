@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kdc/solver_interface.hpp"
+#include "kdc/solver_budget.hpp"
 #include "kdc/types.hpp"
 
 #include <vector>
@@ -15,11 +16,13 @@ struct StaticAssignment {
 
 class StationarySolver {
  public:
-  static StaticAssignment solve_nn(const Instance& instance, double time);
+  static StaticAssignment solve_nn(const Instance& instance, double time,
+                                   SolverBudget* budget = nullptr);
   static StaticAssignment solve_ip(const Instance& instance, double time,
                                    ILPSolver& solver,
                                    double time_limit_sec, double gap_target,
                                    double* out_lower_bound = nullptr,
-                                   ILPResult::Status* out_status = nullptr);
+                                   ILPResult::Status* out_status = nullptr,
+                                   SolverBudget* budget = nullptr);
 };
 }

@@ -1,12 +1,15 @@
 #include "kdc/batch_runner.hpp"
 
+#include "kdc/benchmark_protocol.hpp"
 #include "kdc/benchmark.hpp"
+#include "kdc/candidate.hpp"
 #include "kdc/exact_reference_selector.hpp"
 #include "kdc/io.hpp"
 #include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
 #include "kdc/minmax.hpp"
 #include "kdc/minsum.hpp"
+#include "kdc/profiling.hpp"
 #include "kdc/solution_serializer.hpp"
 #include "kdc/static_solver_registry.hpp"
 #include "kdc/thread_pool.hpp"
@@ -32,35 +35,153 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <spdlog/spdlog.h>
 
 namespace kdc {
 namespace {
 using Json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
 
+unsigned run_seed(unsigned base, const std::string& instance,
+                  const std::string& algorithm, const std::string& objective,
+                  int repeat) {
+  std::uint32_t hash = 2166136261U ^ base;
+  const auto append = [&hash](const std::string& text) {
+    for (const unsigned char character : text) {
+      hash = (hash ^ character) * 16777619U;
+    }
+    hash = (hash ^ 0xffU) * 16777619U;
+  };
+  append(instance);
+  append(algorithm);
+  append(objective);
+  append(std::to_string(repeat));
+  return hash;
+}
+
+std::string experiment_timestamp() {
+  const auto now = std::chrono::system_clock::now();
+  const auto value = std::chrono::system_clock::to_time_t(now);
+  std::tm utc{};
+#if defined(_WIN32)
+  gmtime_s(&utc, &value);
+#else
+  gmtime_r(&value, &utc);
+#endif
+  std::ostringstream output;
+  output << std::put_time(&utc, "%Y%m%dT%H%M%SZ");
+  return output.str();
+}
+
+std::string experiment_id_for(const BatchRunConfig& config) {
+  std::ostringstream output;
+  output << "kdc-" << experiment_timestamp() << "-seed" << config.seed << '-'
+         << std::chrono::steady_clock::now().time_since_epoch().count();
+  return output.str();
+}
+
+class ScopedLogLevel {
+ public:
+  explicit ScopedLogLevel(spdlog::level::level_enum level)
+      : previous_(spdlog::get_level()) {
+    spdlog::set_level(level);
+  }
+  ~ScopedLogLevel() { spdlog::set_level(previous_); }
+
+ private:
+  spdlog::level::level_enum previous_;
+};
+
 Json record_json(const BatchRunRecord& record) {
-  return Json{{"instance_name", record.instance_name},
+  return Json{{"schema_version", 2},
+              {"instance_name", record.instance_name},
               {"algorithm_name", record.algorithm_name},
+              {"algorithm_category", record.algorithm_category},
+              {"requested_backend", record.requested_backend},
+              {"actual_backend", record.actual_backend},
               {"objective", record.objective},
+              {"repeat", record.repeat},
               {"n", record.n},
               {"m", record.m},
               {"wall_time_sec", record.wall_time_sec},
+              {"solve_time_sec", record.solve_time_sec},
+              {"peak_cost", record.peak_cost},
+              {"integral_cost", record.integral_cost},
+              {"empirical_ratio_to_exact",
+               record.empirical_ratio_to_exact
+                   ? Json(*record.empirical_ratio_to_exact)
+                   : Json(nullptr)},
+              {"ratio_to_incumbent",
+               record.ratio_to_incumbent ? Json(*record.ratio_to_incumbent)
+                                         : Json(nullptr)},
               {"cpu_time_sec", record.cpu_time_sec},
               {"peak_memory_mb", record.peak_memory_mb},
               {"time_limit_per_ip_sec", record.time_limit_per_ip_sec},
               {"objective_value", record.objective_value},
               {"lower_bound", record.lower_bound},
+              {"bound_status", bound_status_to_string(record.bound_status)},
+              {"upper_bound", std::isfinite(record.upper_bound)
+                                  ? Json(record.upper_bound)
+                                  : Json(nullptr)},
+              {"certified_gap", record.certified_gap.has_value()
+                                    && record.exact_solver && record.feasible &&
+                                            record.bound_status ==
+                                                BoundStatus::CERTIFIED
+                                    ? Json(*record.certified_gap)
+                                    : Json(nullptr)},
+              {"optimality_status",
+               optimality_status_to_string(
+                   record.time_limited ? OptimalityStatus::TIME_LIMIT
+                   : (!record.exact_solver &&
+                              record.optimality_status ==
+                                  OptimalityStatus::OPTIMAL
+                          ? OptimalityStatus::FEASIBLE
+                          : record.optimality_status))},
+              {"minsum_refinement_policy",
+               minsum_refinement_policy_to_string(
+                   record.minsum_refinement_policy)},
+              {"exact_solver", record.exact_solver},
               {"certified_lower_bound", record.certified_lower_bound},
               {"heuristic_lower_bound", record.heuristic_lower_bound},
               {"gap", record.gap},
               {"num_iterations", record.num_iterations},
               {"num_ip_solves", record.num_ip_solves},
               {"verified", record.verified},
+              {"verification_kind",
+               verification_kind_to_string(record.verification_kind)},
+              {"verification_time_sec", record.verification_time_sec},
+              {"serialization_time_sec", record.serialization_time_sec},
+              {"total_wall_time_sec", record.total_wall_time_sec},
+              {"num_static_solves", record.num_ip_solves},
+              {"seed", record.seed},
+              {"global_time_limit_sec", record.global_time_limit_sec},
+              {"per_static_time_limit_sec", record.time_limit_per_ip_sec},
+              {"refinement_policy",
+               minsum_refinement_policy_to_string(
+                   record.minsum_refinement_policy)},
+              {"verify_each_iteration", record.verify_each_iteration},
+              {"verify_after", record.verify_after},
+              {"handovers_enabled", record.handovers_enabled},
+              {"candidate_count",
+               record.candidate_count ? Json(*record.candidate_count)
+                                      : Json(nullptr)},
+              {"coverage_nnz", record.coverage_nnz
+                                   ? Json(*record.coverage_nnz)
+                                   : Json(nullptr)},
               {"feasible", record.feasible},
+              {"time_limited", record.time_limited},
+              {"timeout", record.timeout},
+              {"failed", record.failed},
+              {"error_message", record.error_message},
+              {"git_commit", record.git_commit},
+              {"compiler", record.compiler},
+              {"build_type", record.build_type},
+              {"thread_count", record.thread_count},
+              {"experiment_id", record.experiment_id},
+              {"configuration", record.configuration},
               {"solution_json_path", record.solution_json_path},
               {"trace_csv_path", record.trace_csv_path},
-              {"result_json_path", record.result_json_path},
-              {"error_message", record.error_message}};
+              {"result_json_path", record.result_json_path}};
 }
 
 std::string csv_escape(const std::string& value) {
@@ -100,14 +221,30 @@ std::string sanitize_path_component(const std::string& value) {
   return sanitized.empty() ? "unnamed" : sanitized;
 }
 
-void write_result(const BatchRunRecord& record) {
+void write_result(BatchRunRecord& record, bool track_time = true) {
+  KDC_PROFILE_PHASE(ProfilePhase::SERIALIZATION);
   const std::filesystem::path path(record.result_json_path);
   std::filesystem::create_directories(path.parent_path());
+  const auto serialization_started = Clock::now();
+  Json document = record_json(record);
+  std::string serialized = document.dump(2);
+  if (track_time) {
+    const double serialization_time =
+        std::chrono::duration<double>(Clock::now() - serialization_started)
+            .count();
+    record.serialization_time_sec += serialization_time;
+    record.total_wall_time_sec += serialization_time;
+    record.wall_time_sec += serialization_time;
+    document["serialization_time_sec"] = record.serialization_time_sec;
+    document["total_wall_time_sec"] = record.total_wall_time_sec;
+    document["wall_time_sec"] = record.wall_time_sec;
+    serialized = document.dump(2);
+  }
   std::ofstream output(path);
   if (!output) {
     throw std::runtime_error("cannot open batch result JSON: " + path.string());
   }
-  output << std::setw(2) << record_json(record) << '\n';
+  output << serialized << '\n';
   if (!output) {
     throw std::runtime_error("failed writing batch result JSON: " +
                              path.string());
@@ -132,20 +269,71 @@ std::string median_text(std::vector<double> values) {
 std::vector<std::string> csv_fields(const BatchRunRecord& record) {
   return {record.instance_name,
           record.algorithm_name,
+          record.algorithm_category,
+          record.requested_backend,
+          record.actual_backend,
           record.objective,
+          std::to_string(record.repeat),
           std::to_string(record.n),
           std::to_string(record.m),
           std::to_string(record.wall_time_sec),
+          std::to_string(record.solve_time_sec),
+          std::to_string(record.peak_cost),
+          std::to_string(record.integral_cost),
+          record.empirical_ratio_to_exact
+              ? std::to_string(*record.empirical_ratio_to_exact)
+              : "",
+          record.ratio_to_incumbent
+              ? std::to_string(*record.ratio_to_incumbent)
+              : "",
           std::to_string(record.cpu_time_sec),
           std::to_string(record.peak_memory_mb),
           std::to_string(record.time_limit_per_ip_sec),
           std::to_string(record.objective_value),
           std::to_string(record.lower_bound),
+          bound_status_to_string(record.bound_status),
+          std::isfinite(record.upper_bound) ? std::to_string(record.upper_bound)
+                                            : "",
+          record.certified_gap.has_value() && record.exact_solver &&
+                  record.feasible &&
+                  record.bound_status == BoundStatus::CERTIFIED
+              ? std::to_string(*record.certified_gap)
+              : "",
+          optimality_status_to_string(
+              record.time_limited ? OptimalityStatus::TIME_LIMIT
+              : (!record.exact_solver &&
+                         record.optimality_status == OptimalityStatus::OPTIMAL
+                     ? OptimalityStatus::FEASIBLE
+                     : record.optimality_status)),
+          minsum_refinement_policy_to_string(
+              record.minsum_refinement_policy),
+          record.exact_solver ? "true" : "false",
           std::to_string(record.gap),
           std::to_string(record.num_iterations),
           std::to_string(record.num_ip_solves),
           record.verified ? "true" : "false",
+          verification_kind_to_string(record.verification_kind),
+          std::to_string(record.verification_time_sec),
+          std::to_string(record.serialization_time_sec),
+          std::to_string(record.total_wall_time_sec),
+          std::to_string(record.seed),
+          std::to_string(record.global_time_limit_sec),
+          std::to_string(record.time_limit_per_ip_sec),
+          record.verify_each_iteration ? "true" : "false",
+          record.verify_after ? "true" : "false",
+          record.handovers_enabled ? "true" : "false",
+          record.candidate_count ? std::to_string(*record.candidate_count) : "",
+          record.coverage_nnz ? std::to_string(*record.coverage_nnz) : "",
           record.feasible ? "true" : "false",
+          record.time_limited ? "true" : "false",
+          record.timeout ? "true" : "false",
+          record.failed ? "true" : "false",
+          record.git_commit,
+          record.compiler,
+          record.build_type,
+          std::to_string(record.thread_count),
+          record.experiment_id,
+          record.configuration.dump(),
           record.error_message};
 }
 
@@ -153,11 +341,36 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
                                       const std::string& algorithm,
                                       ObjectiveType objective,
                                       const std::string& error,
-                                      const BatchRunConfig& config) {
+                                      const BatchRunConfig& config,
+                                      int repeat) {
   BatchRunRecord record;
   record.instance_name = path.stem().string();
   record.algorithm_name = algorithm;
+  record.algorithm_category =
+      algorithm == "ip-kont" || algorithm == "branch-and-bound"
+          ? "exact_reference"
+          : "heuristic";
+  record.requested_backend = config.exact_reference;
+  record.actual_backend = record.algorithm_category == "exact_reference"
+                              ? config.actual_backend
+                              : algorithm;
   record.objective = to_string(objective);
+  record.repeat = repeat;
+  record.failed = true;
+  record.error_message = error;
+  record.seed = run_seed(config.seed, record.instance_name, algorithm,
+                         record.objective, repeat);
+  record.global_time_limit_sec =
+      record.algorithm_category == "exact_reference"
+          ? config.exact_time_limit_sec
+          : config.fast_time_limit_sec;
+  record.verify_each_iteration = config.verify_each_iteration;
+  record.verify_after = config.verify_after;
+  record.experiment_id = config.experiment_id;
+  record.git_commit = KDC_GIT_COMMIT;
+  record.compiler = __VERSION__;
+  record.build_type = KDC_BUILD_TYPE;
+  record.thread_count = config.parallel ? config.num_threads : 1;
   record.time_limit_per_ip_sec = config.per_ip_time_limit_sec;
   record.error_message = error;
   const std::filesystem::path run_dir =
@@ -185,40 +398,27 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
   return record;
 }
 
-std::string exact_reference_name(const std::string& requested) {
-  if (requested == "ip-kont" || requested == "branch-and-bound") {
-    return requested;
-  }
-  const auto decision =
-      ExactReferenceSelector::resolve(requested, "data/instances",
-                                      "results/batch");
-  return decision.actual_backend == "KONT-COPT" ? "ip-kont" : "branch-and-bound";
-}
-
 std::vector<std::string> default_benchmark_algorithms(
-    const std::string& requested_exact_reference) {
+    const std::string& selected_exact_reference) {
   std::vector<std::string> algorithms = {"nn", "greedy", "primal-dual",
                                          "local-search", "sa", "genetic",
                                          "lp-rounding", "shifting"};
-  const std::string exact_reference =
-      requested_exact_reference.empty() || requested_exact_reference == "auto"
-          ? exact_reference_name(requested_exact_reference)
-          : requested_exact_reference;
-  if (std::find(algorithms.begin(), algorithms.end(), exact_reference) ==
+  if (std::find(algorithms.begin(), algorithms.end(),
+                selected_exact_reference) ==
       algorithms.end()) {
-    algorithms.push_back(exact_reference);
+    algorithms.push_back(selected_exact_reference);
   }
   return algorithms;
 }
 
 std::size_t algorithm_phase(const std::string& algorithm) {
-  if (algorithm == "nn" || algorithm == "greedy") {
+  if (algorithm == "ip-kont" || algorithm == "branch-and-bound") {
     return 0U;
   }
-  if (algorithm == "ip-kont" || algorithm == "branch-and-bound") {
-    return 2U;
+  if (algorithm == "nn" || algorithm == "greedy") {
+    return 1U;
   }
-  return 1U;
+  return 2U;
 }
 
 void clear_previous_batch_output(const std::filesystem::path& output) {
@@ -230,28 +430,39 @@ void clear_previous_batch_output(const std::filesystem::path& output) {
 }  // namespace
 
 void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
+  ScopedLogLevel log_level(config.profile == BenchmarkProfile::DEBUG
+                               ? spdlog::level::debug
+                               : spdlog::level::warn);
   if ((config.exact_reference != "auto" &&
        config.exact_reference != "ip-kont" &&
        config.exact_reference != "branch-and-bound") ||
       !std::isfinite(config.per_ip_time_limit_sec) ||
       config.per_ip_time_limit_sec <= 0.0 ||
+      !std::isfinite(config.fast_time_limit_sec) ||
+      config.fast_time_limit_sec <= 0.0 ||
+      !std::isfinite(config.exact_time_limit_sec) ||
+      config.exact_time_limit_sec <= 0.0 ||
       !std::isfinite(config.gap_target) || config.gap_target < 0.0 ||
       config.gap_target >= 1.0 || config.num_threads <= 0) {
     throw std::invalid_argument("batch runner configuration is invalid");
   }
+  if (config.repeats <= 0) {
+    throw std::invalid_argument("batch runner repeat count must be positive");
+  }
   if (config.objectives.empty()) {
     throw std::invalid_argument("batch runner requires at least one objective");
   }
-
-  const auto exact_reference_decision =
-      ExactReferenceSelector::resolve(config.exact_reference,
-                                      config.instances_dir, config.output_dir);
-  if (config.exact_reference == "auto") {
-    LOG_INFO("BatchRunner: exact reference auto-selected '{}' (requested={}, manifest={})",
-             exact_reference_decision.actual_backend,
-             exact_reference_decision.requested_backend,
-             exact_reference_decision.manifest_path);
+  const bool explicitly_selects_both_exact_backends =
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "ip-kont") != config.algorithm_names.end() &&
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "branch-and-bound") != config.algorithm_names.end();
+  if (explicitly_selects_both_exact_backends) {
+    throw std::invalid_argument(
+        "strict benchmark mode cannot select both ip-kont and "
+        "branch-and-bound");
   }
+
   LOG_INFO("BatchRunner: scanning {} for instances", config.instances_dir);
   const std::filesystem::path instances_dir(config.instances_dir);
   if (!std::filesystem::is_directory(instances_dir)) {
@@ -274,6 +485,24 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
     return;
   }
 
+  if (!config.strict_exact_reference && config.exact_reference == "auto") {
+    throw std::invalid_argument(
+        "benchmark fragments must reuse an explicit experiment exact-reference "
+        "decision, not calibrate independently");
+  }
+  const auto exact_reference_decision =
+      ExactReferenceSelector::resolve(config.exact_reference,
+                                      config.instances_dir, config.output_dir);
+  if (!exact_reference_decision.valid) {
+    throw std::invalid_argument("exact-reference selection is invalid");
+  }
+  LOG_INFO("BatchRunner: exact reference selected '{}' (actual={}, "
+           "requested={}, manifest={})",
+           exact_reference_decision.selected_backend,
+           exact_reference_decision.actual_backend,
+           exact_reference_decision.requested_backend,
+           exact_reference_decision.manifest_path);
+
   const auto registered = StaticSolverRegistry::list();
   std::vector<std::string> algorithms;
   const bool wants_default_selection =
@@ -283,8 +512,20 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                     return value == "all" || value == "ALL";
                   });
 
-  if (wants_default_selection) {
-    algorithms = default_benchmark_algorithms(config.exact_reference);
+  const bool wants_fast =
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "all-fast") != config.algorithm_names.end();
+  const bool wants_comparison =
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "all-comparison") != config.algorithm_names.end();
+  if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
+    algorithms = {exact_reference_decision.selected_backend};
+  } else if (wants_default_selection || wants_fast || wants_comparison) {
+    algorithms = default_benchmark_algorithms(
+        exact_reference_decision.selected_backend);
+  } else if (config.algorithm_names.empty()) {
+    algorithms = default_benchmark_algorithms(
+        exact_reference_decision.selected_backend);
   } else {
     for (const auto& requested : config.algorithm_names) {
       if (requested == "brute-force") {
@@ -303,6 +544,38 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
     }
   }
 
+  const auto exact_count = static_cast<int>(std::count_if(
+      algorithms.begin(), algorithms.end(), [](const std::string& name) {
+        return name == "ip-kont" || name == "branch-and-bound";
+      }));
+  if (exact_count > 1) {
+    throw std::invalid_argument(
+        "strict benchmark mode accepts exactly one exact backend; remove "
+        "either ip-kont or branch-and-bound");
+  }
+  const auto exact_position = std::find_if(
+      algorithms.begin(), algorithms.end(), [](const std::string& name) {
+        return name == "ip-kont" || name == "branch-and-bound";
+      });
+  if (exact_position != algorithms.end() &&
+      *exact_position != exact_reference_decision.selected_backend) {
+    if (config.exact_reference == "ip-kont" &&
+        exact_reference_decision.selected_backend == "branch-and-bound") {
+      *exact_position = exact_reference_decision.selected_backend;
+    } else {
+      throw std::invalid_argument(
+          "selected exact algorithm conflicts with the experiment manifest "
+          "decision; set --exact-reference to the requested backend");
+    }
+  }
+  if (config.strict_exact_reference && exact_position == algorithms.end()) {
+    algorithms.push_back(exact_reference_decision.selected_backend);
+  }
+  if (wants_fast || wants_comparison || wants_default_selection) {
+    algorithms = default_benchmark_algorithms(
+        exact_reference_decision.selected_backend);
+  }
+
   if (algorithms.empty()) {
     LOG_ERROR("BatchRunner: no registered algorithms selected");
   }
@@ -310,23 +583,75 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                    [](const std::string& lhs, const std::string& rhs) {
                      return algorithm_phase(lhs) < algorithm_phase(rhs);
                    });
+  BatchRunConfig run_config = config;
+  if (run_config.profile == BenchmarkProfile::FAST) {
+    run_config.minsum_refinement_policy =
+        MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+    run_config.verify_after = true;
+    run_config.verify_each_iteration = false;
+    run_config.save_solutions = false;
+    run_config.save_traces = false;
+  } else if (run_config.profile == BenchmarkProfile::EXACT_REFERENCE) {
+    run_config.minsum_refinement_policy =
+        MinSumRefinementPolicy::CERTIFIED_BOUND;
+    run_config.verify_after = true;
+    run_config.verify_each_iteration = false;
+  } else {
+    run_config.minsum_refinement_policy =
+        MinSumRefinementPolicy::CERTIFIED_BOUND;
+    run_config.verify_after = true;
+    run_config.verify_each_iteration = true;
+  }
+  run_config.actual_backend = exact_reference_decision.actual_backend;
+  if (run_config.experiment_id.empty()) {
+    run_config.experiment_id = experiment_id_for(run_config);
+  }
+  const std::filesystem::path output(config.output_dir);
+  std::filesystem::create_directories(output);
+  Json calibration = Json::object();
+  const std::filesystem::path manifest_path =
+      output / "experiment_manifest.json";
+  if (std::filesystem::is_regular_file(manifest_path)) {
+    std::ifstream prior(manifest_path);
+    if (prior) {
+      prior >> calibration;
+    }
+  }
+  const std::string dataset_identity =
+      calibration.value("dataset_fingerprint", std::string{});
+  Json manifest = make_experiment_manifest(
+      run_config.experiment_id, {}, config.instances_dir, dataset_identity,
+      config.profile, algorithms, config.exact_reference,
+      exact_reference_decision.actual_backend, calibration,
+      config.fast_time_limit_sec, config.exact_time_limit_sec,
+      config.per_ip_time_limit_sec, config.seed, config.repeats,
+      minsum_refinement_policy_to_string(
+          run_config.minsum_refinement_policy),
+      run_config.verify_each_iteration, run_config.verify_after, true, "auto",
+      config.parallel ? config.num_threads : 1);
+  write_experiment_manifest(manifest_path.string(), manifest);
 
   struct WorkItem {
     std::filesystem::path instance_path;
     std::string algorithm;
     ObjectiveType objective;
+    int repeat{0};
   };
   std::vector<std::vector<WorkItem>> phases(3U);
   for (const auto& path : instance_paths) {
     for (const auto& algorithm : algorithms) {
       for (const auto objective : config.objectives) {
-        phases[algorithm_phase(algorithm)].push_back(
-            {path, algorithm, objective});
+        const bool exact = algorithm == "ip-kont" ||
+                           algorithm == "branch-and-bound";
+        const int repeat_count = exact ? 1 : config.repeats;
+        for (int repeat = 0; repeat < repeat_count; ++repeat) {
+          phases[algorithm_phase(algorithm)].push_back(
+              {path, algorithm, objective, repeat});
+        }
       }
     }
   }
 
-  const std::filesystem::path output(config.output_dir);
   clear_previous_batch_output(output);
 
   std::vector<BatchRunRecord> records;
@@ -341,16 +666,18 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       std::vector<std::future<BatchRunRecord>> futures;
       futures.reserve(phase.size());
       for (const auto& item : phase) {
-        futures.push_back(pool.submit([item, config]() {
+        futures.push_back(pool.submit([item, run_config]() {
           try {
             const Instance instance =
                 DatasetReader::read_json(item.instance_path.string());
             KontSolver task_ilp;
             return BatchRunner::run_single(instance, item.algorithm,
-                                           item.objective, &task_ilp, config);
+                                           item.objective, &task_ilp, run_config,
+                                           item.repeat);
           } catch (const std::exception& error) {
             return failed_instance_record(item.instance_path, item.algorithm,
-                                          item.objective, error.what(), config);
+                                          item.objective, error.what(), run_config,
+                                          item.repeat);
           }
         }));
       }
@@ -364,11 +691,12 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
           const Instance instance =
               DatasetReader::read_json(item.instance_path.string());
           records.push_back(run_single(instance, item.algorithm,
-                                       item.objective, ilp, config));
+                                       item.objective, ilp, run_config,
+                                       item.repeat));
         } catch (const std::exception& error) {
           records.push_back(failed_instance_record(
               item.instance_path, item.algorithm, item.objective, error.what(),
-              config));
+              run_config, item.repeat));
         }
       }
     }
@@ -382,6 +710,56 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                               rhs.objective);
             });
 
+  std::map<std::pair<std::string, std::string>, const BatchRunRecord*>
+      exact_results;
+  std::map<std::pair<std::string, std::string>, double> incumbents;
+  for (const auto& record : records) {
+    if (!record.feasible || !std::isfinite(record.objective_value)) {
+      continue;
+    }
+    const auto key = std::make_pair(record.instance_name, record.objective);
+    const auto incumbent = incumbents.find(key);
+    if (incumbent == incumbents.end() ||
+        record.objective_value < incumbent->second) {
+      incumbents[key] = record.objective_value;
+    }
+    if (record.algorithm_category == "exact_reference" &&
+        record.repeat == 0) {
+      exact_results[key] = &record;
+    }
+  }
+  for (auto& record : records) {
+    if (!record.feasible || !std::isfinite(record.objective_value)) {
+      continue;
+    }
+    const auto key = std::make_pair(record.instance_name, record.objective);
+    const auto incumbent = incumbents.find(key);
+    if (incumbent != incumbents.end()) {
+      if (incumbent->second > 0.0) {
+        record.ratio_to_incumbent =
+            record.objective_value / incumbent->second;
+      } else if (record.objective_value <= 1e-12) {
+        record.ratio_to_incumbent = 1.0;
+      }
+    }
+    const auto exact = exact_results.find(key);
+    if (exact != exact_results.end() &&
+        exact->second->optimality_status == OptimalityStatus::OPTIMAL &&
+        exact->second->feasible &&
+        std::isfinite(exact->second->objective_value)) {
+      const double exact_value = exact->second->objective_value;
+      if (exact_value > 0.0) {
+        record.empirical_ratio_to_exact =
+            record.objective_value / exact_value;
+      } else if (record.objective_value <= 1e-12) {
+        record.empirical_ratio_to_exact = 1.0;
+      }
+    }
+  }
+  for (auto& record : records) {
+    write_result(record, false);
+  }
+
   std::filesystem::create_directories(output);
   save_master(records, (output / "master_results.json").string(),
               (output / "master_results.csv").string());
@@ -392,19 +770,61 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
 BatchRunRecord BatchRunner::run_single(const Instance& instance,
                                        const std::string& algorithm_name,
                                        ObjectiveType objective, ILPSolver* ilp,
-                                       const BatchRunConfig& config) {
+                                       const BatchRunConfig& config,
+                                       int repeat) {
   BatchRunRecord record;
   record.instance_name = instance.name.empty() ? std::to_string(instance.id)
                                                 : instance.name;
   record.algorithm_name = algorithm_name;
+  record.algorithm_category =
+      algorithm_name == "ip-kont" || algorithm_name == "branch-and-bound"
+          ? "exact_reference"
+          : "heuristic";
+  record.requested_backend = config.exact_reference;
+  record.actual_backend =
+      record.algorithm_category == "exact_reference"
+          ? config.actual_backend
+          : algorithm_name;
   record.objective = to_string(objective);
+  record.repeat = repeat;
+  if (objective == ObjectiveType::MIN_SUM) {
+    record.minsum_refinement_policy = config.minsum_refinement_policy;
+  }
   record.n = instance.n;
   record.m = instance.m;
   record.time_limit_per_ip_sec = config.per_ip_time_limit_sec;
+  const bool exact = record.algorithm_category == "exact_reference";
+  record.global_time_limit_sec =
+      exact ? config.exact_time_limit_sec : config.fast_time_limit_sec;
+  record.seed = run_seed(config.seed, record.instance_name, algorithm_name,
+                         record.objective, repeat);
+  record.verify_each_iteration = config.verify_each_iteration;
+  record.verify_after = config.verify_after;
+  record.handovers_enabled = true;
+  record.git_commit = KDC_GIT_COMMIT;
+  record.compiler = __VERSION__;
+  record.build_type = KDC_BUILD_TYPE;
+  record.thread_count = config.parallel ? config.num_threads : 1;
+  record.experiment_id = config.experiment_id;
+  record.configuration = {
+      {"profile", benchmark_profile_to_string(config.profile)},
+      {"algorithm", algorithm_name},
+      {"objective", record.objective},
+      {"repeat", repeat},
+      {"seed", record.seed},
+      {"per_static_time_limit_sec", config.per_ip_time_limit_sec},
+      {"global_time_limit_sec", record.global_time_limit_sec},
+      {"verify_each_iteration", record.verify_each_iteration},
+      {"verify_after", record.verify_after},
+      {"minsum_refinement_policy",
+       minsum_refinement_policy_to_string(config.minsum_refinement_policy)},
+      {"handovers_enabled", record.handovers_enabled},
+      {"cache_policy", "auto"}};
 
   const std::filesystem::path run_dir(
       make_run_dir(config.output_dir + "/runs", record.instance_name,
-                   algorithm_name, record.objective));
+                   algorithm_name, record.objective) +
+      (repeat == 0 ? "" : "/repeat-" + std::to_string(repeat)));
   std::filesystem::create_directories(run_dir);
   record.solution_json_path =
       config.save_solutions ? (run_dir / "solution.json").string() : "";
@@ -420,49 +840,120 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       throw std::runtime_error("unknown algorithm: " + algorithm_name);
     }
     solver->set_time_limit(config.per_ip_time_limit_sec);
+    solver->set_seed(record.seed);
+    const double global_limit = record.global_time_limit_sec;
+    SolverBudget budget(global_limit);
 
     KineticSolution solution;
+    std::vector<IterTrace> trace_rows;
     if (objective == ObjectiveType::MIN_MAX) {
       MinMaxSolver::Config solver_config;
       solver_config.time_limit_per_ip = config.per_ip_time_limit_sec;
+      solver_config.global_time_limit_sec = global_limit;
       solver_config.gap_target = config.gap_target;
       solver_config.verify_after = config.verify_after;
-      solver_config.trace_csv_path = record.trace_csv_path;
-      const auto result = MinMaxSolver::solve(instance, *solver, solver_config);
+      solver_config.verify_each_iteration = config.verify_each_iteration;
+      solver_config.trace_csv_path.clear();
+      const auto result =
+          MinMaxSolver::solve(instance, *solver, solver_config, budget);
       record.objective_value = result.peak_cost;
+      record.solve_time_sec = result.total_time_sec;
       record.lower_bound = result.lower_bound;
+      record.bound_status = result.bound_status;
+      record.upper_bound = result.upper_bound;
+      record.certified_gap = result.certified_gap;
+      record.optimality_status = result.optimality_status;
+      record.exact_solver = result.exact_solver;
+      record.certified_lower_bound = result.certified_lower_bound;
+      record.heuristic_lower_bound = result.heuristic_lower_bound;
       record.gap = result.gap;
       record.num_iterations = result.num_iterations;
       record.num_ip_solves = result.num_ip_solves;
       record.verified = result.verified;
-      record.feasible = result.solution.is_well_formed();
+      record.verification_kind = result.verification_kind;
+      record.verification_time_sec = result.verification_time_sec;
+      record.time_limited = result.time_limited;
+      record.feasible = result.feasible;
       solution = result.solution;
+      trace_rows = result.trace;
     } else {
       MinSumSolver::Config solver_config;
       solver_config.time_limit_per_ip = config.per_ip_time_limit_sec;
+      solver_config.global_time_limit_sec = global_limit;
       solver_config.gap_target = config.gap_target;
+      solver_config.refinement_policy = config.minsum_refinement_policy;
       solver_config.verify_after = config.verify_after;
-      const auto result = MinSumSolver::solve(instance, *solver, solver_config);
+      solver_config.verify_each_iteration = config.verify_each_iteration;
+      const auto result =
+          MinSumSolver::solve(instance, *solver, solver_config, budget);
       record.objective_value = result.total_integral;
-      record.lower_bound = result.lower_bound_integral;
+      record.solve_time_sec = result.total_time_sec;
+      record.lower_bound = result.lower_bound;
+      record.bound_status = result.bound_status;
+      record.upper_bound = result.upper_bound;
+      record.certified_gap = result.certified_gap;
+      record.optimality_status = result.optimality_status;
+      record.minsum_refinement_policy = result.refinement_policy;
+      record.exact_solver = result.exact_solver;
+      record.certified_lower_bound =
+          result.certified_lower_bound_integral;
+      record.heuristic_lower_bound =
+          result.heuristic_lower_bound_integral;
       record.gap = result.gap;
       record.num_iterations = result.num_iterations;
       record.num_ip_solves = result.num_ip_solves;
       record.verified = result.verified;
-      record.feasible = result.solution.is_well_formed();
+      record.verification_kind = result.verification_kind;
+      record.verification_time_sec = result.verification_time_sec;
+      record.time_limited = result.time_limited;
+      record.feasible = result.feasible;
       solution = result.solution;
-      if (config.save_traces) {
-        TraceWriter::write_csv(result.trace, record.trace_csv_path);
-      }
+      trace_rows = result.trace;
     }
 
     if (!record.feasible) {
-      record.error_message = "solver returned a malformed solution";
+      if (record.error_message.empty()) {
+        record.error_message =
+            record.optimality_status == OptimalityStatus::INFEASIBLE
+                ? "solver proved the instance infeasible"
+                : (record.time_limited
+                       ? "solver timed out without a feasible incumbent"
+                       : "solver returned no feasible solution");
+      }
+      if (!record.time_limited) {
+        record.optimality_status = OptimalityStatus::FAILED;
+      }
+      record.certified_gap.reset();
+      record.upper_bound = std::numeric_limits<double>::infinity();
+      record.failed = !record.time_limited;
     }
+    const auto serialization_started = Clock::now();
+    if (config.save_traces) {
+      TraceWriter::write_csv(trace_rows, record.trace_csv_path);
+    }
+    record.peak_cost = solution.peak_cost();
+    record.integral_cost = solution.total_integral();
+    record.candidate_count =
+        CandidateSet::precompute(instance)->candidates.size();
     if (config.save_solutions && record.feasible) {
       SolutionSerializer::save_json(instance, solution,
                                     record.solution_json_path);
     }
+    record.serialization_time_sec =
+        std::chrono::duration<double>(Clock::now() - serialization_started)
+            .count();
+  } catch (const SolverBudgetExpired& error) {
+    record.feasible = false;
+    record.verified = false;
+    record.optimality_status = OptimalityStatus::FAILED;
+    record.time_limited = true;
+    record.timeout = true;
+    record.failed = false;
+    record.optimality_status = OptimalityStatus::TIME_LIMIT;
+    record.error_message = error.what();
+    record.failed = true;
+    LOG_WARN("BatchRunner: {} / {} / {} exhausted its budget",
+             record.instance_name, algorithm_name, record.objective);
   } catch (const std::exception& error) {
     record.feasible = false;
     record.verified = false;
@@ -482,6 +973,8 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
 
   record.wall_time_sec =
       std::chrono::duration<double>(Clock::now() - wall_start).count();
+  record.timeout = record.time_limited;
+  record.total_wall_time_sec = record.wall_time_sec;
   record.cpu_time_sec =
       static_cast<double>(std::clock() - cpu_start) / CLOCKS_PER_SEC;
   record.peak_memory_mb = BenchmarkRunner::get_peak_memory_mb();
@@ -532,10 +1025,19 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
     throw std::runtime_error("cannot open batch master CSV: " + csv_path);
   }
   csv_output
-      << "instance_name,algorithm_name,objective,n,m,wall_time_sec,"
-         "cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
-         "objective_value,lower_bound,gap,"
-         "num_iterations,num_ip_solves,verified,feasible,error_message\n";
+      << "instance_name,algorithm_name,algorithm_category,requested_backend,"
+         "actual_backend,objective,repeat,n,m,wall_time_sec,"
+         "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
+         "peak_cost,integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
+         "objective_value,lower_bound,bound_status,upper_bound,certified_gap,"
+         "optimality_status,minsum_refinement_policy,exact_solver,gap,"
+         "num_iterations,num_ip_solves,verified,verification_kind,"
+         "verification_time_sec,serialization_time_sec,total_wall_time_sec,"
+         "seed,global_time_limit_sec,per_static_time_limit_sec,"
+         "verify_each_iteration,verify_after,handovers_enabled,candidate_count,"
+         "coverage_nnz,feasible,time_limited,timeout,failed,git_commit,"
+         "compiler,build_type,thread_count,experiment_id,configuration,"
+         "error_message\n";
   for (const auto& record : records) {
     const auto fields = csv_fields(record);
     for (std::size_t index = 0; index < fields.size(); ++index) {

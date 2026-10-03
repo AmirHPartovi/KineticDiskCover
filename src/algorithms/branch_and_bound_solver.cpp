@@ -116,6 +116,7 @@ double BranchAndBoundSolver::compute_lower_bound(
   if (config_.use_lp_lower_bound && ilp_ != nullptr && node.depth == 0 &&
       config_.time_limit_sec >= 30.0 && point_count > 0 &&
       station_count > 0) {
+    check_budget();
     global_lp_lower_bound_ =
         compute_lp_lower_bound(node, distances, station_count, point_count,
                                time, instance);
@@ -131,8 +132,13 @@ double BranchAndBoundSolver::compute_lp_lower_bound(
   (void)node;
   (void)distances;
   (void)station_count;
-  const auto disks = CandidateSet::build(instance);
-  const auto coverage = CandidateSet::build_coverage(instance, disks, time);
+  const auto precomputed =
+      CandidateSet::precompute(instance, active_budget());
+  const auto& disks = precomputed->candidates;
+  const auto geometry = CandidateSet::build_geometry(
+      instance, *precomputed, time, active_budget());
+  const auto coverage =
+      CandidateSet::build_coverage(instance, disks, geometry, active_budget());
   Eigen::VectorXd costs(static_cast<Eigen::Index>(disks.size()));
   Eigen::SparseMatrix<double> constraints(point_count,
                                            static_cast<int>(disks.size()));
@@ -151,13 +157,15 @@ double BranchAndBoundSolver::compute_lp_lower_bound(
   const double pi = std::acos(-1.0);
   for (Index disk = 0; disk < disks.size(); ++disk) {
     const auto& candidate = disks[disk];
-    const double distance =
-        distances[static_cast<Index>(candidate.supporting_point)]
-                 [static_cast<Index>(candidate.station_id)];
-    costs[static_cast<Eigen::Index>(disk)] = pi * distance * distance;
+    const double distance_squared = geometry.distance_squared(
+        static_cast<Index>(candidate.station_id),
+        static_cast<Index>(candidate.supporting_point),
+        static_cast<Index>(point_count));
+    costs[static_cast<Eigen::Index>(disk)] = pi * distance_squared;
   }
   const ILPResult result =
-      ilp_->solve(costs, constraints, rhs, {}, 30.0, 0.0);
+      ilp_->solve(costs, constraints, rhs, {},
+                  effective_time_limit(30.0), 0.0);
   if (result.status != ILPResult::Status::OPTIMAL &&
       result.status != ILPResult::Status::FEASIBLE &&
       result.status != ILPResult::Status::TIME_LIMIT) {
@@ -168,7 +176,9 @@ double BranchAndBoundSolver::compute_lp_lower_bound(
     throw std::runtime_error(
         "branch-and-bound LP returned an invalid lower bound");
   }
-  return result.lower_bound;
+  return result.status == ILPResult::Status::OPTIMAL
+             ? result.lower_bound
+             : 0.0;
 }
 
 StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
@@ -193,10 +203,15 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
     trivial.lower_bound = 0.0;
     trivial.upper_bound = 0.0;
     trivial.solver_name = name();
+    set_static_result_status(trivial, BoundStatus::CERTIFIED,
+                             OptimalityStatus::OPTIMAL, true);
     return trivial;
   }
   if (instance.m == 0) {
-    return infeasible_solution(instance.m, name());
+    StaticSolution infeasible = infeasible_solution(instance.m, name());
+    set_static_result_status(infeasible, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, true);
+    return infeasible;
   }
   global_lp_lower_bound_ = 0.0;
 
@@ -205,6 +220,7 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
       static_cast<Index>(instance.n),
       std::vector<double>(static_cast<Index>(instance.m), 0.0));
   for (int point = 0; point < instance.n; ++point) {
+    check_budget();
     const Point position =
         instance.trajectories[static_cast<Index>(point)].position(time);
     for (int station = 0; station < instance.m; ++station) {
@@ -214,13 +230,19 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
   }
 
   NNStaticSolver nn_solver;
-  StaticSolution incumbent = nn_solver.solve(instance, time);
+  StaticSolution incumbent =
+      active_budget() == nullptr
+          ? nn_solver.solve(instance, time)
+          : nn_solver.solve_with_budget(instance, time, *active_budget(),
+                                        effective_time_limit(
+                                            config_.time_limit_sec));
   if (!incumbent.feasible) {
     return infeasible_solution(instance.m, name());
   }
   double best_cost = incumbent.cost;
   std::vector<int> best_assignment(static_cast<Index>(instance.n), -1);
   for (int point = 0; point < instance.n; ++point) {
+    check_budget();
     for (int station = 0; station < instance.m; ++station) {
       if (distances[static_cast<Index>(point)][static_cast<Index>(station)] <=
           incumbent.radius[static_cast<Index>(station)] + kTolerance) {
@@ -251,8 +273,11 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
   }
   std::uint64_t nodes_explored = 0U;
   bool terminated_early = false;
+  bool proven_optimal = false;
+  bool hit_time_limit = false;
   while ((config_.use_best_first && !best_first.empty()) ||
          (!config_.use_best_first && !depth_first.empty())) {
+    check_budget();
     const double elapsed =
         std::chrono::duration<double>(Clock::now() - start).count();
     if (nodes_explored >= config_.node_limit) {
@@ -263,6 +288,7 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
     if (elapsed >= config_.time_limit_sec) {
       LOG_WARN("BnB: time limit {:.4f}s reached", elapsed);
       terminated_early = true;
+      hit_time_limit = true;
       break;
     }
     const double queue_lower_bound =
@@ -276,6 +302,7 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
     if (queue_lower_bound >= best_cost * (1.0 - config_.gap_target)) {
       LOG_INFO("BnB: configured gap target reached");
       terminated_early = true;
+      proven_optimal = queue_lower_bound >= best_cost - kTolerance;
       break;
     }
 
@@ -347,6 +374,7 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
   }
   if (!terminated_early && best_first.empty() && depth_first.empty()) {
     lower_bound = best_cost;
+    proven_optimal = true;
   }
 
   StaticSolution result;
@@ -374,6 +402,13 @@ StaticSolution BranchAndBoundSolver::solve(const Instance& instance,
   result.feasible = true;
   result.lower_bound = std::min(lower_bound, result.cost);
   result.upper_bound = result.cost;
+  result.time_limited = hit_time_limit;
+  result.optimality_status =
+      proven_optimal ? OptimalityStatus::OPTIMAL
+                     : (hit_time_limit ? OptimalityStatus::TIME_LIMIT
+                                       : OptimalityStatus::FEASIBLE);
+  set_static_result_status(result, BoundStatus::CERTIFIED,
+                           result.optimality_status, true);
   result.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - start).count();
   result.solver_name = name();
