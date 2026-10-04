@@ -11,6 +11,7 @@
 #include "kdc/algorithms/primal_dual_solver.hpp"
 #include "kdc/algorithms/simulated_annealing_solver.hpp"
 #include "kdc/algorithms/shifting_strategy_solver.hpp"
+#include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
 
 #include <algorithm>
@@ -82,6 +83,13 @@ void StaticSolverRegistry::register_builtins() {
     return std::make_unique<NNStaticSolver>();
   });
   register_solver("ip-kont", [](ILPSolver* solver) {
+    KontSolver::require_native_backend();
+    auto* native_solver = dynamic_cast<KontSolver*>(solver);
+    if (native_solver == nullptr) {
+      throw std::invalid_argument(
+          "ip-kont requires a native KontSolver instance");
+    }
+    native_solver->require_native_for_solves();
     return std::make_unique<IPStaticSolver>(solver);
   });
   register_solver("brute-force", [](ILPSolver*) {

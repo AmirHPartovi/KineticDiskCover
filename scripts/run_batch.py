@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import os
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -14,6 +16,11 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PREFLIGHT_REPORT = ROOT / "results" / "preflight" / "preflight_report.md"
 SOLVER = ROOT / "build" / "kdc-solver"
+sys.path.insert(0, str(ROOT / "scripts"))
+from select_test_instances import (
+    apply_execution_defaults,
+    resolve_instance_directory,
+)
 
 
 def preflight_passed() -> bool:
@@ -26,10 +33,105 @@ def preflight_passed() -> bool:
     return match is not None and int(match.group(1)) == int(match.group(2))
 
 
+def _selection_metadata(path: str | None) -> tuple[dict, str | None]:
+    if not path:
+        return {}, None
+    manifest_path = Path(path).resolve()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict) or not isinstance(
+        manifest.get("instances"), list
+    ):
+        raise ValueError("dataset manifest must contain an instances array")
+    return manifest, str(manifest_path)
+
+
+def annotate_dataset(output: Path, profile: str, manifest_path: str | None,
+                     instance_count: int) -> None:
+    selection, resolved_manifest = _selection_metadata(manifest_path)
+    results_path = output / "master_results.json"
+    records = json.loads(results_path.read_text(encoding="utf-8"))
+    for record in records:
+        record["dataset_profile"] = profile
+        record["experiment_label"] = (
+            "smoke / development validation" if profile == "smoke10"
+            else "scientific benchmark dataset"
+        )
+    results_path.write_text(
+        json.dumps(records, indent=2) + "\n", encoding="utf-8"
+    )
+    csv_path = output / "master_results.csv"
+    if csv_path.is_file():
+        with csv_path.open(newline="", encoding="utf-8") as source:
+            reader = csv.DictReader(source)
+            fields = list(reader.fieldnames or [])
+            rows = list(reader)
+        for field in ("dataset_profile", "experiment_label"):
+            if field not in fields:
+                fields.append(field)
+        with csv_path.open("w", newline="", encoding="utf-8") as target:
+            writer = csv.DictWriter(target, fieldnames=fields)
+            writer.writeheader()
+            for row in rows:
+                row.update({
+                    "dataset_profile": profile,
+                    "experiment_label": (
+                        "smoke / development validation"
+                        if profile == "smoke10"
+                        else "scientific benchmark dataset"
+                    ),
+                })
+                writer.writerow(row)
+    batch_manifest_path = output / "experiment_manifest.json"
+    batch_manifest = json.loads(
+        batch_manifest_path.read_text(encoding="utf-8")
+    )
+    selected_files = [
+        {
+            "family": row.get("family"),
+            "source": row.get("source"),
+            "n": row.get("n"),
+            "m": row.get("m"),
+            "selection_rank": row.get("selection_rank"),
+        }
+        for row in selection.get("instances", [])
+    ]
+    batch_manifest.update({
+        "dataset_profile": profile,
+        "dataset_label": (
+            "smoke / development validation" if profile == "smoke10"
+            else "scientific benchmark dataset"
+        ),
+        "selected_instance_count": instance_count,
+        "selection_policy": selection.get("selection_policy"),
+        "source_dataset_fingerprint": selection.get(
+            "source_dataset_fingerprint"
+        ),
+        "selection_manifest": resolved_manifest,
+        "selected_files": selected_files,
+    })
+    batch_manifest_path.write_text(
+        json.dumps(batch_manifest, indent=2) + "\n", encoding="utf-8"
+    )
+    if profile == "smoke10":
+        summary_path = output / "batch_summary.md"
+        summary = summary_path.read_text(encoding="utf-8")
+        summary_path.write_text(
+            "# Smoke / development validation batch summary\n\n"
+            "This is a smoke dataset for debugging and integration testing; "
+            "it is not the full scientific benchmark.\n\n"
+            + summary.split("\n", 1)[-1],
+            encoding="utf-8",
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--instances", default="data/instances",
                         help="instance directory")
+    parser.add_argument("--dataset-profile", choices=("full", "smoke10"),
+                        default="full")
+    parser.add_argument("--dataset-manifest",
+                        help="selection manifest describing a smoke dataset")
     parser.add_argument("--output", default="results/batch",
                         help="batch output directory")
     parser.add_argument("--algorithms", default="",
@@ -46,14 +148,14 @@ def main() -> int:
     parser.add_argument("--parallel", action="store_true",
                         help="run work items concurrently")
     parser.add_argument(
-        "--threads", type=int, default=max(1, os.cpu_count() or 1),
-        help="parallel worker count (default: available CPU cores)"
+        "--threads", type=int, default=None,
+        help="parallel worker count (smoke default: 2; full default: all cores)"
     )
-    parser.add_argument("--time-limit", type=float, default=60.0,
+    parser.add_argument("--time-limit", type=float, default=None,
                         help="maximum seconds per static/IP solve (default: 60)")
-    parser.add_argument("--fast-time-limit", type=float, default=30.0,
+    parser.add_argument("--fast-time-limit", type=float, default=None,
                         help="global seconds per fast algorithm run (default: 30)")
-    parser.add_argument("--exact-time-limit", type=float, default=600.0,
+    parser.add_argument("--exact-time-limit", type=float, default=None,
                         help="global seconds per exact algorithm run (default: 600)")
     parser.add_argument(
         "--minsum-refinement-policy", choices=("adaptive", "sampled"),
@@ -63,9 +165,49 @@ def main() -> int:
     parser.add_argument("--force", action="store_true",
                         help="run even if the preflight report is missing or failed")
     args = parser.parse_args()
-    if (args.time_limit <= 0 or args.fast_time_limit <= 0 or
-            args.exact_time_limit <= 0 or args.repeats <= 0 or args.seed < 0):
-        parser.error("time limits and repeats must be positive; seed must be nonnegative")
+    instance_root = Path(args.instances)
+    try:
+        resolved_instance_root = resolve_instance_directory(instance_root)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        parser.error(f"invalid dataset manifest: {error}")
+    if resolved_instance_root != instance_root:
+        if args.dataset_manifest is None:
+            args.dataset_manifest = str(instance_root / "manifest.json")
+        args.instances = str(resolved_instance_root)
+        if args.dataset_profile == "full":
+            args.dataset_profile = "smoke10"
+    elif (args.dataset_manifest is None
+          and instance_root.name == "instances"
+          and (instance_root.parent / "manifest.json").is_file()):
+        args.dataset_manifest = str(instance_root.parent / "manifest.json")
+    if args.dataset_profile == "smoke10" and not args.dataset_manifest:
+        parser.error("smoke10 requires the selection manifest for provenance")
+    if args.dataset_manifest:
+        try:
+            selection, _ = _selection_metadata(args.dataset_manifest)
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            parser.error(f"invalid dataset selection manifest: {error}")
+        instance_count = len(list(Path(args.instances).rglob("*.json")))
+        selected_count = int(selection.get(
+            "selected_instance_count", len(selection["instances"])
+        ))
+        sources = [
+            row.get("source") for row in selection["instances"]
+            if isinstance(row, dict)
+        ]
+        if (len(selection["instances"]) != selected_count
+                or len(sources) != selected_count
+                or len(set(sources)) != selected_count
+                or instance_count != selected_count):
+            parser.error(
+                "dataset selection manifest count/uniqueness does not match "
+                f"the {instance_count} canonical instance files"
+            )
+    apply_execution_defaults(args)
+    if (args.threads <= 0 or args.time_limit <= 0
+            or args.fast_time_limit <= 0 or args.exact_time_limit <= 0
+            or args.repeats <= 0 or args.seed < 0):
+        parser.error("threads, time limits, and repeats must be positive; seed must be nonnegative")
 
     if not preflight_passed():
         print(f"warning: preflight is missing or did not pass: "
@@ -117,6 +259,15 @@ def main() -> int:
         print("error: batch command did not produce master results and summary",
               file=sys.stderr)
         return 1
+    try:
+        annotate_dataset(output, args.dataset_profile, args.dataset_manifest,
+                         len(list(Path(args.instances).rglob("*.json"))))
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"error: failed to annotate dataset profile: {error}",
+              file=sys.stderr)
+        return 1
+    print(f"Dataset profile: {args.dataset_profile}")
+    print(f"Selected instances: {len(list(Path(args.instances).rglob('*.json')))}")
     print(f"Master results: {master_results}")
     print(f"Batch summary: {batch_summary}")
     return 0

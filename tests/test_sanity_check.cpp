@@ -1,5 +1,6 @@
 #include "kdc/sanity_check.hpp"
 
+#include "kdc/kont_solver.hpp"
 #include "kdc/static_solver_registry.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -33,7 +34,12 @@ TEST_CASE("SanityCheck: every registered algorithm is callable") {
   for (const auto& name : kdc::StaticSolverRegistry::list()) {
     const auto* item = find_item("algorithm:" + name);
     REQUIRE(item != nullptr);
-    REQUIRE(item->passed);
+    if (name == "ip-kont" && !kdc::KontSolver::probe_native_backend()) {
+      REQUIRE_FALSE(item->passed);
+      REQUIRE_FALSE(item->detail.empty());
+    } else {
+      REQUIRE(item->passed);
+    }
   }
 }
 

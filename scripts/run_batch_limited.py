@@ -16,6 +16,12 @@ import tempfile
 import time
 from types import SimpleNamespace
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from select_test_instances import (
+    apply_execution_defaults,
+    resolve_instance_directory,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOLVER = ROOT / "build" / "kdc-solver"
@@ -51,6 +57,7 @@ CSV_COLUMNS = (
     "wrapper_error",
     "solution_json_path", "trace_csv_path",
     "result_json_path",
+    "dataset_profile", "experiment_label",
 )
 
 
@@ -320,7 +327,9 @@ def write_outputs(records: list[dict], output: Path) -> None:
         writer.writerows(records)
     successful = sum(bool(row["feasible"]) for row in records)
     lines = [
-        "# Batch Run Summary", "",
+        ("# Smoke / development validation batch summary"
+         if records and records[0].get("dataset_profile") == "smoke10"
+         else "# Batch Run Summary"), "",
         f"- **Total runs:** {len(records)}",
         f"- **Successful runs:** {successful}",
         f"- **Failed runs:** {len(records) - successful}", "",
@@ -344,6 +353,9 @@ def write_outputs(records: list[dict], output: Path) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--instances", default="/tmp/kdc-mdc-json")
+    parser.add_argument("--dataset-profile", choices=("full", "smoke10"),
+                        default="full")
+    parser.add_argument("--dataset-manifest")
     parser.add_argument("--output", default="results/batch")
     parser.add_argument("--algorithms", default="all")
     parser.add_argument("--profile", choices=("fast", "exact-reference", "debug"),
@@ -360,14 +372,14 @@ def main(argv: list[str] | None = None) -> int:
                         default="auto",
                         help="exact backend used in the reference slot")
     parser.add_argument(
-        "--threads", type=int, default=max(1, os.cpu_count() or 1),
-        help="parallel worker count (default: available CPU cores)"
+        "--threads", type=int, default=None,
+        help="parallel worker count (smoke default: 2; full default: all cores)"
     )
-    parser.add_argument("--time-limit", type=float, default=60.0,
+    parser.add_argument("--time-limit", type=float, default=None,
                         help="limit per static/IP subsolve (default: 60)")
-    parser.add_argument("--fast-time-limit", type=float, default=30.0,
+    parser.add_argument("--fast-time-limit", type=float, default=None,
                         help="global seconds per fast algorithm run (default: 30)")
-    parser.add_argument("--exact-time-limit", type=float, default=600.0,
+    parser.add_argument("--exact-time-limit", type=float, default=None,
                         help="global seconds per exact algorithm run (default: 600)")
     parser.add_argument(
         "--minsum-refinement-policy", choices=("adaptive", "sampled"),
@@ -375,19 +387,62 @@ def main(argv: list[str] | None = None) -> int:
         help="MinSum refinement policy (default: adaptive)",
     )
     args = parser.parse_args(argv)
-    if (args.threads <= 0 or args.time_limit <= 0 or
-            args.fast_time_limit <= 0 or args.exact_time_limit <= 0 or
-            args.repeats <= 0 or args.seed < 0 or
-            (args.safety_timeout is not None and args.safety_timeout <= 0)):
-        parser.error("threads, repeats, and time limits must be positive; seed must be nonnegative")
     if not SOLVER.is_file():
         parser.error(f"solver executable not found: {SOLVER}")
     instances_root = Path(args.instances).resolve()
     if not instances_root.is_dir():
         parser.error(f"instance directory not found: {instances_root}")
+    try:
+        resolved_instance_root = resolve_instance_directory(instances_root)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        parser.error(f"invalid dataset manifest: {error}")
+    if resolved_instance_root != instances_root:
+        if args.dataset_manifest is None:
+            args.dataset_manifest = str(instances_root / "manifest.json")
+        instances_root = resolved_instance_root
+        if args.dataset_profile == "full":
+            args.dataset_profile = "smoke10"
+    elif (args.dataset_manifest is None
+          and instances_root.name == "instances"
+          and (instances_root.parent / "manifest.json").is_file()):
+        args.dataset_manifest = str(instances_root.parent / "manifest.json")
+    if args.dataset_profile == "smoke10" and not args.dataset_manifest:
+        parser.error("smoke10 requires the selection manifest for provenance")
+    apply_execution_defaults(args)
+    if (args.threads <= 0 or args.time_limit <= 0 or
+            args.fast_time_limit <= 0 or args.exact_time_limit <= 0 or
+            args.repeats <= 0 or args.seed < 0 or
+            (args.safety_timeout is not None and args.safety_timeout <= 0)):
+        parser.error("threads, repeats, and time limits must be positive; seed must be nonnegative")
     instance_paths = sorted(instances_root.rglob("*.json"))
     if not instance_paths:
         parser.error("no canonical JSON instances found")
+    if args.dataset_manifest:
+        try:
+            selection = json.loads(
+                Path(args.dataset_manifest).read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError) as error:
+            parser.error(f"invalid dataset selection manifest: {error}")
+        if not isinstance(selection, dict) or not isinstance(
+            selection.get("instances"), list
+        ):
+            parser.error("dataset manifest must contain an instances array")
+        selected_count = int(selection.get(
+            "selected_instance_count", len(selection["instances"])
+        ))
+        sources = [
+            row.get("source") for row in selection["instances"]
+            if isinstance(row, dict)
+        ]
+        if (len(selection["instances"]) != selected_count
+                or len(sources) != selected_count
+                or len(set(sources)) != selected_count
+                or len(instance_paths) != selected_count):
+            parser.error(
+                "dataset selection manifest count/uniqueness does not match "
+                f"the {len(instance_paths)} canonical instance files"
+            )
     requested = [value.strip() for value in args.algorithms.split(",")
                  if value.strip()]
     if "ip-kont" in requested and "branch-and-bound" in requested:
@@ -505,6 +560,15 @@ def main(argv: list[str] | None = None) -> int:
             "fingerprint_algorithm":
                 manifest.get("dataset_fingerprint_algorithm"),
         },
+        "dataset_profile": args.dataset_profile,
+        "dataset_label": (
+            "smoke / development validation"
+            if args.dataset_profile == "smoke10"
+            else "scientific benchmark dataset"
+        ),
+        "selected_instance_count": len(instance_paths),
+        "selection_manifest": str(Path(args.dataset_manifest).resolve())
+        if args.dataset_manifest else None,
         "time_limits": {
             "fast_global_sec": args.fast_time_limit,
             "exact_global_sec": args.exact_time_limit,
@@ -529,6 +593,26 @@ def main(argv: list[str] | None = None) -> int:
     })
     for record in records:
         record["experiment_id"] = experiment_id
+        record["dataset_profile"] = args.dataset_profile
+        record["experiment_label"] = manifest["dataset_label"]
+    if args.dataset_manifest:
+        selection = json.loads(
+            Path(args.dataset_manifest).read_text(encoding="utf-8")
+        )
+        manifest["selection_policy"] = selection.get("selection_policy")
+        manifest["source_dataset_fingerprint"] = selection.get(
+            "source_dataset_fingerprint"
+        )
+        manifest["selected_files"] = [
+            {
+                "family": row.get("family"),
+                "source": row.get("source"),
+                "n": row.get("n"),
+                "m": row.get("m"),
+                "selection_rank": row.get("selection_rank"),
+            }
+            for row in selection.get("instances", [])
+        ]
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n",
                              encoding="utf-8")
     write_outputs(records, output)

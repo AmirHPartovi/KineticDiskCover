@@ -24,7 +24,12 @@ struct BatchRunRecord {
   std::string algorithm_name;
   std::string algorithm_category;
   std::string requested_backend;
+  std::string selected_backend;
   std::string actual_backend;
+  std::string solver_name;
+  std::string solver_version{"unknown"};
+  bool native_kont{false};
+  bool fallback_used{false};
   std::string objective;
   int repeat{0};
   int n{0};
@@ -97,6 +102,10 @@ struct BatchRunConfig {
   bool save_solutions{true};
   bool save_traces{true};
   std::string exact_reference{"auto"};
+  std::string selected_backend;
+  std::string solver_version{"unknown"};
+  bool native_kont{false};
+  bool fallback_used{false};
   BenchmarkProfile profile{BenchmarkProfile::FAST};
   unsigned seed{42U};
   int repeats{1};

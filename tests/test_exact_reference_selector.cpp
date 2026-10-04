@@ -83,8 +83,10 @@ TEST_CASE("AUTO calibrates exact backends on identical verified objectives") {
       runs_seen.emplace(instance, backend, objective);
       if (run.value("accepted", false)) {
         REQUIRE(run.at("feasible").get<bool>());
-        REQUIRE(run.at("optimality_proven").get<bool>());
-        REQUIRE(run.at("continuously_verified").get<bool>());
+        REQUIRE(run.at("calibration_kind") ==
+                "static_solver_performance");
+        REQUIRE(run.at("solver_runtime_sec").is_number());
+        REQUIRE(run.at("kinetic_optimality_proven").is_null());
       }
     }
   }
@@ -132,7 +134,7 @@ TEST_CASE("AUTO benchmark profile schedules exactly one exact backend") {
   config.objectives = {kdc::ObjectiveType::MIN_MAX};
   config.save_solutions = false;
   config.save_traces = false;
-  kdc::MockILPSolver ilp;
+  kdc::KontSolver ilp;
 
   kdc::BatchRunner::run(config, &ilp);
   const auto manifest_path =
@@ -178,18 +180,14 @@ TEST_CASE("strict benchmark rejects both exact backends before calibration") {
   std::filesystem::remove_all(root);
 }
 
-TEST_CASE("explicit KONT request records and selects fallback when unavailable") {
+TEST_CASE("explicit KONT request fails instead of selecting a fallback") {
   if (kdc::KontSolver::probe_native_backend()) {
     SUCCEED("native KONT/COPT runtime is available");
     return;
   }
   const auto root = temp_root();
-  const auto decision = kdc::ExactReferenceSelector::resolve(
-      "ip-kont", root / "dataset", root / "output");
-  REQUIRE(decision.valid);
-  REQUIRE(decision.selected_backend == "branch-and-bound");
-  REQUIRE(decision.actual_backend ==
-          "built-in-branch-and-bound-fallback");
-  REQUIRE_FALSE(decision.uses_kont);
+  REQUIRE_THROWS_AS(kdc::ExactReferenceSelector::resolve(
+                        "ip-kont", root / "dataset", root / "output"),
+                    std::runtime_error);
   std::filesystem::remove_all(root);
 }

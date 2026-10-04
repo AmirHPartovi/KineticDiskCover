@@ -114,8 +114,8 @@ TEST_CASE("BatchRunner: multiple algorithms and modes") {
   const auto root = temporary_directory("kdc-batch-multiple-");
   write_instance(root / "instances");
   auto config = one_run_config(root, "output");
-  config.algorithm_names = {"nn", "greedy", "ip-kont"};
-  config.exact_reference = "ip-kont";
+  config.algorithm_names = {"nn", "greedy", "branch-and-bound"};
+  config.exact_reference = "branch-and-bound";
   config.objectives = {kdc::ObjectiveType::MIN_MAX,
                        kdc::ObjectiveType::MIN_SUM};
   config.minsum_refinement_policy =

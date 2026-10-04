@@ -20,6 +20,38 @@ for dataset, algorithm, objective, time-limit, backend, animation,
 skip, and resume options. Resume requires the same dataset fingerprint and
 benchmark configuration.
 
+### Fast smoke dataset
+
+The checked-in `data/test_sets/smoke10.json` selects one smallest valid source
+instance from each of the ten current dataset families. Original datasets,
+including the 302-instance `public_instance_set`, are not changed. To run a
+quick development validation:
+
+```bash
+bash scripts/run_experiment.sh \
+  --dataset-profile smoke10 \
+  --modes both \
+  --skip-animations
+```
+
+Smoke runs default to `nn`, `greedy`, and `primal-dual`, two workers,
+2-second static-solve deadlines, 5-second fast-run deadlines, 10-second
+exact-reference deadlines, and skipped animation stages. This keeps fallback
+LP/ILP solvers from making the development run unexpectedly resource-intensive.
+These defaults can be overridden explicitly; use `--algorithms all-fast` or
+`--algorithms all-comparison` to run the broader algorithm sets, and
+`--with-animations` to enable animations. A materialized smoke directory can
+also be created with:
+
+```bash
+python3 scripts/select_test_instances.py \
+  --source data/instances --output /tmp/kdc-smoke10 --count 10
+```
+
+and passed via `--dataset /tmp/kdc-smoke10`. Smoke outputs are labeled
+`smoke / development validation` and must not be interpreted as the full
+scientific benchmark.
+
 FAST keeps the existing low-serialization profile. Exact animations are made
 only when the exact-reference result is feasible, continuously verified, and
 marked `OPTIMAL`; feasible or timed-out results remain reported but are not
@@ -31,9 +63,9 @@ are not theoretical approximation guarantees.
 
 * CMake 3.20 or newer.
 * A compiler with C++17 support.
-* KONT is optional. When available, set `KONT_ROOT` if it is not installed
-  in a standard search path; otherwise the built-in exact fallback and
-  `MockILPSolver` can be used.
+* KONT/COPT is optional. A usable vendor installation and valid runtime
+  license are required for the explicit `ip-kont` algorithm. The built-in
+  `branch-and-bound` backend is available without KONT/COPT.
 
 ## Build
 
@@ -41,15 +73,33 @@ are not theoretical approximation guarantees.
 mkdir build && cd build && cmake .. && make -j
 ```
 
-If KONT is installed in a non-standard location:
+If KONT/COPT is installed in a non-standard location, set the CMake
+`KONT_ROOT` option or the `KONT_ROOT`, `COPT_HOME`, or `KONT_HOME` environment
+variable:
 
 ```sh
-cmake .. -DKONT_ROOT=/path/to/kont
-make -j
+cmake -S . -B build -DKONT_ROOT=/path/to/kont
+cmake --build build --parallel
 ```
 
-When KONT is unavailable, omit `KONT_ROOT`; CMake builds with the built-in
-fallback backend.
+Check both compile-time discovery and runtime/license availability with:
+
+```sh
+build/kdc-solver backend-info
+```
+
+An installed SDK can pass the API compile check but still be unavailable at
+runtime when its license or environment cannot initialize. `backend-info`
+reports this separately. `--exact-reference auto` chooses only a runtime-ready
+native backend; an explicit `--algorithm ip-kont` or
+`--exact-reference ip-kont` fails with the diagnostic rather than switching
+algorithms. Use `branch-and-bound` explicitly when native KONT/COPT is
+unavailable. When KONT/COPT is not found, omit `KONT_ROOT`:
+
+```sh
+cmake -S . -B build
+cmake --build build --parallel
+```
 
 ## Tests
 
@@ -69,8 +119,9 @@ python3 scripts/preflight_check.py [--clean] [--kont-root /path/to/kont]
 
 The CLI check can also be run directly with
 `kdc-solver preflight [--output FILE]`. Its report and the workflow summary are
-written under `results/preflight/`; without a usable KONT backend, checks use
-`MockILPSolver` and report that fallback explicitly.
+written under `results/preflight/`; without a usable KONT backend, optional
+native-IP checks report unavailable and pipeline sanity checks use
+branch-and-bound or `MockILPSolver`.
 
 Run the FAST profile (the eight non-exact algorithms plus one exact reference)
 against every JSON instance in both objectives with:
@@ -127,19 +178,23 @@ files into the solver's canonical JSON format before solving and publishes
 batch results, tables, figures, and animations as workflow artifacts.
 
 `--exact-reference auto` runtime-probes the KONT/COPT API, then calibrates
-KONT/COPT and branch-and-bound on the same deterministic subset of at most
-three small dataset instances for both MinMax and MinSum. A calibration run is
-eligible only when its result is feasible, continuously verified, and proven
-optimal. AUTO compares median static-solver runtime only across paired
-accepted runs for the same instance and objective; ties, unavailable
-KONT/COPT, or insufficient paired runs select branch-and-bound. If the native
-KONT/COPT runtime is unavailable, the
-manifest names the actual backend `built-in-branch-and-bound-fallback`; it is
-never reported as KONT. The resulting `experiment_manifest.json` records the
-request, actual/selected backends, calibration inputs and runs, rejection
-reasons, runtime statistics, and selection rule. A later AUTO run reuses that
-decision only when the dataset path and content fingerprint match. The
-calibration command can be run separately with
+KONT/COPT and branch-and-bound as static solvers on the same deterministic
+subset of at most three small dataset instances, with records labeled for
+both MinMax and MinSum. A calibration run is eligible when it returns a
+feasible result without timing out and has a finite runtime; kinetic
+optimality/continuous-verification status is not used as evidence of static
+solver performance. AUTO compares median static-solver runtime over paired
+accepted runs, with ties selecting branch-and-bound. If no paired measurements
+are available, it selects native KONT/COPT only when its runtime/license probe
+passes, otherwise it selects branch-and-bound. An explicitly requested
+`ip-kont` never silently changes algorithms: it fails with the backend
+diagnostic when the native runtime/license is unavailable. The manifest names
+the actual branch-and-bound algorithm `branch-and-bound`, not a KONT fallback.
+The resulting `experiment_manifest.json` records the request,
+actual/selected backends, calibration inputs and runs, rejection reasons,
+runtime statistics, and selection rule. A later AUTO run reuses that decision
+only when the dataset path and content fingerprint match. The calibration
+command can be run separately with
 `kdc-solver calibrate --dataset DIR --output DIR
 [--exact-reference auto|ip-kont|branch-and-bound]`. Strict benchmark profiles
 include exactly one exact backend; explicitly selecting both is rejected.

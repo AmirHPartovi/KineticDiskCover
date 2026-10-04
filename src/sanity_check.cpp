@@ -2,6 +2,7 @@
 
 #include "kdc/io.hpp"
 #include "kdc/logging.hpp"
+#include "kdc/kont_solver.hpp"
 #include "kdc/minmax.hpp"
 #include "kdc/minsum.hpp"
 #include "kdc/mock_ilp_solver.hpp"
@@ -123,11 +124,18 @@ SanityCheckReport SanityChecker::run(ILPSolver* ilp) {
   std::unique_ptr<ILPSolver> default_ilp;
   ILPSolver* active_ilp = ilp;
   if (active_ilp == nullptr) {
-    default_ilp = std::make_unique<MockILPSolver>();
+    if (KontSolver::probe_native_backend()) {
+      default_ilp = std::make_unique<KontSolver>();
+      LOG_INFO("SanityChecker: using native KONT/COPT");
+      report.items.push_back(
+          make_item("ilp_backend", true, "using native KONT/COPT"));
+    } else {
+      default_ilp = std::make_unique<MockILPSolver>();
+      LOG_WARN("SanityChecker: KONT unavailable; using MockILPSolver");
+      report.items.push_back(make_item(
+          "ilp_backend", true, "KONT not provided; using MockILPSolver"));
+    }
     active_ilp = default_ilp.get();
-    LOG_WARN("SanityChecker: KONT unavailable; using MockILPSolver");
-    report.items.push_back(make_item(
-        "ilp_backend", true, "KONT not provided; using MockILPSolver"));
   } else {
     report.items.push_back(
         make_item("ilp_backend", true, "using " + active_ilp->name()));
@@ -203,6 +211,11 @@ SanityCheckItem SanityChecker::check_algorithm_callable(const std::string& name,
 SanityCheckItem SanityChecker::check_all_algorithms_on_dummy(ILPSolver* ilp) {
   const Instance instance = make_check_instance(8, 3, 7U);
   for (const auto& name : StaticSolverRegistry::list()) {
+    if (name == "ip-kont" &&
+        (!KontSolver::probe_native_backend() ||
+         dynamic_cast<KontSolver*>(ilp) == nullptr)) {
+      continue;
+    }
     auto solver = StaticSolverRegistry::create(name, ilp);
     if (!solver) {
       return make_item("all_algorithms_on_dummy", false,
@@ -240,10 +253,14 @@ SanityCheckItem SanityChecker::check_verifier_accepts_all(ILPSolver* ilp) {
 
 SanityCheckItem SanityChecker::check_minmax_pipeline(ILPSolver* ilp) {
   const Instance instance = make_check_instance(8, 3, 7U);
-  auto solver = StaticSolverRegistry::create("ip-kont", ilp);
+  const bool native_kont = KontSolver::probe_native_backend() &&
+                           dynamic_cast<KontSolver*>(ilp) != nullptr;
+  const std::string backend =
+      native_kont ? "ip-kont" : "branch-and-bound";
+  auto solver = StaticSolverRegistry::create(backend, ilp);
   if (!solver) {
     return make_item("minmax_pipeline", false,
-                     "could not create the ip-kont static solver");
+                     "could not create the " + backend + " static solver");
   }
   MinMaxSolver::Config config;
   config.gap_target = 0.99;
@@ -252,16 +269,21 @@ SanityCheckItem SanityChecker::check_minmax_pipeline(ILPSolver* ilp) {
   return make_item(
       "minmax_pipeline", result.verified,
       result.verified
-          ? "min-max pipeline OK, peak=" + std::to_string(result.peak_cost)
+          ? "min-max pipeline OK using " + backend +
+                ", peak=" + std::to_string(result.peak_cost)
           : "min-max solution failed verification");
 }
 
 SanityCheckItem SanityChecker::check_minsum_pipeline(ILPSolver* ilp) {
   const Instance instance = make_check_instance(8, 3, 7U);
-  auto solver = StaticSolverRegistry::create("ip-kont", ilp);
+  const bool native_kont = KontSolver::probe_native_backend() &&
+                           dynamic_cast<KontSolver*>(ilp) != nullptr;
+  const std::string backend =
+      native_kont ? "ip-kont" : "branch-and-bound";
+  auto solver = StaticSolverRegistry::create(backend, ilp);
   if (!solver) {
     return make_item("minsum_pipeline", false,
-                     "could not create the ip-kont static solver");
+                     "could not create the " + backend + " static solver");
   }
   MinSumSolver::Config config;
   config.gap_target = 0.99;
@@ -271,7 +293,7 @@ SanityCheckItem SanityChecker::check_minsum_pipeline(ILPSolver* ilp) {
   return make_item(
       "minsum_pipeline", result.verified,
       result.verified
-          ? "min-sum pipeline OK, integral=" +
+          ? "min-sum pipeline OK using " + backend + ", integral=" +
                 std::to_string(result.total_integral)
           : "min-sum solution failed verification");
 }

@@ -1,0 +1,109 @@
+{
+  "name": "smoke10",
+  "selection_policy": "one smallest valid instance per dataset family, then globally smallest remaining candidates; ordered by n, m, n*m, file size, and relative path",
+  "source_root": "data/instances",
+  "source_dataset_fingerprint": "5daacd531a5155ebb2b86d41d8304fc53f765349a27ef840735fc5f72741fc3d",
+  "selected_instance_count": 10,
+  "instances": [
+    {
+      "family": "public_instance_set",
+      "source": "data/instances/public_instance_set/us-night-0000030.instance.mdc",
+      "relative_source": "public_instance_set/us-night-0000030.instance.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1679,
+      "sha256": "89cc3fc4c0fbe027a9b8759bd278f62531c28aa58f29008e0bfe6c51bb1b2ad9",
+      "selection_rank": 1
+    },
+    {
+      "family": "debug",
+      "source": "data/instances/debug/3_3_debug.mdc",
+      "relative_source": "debug/3_3_debug.mdc",
+      "n": 3,
+      "m": 3,
+      "file_size_bytes": 1038,
+      "sha256": "700f80fd0db09f6f4c37f1afd0e2a301a07ae83ecea78cb6c5a3bb5acc8de928",
+      "selection_rank": 2
+    },
+    {
+      "family": "pretty",
+      "source": "data/instances/pretty/pretty1.mdc",
+      "relative_source": "pretty/pretty1.mdc",
+      "n": 10,
+      "m": 5,
+      "file_size_bytes": 1535,
+      "sha256": "441b41e4064a83cf6ce9b33235da39e3dbf010cf3ef9ecf4fe70dcf2c7ec948d",
+      "selection_rank": 3
+    },
+    {
+      "family": "random_small",
+      "source": "data/instances/random_small/random_100_n_010_m_05_10_20_1.mdc",
+      "relative_source": "random_small/random_100_n_010_m_05_10_20_1.mdc",
+      "n": 10,
+      "m": 5,
+      "file_size_bytes": 1542,
+      "sha256": "b0d5babe9660dcec22c51d3109de36b423c4295406242f9f0fdb3294a6fe3764",
+      "selection_rank": 4
+    },
+    {
+      "family": "fixed_m",
+      "source": "data/instances/fixed_m/random_100_n_050_m_25_25_50_09.mdc",
+      "relative_source": "fixed_m/random_100_n_050_m_25_25_50_09.mdc",
+      "n": 50,
+      "m": 25,
+      "file_size_bytes": 7471,
+      "sha256": "b1852cc0ac9b238e54d477b4b0e9639398c9f1846572b98bd56be03a6810be90",
+      "selection_rank": 5
+    },
+    {
+      "family": "fixed_n",
+      "source": "data/instances/fixed_n/random_100_n_500_m_05_25_50_03.mdc",
+      "relative_source": "fixed_n/random_100_n_500_m_05_25_50_03.mdc",
+      "n": 500,
+      "m": 5,
+      "file_size_bytes": 60750,
+      "sha256": "0e03b5f14814f2448373c2ec38e295b306f3469ea944ec139c9022eb298318a9",
+      "selection_rank": 6
+    },
+    {
+      "family": "fixed_size_same_start",
+      "source": "data/instances/fixed_size_same_start/random_100_n_500_m_25_25_50_07.mdc",
+      "relative_source": "fixed_size_same_start/random_100_n_500_m_25_25_50_07.mdc",
+      "n": 500,
+      "m": 25,
+      "file_size_bytes": 61125,
+      "sha256": "d8cf34e37ee7a063832e969ffd1caa3ffe4ac7581a2d9b6a2300dc7c851785ad",
+      "selection_rank": 7
+    },
+    {
+      "family": "fixed_size_same_end",
+      "source": "data/instances/fixed_size_same_end/random_100_n_500_m_25_25_50_16.mdc",
+      "relative_source": "fixed_size_same_end/random_100_n_500_m_25_25_50_16.mdc",
+      "n": 500,
+      "m": 25,
+      "file_size_bytes": 61203,
+      "sha256": "c44ae9dd3b79662c0d3c95ea68a5b5f2b376aeac5cd3124d99a3420e4e7920e9",
+      "selection_rank": 8
+    },
+    {
+      "family": "fixed_size",
+      "source": "data/instances/fixed_size/random_100_n_500_m_25_25_50_04.mdc",
+      "relative_source": "fixed_size/random_100_n_500_m_25_25_50_04.mdc",
+      "n": 500,
+      "m": 25,
+      "file_size_bytes": 61771,
+      "sha256": "86383a45e563a47fdbbfb8aac5b6594e0a5e1d2aa9b81c67cbcfaba5525fcb0a",
+      "selection_rank": 9
+    },
+    {
+      "family": "fixed_size_same_orientation",
+      "source": "data/instances/fixed_size_same_orientation/random_100_n_500_m_25_25_50_05.mdc",
+      "relative_source": "fixed_size_same_orientation/random_100_n_500_m_25_25_50_05.mdc",
+      "n": 500,
+      "m": 25,
+      "file_size_bytes": 61792,
+      "sha256": "87490093bc1bc4cb7019620e4afa86dfb2f8a78f6b122566a1191a9ef73e23de",
+      "selection_rank": 10
+    }
+  ]
+}

@@ -64,6 +64,27 @@ def relpath(path: Path) -> str:
 def command_init(args: argparse.Namespace) -> None:
     experiment = Path(args.experiment).resolve()
     manifest_path = experiment / "experiment_manifest.json"
+    selection_manifest = None
+    selection_manifest_path = (
+        Path(args.selection_manifest).resolve()
+        if args.selection_manifest else None
+    )
+    if selection_manifest_path is not None:
+        selection_manifest = load_json(selection_manifest_path)
+        if not isinstance(selection_manifest, dict) or not isinstance(
+            selection_manifest.get("instances"), list
+        ):
+            raise ValueError("selection manifest must contain an instances array")
+    selected_files = [
+        {
+            "family": row.get("family"),
+            "source": row.get("source"),
+            "n": row.get("n"),
+            "m": row.get("m"),
+            "selection_rank": row.get("selection_rank"),
+        }
+        for row in (selection_manifest or {}).get("instances", [])
+    ]
     if args.resume:
         if not manifest_path.is_file():
             raise ValueError(f"cannot resume: missing {manifest_path}")
@@ -84,6 +105,8 @@ def command_init(args: argparse.Namespace) -> None:
             "animation_top_n": args.animation_top_n,
             "animation_mode": args.animation_mode,
             "animation_instances_requested": args.animation_instances,
+            "dataset_profile": args.dataset_profile,
+            "selection_manifest_fingerprint": args.selection_fingerprint,
         }
         changed = [key for key, value in expected.items()
                    if manifest.get(key) != value]
@@ -108,9 +131,19 @@ def command_init(args: argparse.Namespace) -> None:
         ).stdout.strip()),
         "dataset_source": args.dataset_label,
         "dataset_source_fingerprint": args.dataset_fingerprint,
+        "source_dataset_fingerprint": args.source_dataset_fingerprint,
+        "dataset_profile": args.dataset_profile,
+        "selection_manifest": args.selection_manifest or None,
+        "selected_instance_count": len(selected_files) or None,
+        "selection_policy": (selection_manifest or {}).get(
+            "selection_policy"
+        ),
+        "selection_manifest_fingerprint": args.selection_fingerprint,
+        "selected_files": selected_files,
         "dataset_canonical_path": "dataset",
         "instance_count": None,
         "algorithm_list": args.algorithms,
+        "algorithm_set": [],
         "objectives": ["minmax", "minsum"] if args.modes == "both"
         else [args.modes],
         "profile": "fast",
@@ -170,6 +203,7 @@ def command_dataset(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
     source = Path(args.source).resolve()
     canonical = exp / "dataset"
+    converted_legacy = False
     if args.resume and canonical.is_dir():
         if sha256_files(canonical, {".json"}) == args.canonical_fingerprint:
             return
@@ -180,8 +214,28 @@ def command_dataset(args: argparse.Namespace) -> None:
     if source.is_file():
         if source.suffix.lower() != ".json":
             raise ValueError("a dataset file must be canonical .json")
-        shutil.copy2(source, canonical / source.name)
+        payload = load_json(source)
+        if isinstance(payload, dict) and isinstance(
+            payload.get("instances"), list
+        ):
+            converted_legacy = any(
+                Path(str(row.get("relative_source", row.get("source", ""))))
+                .suffix.lower() == ".mdc"
+                for row in payload["instances"] if isinstance(row, dict)
+            )
+            _materialize_selection_manifest(source, payload, canonical)
+        else:
+            shutil.copy2(source, canonical / source.name)
     else:
+        source_manifest_path = source / "manifest.json"
+        if source_manifest_path.is_file():
+            selection = load_json(source_manifest_path)
+            if not isinstance(selection, dict) or not isinstance(
+                selection.get("instances"), list
+            ):
+                raise ValueError("dataset manifest must contain an instances array")
+            _copy_materialized_selection(source, selection, canonical)
+            source = source / "instances"
         mdc = sorted(source.rglob("*.mdc"))
         if json_files(canonical):
             pass
@@ -195,6 +249,7 @@ def command_dataset(args: argparse.Namespace) -> None:
                 "--input", str(source), "--output", str(canonical),
             ]
             subprocess.run(command, cwd=ROOT, check=True)
+            converted_legacy = True
         else:
             files = json_files(source)
             if not files:
@@ -213,13 +268,105 @@ def command_dataset(args: argparse.Namespace) -> None:
         "dataset_canonical_path": "dataset",
         "dataset_fingerprint": fingerprint,
         "instance_count": len(files),
-        "dataset_conversion": "mdc-to-canonical-json" if
-        source.is_dir() and any(source.rglob("*.mdc")) else "none",
+        "dataset_conversion": (
+            "mdc-to-canonical-json" if converted_legacy else "none"
+        ),
         "canonical_instance_files": [
             path.relative_to(canonical).as_posix() for path in files
         ],
+        "selected_instance_count": len(files),
     })
     write_json(manifest_path, manifest)
+
+
+def _selection_module():
+    scripts_dir = str(ROOT / "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    import select_test_instances
+
+    return select_test_instances
+
+
+def _write_canonical_payload(payload: dict[str, Any], destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def _materialize_selection_manifest(manifest_path: Path,
+                                    selection: dict[str, Any],
+                                    canonical: Path) -> None:
+    selector = _selection_module()
+    source_root = selector._manifest_source_root(selection, manifest_path)
+    rows = selection["instances"]
+    expected = selection.get("selected_instance_count", len(rows))
+    if len(rows) != expected:
+        raise ValueError(
+            f"selection manifest expects {expected} instances, has {len(rows)}"
+        )
+    seen_sources: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("selection manifest instances must be objects")
+        source_name = str(row.get("source", row.get("relative_source", "")))
+        if not source_name or source_name in seen_sources:
+            raise ValueError("selection manifest has a missing or duplicate source")
+        seen_sources.add(source_name)
+        source = selector._resolve_manifest_entry(
+            row, source_root, manifest_path
+        )
+        expected_sha = row.get("sha256")
+        actual_sha = hashlib.sha256(source.read_bytes()).hexdigest()
+        materialized_sha = row.get("materialized_sha256")
+        if (expected_sha and actual_sha != expected_sha
+                and actual_sha != materialized_sha):
+            raise ValueError(f"selection source checksum mismatch: {row.get('source')}")
+        payload = selector._canonical_payload(source)
+        n, m = selector.validate_instance(payload)
+        if n != row.get("n") or m != row.get("m"):
+            raise ValueError(f"selection manifest metadata mismatch: {row.get('source')}")
+        relative = Path(str(row.get("relative_source") or source.name))
+        family = str(row.get("family", "instances"))
+        destination = canonical / family / f"{relative.stem}.json"
+        _write_canonical_payload(payload, destination)
+
+
+def _copy_materialized_selection(source: Path,
+                                 selection: dict[str, Any],
+                                 canonical: Path) -> None:
+    selector = _selection_module()
+    rows = selection["instances"]
+    expected = selection.get("selected_instance_count", len(rows))
+    if len(rows) != expected:
+        raise ValueError(
+            f"materialized manifest expects {expected} instances, has {len(rows)}"
+        )
+    seen_sources: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("selection manifest instances must be objects")
+        source_name = str(row.get("source", ""))
+        if not source_name or source_name in seen_sources:
+            raise ValueError("materialized manifest has a missing or duplicate source")
+        seen_sources.add(source_name)
+        materialized = row.get("materialized_file")
+        if not isinstance(materialized, str):
+            raise ValueError("materialized smoke manifest lacks materialized_file")
+        path = source / materialized
+        if not path.is_file():
+            raise ValueError(f"materialized instance not found: {materialized}")
+        payload = load_json(path)
+        expected_sha = row.get("materialized_sha256")
+        if expected_sha and hashlib.sha256(path.read_bytes()).hexdigest() != expected_sha:
+            raise ValueError(f"materialized instance checksum mismatch: {materialized}")
+        n, m = selector.validate_instance(payload)
+        if n != row.get("n") or m != row.get("m"):
+            raise ValueError(f"materialized instance metadata mismatch: {materialized}")
+        relative = Path(materialized).relative_to("instances")
+        destination = canonical / relative
+        _write_canonical_payload(payload, destination)
 
 
 def command_preflight_snapshot(args: argparse.Namespace) -> None:
@@ -420,8 +567,22 @@ def command_summary(args: argparse.Namespace) -> None:
             "T_end": payload.get("T_end"),
             "family": str(payload.get("name", path.stem)).split("-")[0].split("_")[0],
         })
-    report = ["# Benchmark research summary", "", "## Dataset summary", "",
-              f"- Instances: {len(instances)}"]
+    profile = str(load_json(exp / "experiment_manifest.json").get(
+        "dataset_profile", "full"
+    ))
+    heading = ("# Smoke / development validation summary" if profile == "smoke10"
+               else "# Benchmark research summary")
+    report = [heading, ""]
+    if profile == "smoke10":
+        report.extend([
+            "This is a smoke / development validation dataset, not the full "
+            "scientific benchmark.", "",
+        ])
+    report.extend([
+        "## Dataset summary", "",
+        f"- Profile: {profile}",
+        f"- Instances: {len(instances)}",
+    ])
     for field, label in (("n", "n"), ("m", "m"), ("T_end", "T_end")):
         values = [float(item[field]) for item in instances if item[field] is not None]
         report.append(f"- {label} range: {min(values):g} to {max(values):g}" if values
@@ -721,19 +882,41 @@ def command_finalize(args: argparse.Namespace) -> None:
                      if p.is_file())
     animations = sorted(p.relative_to(exp).as_posix() for p in (exp / "animations").rglob("*")
                         if p.is_file())
+    is_smoke = manifest.get("dataset_profile") == "smoke10"
     sections = [
-        "# Final experiment report", "",
+        "# Smoke / development validation report" if is_smoke
+        else "# Final experiment report", "",
+        *(
+            ["This is a smoke / development validation run and must not be "
+             "interpreted as the full scientific benchmark.", ""]
+            if is_smoke else []
+        ),
         "## 1. Experiment configuration", "",
         f"- Status: **{manifest['status']}**",
         f"- Experiment ID: `{manifest['experiment_id']}`",
         f"- Reproduction command: `{manifest.get('reproduction_command', 'bash scripts/run_experiment.sh')}`",
-        f"- Algorithms/profile: `{manifest.get('algorithm_list')}` / FAST",
+        f"- Algorithms/profile: "
+        f"`{', '.join(manifest.get('algorithm_set', [])) or manifest.get('algorithm_list')}` / FAST",
         f"- Objectives: {', '.join(manifest.get('objectives', []))}",
         f"- Seed/repeats/threads: {manifest.get('seed')} / {manifest.get('repeats')} / {manifest.get('thread_count')}",
         "", "## 2. Dataset description", "",
-        f"- Source: `{manifest.get('dataset_source')}`",
+        f"- Profile/source: `{manifest.get('dataset_profile', 'full')}` / "
+        f"`{manifest.get('dataset_source')}`",
         f"- Canonical instances: {manifest.get('instance_count')}",
         f"- Fingerprint: `{manifest.get('dataset_fingerprint')}`",
+        *(
+            [
+                f"- Selection policy: {manifest.get('selection_policy')}",
+                "- Selected files:",
+                *[
+                    f"  - `{row.get('source')}` ({row.get('family')}, "
+                    f"n={row.get('n')}, m={row.get('m')})"
+                    for row in manifest.get("selected_files", [])
+                ],
+                f"- Source dataset fingerprint: "
+                f"`{manifest.get('source_dataset_fingerprint')}`",
+            ] if is_smoke else []
+        ),
         "", "## 3. Environment", "",
         f"- Commit: `{manifest.get('git_commit')}` (dirty={manifest.get('git_dirty')})",
         f"- Compiler/build: {manifest.get('compiler') or 'unreported'} / {manifest.get('build_type') or 'unreported'}",
@@ -851,6 +1034,11 @@ def main() -> int:
     init.add_argument("--dataset", required=True)
     init.add_argument("--dataset-label", required=True)
     init.add_argument("--dataset-fingerprint", required=True)
+    init.add_argument("--dataset-profile", choices=("full", "smoke10"),
+                      default="full")
+    init.add_argument("--source-dataset-fingerprint", default="")
+    init.add_argument("--selection-fingerprint", default="")
+    init.add_argument("--selection-manifest", default="")
     init.add_argument("--algorithms", required=True)
     init.add_argument("--modes", required=True)
     init.add_argument("--seed", type=int, required=True)

@@ -4,10 +4,7 @@
 #include "kdc/io.hpp"
 #include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
-#include "kdc/minmax.hpp"
-#include "kdc/minsum.hpp"
 #include "kdc/static_solver_registry.hpp"
-#include "kdc/verify.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -28,7 +25,7 @@ namespace {
 using Json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
 
-constexpr int kManifestVersion = 2;
+constexpr int kManifestVersion = 4;
 constexpr const char* kFingerprintAlgorithm =
     "FNV-1a-64 over sorted relative JSON paths and raw bytes";
 constexpr std::size_t kMaximumCalibrationInstances = 3U;
@@ -136,6 +133,8 @@ bool reusable_calibration(const Json& manifest, const std::string& dataset,
         !manifest.at("actual_backend").is_string() ||
         !manifest.contains("kont_runtime_available") ||
         !manifest.at("kont_runtime_available").is_boolean() ||
+        !manifest.contains("kont_version") ||
+        !manifest.at("kont_version").is_string() ||
         !manifest.contains("calibration_instances") ||
         !manifest.at("calibration_instances").is_array() ||
         !manifest.contains("calibration_objectives") ||
@@ -160,24 +159,28 @@ bool reusable_calibration(const Json& manifest, const std::string& dataset,
         manifest.at("kont_runtime_available").get<bool>();
     if ((selected == "ip-kont" &&
          (!kont_available || actual != "KONT/COPT")) ||
-        (selected == "branch-and-bound" &&
-         actual != (kont_available
-                        ? "branch-and-bound"
-                        : "built-in-branch-and-bound-fallback"))) {
+        (selected == "branch-and-bound" && actual != "branch-and-bound")) {
       return false;
     }
     const auto& successful = manifest.at("successful_runs");
     for (const auto& run : successful) {
       if (!run.is_object() || !run.value("accepted", false) ||
           !run.value("feasible", false) ||
-          !run.value("continuously_verified", false) ||
-          !run.value("optimality_proven", false)) {
+          run.value("calibration_kind", std::string{}) !=
+              "static_solver_performance" ||
+          !run.contains("solver_runtime_sec") ||
+          !run.at("solver_runtime_sec").is_number()) {
         return false;
       }
     }
     decision.requested_backend = "auto";
     decision.selected_backend = selected;
     decision.actual_backend = actual;
+    decision.native_kont_available = kont_available;
+    decision.fallback_used = manifest.value("fallback_used", false);
+    decision.kont_version = manifest.at("kont_version").get<std::string>();
+    decision.availability_reason =
+        manifest.value("availability_reason", std::string{});
     decision.selection_rule = manifest.at("selection_rule").get<std::string>();
     decision.calibration_instances =
         manifest.at("calibration_instances").get<std::vector<std::string>>();
@@ -241,121 +244,55 @@ std::vector<CalibrationInstance> select_calibration_instances(
   return eligible;
 }
 
-bool objective_is_proven_optimal(OptimalityStatus status, bool exact_solver,
-                                 bool feasible, bool time_limited,
-                                 BoundStatus bound_status, double lower_bound,
-                                 double upper_bound) {
-  if (!exact_solver || !feasible || time_limited ||
-      bound_status != BoundStatus::CERTIFIED ||
-      !std::isfinite(lower_bound) || !std::isfinite(upper_bound)) {
-    return false;
-  }
-  if (status == OptimalityStatus::OPTIMAL) {
-    return true;
-  }
-  // The certified zero lower bound proves optimality when a feasible exact
-  // result also has zero objective, even if a legacy solver status is weaker.
-  return lower_bound >= -1e-9 && upper_bound <= 1e-9;
-}
-
 Json run_calibration(const CalibrationInstance& item,
                      const std::string& backend, ObjectiveType objective,
                      ILPSolver& ilp) {
   Json run{{"instance", absolute_path(item.path)},
            {"backend", backend},
            {"objective", to_string(objective)},
+           {"calibration_kind", "static_solver_performance"},
            {"n", item.instance.n},
            {"m", item.instance.m}};
   const auto started = Clock::now();
   try {
-    auto static_solver = StaticSolverRegistry::create(backend, &ilp);
+    auto static_solver = StaticSolverRegistry::create(
+        backend, backend == "ip-kont" ? &ilp : nullptr);
     if (!static_solver || !static_solver->is_exact()) {
       run["accepted"] = false;
       run["rejection_reason"] = "backend is unavailable or not exact";
       return run;
     }
-    bool feasible = false;
-    bool time_limited = false;
-    double lower_bound = 0.0;
-    double upper_bound = std::numeric_limits<double>::infinity();
-    double runtime = 0.0;
-    OptimalityStatus status = OptimalityStatus::FAILED;
-    BoundStatus bound_status = BoundStatus::NONE;
-    KineticSolution solution;
-    if (objective == ObjectiveType::MIN_MAX) {
-      MinMaxSolver::Config config;
-      config.time_limit_per_ip = kCalibrationTimeLimitSec;
-      config.global_time_limit_sec = 2.0 * kCalibrationTimeLimitSec;
-      config.gap_target = 0.0;
-      config.max_iterations = 32;
-      config.verify_after = true;
-      const auto result =
-          MinMaxSolver::solve(item.instance, *static_solver, config);
-      feasible = result.feasible;
-      time_limited = result.time_limited;
-      lower_bound = result.lower_bound;
-      upper_bound = result.upper_bound;
-      status = result.optimality_status;
-      bound_status = result.bound_status;
-      runtime = result.total_time_sec;
-      solution = result.solution;
-    } else {
-      MinSumSolver::Config config;
-      config.time_limit_per_ip = kCalibrationTimeLimitSec;
-      config.global_time_limit_sec = 2.0 * kCalibrationTimeLimitSec;
-      config.gap_target = 0.0;
-      config.max_iterations = 32;
-      config.verify_after = true;
-      const auto result =
-          MinSumSolver::solve(item.instance, *static_solver, config);
-      feasible = result.feasible;
-      time_limited = result.time_limited;
-      lower_bound = result.lower_bound;
-      upper_bound = result.upper_bound;
-      status = result.optimality_status;
-      bound_status = result.bound_status;
-      runtime = result.total_time_sec;
-      solution = result.solution;
-    }
-
-    const VerificationReport verification =
-        feasible ? Verifier::verify_continuous(item.instance, solution)
-                 : VerificationReport{};
-    const bool proven = objective_is_proven_optimal(
-        status, static_solver->is_exact(), feasible, time_limited, bound_status,
-        lower_bound, upper_bound);
+    static_solver->set_time_limit(kCalibrationTimeLimitSec);
+    const StaticSolution result = static_solver->solve(item.instance, 0.0);
+    const bool feasible = result.feasible;
+    const bool time_limited = result.time_limited;
+    const bool proven =
+        result.optimality_status == OptimalityStatus::OPTIMAL;
+    const double runtime = result.solve_time_sec;
     run["runtime_sec"] =
         std::chrono::duration<double>(Clock::now() - started).count();
-    run["solver_runtime_sec"] = runtime;
+    run["solver_runtime_sec"] = result.solve_time_sec;
+    run["objective_value"] = result.cost;
+    run["lower_bound"] = result.lower_bound;
+    run["upper_bound"] = result.upper_bound;
+    run["optimality_status"] =
+        optimality_status_to_string(result.optimality_status);
+    run["static_optimality_proven"] = proven;
     run["feasible"] = feasible;
     run["time_limited"] = time_limited;
-    run["optimality_status"] = optimality_status_to_string(status);
-    run["optimality_proven"] = proven;
-    run["bound_status"] = bound_status_to_string(bound_status);
-    run["lower_bound"] = lower_bound;
-    run["upper_bound"] =
-        std::isfinite(upper_bound) ? Json(upper_bound) : Json(nullptr);
-    run["verification_kind"] =
-        verification_kind_to_string(verification.kind);
-    run["continuously_verified"] =
-        verification.certified_continuous_verification &&
-        verification.all_ok();
-    const bool accepted =
-        feasible && !time_limited && proven &&
-        verification.certified_continuous_verification &&
-        verification.all_ok() && std::isfinite(runtime);
+    run["kinetic_optimality_proven"] = nullptr;
+    const bool accepted = feasible && !time_limited &&
+                          std::isfinite(runtime) && runtime >= 0.0;
     run["accepted"] = accepted;
     if (accepted) {
       return run;
     } else {
       run["rejection_reason"] =
           !feasible
-              ? "no feasible kinetic solution"
+              ? "static solver returned no feasible solution"
               : (time_limited
-                     ? "calibration run hit a time limit"
-                     : (!verification.all_ok()
-                            ? "continuous verification failed"
-                            : "optimality was not proven"));
+                     ? "static solver calibration hit a time limit"
+                     : "static solver runtime was not finite");
     }
     return run;
   } catch (const std::exception& error) {
@@ -403,9 +340,15 @@ Json decision_manifest(const ExactReferenceDecision& decision,
                 {"actual_backend", decision.actual_backend},
                 {"selected_backend", decision.selected_backend},
                 {"selection_rule", decision.selection_rule},
+                {"availability_reason", decision.availability_reason},
                 {"dataset_dir", absolute_path(dataset_dir)},
                 {"output_dir", absolute_path(output_dir)},
                 {"kont_runtime_available", kont_runtime_available},
+                {"native_kont_available", decision.native_kont_available},
+                {"kont_version", decision.kont_version},
+                {"native_kont_used",
+                 decision.actual_backend == "KONT/COPT"},
+                {"fallback_used", decision.fallback_used},
                 {"calibration_instances", decision.calibration_instances},
                 {"successful_runs", successful},
                 {"rejected_runs", rejected},
@@ -435,6 +378,8 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
       output_dir / "experiment_manifest.json";
   decision.manifest_path = manifest_path.string();
   const std::string dataset_absolute = absolute_path(dataset_dir);
+  const KontBackendDiagnostics backend_info =
+      KontSolver::backend_diagnostics();
 
   std::string fingerprint;
   if (normalized == "auto") {
@@ -450,24 +395,24 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
 
   const bool native_kont_available =
       normalized != "branch-and-bound" &&
-      KontSolver::probe_native_backend();
+      backend_info.native_backend_available;
   if (normalized != "auto") {
-    decision.selected_backend =
-        normalized == "ip-kont" && !native_kont_available
-            ? "branch-and-bound"
-            : normalized;
+    if (normalized == "ip-kont" && !native_kont_available) {
+      KontSolver::require_native_backend();
+    }
+    decision.selected_backend = normalized;
     decision.uses_kont = decision.selected_backend == "ip-kont";
-    decision.actual_backend =
-        decision.selected_backend == "ip-kont"
-            ? "KONT/COPT"
-            : (normalized == "ip-kont"
-                   ? "built-in-branch-and-bound-fallback"
-                   : "branch-and-bound");
-    decision.selection_rule =
-        normalized == "ip-kont" && !native_kont_available
-            ? "explicit ip-kont requested; runtime probe unavailable, using "
-              "built-in branch-and-bound fallback"
-            : "explicit user selection";
+    decision.actual_backend = decision.selected_backend == "ip-kont"
+                                  ? "KONT/COPT"
+                                  : "branch-and-bound";
+    decision.native_kont_available = native_kont_available;
+    decision.fallback_used = false;
+    decision.kont_version = backend_info.version;
+    decision.availability_reason =
+        backend_info.runtime_probe_passed
+            ? "native KONT/COPT runtime capability probe passed"
+            : backend_info.runtime_probe_failure_reason;
+    decision.selection_rule = "explicit user selection";
     decision.valid = true;
     const Json empty = Json::array();
     const Json statistics{{"ip-kont_median_sec", -1.0},
@@ -488,6 +433,12 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
 
   Json successful = Json::array();
   Json rejected = Json::array();
+  decision.native_kont_available = native_kont_available;
+  decision.kont_version = backend_info.version;
+  decision.availability_reason =
+      backend_info.runtime_probe_passed
+          ? "native KONT/COPT runtime capability probe passed"
+          : backend_info.runtime_probe_failure_reason;
   const auto calibration_instances =
       select_calibration_instances(dataset_dir);
   if (calibration_instances.empty()) {
@@ -518,7 +469,9 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
                  {"m", item.instance.m},
                  {"accepted", false},
                  {"rejection_reason",
-                  "native KONT/COPT failed the runtime capability probe"}});
+                  backend_info.runtime_probe_failure_reason.empty()
+                      ? "native KONT/COPT failed the runtime capability probe"
+                      : backend_info.runtime_probe_failure_reason}});
       }
     } else {
       KontSolver kont;
@@ -572,7 +525,8 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
   decision.ip_kont_median_runtime_sec = median(paired_kont_runtimes);
   decision.branch_and_bound_median_runtime_sec =
       median(paired_branch_runtimes);
-  if (native_kont_available && decision.ip_kont_median_runtime_sec >= 0.0 &&
+  if (native_kont_available &&
+      decision.ip_kont_median_runtime_sec >= 0.0 &&
       decision.branch_and_bound_median_runtime_sec >= 0.0) {
     decision.selected_backend =
         decision.ip_kont_median_runtime_sec <
@@ -580,19 +534,28 @@ ExactReferenceDecision ExactReferenceSelector::resolve(
             ? "ip-kont"
             : "branch-and-bound";
     decision.selection_rule =
-        "choose backend with lower median solver runtime over accepted, "
-        "same-instance, same-objective continuously verified optimal runs; "
-        "ties select branch-and-bound";
+        "among native KONT and built-in branch-and-bound, selected the lower "
+        "median static-solver runtime over paired accepted calibration runs; "
+        "ties select branch-and-bound. Kinetic optimality certification is "
+        "not used for backend availability or static performance.";
+  } else if (native_kont_available) {
+    decision.selected_backend = "ip-kont";
+    decision.selection_rule =
+        "native KONT/COPT API and license/runtime probe passed; static "
+        "calibration did not produce paired performance measurements, so "
+        "selected the available native backend. Kinetic optimality "
+        "certification is not used for this decision.";
   } else {
     decision.selected_backend = "branch-and-bound";
     decision.selection_rule =
-        "select branch-and-bound unless both backends have accepted, "
-        "continuously verified, proven-optimal calibration runs";
+        "native KONT/COPT API/license/runtime probe failed; selected the "
+        "built-in branch-and-bound algorithm. Kinetic optimality "
+        "certification is not used for backend availability.";
   }
   decision.uses_kont = decision.selected_backend == "ip-kont";
-  decision.actual_backend =
-      !native_kont_available ? "built-in-branch-and-bound-fallback"
-                             : decision.selected_backend;
+  decision.actual_backend = decision.uses_kont ? "KONT/COPT"
+                                               : "branch-and-bound";
+  decision.fallback_used = false;
   decision.valid = true;
 
   Json by_objective = Json::object();

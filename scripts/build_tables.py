@@ -434,12 +434,22 @@ def write_tables(df: pd.DataFrame, successful: pd.DataFrame,
         for file in files:
             relative = file.relative_to(output)
             links.append((label, relative))
+    smoke_profile = (
+        "dataset_profile" in df.columns
+        and (df["dataset_profile"].astype(str) == "smoke10").any()
+    )
     index_lines = [
-        "# Results Tables Index",
-        "",
-        summary,
+        ("# Smoke / development validation tables"
+         if smoke_profile else "# Results Tables Index"),
         "",
     ]
+    if smoke_profile:
+        index_lines.extend([
+            "This table set is for smoke / development validation only; "
+            "it is not the full scientific benchmark.",
+            "",
+        ])
+    index_lines.extend([summary, ""])
     for label, relative in links:
         if relative.exists() or (output / relative).exists():
             index_lines.append(f"- [{label}: {relative.as_posix()}]({relative.as_posix()})")
