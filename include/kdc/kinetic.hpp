@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kdc/solver_budget.hpp"
 #include "kdc/types.hpp"
 
 #include <vector>
@@ -30,26 +31,38 @@ class KineticCore {
 
   static std::vector<SupportChangeEvent> find_support_changes(
       const Instance& instance, int station_id, int current_support,
-      double t_start, double t_end, bool forward);
+      double t_start, double t_end, bool forward,
+      SolverBudget* budget = nullptr);
 
   static SupportChangeEvent find_next_event(
       const Instance& instance, const std::vector<int>& current_supports,
-      double t_start, double t_end, bool forward);
+      double t_start, double t_end, bool forward,
+      SolverBudget* budget = nullptr);
 
   static int resolve_degeneracy(const Instance& instance, int station_id,
-                                const std::vector<int>& candidates, double t);
+                                const std::vector<int>& candidates, double t,
+                                SolverBudget* budget = nullptr);
 
   static std::vector<HandoverEvent> find_handovers(
       const Instance& instance, int station_from, int station_to,
-      const std::vector<int>& current_supports, double t_start, double t_end,
-      bool forward);
+      const std::vector<int>& current_supports,
+      const std::vector<int>& assigned_points, double t_start, double t_end,
+      bool forward, SolverBudget* budget = nullptr);
+  static std::vector<HandoverEvent> find_handovers_from(
+      const Instance& instance, int station_from,
+      const std::vector<int>& current_supports,
+      const std::vector<int>& assigned_points, double t_start, double t_end,
+      bool forward, SolverBudget* budget = nullptr);
 
   static HandoverEvent find_next_handover(
       const Instance& instance, const std::vector<int>& current_supports,
-      double t_start, double t_end, bool forward);
+      const std::vector<int>& assigned_points, double t_start, double t_end,
+      bool forward,
+      SolverBudget* budget = nullptr);
 
   static int second_furthest_assigned(
       const Instance& instance, int station_id,
-      const std::vector<int>& assigned_points, double t);
+      const std::vector<int>& assigned_points, double t,
+      SolverBudget* budget = nullptr);
 };
 }

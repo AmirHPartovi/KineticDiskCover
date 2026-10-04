@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -41,11 +42,16 @@ TEST_CASE("Benchmark runner measures and persists results") {
     const auto result = kdc::BenchmarkRunner::run_single(
         instance, solver, kdc::ObjectiveType::MIN_MAX, config);
     REQUIRE(result.verified);
+    REQUIRE(result.verification_kind ==
+            kdc::VerificationKind::CERTIFIED_CONTINUOUS);
+    REQUIRE(result.verification_time_sec >= 0.0);
     REQUIRE(result.instance_name == instance.name);
     REQUIRE(result.n == instance.n);
     REQUIRE(result.m == instance.m);
     REQUIRE(result.objective == kdc::ObjectiveType::MIN_MAX);
     REQUIRE(result.wall_time_sec >= 0.0);
+    REQUIRE(result.solve_time_sec >= 0.0);
+    REQUIRE(result.solve_time_sec <= result.wall_time_sec + 1e-6);
     REQUIRE(result.cpu_time_sec >= 0.0);
     REQUIRE(result.ip_time_sec >= 0.0);
     REQUIRE(result.objective_value >= result.lower_bound - 1e-6);
@@ -68,9 +74,30 @@ TEST_CASE("Benchmark runner measures and persists results") {
     REQUIRE(loaded.front().objective == result.objective);
     REQUIRE(loaded.front().objective_value == result.objective_value);
     REQUIRE(loaded.front().lower_bound == result.lower_bound);
+    REQUIRE(loaded.front().minsum_refinement_policy ==
+            kdc::MinSumRefinementPolicy::HEURISTIC_ADAPTIVE);
     REQUIRE(loaded.front().verified == result.verified);
+    REQUIRE(loaded.front().verification_kind == result.verification_kind);
+    REQUIRE(loaded.front().verification_time_sec ==
+            result.verification_time_sec);
     std::filesystem::remove(json_path);
     std::filesystem::remove(csv_path);
+  }
+
+  SECTION("MinSum policy is persisted") {
+    config.minsum_cfg.refinement_policy =
+        kdc::MinSumRefinementPolicy::CERTIFIED_BOUND;
+    const auto result = kdc::BenchmarkRunner::run_single(
+        instance, solver, kdc::ObjectiveType::MIN_SUM, config);
+    REQUIRE(result.minsum_refinement_policy ==
+            kdc::MinSumRefinementPolicy::CERTIFIED_BOUND);
+    REQUIRE_FALSE(result.certified_gap.has_value());
+    const std::string json_path = unique_temp_stem() + ".json";
+    kdc::BenchmarkRunner::save_json({result}, json_path);
+    const auto loaded = kdc::BenchmarkRunner::load_json(json_path);
+    REQUIRE(loaded.front().minsum_refinement_policy ==
+            kdc::MinSumRefinementPolicy::CERTIFIED_BOUND);
+    std::filesystem::remove(json_path);
   }
 
   SECTION("memory") {
@@ -102,18 +129,17 @@ TEST_CASE("Benchmark CLI workflow writes JSON and CSV outputs") {
   const auto csv_path = output / "csv" / "benchmark.csv";
   REQUIRE(std::filesystem::exists(json_path));
   REQUIRE(std::filesystem::exists(csv_path));
+  const auto manifest_path =
+      output / "experiment_manifest.json";
+  REQUIRE(std::filesystem::exists(manifest_path));
+  std::ifstream manifest_input(manifest_path);
+  const auto manifest = nlohmann::json::parse(manifest_input);
+  REQUIRE(manifest.at("source_tree_dirty").is_boolean());
   const auto results =
       kdc::BenchmarkRunner::load_json(json_path.string());
   REQUIRE(results.size() == 2U);
   REQUIRE(results[0].objective == kdc::ObjectiveType::MIN_MAX);
   REQUIRE(results[1].objective == kdc::ObjectiveType::MIN_SUM);
 
-  std::filesystem::remove(json_path);
-  std::filesystem::remove(csv_path);
-  std::filesystem::remove(json_path.parent_path());
-  std::filesystem::remove(csv_path.parent_path());
-  std::filesystem::remove(dataset / "instance.json");
-  std::filesystem::remove(dataset);
-  std::filesystem::remove(output);
-  std::filesystem::remove(root);
+  std::filesystem::remove_all(root);
 }

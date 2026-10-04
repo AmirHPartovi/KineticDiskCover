@@ -19,6 +19,7 @@ class LPRoundingSolver final : public IStaticSolver {
   bool is_exact() const override { return false; }
   bool provides_lower_bound() const override { return true; }
   void set_time_limit(double time_limit_sec) override;
+  void set_seed(unsigned seed) override { config_.seed = seed; }
 
  private:
   ILPSolver* ilp_{nullptr};

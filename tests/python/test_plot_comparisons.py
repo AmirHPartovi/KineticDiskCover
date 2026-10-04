@@ -109,3 +109,19 @@ def test_png_generation_is_reproducible(tmp_path):
     assert digest(first_dir / "A2_runtime_box.png") == digest(
         second_dir / "A2_runtime_box.png"
     )
+
+
+def test_convergence_grid_splits_large_instance_sets(tmp_path):
+    frame = pd.concat([
+        sample_frame().assign(instance_name=f"instance_{index:03d}")
+        for index in range(25)
+    ], ignore_index=True)
+    plot_comparisons.configure_style(30)
+    plot_comparisons.FIGURE_DPI = 30
+
+    names = plot_comparisons.generate_figures(
+        frame, tmp_path, sections={"F2"}
+    )
+
+    assert names == ["F2_convergence_grid_001", "F2_convergence_grid_002"]
+    assert all((tmp_path / f"{name}.png").is_file() for name in names)

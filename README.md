@@ -3,6 +3,30 @@
 `kdc-solver` is a C++17 project scaffold for kinetic discrepancy correction
 models. Its optimization backend is KONT, which uses the COPT-compatible API.
 
+## Reproducible experiment pipeline
+
+Run the end-to-end research workflow from any current working directory with:
+
+```bash
+bash scripts/run_experiment.sh
+```
+
+The orchestrator snapshots or converts the dataset, runs preflight and the FAST
+benchmark, validates raw records, generates tables and PNG/PDF figures, then
+uses the selected exact backend for separate animation solves. Each run is
+stored under `results/experiments/<EXPERIMENT_ID>/` with stage logs, a complete
+manifest, integrity checks, and reports. Use `bash scripts/run_experiment.sh --help`
+for dataset, algorithm, objective, time-limit, backend, animation,
+skip, and resume options. Resume requires the same dataset fingerprint and
+benchmark configuration.
+
+FAST keeps the existing low-serialization profile. Exact animations are made
+only when the exact-reference result is feasible, continuously verified, and
+marked `OPTIMAL`; feasible or timed-out results remain reported but are not
+animated as exact. Figure summaries may filter to feasible, verified records;
+the raw integrity report retains timeout and failure counts. Empirical ratios
+are not theoretical approximation guarantees.
+
 ## Prerequisites
 
 * CMake 3.20 or newer.
@@ -48,19 +72,53 @@ The CLI check can also be run directly with
 written under `results/preflight/`; without a usable KONT backend, checks use
 `MockILPSolver` and report that fallback explicitly.
 
-Run all registered static solvers against every JSON instance in both
-objectives with:
+Run the FAST profile (the eight non-exact algorithms plus one exact reference)
+against every JSON instance in both objectives with:
 
 ```sh
-python3 scripts/run_batch.py [--parallel --threads N] [--algorithms nn,greedy]
+python3 scripts/run_batch.py [--parallel --threads N] [--algorithms all] \
+    [--profile fast --seed 42 --repeats 1] \
+    [--exact-reference auto|ip-kont|branch-and-bound]
 ```
+
+The supported profiles are `fast`, `exact-reference`, and `debug`.
+`--algorithms all-fast` selects the eight fast algorithms plus the selected
+exact reference; `--algorithms all-comparison` selects the full comparison
+set plus that same single exact reference. `--seed` and `--repeats` apply to
+heuristics; exact reference runs execute once per instance and objective.
+Solver seeds are derived deterministically from the base seed, instance,
+algorithm, objective, and repeat index. The result files and
+`experiment_manifest.json` record this policy, environment, configuration,
+time limits, and exact-reference calibration decision.
+
+Each exact result is reused for all heuristic comparisons for the same
+instance and objective. `empirical_ratio_to_exact` is populated only when that
+exact run is feasible and proven optimal; it is an empirical comparison, not a
+theoretical approximation ratio. `ratio_to_incumbent` compares feasible
+results with the best feasible result in the experiment. Solve, verification,
+and serialization times are recorded separately; `solve_time_sec` is the
+primary runtime metric.
+
+For optional phase-level profiling, set `KDC_PROFILE_PHASES` to an output
+filename (or `1` to write `profile_phases.json`) when running a solver command.
+The JSON report includes call counts and cumulative seconds for candidate
+construction, trajectory positions, geometry/coverage matrices, model and
+LP/ILP construction/solve, kinetic events/extensions, combination, local
+improvement, verification, and serialization. Profiling is disabled by
+default; reported phase times are inclusive where operations are nested and
+must not be summed as disjoint wall time. `candidate_build` includes scoped
+precompute-cache lookups as well as cold builds.
 
 The wrapper requires a passing pre-flight report unless `--force` is supplied.
 Parallel runs use all available CPU cores by default. Each static/IP subsolve
-is limited to 60 seconds by default; override this
-with `--time-limit SEC`. Algorithms that perform multiple static solves per
-kinetic objective (notably MinSum) can therefore take longer than one timeout
-in total. The configured per-subsolve timeout is recorded in each result.
+is limited to 60 seconds by default; override this with `--time-limit SEC`.
+Each instance/algorithm/objective run also has a cooperative global deadline:
+30 seconds for fast algorithms and 600 seconds for exact algorithms by default.
+Override these with `--fast-time-limit SEC` and `--exact-time-limit SEC`.
+Nested static solves are capped by both their per-solve limit and the remaining
+global budget. On expiration, the solver returns its best complete feasible
+kinetic solution when one is available and records `time_limited`; it does not
+claim optimality because of a timeout.
 Batch artifacts are written beneath `results/batch/`, including per-run
 solutions, result metadata, convergence traces, master JSON/CSV, and a summary.
 The manual GitHub Actions pipeline defaults to the 302-instance public dataset
@@ -68,14 +126,36 @@ in `data/instances/public_instance_set/`. It converts the repository's MDC
 files into the solver's canonical JSON format before solving and publishes
 batch results, tables, figures, and animations as workflow artifacts.
 
-For a strict wall-clock cap on each individual
-instance/algorithm/objective combination, use
+`--exact-reference auto` runtime-probes the KONT/COPT API, then calibrates
+KONT/COPT and branch-and-bound on the same deterministic subset of at most
+three small dataset instances for both MinMax and MinSum. A calibration run is
+eligible only when its result is feasible, continuously verified, and proven
+optimal. AUTO compares median static-solver runtime only across paired
+accepted runs for the same instance and objective; ties, unavailable
+KONT/COPT, or insufficient paired runs select branch-and-bound. If the native
+KONT/COPT runtime is unavailable, the
+manifest names the actual backend `built-in-branch-and-bound-fallback`; it is
+never reported as KONT. The resulting `experiment_manifest.json` records the
+request, actual/selected backends, calibration inputs and runs, rejection
+reasons, runtime statistics, and selection rule. A later AUTO run reuses that
+decision only when the dataset path and content fingerprint match. The
+calibration command can be run separately with
+`kdc-solver calibrate --dataset DIR --output DIR
+[--exact-reference auto|ip-kont|branch-and-bound]`. Strict benchmark profiles
+include exactly one exact backend; explicitly selecting both is rejected.
+`run_batch_limited.py` performs calibration once at the experiment level and
+passes its selected backend into each isolated per-run process.
+
+To run each individual
+instance/algorithm/objective combination in a separate process, use
 `python3 scripts/run_batch_limited.py --instances DIR --output results/batch
 --algorithms all --modes both`. It defaults to
-using all available CPU cores and applies a 60-second limit to each combination
-and static/IP subsolve. Faster, semi-exact, and exact algorithms run in
-successive phases; previous batch-owned result files are cleared before each
-run, and timed-out combinations are recorded as failed.
+using all available CPU cores and forwards the cooperative global and
+per-static-solve limits to the solver. An optional `--safety-timeout SEC`
+provides an external hard subprocess timeout; any such interruption is recorded
+as wrapper metadata and does not manufacture a solver optimality or feasibility
+status. Faster, semi-exact, and exact algorithms run in successive phases;
+previous batch-owned result files are cleared before each run.
 
 Generate Markdown and CSV master, per-algorithm, per-instance, and per-family
 tables from the batch master JSON with:
@@ -106,9 +186,14 @@ subsets.
 ```text
 kdc-solver solve --instance FILE [--mode minmax|minsum] [--algorithm NAME]
                   [--output FILE] [--time-limit SEC] [--gap TARGET]
+                  [--verify-each-iteration] [--no-verify]
                   [--no-handovers] [--no-dedup] [--no-partial]
 kdc-solver verify --instance FILE --solution FILE
-kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum
+kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum \
+                    [--profile fast|exact-reference|debug]
+                    [--algorithms all-fast|all-comparison]
+                    [--seed N] [--repeats N]
+                    [--exact-reference auto|ip-kont|branch-and-bound]
 ```
 
 The `solve` command defaults to the `minmax` objective and `ip-kont` static
@@ -136,21 +221,34 @@ the solver lower bound and status.
 `kdc::KineticCore` provides stable quadratic roots, support-change and
 handover event detection across piecewise-linear trajectories, second-furthest
 assigned-support selection, and derivative-based resolution for equidistant
-supports.
+supports. Static assignments include an explicit point-to-station ownership
+map. Handover events transfer the source's owned support only when it enters
+the receiving station's current disk; each kinetic interval serializes the
+resulting ownership map alongside its supporting points.
 
 `kdc::KineticSolution` stores piecewise quadratic cost intervals and evaluates
 costs, integrals, peak values/times, and structural consistency. It can extend
 a stationary assignment across kinetic support and handover events, combine
-two interval solutions under either objective, and truncate an extension at an
-integral intersection.
+two interval solutions using their pointwise lower envelope, and truncate
+non-MinSum extensions at a cumulative-integral crossing.
 
 `kdc::MinMaxSolver` iteratively solves stationary IPs at the current peak time,
 extends and combines the resulting kinetic assignments, tracks a monotone
 relative-gap trace, and can verify point coverage and interval costs.
 
-`kdc::MinSumSolver` builds a sampled stationary lower-bound integral, refines
-the sample with contribution-guided stationary IP solves, and combines
-lower-integral kinetic assignments while tracking the relative-gap trace.
+`kdc::MinSumSolver` defaults to incumbent-driven adaptive refinement: it
+starts with one feasible stationary solve and selects the current solution
+interval with the largest estimated integral contribution for refinement.
+Stop conditions include the global deadline, iteration cap, stagnation
+patience, and negligible objective improvement. The optional `sampled`
+(`CERTIFIED_BOUND`) policy performs sampled static solves to guide refinement,
+but their trapezoidal integral is heuristic, not a certified continuous-time
+lower bound. MinSum combines candidates by splitting intervals at roots where
+their quadratic instantaneous area costs cross, then selecting the cheaper
+candidate at each time; candidate generation remains heuristic and does not
+certify global optimality. Select the policy with
+`--minsum-refinement-policy adaptive|sampled` for solve, batch, or benchmark
+commands.
 
 `kdc::StaticSolverRegistry` provides the `nn`, `greedy`, `lp-rounding`,
 `primal-dual`, `local-search`, `sa`, `genetic`, and `shifting` heuristics and
@@ -165,7 +263,22 @@ lower bounds when interrupted.
 
 `kdc::Verifier` reports coverage, support, assignment, pointwise-cost, and
 integral-consistency checks separately, including the maximum observed
-coverage violation.
+coverage violation. `verify()` and solver final verification use the
+piecewise-linear continuous-time path: trajectory breakpoints partition the
+time domain, polynomial contact roots partition each affine piece, and
+inequalities are checked at all resulting boundaries and interval interiors.
+`verify_empirical()` is an explicitly finite-sample diagnostic and must not be
+interpreted as a proof of continuous feasibility. Solver output reports the
+verification kind and verification wall time separately from solve time.
+The continuous checks use floating-point polynomial root isolation and the
+configured geometric tolerance; they are not an exact-arithmetic certificate.
+Benchmark and batch records retain end-to-end `wall_time_sec` and expose
+`solve_time_sec` separately, so post-solve verification does not inflate the
+solver timing.
+Verification after solve is enabled by default; `--no-verify` disables that
+final report, while MinSum still requires continuous verification before
+accepting a refinement. `--verify-each-iteration` requests explicit
+verification of every accepted iteration.
 
 `kdc::BenchmarkRunner` runs either or both objectives over JSON datasets and
 writes timestamped JSON and CSV summaries under the requested output directory.

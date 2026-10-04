@@ -2,6 +2,7 @@
 
 #include "kdc/logging.hpp"
 #include "kdc/objective.hpp"
+#include "kdc/profiling.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -74,6 +75,7 @@ bool SolutionSerializer::validate(const Instance& instance,
 void SolutionSerializer::save_json(const Instance& instance,
                                    const KineticSolution& solution,
                                    const std::string& path) {
+  KDC_PROFILE_PHASE(ProfilePhase::SERIALIZATION);
   LOG_DEBUG("SolutionSerializer::save_json path={} intervals={}", path,
             solution.intervals.size());
   validate_instance_dimensions(instance);

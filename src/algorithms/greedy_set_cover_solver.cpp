@@ -42,6 +42,8 @@ StaticSolution GreedySetCoverSolver::solve(const Instance& instance,
     solution.upper_bound = 0.0;
     solution.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - start).count();
+    set_static_result_status(solution, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return solution;
   }
   if (instance.m == 0) {
@@ -49,6 +51,8 @@ StaticSolution GreedySetCoverSolver::solve(const Instance& instance,
     solution.upper_bound = std::numeric_limits<double>::infinity();
     solution.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - start).count();
+    set_static_result_status(solution, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return solution;
   }
 
@@ -123,6 +127,7 @@ StaticSolution GreedySetCoverSolver::solve(const Instance& instance,
   std::vector<Index> selected;
   selected.reserve(point_count);
   while (num_uncovered > 0) {
+    check_budget();
     for (Index station = 0; station < station_count; ++station) {
       const auto& ordering = points_by_distance[station];
       auto& prefix = uncovered_prefix[station];
@@ -218,6 +223,11 @@ StaticSolution GreedySetCoverSolver::solve(const Instance& instance,
                              : std::numeric_limits<double>::infinity();
   solution.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - start).count();
+  set_static_result_status(
+      solution, BoundStatus::CERTIFIED,
+      solution.feasible ? OptimalityStatus::FEASIBLE
+                        : OptimalityStatus::FAILED,
+      false);
   LOG_INFO("Greedy: cost={:.9f} LB={:.9f} ratio={:.4f}", solution.cost,
            lower_bound,
            solution.cost / std::max(lower_bound, 1e-12));

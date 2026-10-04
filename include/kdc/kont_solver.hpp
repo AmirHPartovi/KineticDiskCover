@@ -11,6 +11,7 @@ class KontSolver final : public ILPSolver {
  public:
   KontSolver();
   ~KontSolver() override;
+  static bool probe_native_backend();
 
   ILPResult solve(const Eigen::VectorXd& c,
                   const Eigen::SparseMatrix<double>& A,

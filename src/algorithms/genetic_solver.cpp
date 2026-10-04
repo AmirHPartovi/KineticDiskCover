@@ -124,12 +124,16 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
     StaticSolution result = empty_solution(instance.m, name(), true);
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return result;
   }
   if (instance.m == 0) {
     StaticSolution result = empty_solution(instance.m, name(), false);
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return result;
   }
 
@@ -146,7 +150,7 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
   }
 
   const StaticAssignment nearest =
-      StationarySolver::solve_nn(instance, time);
+      StationarySolver::solve_nn(instance, time, active_budget());
   Individual nearest_individual;
   nearest_individual.assignment.assign(static_cast<Index>(instance.n), -1);
   for (int point = 0; point < instance.n; ++point) {
@@ -177,6 +181,7 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
   population.reserve(static_cast<Index>(config_.population_size));
   population.push_back(nearest_individual);
   for (int member = 1; member < config_.population_size; ++member) {
+    check_budget();
     Individual individual;
     individual.assignment.resize(static_cast<Index>(instance.n));
     for (int point = 0; point < instance.n; ++point) {
@@ -188,6 +193,7 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
   Individual best = nearest_individual;
 
   for (int generation = 0; generation < config_.generations; ++generation) {
+    check_budget();
     std::sort(population.begin(), population.end(),
               [](const Individual& lhs, const Individual& rhs) {
                 return lhs.cost < rhs.cost;
@@ -203,6 +209,7 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
         population.begin() + static_cast<std::ptrdiff_t>(elite_count));
     while (static_cast<int>(next_population.size()) <
            config_.population_size) {
+      check_budget();
       const Individual first = tournament_select(
           population, config_.tournament_size, random);
       const Individual second = tournament_select(
@@ -262,6 +269,8 @@ StaticSolution GeneticSolver::solve(const Instance& instance, double time) {
   result.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - started).count();
   result.solver_name = name();
+  set_static_result_status(result, BoundStatus::CERTIFIED,
+                           OptimalityStatus::FEASIBLE, false);
   LOG_INFO("GA: cost={:.9f} gens={}", result.cost, config_.generations);
   return result;
 }

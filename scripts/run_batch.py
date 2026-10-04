@@ -33,9 +33,16 @@ def main() -> int:
     parser.add_argument("--output", default="results/batch",
                         help="batch output directory")
     parser.add_argument("--algorithms", default="",
-                        help="comma-separated solver names (default: all)")
+                        help="solver names or all-fast/all-comparison")
+    parser.add_argument("--profile", choices=("fast", "exact-reference", "debug"),
+                        default="fast")
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
                         default="both")
+    parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
+                        default="auto",
+                        help="exact backend used in the reference slot (default: auto)")
     parser.add_argument("--parallel", action="store_true",
                         help="run work items concurrently")
     parser.add_argument(
@@ -44,11 +51,21 @@ def main() -> int:
     )
     parser.add_argument("--time-limit", type=float, default=60.0,
                         help="maximum seconds per static/IP solve (default: 60)")
+    parser.add_argument("--fast-time-limit", type=float, default=30.0,
+                        help="global seconds per fast algorithm run (default: 30)")
+    parser.add_argument("--exact-time-limit", type=float, default=600.0,
+                        help="global seconds per exact algorithm run (default: 600)")
+    parser.add_argument(
+        "--minsum-refinement-policy", choices=("adaptive", "sampled"),
+        default="adaptive",
+        help="MinSum refinement policy (default: adaptive)",
+    )
     parser.add_argument("--force", action="store_true",
                         help="run even if the preflight report is missing or failed")
     args = parser.parse_args()
-    if args.time_limit <= 0:
-        parser.error("--time-limit must be positive")
+    if (args.time_limit <= 0 or args.fast_time_limit <= 0 or
+            args.exact_time_limit <= 0 or args.repeats <= 0 or args.seed < 0):
+        parser.error("time limits and repeats must be positive; seed must be nonnegative")
 
     if not preflight_passed():
         print(f"warning: preflight is missing or did not pass: "
@@ -68,13 +85,20 @@ def main() -> int:
         "--output", args.output,
         "--modes", args.modes,
         "--time-limit", str(args.time_limit),
+        "--fast-time-limit", str(args.fast_time_limit),
+        "--exact-time-limit", str(args.exact_time_limit),
+        "--minsum-refinement-policy", args.minsum_refinement_policy,
+        "--exact-reference", args.exact_reference,
+        "--profile", args.profile,
+        "--seed", str(args.seed),
+        "--repeats", str(args.repeats),
     ]
     requested_algorithms = [
         name.strip() for name in args.algorithms.split(",") if name.strip()
     ]
-    if requested_algorithms and "all" not in {
-        name.lower() for name in requested_algorithms
-    }:
+    if requested_algorithms and not any(
+        name.lower() == "all" for name in requested_algorithms
+    ):
         command.extend(["--algorithms", ",".join(requested_algorithms)])
     if args.parallel:
         command.extend(["--parallel", "--threads", str(args.threads)])

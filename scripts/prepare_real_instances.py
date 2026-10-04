@@ -43,7 +43,8 @@ def convert_instance(source: Path, instance_id: int) -> dict[str, Any]:
     for index, center in enumerate(centers):
         if not isinstance(center, dict):
             raise ValueError(f"center {index} must be an object")
-        x, y = _coordinate(center.get("coord"), f"center {index}")
+        coordinates = center.get("coord", center.get("center"))
+        x, y = _coordinate(coordinates, f"center {index}")
         stations.append({"id": index, "x": x, "y": y})
 
     trajectories = []

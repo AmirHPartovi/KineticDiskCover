@@ -140,6 +140,8 @@ StaticSolution SimulatedAnnealingSolver::solve(const Instance& instance,
     result.upper_bound = 0.0;
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::CERTIFIED,
+                             OptimalityStatus::FEASIBLE, false);
     return result;
   }
   if (instance.m == 0) {
@@ -147,6 +149,8 @@ StaticSolution SimulatedAnnealingSolver::solve(const Instance& instance,
     result.upper_bound = std::numeric_limits<double>::infinity();
     result.solve_time_sec =
         std::chrono::duration<double>(Clock::now() - started).count();
+    set_static_result_status(result, BoundStatus::NONE,
+                             OptimalityStatus::INFEASIBLE, false);
     return result;
   }
 
@@ -163,7 +167,7 @@ StaticSolution SimulatedAnnealingSolver::solve(const Instance& instance,
   }
 
   const StaticAssignment nearest =
-      StationarySolver::solve_nn(instance, time);
+      StationarySolver::solve_nn(instance, time, active_budget());
   State current;
   current.assignment.assign(static_cast<Index>(instance.n), -1);
   for (int point = 0; point < instance.n; ++point) {
@@ -194,7 +198,9 @@ StaticSolution SimulatedAnnealingSolver::solve(const Instance& instance,
   std::uniform_int_distribution<int> station_distribution(0, instance.m - 1);
   double temperature = config_.T_init;
   for (int outer = 0; outer < config_.max_outer_iters; ++outer) {
+    check_budget();
     for (int inner = 0; inner < config_.iters_per_temp; ++inner) {
+      check_budget();
       const int point = point_distribution(random);
       const int from = current.assignment[static_cast<Index>(point)];
       const int to = station_distribution(random);
@@ -248,6 +254,8 @@ StaticSolution SimulatedAnnealingSolver::solve(const Instance& instance,
   result.upper_bound = result.cost;
   result.solve_time_sec =
       std::chrono::duration<double>(Clock::now() - started).count();
+  set_static_result_status(result, BoundStatus::CERTIFIED,
+                           OptimalityStatus::FEASIBLE, false);
   LOG_INFO("SA: cost={:.9f} LB={:.9f} final_T={:.6e}", result.cost,
            result.lower_bound, temperature);
   return result;
