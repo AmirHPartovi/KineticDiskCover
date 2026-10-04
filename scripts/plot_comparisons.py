@@ -900,9 +900,22 @@ def write_report(df: pd.DataFrame, output: str | Path,
         q25_objective=("objective_value", lambda values: values.quantile(0.25)),
         q75_objective=("objective_value", lambda values: values.quantile(0.75)),
     ) if not df.empty else pd.DataFrame()
+    smoke_profile = (
+        "dataset_profile" in df.columns
+        and (df["dataset_profile"].astype(str) == "smoke10").any()
+    )
     lines = [
-        "# Comparative Charts Report",
+        ("# Smoke / development validation charts"
+         if smoke_profile else "# Comparative Charts Report"),
         "",
+    ]
+    if smoke_profile:
+        lines.extend([
+            "These figures describe smoke / development validation only; "
+            "they are not the full scientific benchmark.",
+            "",
+        ])
+    lines.extend([
         "## Dataset description",
         "",
         f"- Instances: {df.instance_name.nunique() if not df.empty else 0}",
@@ -919,7 +932,7 @@ def write_report(df: pd.DataFrame, output: str | Path,
         "",
         "## Summary statistics",
         "",
-    ]
+    ])
     if not summary_stats.empty:
         table = summary_stats.reset_index()
         lines.extend([

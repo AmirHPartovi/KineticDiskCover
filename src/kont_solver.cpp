@@ -1,17 +1,27 @@
 #include "kdc/kont_solver.hpp"
 
+#include "kdc/kont_build_config.hpp"
 #include "kdc/logging.hpp"
 
-#ifdef KDC_HAS_COPT_CPP_API
-#include <copt.h>
+#ifdef KDC_HAS_KONT_NATIVE_PLUGIN
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 #endif
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
+#include <filesystem>
 #include <functional>
 #include <limits>
+#include <mutex>
 #include <numeric>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
@@ -20,6 +30,17 @@ using Index = std::size_t;
 
 namespace {
 constexpr double kEpsilon = 1e-9;
+
+struct NativeRuntimeState {
+  std::atomic<bool> initialization_unavailable{false};
+  std::mutex mutex;
+  std::string failure_reason;
+};
+
+NativeRuntimeState& native_runtime_state() {
+  static NativeRuntimeState state;
+  return state;
+}
 
 const char* status_name(ILPResult::Status status) {
   switch (status) {
@@ -38,6 +59,79 @@ const char* status_name(ILPResult::Status status) {
   }
   return "ERROR";
 }
+
+#ifdef KDC_HAS_KONT_NATIVE_PLUGIN
+using NativeSolveFunction = bool (*)(
+    const Eigen::VectorXd*, const Eigen::SparseMatrix<double>*,
+    const Eigen::VectorXd*, const std::vector<int>*, double, double,
+    ILPResult*) noexcept;
+
+struct NativePlugin {
+  NativeSolveFunction solve{nullptr};
+  std::string load_error;
+};
+
+const NativePlugin& native_plugin() {
+  static const NativePlugin plugin = [] {
+    NativePlugin loaded;
+#ifdef _WIN32
+    const HMODULE handle = LoadLibraryA(KDC_KONT_NATIVE_PLUGIN_PATH);
+    if (handle == nullptr) {
+      loaded.load_error = "LoadLibrary failed with error " +
+                          std::to_string(GetLastError());
+      return loaded;
+    }
+    loaded.solve = reinterpret_cast<NativeSolveFunction>(
+        GetProcAddress(handle, "kdc_kont_native_solve"));
+#else
+    void* handle =
+        dlopen(KDC_KONT_NATIVE_PLUGIN_PATH, RTLD_NOW | RTLD_LOCAL);
+    if (handle == nullptr) {
+      const char* error = dlerror();
+      loaded.load_error = error == nullptr ? "dlopen failed" : error;
+      return loaded;
+    }
+    dlerror();
+    loaded.solve = reinterpret_cast<NativeSolveFunction>(
+        dlsym(handle, "kdc_kont_native_solve"));
+    const char* error = dlerror();
+    if (error != nullptr) {
+      loaded.load_error = error;
+      return loaded;
+    }
+#endif
+    if (loaded.solve == nullptr) {
+      loaded.load_error = "native adapter does not export its solve entry point";
+    }
+    return loaded;
+  }();
+  return plugin;
+}
+
+ILPResult solve_with_native_plugin(
+    const Eigen::VectorXd& costs,
+    const Eigen::SparseMatrix<double>& matrix, const Eigen::VectorXd& rhs,
+    const std::vector<int>& integer_vars, double time_limit_sec,
+    double gap_target) {
+  ILPResult result;
+  result.actual_backend = "KONT/COPT";
+  result.solver_version = kont_build_config::version;
+  const NativePlugin& plugin = native_plugin();
+  if (plugin.solve == nullptr) {
+    result.status = ILPResult::Status::ERROR;
+    result.solver_message =
+        "native KONT/COPT adapter could not be loaded: " + plugin.load_error;
+    return result;
+  }
+  if (!plugin.solve(&costs, &matrix, &rhs, &integer_vars, time_limit_sec,
+                    gap_target, &result)) {
+    result.status = ILPResult::Status::ERROR;
+    result.solver_message =
+        "native KONT/COPT adapter rejected the solve request";
+  }
+  return result;
+}
+#endif
 
 enum class LPStatus { OPTIMAL, INFEASIBLE, UNBOUNDED };
 
@@ -450,6 +544,11 @@ ILPResult solve_with_kont(const Eigen::VectorXd& costs,
                           const std::vector<int>& integer_vars,
                           double time_limit_sec, double gap_target) {
   static copt::Env environment;
+  ILPResult result;
+  result.actual_backend = "KONT/COPT";
+  result.solver_version = kont_build_config::version;
+  result.native_backend_used = true;
+  result.license_runtime_initialization_passed = true;
   copt::Model model = environment.CreateModel("kdc_ip");
   std::vector<copt::Var> variables;
   variables.reserve(static_cast<Index>(costs.size()));
@@ -478,7 +577,6 @@ ILPResult solve_with_kont(const Eigen::VectorXd& costs,
   model.SetIntParam(COPT_INTPARAM_LOGGING, 1);
   model.SetIntParam(COPT_INTPARAM_THREADS, 1);
 
-  ILPResult result;
   const int return_code = model.Solve();
   if (return_code != 0) {
     result.status = ILPResult::Status::ERROR;
@@ -525,29 +623,242 @@ ILPResult solve_with_kont(const Eigen::VectorXd& costs,
   model.clear();
   return result;
 }
+#elif defined(KDC_HAS_KONT_CPP_API)
+ILPResult solve_with_kont(const Eigen::VectorXd& costs,
+                          const Eigen::SparseMatrix<double>& matrix,
+                          const Eigen::VectorXd& rhs,
+                          const std::vector<int>& integer_vars,
+                          double time_limit_sec, double gap_target) {
+  const auto started = std::chrono::steady_clock::now();
+  ILPResult result;
+  result.actual_backend = "KONT/COPT";
+  result.solver_version = kont_build_config::version;
+  try {
+    static Envr environment = [] {
+      if (const char* license_directory =
+              std::getenv("KONT_LICENSE_DIR")) {
+        if (license_directory[0] != '\0') {
+          return Envr(license_directory);
+        }
+      }
+      const std::filesystem::path root(kont_build_config::root);
+      const std::filesystem::path installed_license_directory =
+          root / "bin";
+      if (std::filesystem::exists(installed_license_directory /
+                                  "license.dat")) {
+        return Envr(installed_license_directory.string().c_str());
+      }
+      return Envr();
+    }();
+    result.license_runtime_initialization_passed = true;
+    Model model = environment.CreateModel("kdc_ip");
+    std::vector<Var> variables;
+    variables.reserve(static_cast<Index>(costs.size()));
+    for (Eigen::Index column = 0; column < costs.size(); ++column) {
+      const bool is_integer =
+          std::find(integer_vars.begin(), integer_vars.end(),
+                    static_cast<int>(column)) != integer_vars.end();
+      variables.push_back(model.AddVar(
+          0.0, 1.0, costs[column],
+          is_integer ? KONT_BINARY : KONT_CONTINUOUS,
+          ("x" + std::to_string(column)).c_str()));
+    }
+    for (Eigen::Index row = 0; row < matrix.rows(); ++row) {
+      Expr expression;
+      for (Eigen::Index column = 0; column < matrix.cols(); ++column) {
+        const double coefficient = matrix.coeff(row, column);
+        if (coefficient != 0.0) {
+          expression.AddTerm(variables[static_cast<Index>(column)],
+                             coefficient);
+        }
+      }
+      model.AddConstr(expression, KONT_GREATER_EQUAL, rhs[row],
+                      ("c" + std::to_string(row)).c_str());
+    }
+    model.SetDblParam(KONT_DBLPARAM_TIMELIMIT, time_limit_sec);
+    model.SetDblParam(KONT_DBLPARAM_RELGAP, gap_target);
+    model.SetIntParam(KONT_INTPARAM_LOGGING, 0);
+    model.SetIntParam(KONT_INTPARAM_LOGTOCONSOLE, 0);
+    model.SetIntParam(KONT_INTPARAM_THREADS, 1);
+    result.native_backend_used = true;
+    model.Solve();
+    const int status = model.GetIntAttr(KONT_INTATTR_MIPSTATUS);
+    const bool has_solution =
+        model.GetIntAttr(KONT_INTATTR_HASMIPSOL) != 0;
+    switch (status) {
+      case KONT_MIPSTATUS_OPTIMAL:
+        result.status = ILPResult::Status::OPTIMAL;
+        break;
+      case KONT_MIPSTATUS_INFEASIBLE:
+        result.status = ILPResult::Status::INFEASIBLE;
+        break;
+      case KONT_MIPSTATUS_UNBOUNDED:
+        result.status = ILPResult::Status::UNBOUNDED;
+        break;
+      case KONT_MIPSTATUS_TIMEOUT:
+        result.status = ILPResult::Status::TIME_LIMIT;
+        break;
+      case KONT_MIPSTATUS_NODELIMIT:
+      case KONT_MIPSTATUS_UNFINISHED:
+      case KONT_MIPSTATUS_INTERRUPTED:
+        result.status = has_solution ? ILPResult::Status::FEASIBLE
+                                     : ILPResult::Status::TIME_LIMIT;
+        break;
+      case KONT_MIPSTATUS_UNSTARTED:
+      case KONT_MIPSTATUS_INF_OR_UNB:
+      default:
+        result.status = ILPResult::Status::ERROR;
+        break;
+    }
+    if (has_solution) {
+      result.objective = model.GetDblAttr(KONT_DBLATTR_BESTOBJ);
+      result.x.resize(static_cast<Index>(costs.size()));
+      for (Index column = 0; column < result.x.size(); ++column) {
+        result.x[column] = variables[column].Get(KONT_DBLINFO_VALUE);
+      }
+    }
+    result.lower_bound = model.GetDblAttr(KONT_DBLATTR_BESTBND);
+    result.gap = model.GetDblAttr(KONT_DBLATTR_BESTGAP);
+    result.solve_time_sec = model.GetDblAttr(KONT_DBLATTR_SOLVINGTIME);
+    if (!std::isfinite(result.lower_bound) ||
+        std::abs(result.lower_bound) >= KONT_UNDEFINED) {
+      result.lower_bound = 0.0;
+    }
+    if (!std::isfinite(result.gap) || std::abs(result.gap) >= KONT_UNDEFINED) {
+      result.gap = 0.0;
+    }
+    if (result.status == ILPResult::Status::OPTIMAL) {
+      result.lower_bound = result.objective;
+    }
+    result.solver_message =
+        "KONT/COPT " + result.solver_version +
+        ": MIP status " + std::to_string(status);
+  } catch (const KontException& error) {
+    result.status = ILPResult::Status::ERROR;
+    result.solver_message =
+        "KONT/COPT initialization/model error (code " +
+        std::to_string(error.GetCode()) + "): " + error.what();
+  } catch (const std::exception& error) {
+    result.status = ILPResult::Status::ERROR;
+    result.solver_message =
+        "KONT/COPT initialization/model error: " + std::string(error.what());
+  }
+  if (result.solve_time_sec <= 0.0 ||
+      !std::isfinite(result.solve_time_sec)) {
+    result.solve_time_sec =
+        std::chrono::duration<double>(std::chrono::steady_clock::now() -
+                                      started)
+            .count();
+  }
+  return result;
+}
 #endif
 }
 
 KontSolver::KontSolver() = default;
 KontSolver::~KontSolver() = default;
 
+std::string KontSolver::name() const {
+  return probe_native_backend()
+             ? "KONT/COPT"
+             : "built-in-branch-and-bound-fallback";
+}
+
+bool KontSolver::native_backend_compiled() {
+#ifdef KDC_HAS_KONT_NATIVE_PLUGIN
+  return true;
+#else
+  return false;
+#endif
+}
+
+KontBackendDiagnostics KontSolver::backend_diagnostics() {
+  static const KontBackendDiagnostics diagnostics = [] {
+    KontBackendDiagnostics info;
+    info.root = kont_build_config::root;
+    info.root_source = kont_build_config::root_source;
+    info.copt_header = kont_build_config::copt_header;
+    info.copt_library = kont_build_config::copt_library;
+    info.kont_header = kont_build_config::kont_header;
+    info.kont_cpp_header = kont_build_config::kont_cpp_header;
+    info.kont_cpp_library = kont_build_config::kont_cpp_library;
+    info.include_directory = kont_build_config::include_directory;
+    info.library = kont_build_config::library;
+    info.architecture = kont_build_config::architecture;
+    info.native_api = kont_build_config::native_api;
+    info.compile_check = kont_build_config::compile_check;
+    info.compile_failure_reason = kont_build_config::compile_failure_reason;
+    info.version = kont_build_config::version;
+    if (!KontSolver::native_backend_compiled()) {
+      info.runtime_probe_failure_reason =
+          info.compile_failure_reason.empty()
+              ? "native KONT/COPT C++ API is not compiled into this build"
+              : info.compile_failure_reason;
+      return info;
+    }
+
+    Eigen::VectorXd costs(1);
+    costs[0] = 1.0;
+    Eigen::SparseMatrix<double> constraints(1, 1);
+    constraints.insert(0, 0) = 1.0;
+    Eigen::VectorXd rhs(1);
+    rhs[0] = 1.0;
+    KontSolver solver;
+    ILPResult result;
+    try {
+      result = solver.solve(costs, constraints, rhs, {0}, 5.0, 0.0);
+    } catch (const std::exception& error) {
+      info.runtime_probe_failure_reason = error.what();
+      return info;
+    }
+    info.runtime_probe_passed =
+        result.status == ILPResult::Status::OPTIMAL &&
+        result.native_backend_used && !result.fallback_used;
+    info.license_runtime_initialization_passed =
+        result.license_runtime_initialization_passed;
+    info.native_backend_available = info.runtime_probe_passed;
+    if (!info.runtime_probe_passed) {
+      info.runtime_probe_failure_reason =
+          result.solver_message.empty()
+              ? "native runtime probe did not produce a proven-optimal result"
+              : result.solver_message;
+    }
+    return info;
+  }();
+  return diagnostics;
+}
+
 bool KontSolver::probe_native_backend() {
-  Eigen::VectorXd costs(1);
-  costs[0] = 1.0;
-  Eigen::SparseMatrix<double> constraints(1, 1);
-  constraints.insert(0, 0) = 1.0;
-  Eigen::VectorXd rhs(1);
-  rhs[0] = 1.0;
-  KontSolver solver;
-  try {
-    const ILPResult result =
-        solver.solve(costs, constraints, rhs, {0}, 5.0, 0.0);
-    return result.status == ILPResult::Status::OPTIMAL &&
-           result.solver_message.find("Exact fallback") == std::string::npos;
-  } catch (const std::exception& error) {
-    LOG_WARN("KONT/COPT runtime probe failed: {}", error.what());
-    return false;
+  return backend_diagnostics().native_backend_available;
+}
+
+void KontSolver::require_native_backend() {
+  const KontBackendDiagnostics info = backend_diagnostics();
+  if (info.native_backend_available) {
+    return;
   }
+  std::ostringstream message;
+  message << "explicit ip-kont request cannot run: native KONT/COPT is "
+             "unavailable; KONT_ROOT="
+          << (info.root.empty() ? "<not supplied>" : info.root)
+          << "; detected API=" << info.native_api
+          << "; C++ API compile check=" << info.compile_check
+          << "; include directory="
+          << (info.include_directory.empty() ? "<not found>"
+                                             : info.include_directory)
+          << "; library="
+          << (info.library.empty() ? "<not found>" : info.library)
+          << "; architecture=" << info.architecture
+          << "; reason="
+          << (!info.runtime_probe_failure_reason.empty()
+                  ? info.runtime_probe_failure_reason
+                  : info.compile_failure_reason);
+  throw std::runtime_error(message.str());
+}
+
+void KontSolver::require_native_for_solves() {
+  require_native_backend();
+  native_required_ = true;
 }
 
 ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
@@ -558,13 +869,71 @@ ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
   LOG_DEBUG("KONT: building model with {} vars, {} constrs", costs.size(),
             matrix.rows());
   validate_problem(costs, matrix, rhs, integer_vars, time_limit_sec, gap_target);
-#ifdef KDC_HAS_COPT_CPP_API
-  ILPResult result = solve_with_kont(costs, matrix, rhs, integer_vars,
-                                     time_limit_sec, gap_target);
+  auto run_fallback = [&](const std::string& reason) {
+    ILPResult fallback = solve_fallback(
+        costs, matrix, rhs, integer_vars, time_limit_sec, gap_target,
+        "built-in branch-and-bound fallback");
+    fallback.actual_backend = "built-in-branch-and-bound-fallback";
+    fallback.fallback_used = true;
+    fallback.solver_version = "not-applicable";
+    fallback.solver_message =
+        "Native KONT/COPT initialization failed (" + reason +
+        "); generic KontSolver used the built-in branch-and-bound fallback";
+    return fallback;
+  };
+#ifdef KDC_HAS_KONT_NATIVE_PLUGIN
+  NativeRuntimeState& runtime_state = native_runtime_state();
+  if (runtime_state.initialization_unavailable.load()) {
+    if (native_required_) {
+      require_native_backend();
+    }
+    std::string reason;
+    {
+      std::lock_guard<std::mutex> lock(runtime_state.mutex);
+      reason = runtime_state.failure_reason;
+    }
+    ILPResult result = run_fallback(
+        reason.empty()
+            ? "a previous native initialization/license probe failed"
+            : reason);
+    LOG_DEBUG("KONT: using built-in fallback after prior native initialization "
+              "failure");
+    return result;
+  }
+  ILPResult result;
+  try {
+    result = solve_with_native_plugin(costs, matrix, rhs, integer_vars,
+                                      time_limit_sec, gap_target);
+  } catch (const std::exception& error) {
+    result.status = ILPResult::Status::ERROR;
+    result.actual_backend = "KONT/COPT";
+    result.solver_version = kont_build_config::version;
+    result.solver_message =
+        "KONT/COPT initialization/model error: " + std::string(error.what());
+  }
+  if (result.status == ILPResult::Status::ERROR &&
+      !result.license_runtime_initialization_passed) {
+    const std::string reason = result.solver_message;
+    {
+      std::lock_guard<std::mutex> lock(runtime_state.mutex);
+      runtime_state.failure_reason = reason;
+    }
+    runtime_state.initialization_unavailable.store(true);
+    if (native_required_) {
+      throw std::runtime_error(
+          "explicit ip-kont solve failed during native initialization: " +
+          reason);
+    }
+    result = run_fallback(reason);
+    LOG_WARN("KONT: native initialization failed; generic KontSolver used "
+             "the built-in fallback");
+  }
 #else
   ILPResult result = solve_fallback(
       costs, matrix, rhs, integer_vars, time_limit_sec, gap_target,
-      "Exact fallback (KONT C++ API unavailable)");
+      "built-in branch-and-bound fallback");
+  result.actual_backend = "built-in-branch-and-bound-fallback";
+  result.fallback_used = true;
 #endif
   LOG_INFO("KONT: status={}, obj={:.6f}, lb={:.6f}, gap={:.4f}, t={:.3f}s",
            status_name(result.status), result.objective,

@@ -98,7 +98,13 @@ Json record_json(const BatchRunRecord& record) {
               {"algorithm_name", record.algorithm_name},
               {"algorithm_category", record.algorithm_category},
               {"requested_backend", record.requested_backend},
+              {"selected_backend", record.selected_backend},
               {"actual_backend", record.actual_backend},
+              {"native_kont", record.native_kont},
+              {"fallback_used", record.fallback_used},
+              {"kont_version", record.solver_version},
+              {"solver_name", record.solver_name},
+              {"solver_runtime_sec", record.solve_time_sec},
               {"objective", record.objective},
               {"repeat", record.repeat},
               {"n", record.n},
@@ -271,7 +277,13 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           record.algorithm_name,
           record.algorithm_category,
           record.requested_backend,
+          record.selected_backend,
           record.actual_backend,
+          record.solver_name,
+          record.solver_version,
+          record.native_kont ? "true" : "false",
+          record.fallback_used ? "true" : "false",
+          std::to_string(record.solve_time_sec),
           record.objective,
           std::to_string(record.repeat),
           std::to_string(record.n),
@@ -351,9 +363,20 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
           ? "exact_reference"
           : "heuristic";
   record.requested_backend = config.exact_reference;
+  record.selected_backend =
+      record.algorithm_category == "exact_reference"
+          ? config.selected_backend
+          : algorithm;
   record.actual_backend = record.algorithm_category == "exact_reference"
                               ? config.actual_backend
                               : algorithm;
+  record.native_kont = record.algorithm_category == "exact_reference" &&
+                       config.native_kont;
+  record.fallback_used = record.algorithm_category == "exact_reference" &&
+                         config.fallback_used;
+  record.solver_version = record.native_kont ? config.solver_version
+                                              : "not-applicable";
+  record.solver_name = algorithm;
   record.objective = to_string(objective);
   record.repeat = repeat;
   record.failed = true;
@@ -602,6 +625,13 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
     run_config.verify_each_iteration = true;
   }
   run_config.actual_backend = exact_reference_decision.actual_backend;
+  run_config.selected_backend = exact_reference_decision.selected_backend;
+  run_config.native_kont =
+      exact_reference_decision.actual_backend == "KONT/COPT";
+  run_config.fallback_used = exact_reference_decision.fallback_used;
+  run_config.solver_version =
+      run_config.native_kont ? exact_reference_decision.kont_version
+                             : "not-applicable";
   if (run_config.experiment_id.empty()) {
     run_config.experiment_id = experiment_id_for(run_config);
   }
@@ -780,10 +810,21 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
           ? "exact_reference"
           : "heuristic";
   record.requested_backend = config.exact_reference;
+  record.selected_backend =
+      record.algorithm_category == "exact_reference"
+          ? config.selected_backend
+          : algorithm_name;
   record.actual_backend =
       record.algorithm_category == "exact_reference"
           ? config.actual_backend
           : algorithm_name;
+  record.native_kont = record.algorithm_category == "exact_reference" &&
+                       config.native_kont;
+  record.fallback_used = record.algorithm_category == "exact_reference" &&
+                         config.fallback_used;
+  record.solver_version = record.native_kont ? config.solver_version
+                                              : "not-applicable";
+  record.solver_name = algorithm_name;
   record.objective = to_string(objective);
   record.repeat = repeat;
   if (objective == ObjectiveType::MIN_SUM) {
@@ -1025,7 +1066,8 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
   }
   csv_output
       << "instance_name,algorithm_name,algorithm_category,requested_backend,"
-         "actual_backend,objective,repeat,n,m,wall_time_sec,"
+         "selected_backend,actual_backend,solver_name,kont_version,native_kont,"
+         "fallback_used,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
          "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
          "peak_cost,integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
          "objective_value,lower_bound,bound_status,upper_bound,certified_gap,"

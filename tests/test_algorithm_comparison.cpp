@@ -34,7 +34,8 @@ std::string write_temp_instance(const kdc::Instance& instance) {
 
 TEST_CASE("Comparison: brute force matches IP on n=6 m=3") {
   kdc::AlgorithmComparisonConfig config;
-  config.algorithm_names = {"brute-force", "ip-kont"};
+  config.algorithm_names = {"brute-force", "branch-and-bound"};
+  config.reference_algorithm = "branch-and-bound";
   const std::string instance_path =
       write_temp_instance(kdc::test::make_dummy_instance(6, 3, 3U));
   config.instance_paths = {instance_path};
@@ -54,8 +55,13 @@ TEST_CASE("Comparison: brute force matches IP on n=6 m=3") {
 }
 
 TEST_CASE("Comparison: branch and bound matches IP on n=15 m=5") {
+  if (!kdc::KontSolver::probe_native_backend()) {
+    SUCCEED("native KONT/COPT runtime is unavailable");
+    return;
+  }
   kdc::AlgorithmComparisonConfig config;
   config.algorithm_names = {"branch-and-bound", "ip-kont"};
+  config.reference_algorithm = "ip-kont";
   const std::string instance_path =
       write_temp_instance(kdc::test::make_dummy_instance(15, 5, 11U));
   config.instance_paths = {instance_path};
@@ -75,7 +81,8 @@ TEST_CASE("Comparison: branch and bound matches IP on n=15 m=5") {
 
 TEST_CASE("Comparison: greedy record has a valid bound") {
   kdc::AlgorithmComparisonConfig config;
-  config.algorithm_names = {"greedy", "ip-kont"};
+  config.algorithm_names = {"greedy", "branch-and-bound"};
+  config.reference_algorithm = "branch-and-bound";
   const std::string instance_path =
       write_temp_instance(kdc::test::make_dummy_instance(30, 5, 3U));
   config.instance_paths = {instance_path};
@@ -95,6 +102,13 @@ TEST_CASE("Comparison: greedy record has a valid bound") {
 TEST_CASE("Comparison: every built-in solver verifies on n=10 m=3") {
   kdc::AlgorithmComparisonConfig config;
   config.algorithm_names = kdc::StaticSolverRegistry::list();
+  config.reference_algorithm = "branch-and-bound";
+  if (!kdc::KontSolver::probe_native_backend()) {
+    config.algorithm_names.erase(
+        std::remove(config.algorithm_names.begin(),
+                    config.algorithm_names.end(), "ip-kont"),
+        config.algorithm_names.end());
+  }
   const std::string instance_path =
       write_temp_instance(kdc::test::make_dummy_instance(10, 3, 5U));
   config.instance_paths = {instance_path};

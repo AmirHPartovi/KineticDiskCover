@@ -52,6 +52,7 @@ void usage() {
       << "  compare   --algorithms a,b --dataset DIR --output DIR "
          "[--mode static|minmax|minsum]\n"
       << "  preflight [--output FILE]\n"
+      << "  backend-info  Diagnose configured KONT/COPT compilation and runtime\n"
       << "  calibrate --dataset DIR --output DIR "
          "[--exact-reference auto|ip-kont|branch-and-bound]\n"
       << "  batch     [--instances DIR] [--output DIR] [--algorithms LIST] "
@@ -85,6 +86,8 @@ void command_help(const std::string& command) {
   } else if (command == "preflight") {
     std::cout << "Usage: kdc-solver preflight "
                  "[--output results/preflight/preflight_report.md]\n";
+  } else if (command == "backend-info") {
+    std::cout << "Usage: kdc-solver backend-info\n";
   } else if (command == "batch") {
     std::cout
         << "Usage: kdc-solver batch [OPTIONS]\n"
@@ -407,6 +410,9 @@ int handle_solve(int argc, char** argv) {
                  "must be non-negative\n";
     return 1;
   }
+  if (algorithm == "ip-kont") {
+    kdc::KontSolver::require_native_backend();
+  }
 
   kdc::Instance instance;
   try {
@@ -520,6 +526,63 @@ int handle_preflight(int argc, char** argv) {
   std::cout << "preflight: " << report.num_passed << " passed, "
             << report.num_failed << " failed\n";
   return report.all_passed() ? 0 : 1;
+}
+
+int handle_backend_info() {
+  const kdc::KontBackendDiagnostics info =
+      kdc::KontSolver::backend_diagnostics();
+  const auto path_status = [](const std::string& path) {
+    return path.empty() || path.find("NOTFOUND") != std::string::npos
+               ? std::string("not found")
+               : path;
+  };
+  std::cout << "KONT configuration\n"
+            << "------------------\n"
+            << "KONT_ROOT: "
+            << (info.root.empty() ? "<not supplied>" : info.root)
+            << " (" << info.root_source << ")\n"
+            << "COPT copt.h: " << path_status(info.copt_header) << '\n'
+            << "COPT library: " << path_status(info.copt_library) << '\n'
+            << "KONT header: " << path_status(info.kont_header) << '\n'
+            << "KONT C++ wrapper header: "
+            << path_status(info.kont_cpp_header) << '\n'
+            << "KONT C++ library: " << path_status(info.kont_cpp_library)
+            << '\n'
+            << "selected include directory: "
+            << (info.include_directory.empty() ? "<not found>"
+                                                : info.include_directory)
+            << '\n'
+            << "selected library: "
+            << (info.library.empty() ? "<not found>" : info.library) << '\n'
+            << "detected architecture: " << info.architecture << '\n'
+            << "selected API: " << info.native_api << '\n'
+            << "C++ API compile check: " << info.compile_check << '\n'
+            << "native runtime probe: "
+            << (info.runtime_probe_passed ? "PASS" : "FAIL") << '\n'
+            << "license/runtime initialization: "
+            << (!kdc::KontSolver::native_backend_compiled()
+                    ? "NOT RUN"
+                    : (info.license_runtime_initialization_passed
+                           ? "PASS"
+                           : "FAIL"))
+            << '\n'
+            << "native backend: "
+            << (info.native_backend_available ? "AVAILABLE" : "UNAVAILABLE")
+            << '\n'
+            << "actual backend for auto: "
+            << (info.native_backend_available ? "KONT/COPT"
+                                               : "branch-and-bound")
+            << '\n'
+            << "KONT/COPT version: " << info.version << '\n';
+  if (!info.runtime_probe_failure_reason.empty()) {
+    std::cout << "runtime failure reason: "
+              << info.runtime_probe_failure_reason << '\n';
+  }
+  if (!info.compile_failure_reason.empty()) {
+    std::cout << "compile/configuration failure reason: "
+              << info.compile_failure_reason << '\n';
+  }
+  return info.native_backend_available ? 0 : 1;
 }
 
 int handle_batch(int argc, char** argv) {
@@ -676,7 +739,7 @@ int main(int argc, char** argv) {
   if (command != "solve" && command != "verify" &&
       command != "benchmark" && command != "compare" &&
       command != "preflight" && command != "batch" &&
-      command != "calibrate") {
+      command != "calibrate" && command != "backend-info") {
     usage();
     return 1;
   }
@@ -709,6 +772,14 @@ int main(int argc, char** argv) {
       return handle_preflight(argc, argv);
     } catch (const std::exception& error) {
       LOG_ERROR("preflight failed: {}", error.what());
+      return 1;
+    }
+  }
+  if (command == "backend-info") {
+    try {
+      return handle_backend_info();
+    } catch (const std::exception& error) {
+      LOG_ERROR("backend-info failed: {}", error.what());
       return 1;
     }
   }

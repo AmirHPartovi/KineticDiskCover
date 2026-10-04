@@ -32,6 +32,11 @@ struct ILPResult {
   double solve_time_sec{0.0};
   double gap{0.0};
   std::string solver_message;
+  std::string actual_backend;
+  std::string solver_version;
+  bool native_backend_used{false};
+  bool fallback_used{false};
+  bool license_runtime_initialization_passed{false};
 };
 
 class ILPSolver {

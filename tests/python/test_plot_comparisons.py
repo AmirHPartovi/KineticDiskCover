@@ -111,6 +111,18 @@ def test_png_generation_is_reproducible(tmp_path):
     )
 
 
+def test_smoke_figure_report_is_labeled_as_development_validation(tmp_path):
+    plot_comparisons.configure_style(50)
+    frame = plot_comparisons.prepare_frame(sample_frame())
+    frame["dataset_profile"] = "smoke10"
+
+    report = plot_comparisons.write_report(frame, tmp_path, [])
+
+    contents = report.read_text()
+    assert "Smoke / development validation" in contents
+    assert "not the full scientific benchmark" in contents
+
+
 def test_convergence_grid_splits_large_instance_sets(tmp_path):
     frame = pd.concat([
         sample_frame().assign(instance_name=f"instance_{index:03d}")

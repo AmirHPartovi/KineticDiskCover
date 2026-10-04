@@ -117,6 +117,22 @@ def test_index_links_exist(tmp_path):
         assert f"]({relative})" in index
 
 
+def test_smoke_tables_are_labeled_as_development_validation(tmp_path):
+    frame = sample_frame()
+    frame["dataset_profile"] = "smoke10"
+    raw, good, failed = _prepare(frame)
+
+    build_tables.write_tables(raw, good, failed, tmp_path,
+                              {"markdown", "csv"})
+
+    assert "Smoke / development validation" in (
+        tmp_path / "00_index.md"
+    ).read_text()
+    assert "not the full scientific benchmark" in (
+        tmp_path / "00_index.md"
+    ).read_text()
+
+
 def test_numeric_formatting():
     assert build_tables._format_value("objective_value", 123.4567) == "123.457"
     assert build_tables._format_value("gap_pct", 12.345) == "12.35%"

@@ -14,6 +14,7 @@
 #include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -98,7 +99,7 @@ TEST_CASE("Result status enum values round-trip") {
 TEST_CASE("Static lower-bound provenance is explicit for every solver") {
   const auto instance = status_instance();
   kdc::KontSolver kont;
-  const std::vector<std::pair<std::string, kdc::BoundStatus>> solvers{
+  std::vector<std::pair<std::string, kdc::BoundStatus>> solvers{
       {"nn", kdc::BoundStatus::CERTIFIED},
       {"greedy", kdc::BoundStatus::CERTIFIED},
       {"primal-dual", kdc::BoundStatus::HEURISTIC},
@@ -110,6 +111,13 @@ TEST_CASE("Static lower-bound provenance is explicit for every solver") {
       {"ip-kont", kdc::BoundStatus::CERTIFIED},
       {"branch-and-bound", kdc::BoundStatus::CERTIFIED},
       {"brute-force", kdc::BoundStatus::CERTIFIED}};
+  if (!kdc::KontSolver::probe_native_backend()) {
+    solvers.erase(
+        std::remove_if(solvers.begin(), solvers.end(), [](const auto& entry) {
+          return entry.first == "ip-kont";
+        }),
+        solvers.end());
+  }
 
   for (const auto& entry : solvers) {
     auto solver = kdc::StaticSolverRegistry::create(entry.first, &kont);

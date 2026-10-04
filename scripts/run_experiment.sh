@@ -7,8 +7,11 @@ PIPELINE="$ROOT/scripts/experiment_pipeline.py"
 ORIGINAL_ARGS=("$@")
 
 DATASET="data/instances/public_instance_set"
+DATASET_PROFILE="full"
+DATASET_EXPLICIT=0
 OUTPUT=""
 ALGORITHMS="all-fast"
+ALGORITHMS_EXPLICIT=0
 MODES="both"
 SEED=42
 REPEATS=1
@@ -24,8 +27,13 @@ SKIP_PREFLIGHT=0
 SKIP_FIGURES=0
 SKIP_TABLES=0
 SKIP_ANIMATIONS=0
+ANIMATIONS_EXPLICIT=0
 RESUME=0
 FORCE=0
+THREADS_EXPLICIT=0
+FAST_LIMIT_EXPLICIT=0
+EXACT_LIMIT_EXPLICIT=0
+STATIC_LIMIT_EXPLICIT=0
 
 usage() {
   cat <<'EOF'
@@ -33,6 +41,7 @@ Usage: bash scripts/run_experiment.sh [OPTIONS]
 
 Options:
   --dataset PATH                   Dataset directory or canonical JSON file
+  --dataset-profile full|smoke10   Built-in dataset profile (default: full)
   --output PATH                    Experiment directory (default: unique results/experiments/<ID>)
   --algorithms all-fast|all-comparison|LIST
   --modes minmax|minsum|both
@@ -50,6 +59,7 @@ Options:
   --skip-figures
   --skip-tables
   --skip-animations
+  --with-animations                Enable animations for smoke profiles
   --resume                         Resume the latest incomplete matching experiment
   --force                          Continue after preflight failure; never marks it passed
   --help
@@ -64,7 +74,7 @@ fail_usage() {
 
 while (($#)); do
   case "$1" in
-    --dataset|--output|--algorithms|--modes|--seed|--repeats|--threads|\
+    --dataset|--dataset-profile|--output|--algorithms|--modes|--seed|--repeats|--threads|\
     --fast-time-limit|--exact-time-limit|--time-limit|--exact-reference|\
     --animation-top-n|--animation-mode|--animation-instances)
       (($# >= 2)) || fail_usage "missing value for $1"
@@ -72,16 +82,17 @@ while (($#)); do
       value="$2"
       shift 2
       case "$option" in
-        --dataset) DATASET="$value" ;;
+        --dataset) DATASET="$value"; DATASET_EXPLICIT=1 ;;
+        --dataset-profile) DATASET_PROFILE="$value" ;;
         --output) OUTPUT="$value" ;;
-        --algorithms) ALGORITHMS="$value" ;;
+        --algorithms) ALGORITHMS="$value"; ALGORITHMS_EXPLICIT=1 ;;
         --modes) MODES="$value" ;;
         --seed) SEED="$value" ;;
         --repeats) REPEATS="$value" ;;
-        --threads) THREADS="$value" ;;
-        --fast-time-limit) FAST_LIMIT="$value" ;;
-        --exact-time-limit) EXACT_LIMIT="$value" ;;
-        --time-limit) STATIC_LIMIT="$value" ;;
+        --threads) THREADS="$value"; THREADS_EXPLICIT=1 ;;
+        --fast-time-limit) FAST_LIMIT="$value"; FAST_LIMIT_EXPLICIT=1 ;;
+        --exact-time-limit) EXACT_LIMIT="$value"; EXACT_LIMIT_EXPLICIT=1 ;;
+        --time-limit) STATIC_LIMIT="$value"; STATIC_LIMIT_EXPLICIT=1 ;;
         --exact-reference) EXACT_REFERENCE="$value" ;;
         --animation-top-n) ANIMATION_TOP_N="$value" ;;
         --animation-mode) ANIMATION_MODE="$value" ;;
@@ -92,6 +103,7 @@ while (($#)); do
     --skip-figures) SKIP_FIGURES=1; shift ;;
     --skip-tables) SKIP_TABLES=1; shift ;;
     --skip-animations) SKIP_ANIMATIONS=1; shift ;;
+    --with-animations) SKIP_ANIMATIONS=0; ANIMATIONS_EXPLICIT=1; shift ;;
     --resume) RESUME=1; shift ;;
     --force) FORCE=1; shift ;;
     --help|-h) usage; exit 0 ;;
@@ -99,6 +111,40 @@ while (($#)); do
   esac
 done
 
+if [[ "$DATASET_PROFILE" == "full" && "$DATASET_EXPLICIT" -eq 1 ]]; then
+  candidate_dataset="$DATASET"
+  [[ "$candidate_dataset" = /* ]] || candidate_dataset="$ROOT/$candidate_dataset"
+  candidate_manifest=""
+  if [[ -d "$candidate_dataset" && -s "$candidate_dataset/manifest.json" ]]; then
+    candidate_manifest="$candidate_dataset/manifest.json"
+  elif [[ -f "$candidate_dataset" ]]; then
+    candidate_manifest="$candidate_dataset"
+  fi
+  if [[ -n "$candidate_manifest" ]] && python3 - "$candidate_manifest" <<'PY'
+import json, sys
+from pathlib import Path
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+raise SystemExit(0 if isinstance(payload, dict)
+                 and payload.get("name") == "smoke10" else 1)
+PY
+  then
+    DATASET_PROFILE="smoke10"
+  fi
+fi
+case "$DATASET_PROFILE" in full|smoke10) ;; *) fail_usage "invalid --dataset-profile value" ;; esac
+if [[ "$DATASET_PROFILE" == "smoke10" ]]; then
+  if ((!DATASET_EXPLICIT)); then
+    DATASET="data/test_sets/smoke10.json"
+  fi
+  if ((!ALGORITHMS_EXPLICIT)); then
+    ALGORITHMS="nn,greedy,primal-dual"
+  fi
+  ((THREADS_EXPLICIT)) || THREADS=2
+  ((FAST_LIMIT_EXPLICIT)) || FAST_LIMIT=5
+  ((EXACT_LIMIT_EXPLICIT)) || EXACT_LIMIT=10
+  ((STATIC_LIMIT_EXPLICIT)) || STATIC_LIMIT=2
+  ((ANIMATIONS_EXPLICIT)) || SKIP_ANIMATIONS=1
+fi
 case "$MODES" in minmax|minsum|both) ;; *) fail_usage "invalid --modes value" ;; esac
 case "$ANIMATION_MODE" in minmax|minsum|both) ;; *) fail_usage "invalid --animation-mode value" ;; esac
 case "$EXACT_REFERENCE" in auto|ip-kont|branch-and-bound) ;; *) fail_usage "invalid --exact-reference value" ;; esac
@@ -120,9 +166,40 @@ resolve_from_root() {
 
 DATASET_PATH="$(resolve_from_root "$DATASET")"
 [[ -e "$DATASET_PATH" ]] || fail_usage "dataset not found: $DATASET_PATH"
+SELECTION_MANIFEST=""
+SOURCE_DATASET_PATH="$DATASET_PATH"
+if [[ "$DATASET_PROFILE" == "smoke10" ]]; then
+  if [[ -d "$DATASET_PATH" && -s "$DATASET_PATH/manifest.json" ]]; then
+    SELECTION_MANIFEST="$DATASET_PATH/manifest.json"
+  elif [[ -f "$DATASET_PATH" ]]; then
+    SELECTION_MANIFEST="$DATASET_PATH"
+  else
+    fail_usage "smoke10 requires a selection manifest or materialized smoke dataset directory"
+  fi
+  SOURCE_DATASET_PATH="$(python3 - "$SELECTION_MANIFEST" "$ROOT" <<'PY'
+import json, sys
+from pathlib import Path
+manifest_path = Path(sys.argv[1])
+root = Path(sys.argv[2])
+manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+if not isinstance(manifest.get("instances"), list):
+    raise SystemExit("selection manifest has no instances array")
+source_root = Path(str(manifest.get("source_root", ".")))
+if source_root == Path(".") and manifest_path.parent.name != "test_sets":
+    source_root = manifest_path.parent
+elif not source_root.is_absolute():
+    source_root = root / source_root
+print(source_root.resolve())
+PY
+)" || fail_usage "unable to read smoke10 selection manifest"
+fi
 EXP_ROOT="$ROOT/results/experiments"
 mkdir -p "$EXP_ROOT"
-SOURCE_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$DATASET_PATH")"
+SOURCE_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$SOURCE_DATASET_PATH")"
+SELECTION_FINGERPRINT=""
+if [[ -n "$SELECTION_MANIFEST" ]]; then
+  SELECTION_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$SELECTION_MANIFEST")"
+fi
 
 if ((RESUME)); then
   if [[ -n "$OUTPUT" ]]; then
@@ -167,6 +244,10 @@ done
 python3 "$PIPELINE" init --experiment "$EXPERIMENT_DIR" \
   --dataset "$DATASET_PATH" --dataset-label "$DATASET" \
   --dataset-fingerprint "$SOURCE_FINGERPRINT" \
+  --dataset-profile "$DATASET_PROFILE" \
+  --source-dataset-fingerprint "$SOURCE_FINGERPRINT" \
+  --selection-fingerprint "$SELECTION_FINGERPRINT" \
+  --selection-manifest "$SELECTION_MANIFEST" \
   --algorithms "$ALGORITHMS" --modes "$MODES" --seed "$SEED" \
   --repeats "$REPEATS" --threads "$THREADS" --fast-limit "$FAST_LIMIT" \
   --exact-limit "$EXACT_LIMIT" --static-limit "$STATIC_LIMIT" \
@@ -325,7 +406,11 @@ if ! stage_done fast_benchmark || ((batch_artifacts_exist == 0)); then
     --fast-time-limit "$FAST_LIMIT"
     --exact-time-limit "$EXACT_LIMIT"
     --force
+    --dataset-profile "$DATASET_PROFILE"
   )
+  if [[ -n "$SELECTION_MANIFEST" ]]; then
+    batch_args+=(--dataset-manifest "$SELECTION_MANIFEST")
+  fi
   run_stage fast_benchmark fast_benchmark.log "${batch_args[@]}"
 fi
 for required in master_results.json master_results.csv batch_summary.md experiment_manifest.json; do
@@ -337,6 +422,22 @@ for required in master_results.json master_results.csv batch_summary.md experime
     exit 1
   }
 done
+python3 - "$EXPERIMENT_DIR" <<'PY'
+import json, sys
+from pathlib import Path
+experiment = Path(sys.argv[1])
+manifest_path = experiment / "experiment_manifest.json"
+batch_path = experiment / "batch" / "experiment_manifest.json"
+manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+batch = json.loads(batch_path.read_text(encoding="utf-8"))
+manifest["algorithm_set"] = batch.get("algorithm_set", [])
+manifest["selected_exact_backend"] = (
+    batch.get("selected_backend") or batch.get("selected_exact_reference")
+)
+manifest["actual_exact_backend"] = batch.get("actual_backend")
+manifest_path.write_text(json.dumps(manifest, indent=2) + "\n",
+                         encoding="utf-8")
+PY
 
 if ! stage_done result_validation || [[ ! -s "$EXPERIMENT_DIR/reports/result_integrity_report.md" ]]; then
   run_stage result_validation fast_benchmark.log python3 "$PIPELINE" validate \
@@ -432,5 +533,26 @@ python3 - "$EXPERIMENT_DIR/experiment_manifest.json" <<'PY' | tee -a "$PIPELINE_
 import json, sys
 from pathlib import Path
 print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")).get("status", "UNKNOWN"))
+PY
+python3 - "$EXPERIMENT_DIR" <<'PY' | tee -a "$PIPELINE_LOG"
+import json, sys
+from pathlib import Path
+experiment = Path(sys.argv[1])
+manifest = json.loads((experiment / "experiment_manifest.json").read_text())
+batch_path = experiment / "batch" / "experiment_manifest.json"
+batch = json.loads(batch_path.read_text()) if batch_path.is_file() else {}
+print(f"Dataset profile: {manifest.get('dataset_profile', 'full')}")
+print(f"Selected instances: {manifest.get('instance_count')}")
+print("Algorithms: " + ", ".join(batch.get("algorithm_set", [])))
+print("Objectives: " + ", ".join(manifest.get("objectives", [])))
+print(f"Threads: {manifest.get('thread_count')}")
+print("Time limits (static/fast/exact): "
+      f"{manifest.get('per_static_time_limit_sec')} / "
+      f"{manifest.get('fast_time_limit_sec')} / "
+      f"{manifest.get('exact_time_limit_sec')} seconds")
+if manifest.get("dataset_profile") == "smoke10":
+    print("Selected families: " + ", ".join(sorted({
+        str(row.get("family")) for row in manifest.get("selected_files", [])
+    })))
 PY
 printf 'Experiment artifacts: %s\n' "$EXPERIMENT_DIR"

@@ -120,7 +120,13 @@ Json result_to_json(const BenchmarkResult& result) {
               {"algorithm_name", result.algorithm_name},
               {"algorithm_category", result.algorithm_category},
               {"requested_backend", result.requested_backend},
+              {"selected_backend", result.selected_backend},
               {"actual_backend", result.actual_backend},
+              {"native_kont", result.native_kont},
+              {"fallback_used", result.fallback_used},
+              {"kont_version", result.solver_version},
+              {"solver_name", result.solver_name},
+              {"solver_runtime_sec", result.solve_time_sec},
               {"repeat", result.repeat},
               {"n", result.n},
               {"m", result.m},
@@ -210,7 +216,13 @@ BenchmarkResult result_from_json(const Json& json) {
       json.value("algorithm_category", std::string("exact"));
   result.requested_backend =
       json.value("requested_backend", std::string{});
+  result.selected_backend = json.value("selected_backend", std::string{});
   result.actual_backend = json.value("actual_backend", std::string{});
+  result.native_kont = json.value("native_kont", false);
+  result.fallback_used = json.value("fallback_used", false);
+  result.solver_version =
+      json.value("kont_version", std::string("not-applicable"));
+  result.solver_name = json.value("solver_name", std::string{});
   result.repeat = json.value("repeat", 0);
   result.n = json.at("n").get<int>();
   result.m = json.at("m").get<int>();
@@ -375,9 +387,18 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
   benchmark.algorithm_name = selected_backend;
   benchmark.algorithm_category = is_exact ? "exact_reference" : "heuristic";
   benchmark.requested_backend = config.exact_reference;
+  benchmark.selected_backend = selected_backend;
   benchmark.actual_backend =
       is_exact ? (actual_backend.empty() ? selected_backend : actual_backend)
                : selected_backend;
+  benchmark.native_kont =
+      is_exact && benchmark.actual_backend == "KONT/COPT";
+  benchmark.fallback_used =
+      is_exact && benchmark.actual_backend ==
+                      "built-in-branch-and-bound-fallback";
+  benchmark.solver_version =
+      benchmark.native_kont ? config.solver_version : "not-applicable";
+  benchmark.solver_name = static_solver->name();
   benchmark.repeat = config.repeat_index;
   benchmark.seed = run_seed(config.seed, benchmark.instance_name,
                             selected_backend, to_string(objective),
@@ -552,6 +573,13 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
   BenchmarkConfig resolved_config = config;
   resolved_config.exact_reference = exact_decision.selected_backend;
   resolved_config.actual_backend = exact_decision.actual_backend;
+  resolved_config.selected_backend = exact_decision.selected_backend;
+  resolved_config.native_kont =
+      exact_decision.actual_backend == "KONT/COPT";
+  resolved_config.fallback_used = exact_decision.fallback_used;
+  resolved_config.solver_version =
+      resolved_config.native_kont ? exact_decision.kont_version
+                                  : "not-applicable";
   resolved_config.verify_after = true;
   if (resolved_config.profile == BenchmarkProfile::DEBUG) {
     resolved_config.verify_each_iteration = true;
@@ -846,7 +874,9 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
     throw std::runtime_error("cannot open benchmark CSV output: " + path);
   }
   output << "instance_name,n,m,algorithm_name,algorithm_category,"
-            "requested_backend,actual_backend,objective,repeat,objective_value,"
+            "requested_backend,selected_backend,actual_backend,solver_name,"
+            "kont_version,native_kont,fallback_used,solver_runtime_sec,"
+            "objective,repeat,objective_value,"
             "peak_cost,integral_cost,lower_bound,upper_bound,bound_status,"
             "optimality_status,certified_gap,empirical_ratio_to_exact,"
             "ratio_to_incumbent,feasible,verified,solve_time_sec,"
@@ -862,7 +892,13 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
            << result.m << ',' << csv_escape(result.algorithm_name) << ','
            << csv_escape(result.algorithm_category) << ','
            << csv_escape(result.requested_backend) << ','
+           << csv_escape(result.selected_backend) << ','
            << csv_escape(result.actual_backend) << ','
+           << csv_escape(result.solver_name) << ','
+           << csv_escape(result.solver_version) << ','
+           << (result.native_kont ? "true" : "false") << ','
+           << (result.fallback_used ? "true" : "false") << ','
+           << result.solve_time_sec << ','
            << to_string(result.objective) << ',' << result.repeat << ','
            << result.objective_value << ',' << result.peak_cost << ','
            << result.integral_cost << ',' << result.lower_bound << ',';

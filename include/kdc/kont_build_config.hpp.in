@@ -1,0 +1,18 @@
+#pragma once
+
+namespace kdc::kont_build_config {
+inline constexpr char root[] = @KDC_KONT_ROOT_CPP@;
+inline constexpr char root_source[] = @KDC_KONT_ROOT_SOURCE_CPP@;
+inline constexpr char copt_header[] = @KDC_COPT_HEADER_CPP@;
+inline constexpr char copt_library[] = @KDC_COPT_LIBRARY_CPP@;
+inline constexpr char kont_header[] = @KDC_KONT_HEADER_CPP@;
+inline constexpr char kont_cpp_header[] = @KDC_KONT_CPP_HEADER_CPP@;
+inline constexpr char kont_cpp_library[] = @KDC_KONT_CPP_LIBRARY_CPP@;
+inline constexpr char include_directory[] = @KDC_KONT_INCLUDE_CPP@;
+inline constexpr char library[] = @KDC_KONT_LIBRARY_CPP@;
+inline constexpr char architecture[] = @KDC_KONT_ARCH_CPP@;
+inline constexpr char native_api[] = @KDC_KONT_API_CPP@;
+inline constexpr char compile_check[] = @KDC_KONT_API_STATUS_CPP@;
+inline constexpr char compile_failure_reason[] = @KDC_KONT_API_FAILURE_CPP@;
+inline constexpr char version[] = @KDC_KONT_VERSION_CPP@;
+}

@@ -26,6 +26,10 @@ struct BenchmarkConfig {
   BenchmarkProfile profile{BenchmarkProfile::EXACT_REFERENCE};
   bool both_objectives{false};
   std::string exact_reference{"auto"};
+  std::string selected_backend;
+  std::string solver_version{"unknown"};
+  bool native_kont{false};
+  bool fallback_used{false};
   double per_static_time_limit_sec{60.0};
   double fast_time_limit_sec{30.0};
   double exact_time_limit_sec{600.0};
@@ -48,7 +52,12 @@ struct BenchmarkResult {
   std::string algorithm_name{"exact-reference"};
   std::string algorithm_category{"exact"};
   std::string requested_backend;
+  std::string selected_backend;
   std::string actual_backend;
+  std::string solver_name;
+  std::string solver_version{"unknown"};
+  bool native_kont{false};
+  bool fallback_used{false};
   int repeat{0};
   int n{0};
   int m{0};
