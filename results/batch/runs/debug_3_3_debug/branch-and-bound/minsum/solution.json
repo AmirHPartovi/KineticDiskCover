@@ -1,0 +1,51 @@
+{
+    "instance": {
+        "T_end": 1.0,
+        "m": 3,
+        "n": 3,
+        "name": "debug_3_3_debug"
+    },
+    "intervals": [
+        {
+            "a": 41666.943364561426,
+            "assigned_points": [
+                1,
+                1,
+                0
+            ],
+            "b": -19126.01607505466,
+            "c": 7109.424175073702,
+            "supporting_point": [
+                2,
+                0,
+                -1
+            ],
+            "t_end": 0.2062567621487705,
+            "t_start": 0.0
+        },
+        {
+            "a": 46643.22612784766,
+            "assigned_points": [
+                1,
+                1,
+                0
+            ],
+            "b": -1143.5397259066845,
+            "c": 3188.7165433936398,
+            "supporting_point": [
+                2,
+                1,
+                -1
+            ],
+            "t_end": 1.0,
+            "t_start": 0.2062567621487705
+        }
+    ],
+    "objective": "minsum",
+    "summary": {
+        "num_intervals": 2,
+        "peak_cost": 48688.402945334616,
+        "peak_time": 1.0,
+        "total_integral": 18576.302389648077
+    }
+}

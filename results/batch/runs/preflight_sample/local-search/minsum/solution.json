@@ -1,0 +1,32 @@
+{
+    "instance": {
+        "T_end": 1.0,
+        "m": 2,
+        "n": 2,
+        "name": "preflight_sample"
+    },
+    "intervals": [
+        {
+            "a": 12.566370614359172,
+            "assigned_points": [
+                0,
+                1
+            ],
+            "b": -12.566370614359172,
+            "c": 31.41592653589793,
+            "supporting_point": [
+                0,
+                1
+            ],
+            "t_end": 1.0,
+            "t_start": 0.0
+        }
+    ],
+    "objective": "minsum",
+    "summary": {
+        "num_intervals": 1,
+        "peak_cost": 31.41592653589793,
+        "peak_time": 0.0,
+        "total_integral": 29.321531433504735
+    }
+}
