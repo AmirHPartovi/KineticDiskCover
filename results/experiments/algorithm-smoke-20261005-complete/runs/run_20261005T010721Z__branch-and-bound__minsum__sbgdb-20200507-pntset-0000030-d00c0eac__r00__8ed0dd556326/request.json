@@ -1,0 +1,36 @@
+{
+  "algorithm": "branch-and-bound",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "instance_id": "sbgdb-20200507-pntset-0000030-d00c0eac6b",
+  "objective": "minsum",
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 10.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "branch-and-bound",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 10.0,
+    "resolved_algorithm": "branch-and-bound",
+    "selected_backend": "branch-and-bound"
+  },
+  "run_id": "run_20261005T010721Z__branch-and-bound__minsum__sbgdb-20200507-pntset-0000030-d00c0eac__r00__8ed0dd556326",
+  "run_key": "82f2e1458187c024beb4b623fbe78f2f183d4f12207156eed65d74ef95fe78c0",
+  "schema_version": 1,
+  "seed": 42
+}

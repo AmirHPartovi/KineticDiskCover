@@ -1,0 +1,36 @@
+{
+  "algorithm": "nn",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "instance_id": "berlin52-6ce5d7089a",
+  "objective": "minsum",
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "nn",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "nn",
+    "selected_backend": "branch-and-bound"
+  },
+  "run_id": "run_20261005T010718Z__nn__minsum__berlin52-6ce5d7089a__r00__b5e1813cee9b",
+  "run_key": "70965e5ee8ce07c36e876943db043a69a1b6904634492ce727a2496d9ea0fed4",
+  "schema_version": 1,
+  "seed": 42
+}

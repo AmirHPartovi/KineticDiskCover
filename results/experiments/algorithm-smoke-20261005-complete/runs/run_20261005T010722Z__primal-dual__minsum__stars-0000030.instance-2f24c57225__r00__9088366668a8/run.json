@@ -1,0 +1,292 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "51d8594a4d216943334fbd2fa6a0091871a658a26ac69f1a2d4bc21c54e93beb",
+      "size_bytes": 938
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "8aa35ee856268a7542fcf362b45aac59be59e7b35b2219ecf010fec1edc4b5f3",
+      "size_bytes": 459
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "ca145c0131916e118cdcfcda1340f2ee7ca5b554127d4a04ca5bf85474996ff7",
+      "size_bytes": 3230
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "eee51a8fc231c53650fe2649534adc83819b07ad0fb01a6c488cf8542a7e606e",
+      "size_bytes": 1817
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "5d0b909f6db23cf7473dc901f4e47065e0bfeb3071f74afac26f7ef9fd01ee00",
+      "size_bytes": 3733
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/stars-0000030.instance/primal-dual/minsum/result.json",
+      "sha256": "d83ecde25185bec428da2148e2c2b1dc0f51f90bf6571b964c68a7b0c465ddf0",
+      "size_bytes": 3559
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/stars-0000030.instance/primal-dual/minsum/solution.json",
+      "sha256": "8ed4ab58e375c1e7f999ddad3352ce0585734a859faee8cc7209fe6f951e6d77",
+      "size_bytes": 4549
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/stars-0000030.instance/primal-dual/minsum/trace.csv",
+      "sha256": "b965aaab252fb5aa32d4e3441ba5139118f782de82bc1fc779260bd852dc0499",
+      "size_bytes": 833
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "b93dbdd1fa488e8853aa931dc6dff5b11e40ad22e311834d17afe4969b1549e6",
+      "size_bytes": 9817
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "9782323803da853ee5fa59c620f22bb9ff2649a0c5a33d25febe46097d586b32",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "2f24c57225fcd058c9f9a0838ccc248221fa4044c56e7a1cdf24e9459c40f07b",
+      "size_bytes": 2855
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "c12137c0abae1b3ad1aa346223624b3a36aa3aea20e568b813fd89e85895735c",
+      "size_bytes": 424
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "b08646fe2a2946d67d45794d56f38d08bb4e044dc597daf6832514393bc5e6ed",
+      "size_bytes": 1221
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "9b68dc568e2c6fa650ac06f7cefb513ff0e7d548a0a4ae4e7081dc447baf25fe",
+      "size_bytes": 3634
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "8ed4ab58e375c1e7f999ddad3352ce0585734a859faee8cc7209fe6f951e6d77",
+      "size_bytes": 4549
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "b965aaab252fb5aa32d4e3441ba5139118f782de82bc1fc779260bd852dc0499",
+      "size_bytes": 833
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "2d08bc7b28500fa7efee423f0833fa5f6ce139a0261a9c817c74415da568ff47",
+      "size_bytes": 3022
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "cf2af4cbb06c95ba5574ef0f34f595cdd89d75ab0b1e43c9a5166a925a04a39a",
+      "size_bytes": 479
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d0047e513e6fa4ef1dbb2ffedcdfd9f5aa3d4be2db7e08721b7414135a50d493",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "stars",
+  "finished_at": "2026-10-05T01:07:22.623684Z",
+  "input_sha256": "2f24c57225fcd058c9f9a0838ccc248221fa4044c56e7a1cdf24e9459c40f07b",
+  "instance_id": "stars-0000030.instance-2f24c57225",
+  "m": 25,
+  "n": 2,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 246.62673106106388,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "primal-dual",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "primal-dual",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "primal-dual",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 1995816844,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.00233,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 26.780636939441834,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 8.877648543432535,
+      "instance_id": "stars-0000030.instance-2f24c57225",
+      "instance_name": "stars-0000030.instance",
+      "integral_cost": 246.62673106106388,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 13,
+      "num_iterations": 7,
+      "num_static_solves": 13,
+      "objective": "minsum",
+      "objective_value": 246.62673106106388,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 771.6170616721125,
+      "peak_memory_mb": 17.265625,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010722Z__primal-dual__minsum__stars-0000030.instance-2f24c57225__r00__9088366668a8",
+      "run_key": "db0f049f58dbfb1a1d2483c9b556a83158f4263383a2747bdc464af0d9793916",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "primal-dual",
+      "serialization_time_sec": 0.000372041,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.0005957900000000001,
+      "solver_name": "primal-dual",
+      "solver_runtime_sec": 0.0005957900000000001,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.002015875,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 246.62673106106388,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.00103346,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.002015875,
+      "wrapper_wall_time_sec": 0.027476667000000177
+    },
+    "upper_bound": 246.62673106106388
+  },
+  "run_id": "run_20261005T010722Z__primal-dual__minsum__stars-0000030.instance-2f24c57225__r00__9088366668a8",
+  "run_key": "db0f049f58dbfb1a1d2483c9b556a83158f4263383a2747bdc464af0d9793916",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "primal-dual",
+  "started_at": "2026-10-05T01:07:22.577214Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:22.618376Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "9b68dc568e2c6fa650ac06f7cefb513ff0e7d548a0a4ae4e7081dc447baf25fe",
+    "run_id": "run_20261005T010722Z__primal-dual__minsum__stars-0000030.instance-2f24c57225__r00__9088366668a8",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

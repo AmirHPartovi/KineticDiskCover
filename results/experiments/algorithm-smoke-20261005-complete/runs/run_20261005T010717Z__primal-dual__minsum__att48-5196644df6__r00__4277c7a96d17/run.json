@@ -1,0 +1,292 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "fe5b59529a943fc0bb9fffa247ec98d55c070b34e1299fa1409241a58ece703f",
+      "size_bytes": 904
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "14661bf226a4a4b2bcb5a51cc5c9a3cb665721ab189c51844d1b950fe9a9266f",
+      "size_bytes": 440
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "0ddd0ddeb55a131c13533abf9a0087db3c5c25b20d19f6de8962512c1187b02b",
+      "size_bytes": 3179
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "4c2438d42ba2181519effe93a0ae71914c6edc642d896cad5d1b1fa3b10228a1",
+      "size_bytes": 1804
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "78349594acf7fa8a3b196feda7037d34fc204499a463e44ac504e02f1a20378c",
+      "size_bytes": 3607
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/att48/primal-dual/minsum/result.json",
+      "sha256": "86b9ef6c947e732e41e24aa87c9d430d53a787bc28a39aa20d77ee9b20d3029a",
+      "size_bytes": 3433
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/att48/primal-dual/minsum/solution.json",
+      "sha256": "4acbba1cd62d5a686b3eedd957399580e29891b7647b070f34a0046d8b00c485",
+      "size_bytes": 36062
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/att48/primal-dual/minsum/trace.csv",
+      "sha256": "b131a8c5b5b72c591a9bf4437c523ecc6ef61a4edc0211db9bf2baf8b3182a4f",
+      "size_bytes": 1058
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "6367dade2daa906e0ac891894aaba8fb77bd20bdff182efa67980eabdb65f1d9",
+      "size_bytes": 11723
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "ef1913c728d2a169299979d9b41819424febf9f0e5f77d5eb79280600438364b",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+      "size_bytes": 5289
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "edd89bc46c1bfef8de594bc67700ffbc7ea786f866de8f0de08ba348bf0eaf85",
+      "size_bytes": 391
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "08d2709782a4ac9f6b4a7e4a6d7779f8de3faf2ed26b5bf121f486fc48a198b9",
+      "size_bytes": 1187
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "5678cb7874184ce24b91e2e9a56fbca67313cac8d0341cf6467230a32a3d864e",
+      "size_bytes": 3559
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "4acbba1cd62d5a686b3eedd957399580e29891b7647b070f34a0046d8b00c485",
+      "size_bytes": 36062
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "b131a8c5b5b72c591a9bf4437c523ecc6ef61a4edc0211db9bf2baf8b3182a4f",
+      "size_bytes": 1058
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "7bd18d9eaf3099c8a74789c444621b9639e36cd8de09e9daefc979fb672a1e41",
+      "size_bytes": 3632
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "7f2f8a66c42743879c101332bf17e1b562487fbe5abd420d2e11255fa64e482f",
+      "size_bytes": 462
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d0047e513e6fa4ef1dbb2ffedcdfd9f5aa3d4be2db7e08721b7414135a50d493",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "att48",
+  "finished_at": "2026-10-05T01:07:17.303625Z",
+  "input_sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+  "instance_id": "att48-5196644df6",
+  "m": 25,
+  "n": 11,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 1454.701116364208,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "primal-dual",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "primal-dual",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 275,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "primal-dual",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 239660957,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.068115,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 27.77780407653334,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 50.549413447095986,
+      "instance_id": "att48-5196644df6",
+      "instance_name": "att48",
+      "integral_cost": 1454.701116364208,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 11,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 15,
+      "num_iterations": 9,
+      "num_static_solves": 15,
+      "objective": "minsum",
+      "objective_value": 1454.701116364208,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 2549.1972965434834,
+      "peak_memory_mb": 17.96875,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010717Z__primal-dual__minsum__att48-5196644df6__r00__4277c7a96d17",
+      "run_key": "588c9e97a745ed0ef2ebc26d4e9c9b922db4d435225c099f4f9fefd1c702e637",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "primal-dual",
+      "serialization_time_sec": 0.000509084,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.028265834000000004,
+      "solver_name": "primal-dual",
+      "solver_runtime_sec": 0.028265834000000004,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.0671505,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1454.701116364208,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.038347583,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.0671505,
+      "wrapper_wall_time_sec": 0.08178937500000005
+    },
+    "upper_bound": 1454.701116364208
+  },
+  "run_id": "run_20261005T010717Z__primal-dual__minsum__att48-5196644df6__r00__4277c7a96d17",
+  "run_key": "588c9e97a745ed0ef2ebc26d4e9c9b922db4d435225c099f4f9fefd1c702e637",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "primal-dual",
+  "started_at": "2026-10-05T01:07:17.209526Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:17.298209Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "5678cb7874184ce24b91e2e9a56fbca67313cac8d0341cf6467230a32a3d864e",
+    "run_id": "run_20261005T010717Z__primal-dual__minsum__att48-5196644df6__r00__4277c7a96d17",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

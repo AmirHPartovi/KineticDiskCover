@@ -1,0 +1,292 @@
+{
+  "actual_backend": "local-search",
+  "algorithm": "local-search",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "0493ce4d114d3935205a572b639eebdfa34bf4af9a1b660c58ad769253fdcec8",
+      "size_bytes": 931
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "c602bdf9f5d7bf017c8ceaca5ffd6f82607155bfeee9eabbe90dc0c5dc1bcfb5",
+      "size_bytes": 458
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "4251a1dd5cd0d118ca84fbc3a98e2b7f7048bab5aecf82b324bbcd233db3c257",
+      "size_bytes": 3219
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "7c9def159cc016eab101d5e2ea3d20c121602a1d89ee39b311616d5551b80ad0",
+      "size_bytes": 1820
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "3bdadc1b1cd06efc1ca4838898d5fa76cfa9097505afce5088488dd6163c9b1c",
+      "size_bytes": 3708
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/local-search/minsum/result.json",
+      "sha256": "bdf04b521e4a61ff23f17ef8dddb597d90062c213c6884c7a38573ea8be845d6",
+      "size_bytes": 3534
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/local-search/minsum/solution.json",
+      "sha256": "d06893638bc180758c857c43ea6be3b897d43743e7242c13739c6f2025019b65",
+      "size_bytes": 2001
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/uniform-0000030-2/local-search/minsum/trace.csv",
+      "sha256": "f9638a77ff56032ccca53f8ebd329d2f2b9f85463fa9b3897f5fb5e5f410df75",
+      "size_bytes": 540
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "3b4768134613a92d6e24cde228d8390e656b7a92aaf763d9e303cd7b03457b6c",
+      "size_bytes": 7290
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "a8ce5a12474560dff55afac9f3085884b13613e2684e90b1b0defa49a54228ee",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+      "size_bytes": 2843
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "fb7d17bf107d4b7290ad68796df8df54b19bf24211fc2a750c17d730e4ff083e",
+      "size_bytes": 416
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "2fba91d95ea96fe9aadb1f49fd45331df4cd18536c7a9a1fc63179ea0cecda49",
+      "size_bytes": 1215
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "04ed76f221387f76fbd9c2e4c108dbc434b465018337d9ae57e6a182d1756e9b",
+      "size_bytes": 3619
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "d06893638bc180758c857c43ea6be3b897d43743e7242c13739c6f2025019b65",
+      "size_bytes": 2001
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "f9638a77ff56032ccca53f8ebd329d2f2b9f85463fa9b3897f5fb5e5f410df75",
+      "size_bytes": 540
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "df3123c4d67a5021de93b05dca5a1f223d01f51f532c622aec91a048f76b8a29",
+      "size_bytes": 1856
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "225d0a44c18fcce929e7c0665be1c963fc6f4ca3747465f61950d12c6de84219",
+      "size_bytes": 475
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "7cab415e625de3d19bca031aab16b18eff65e52d80d6df7be4d23b25bbe8be34",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "uniform",
+  "finished_at": "2026-10-05T01:07:23.045461Z",
+  "input_sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+  "instance_id": "uniform-0000030-2-ac5ba17054",
+  "m": 25,
+  "n": 2,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "local-search",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "local-search",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 1441.1118281903846,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "local-search",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "local-search",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "local-search",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 3565059089,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.001032,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.9793850802294732,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 728.0603671233665,
+      "instance_id": "uniform-0000030-2-ac5ba17054",
+      "instance_name": "uniform-0000030-2",
+      "integral_cost": 1441.1118281903846,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 10,
+      "num_iterations": 4,
+      "num_static_solves": 10,
+      "objective": "minsum",
+      "objective_value": 1441.1118281903846,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 2894.673470277546,
+      "peak_memory_mb": 17.25,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010723Z__local-search__minsum__uniform-0000030-2-ac5ba17054__r00__f7dc62a70598",
+      "run_key": "04bc7a3d59b635d565e776c5f9402a767683dea2fe8b95c9612513db93cea4ac",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "local-search",
+      "serialization_time_sec": 0.000261709,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.00034670800000000004,
+      "solver_name": "local-search",
+      "solver_runtime_sec": 0.00034670800000000004,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.000796334,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1441.1118281903846,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.00017275,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.000796334,
+      "wrapper_wall_time_sec": 0.01462316700000077
+    },
+    "upper_bound": 1441.1118281903846
+  },
+  "run_id": "run_20261005T010723Z__local-search__minsum__uniform-0000030-2-ac5ba17054__r00__f7dc62a70598",
+  "run_key": "04bc7a3d59b635d565e776c5f9402a767683dea2fe8b95c9612513db93cea4ac",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "local-search",
+  "started_at": "2026-10-05T01:07:23.023295Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:23.041551Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "04ed76f221387f76fbd9c2e4c108dbc434b465018337d9ae57e6a182d1756e9b",
+    "run_id": "run_20261005T010723Z__local-search__minsum__uniform-0000030-2-ac5ba17054__r00__f7dc62a70598",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

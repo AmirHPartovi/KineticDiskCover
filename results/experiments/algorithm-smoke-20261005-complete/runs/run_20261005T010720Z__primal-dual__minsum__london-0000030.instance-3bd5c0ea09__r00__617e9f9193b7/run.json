@@ -1,0 +1,292 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "6d4ebdbfb8cb7cc6c6d9069c55d715ced2bdc745cad48d49e6251b2863c57111",
+      "size_bytes": 940
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "86bb6d9b58d89c388ed966772ff15a9615ecc877ebecabeada69aeea0d4d0341",
+      "size_bytes": 460
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "0416da63f06e12fce344ca7ad1f3c4a446d9050dfc8835b9d04b5f729256c46d",
+      "size_bytes": 3233
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "1f2aed6a833b8b8cc5668d7d54fa244a77060b19df392bc20d362120a5db6915",
+      "size_bytes": 1818
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "bdbfe38d7d1aadbbfdf3778c4c4b323e08fe435466f0601c85eedcf71f43e5fa",
+      "size_bytes": 3756
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minsum/result.json",
+      "sha256": "8f72291cf2b925a5e224c4e5e12202c05cea679a670c62d1977de11e96fd82ce",
+      "size_bytes": 3582
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minsum/solution.json",
+      "sha256": "b0574ee442c482ef1a636c75c3491d25a93a2875febc8d1779196916b2b0245d",
+      "size_bytes": 5381
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minsum/trace.csv",
+      "sha256": "1a09a3a461362024b3f07492a870e74471129986f0057c06e2d879a358475f50",
+      "size_bytes": 806
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "ad7927b17d548c2875e538ffe664fccf6017c37c6468a619a7ac61abf0612d78",
+      "size_bytes": 9839
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "cea52c34154b91469bf9ce6c77e2803ee7fe70224db5b50978daf9c07c28a193",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "size_bytes": 2854
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "26ad7241dbf1bfd52832c77756c100e5af0744592cdf905584928d1ac48cfc44",
+      "size_bytes": 427
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "285328b02a8509f54d13119172036aa66de418f736c273b4821d200166b662de",
+      "size_bytes": 1223
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "aef39162c7260ce7304aa5a64bc457fa0251ee76384d8aaf11e477003f93eaee",
+      "size_bytes": 3653
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "b0574ee442c482ef1a636c75c3491d25a93a2875febc8d1779196916b2b0245d",
+      "size_bytes": 5381
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "1a09a3a461362024b3f07492a870e74471129986f0057c06e2d879a358475f50",
+      "size_bytes": 806
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "27efd4dba28da453224c44f26f713ad527235242e8b332b9de8b45d49b493ad0",
+      "size_bytes": 3027
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "46500b25e215b68f37d011e2c79c12cddd4367b8d5ad462f9cffa7a128e98719",
+      "size_bytes": 480
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d0047e513e6fa4ef1dbb2ffedcdfd9f5aa3d4be2db7e08721b7414135a50d493",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "london",
+  "finished_at": "2026-10-05T01:07:20.878101Z",
+  "input_sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+  "instance_id": "london-0000030.instance-3bd5c0ea09",
+  "m": 25,
+  "n": 2,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 469.3462628018914,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "primal-dual",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "primal-dual",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "primal-dual",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 3847050723,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.002766,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 25.359732967573297,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 17.80542554734005,
+      "instance_id": "london-0000030.instance-3bd5c0ea09",
+      "instance_name": "london-0000030.instance",
+      "integral_cost": 469.3462628018914,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 13,
+      "num_iterations": 7,
+      "num_static_solves": 13,
+      "objective": "minsum",
+      "objective_value": 469.3462628018914,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 945.587070278064,
+      "peak_memory_mb": 17.375,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010720Z__primal-dual__minsum__london-0000030.instance-3bd5c0ea09__r00__617e9f9193b7",
+      "run_key": "3565d8d01900aacaff8e98550e945484966fe075868402d2d578a78e66b24ad3",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "primal-dual",
+      "serialization_time_sec": 0.00030320900000000003,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.0006613759999999998,
+      "solver_name": "primal-dual",
+      "solver_runtime_sec": 0.0006613759999999998,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.002370708,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 469.3462628018914,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.0013921650000000001,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.002370708,
+      "wrapper_wall_time_sec": 0.01629820800000026
+    },
+    "upper_bound": 469.3462628018914
+  },
+  "run_id": "run_20261005T010720Z__primal-dual__minsum__london-0000030.instance-3bd5c0ea09__r00__617e9f9193b7",
+  "run_key": "3565d8d01900aacaff8e98550e945484966fe075868402d2d578a78e66b24ad3",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "primal-dual",
+  "started_at": "2026-10-05T01:07:20.854504Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:20.874589Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "aef39162c7260ce7304aa5a64bc457fa0251ee76384d8aaf11e477003f93eaee",
+    "run_id": "run_20261005T010720Z__primal-dual__minsum__london-0000030.instance-3bd5c0ea09__r00__617e9f9193b7",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

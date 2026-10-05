@@ -1,0 +1,36 @@
+{
+  "algorithm": "lp-rounding",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "instance_id": "uniform-0000030-2-ac5ba17054",
+  "objective": "minsum",
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "lp-rounding",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "lp-rounding",
+    "selected_backend": "branch-and-bound"
+  },
+  "run_id": "run_20261005T010723Z__lp-rounding__minsum__uniform-0000030-2-ac5ba17054__r00__aa5d27d0122a",
+  "run_key": "81db2962ba7eaa2eabe636b19d8ce3c1d98f629ab9d804035bea5514c65df764",
+  "schema_version": 1,
+  "seed": 42
+}

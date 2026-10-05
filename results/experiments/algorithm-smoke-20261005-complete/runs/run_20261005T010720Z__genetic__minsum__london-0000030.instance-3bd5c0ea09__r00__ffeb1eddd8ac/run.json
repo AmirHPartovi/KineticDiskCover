@@ -1,0 +1,292 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "1bc57282600c7d5bed1dd6e7a40a1dd27e25a8b66fa4d2d0a7a9366a60c027be",
+      "size_bytes": 928
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "5dc6e4d42f575eaf843fe7cce77bfceab19a96d92af483a49874ee8396053578",
+      "size_bytes": 451
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "2bbef98f5bd2156fbc4dea7c7fa17cfa86fea7dad5b5e4fcc660db149b6f4aef",
+      "size_bytes": 3217
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "7e215616bb4c62e271ff34c4e038d4b90156ec799d950998fb81c9473acc499d",
+      "size_bytes": 1798
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "cbec1827adf14e9efd39169aa2017c40ff1a14a2e5fddb3b88d6fc99b57e9462",
+      "size_bytes": 3688
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/result.json",
+      "sha256": "3e583006ad0dd9ca818d0c7bd7dc5f89744aa21b3f1ea2d33f1e86e32e02f447",
+      "size_bytes": 3514
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/solution.json",
+      "sha256": "3e27d968723c2bfdad4cfb10d521a46d27713ef0309a3713b953872234a25bef",
+      "size_bytes": 4541
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/trace.csv",
+      "sha256": "fa839022c9d032ec9cd212200b0c64ee7173eb666b98f3a24bc11412ea9f71c5",
+      "size_bytes": 734
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "2d8406fc43bfee68bee2bc0582e512936bd81e73160b427e8bcb13b6d3f2acfb",
+      "size_bytes": 8769
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "4219891c022b2d456a1d4d4652d9504ec6d1e7392981c9cb2b47a72ea181d340",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "size_bytes": 2854
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "26ad7241dbf1bfd52832c77756c100e5af0744592cdf905584928d1ac48cfc44",
+      "size_bytes": 427
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "77e8d981cbbc364cbaec8b6ae1e530a34c361d939dea878f749600dc97587ef8",
+      "size_bytes": 1207
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "9b8a354eb468966863e9e4a97587392885fb52a36aa457b7fd8e50b7a22b3bef",
+      "size_bytes": 3601
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "3e27d968723c2bfdad4cfb10d521a46d27713ef0309a3713b953872234a25bef",
+      "size_bytes": 4541
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "fa839022c9d032ec9cd212200b0c64ee7173eb666b98f3a24bc11412ea9f71c5",
+      "size_bytes": 734
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "fca5b584dc81e65b632398d2e4d1c1c1587db6b53403b90875d690180260f82e",
+      "size_bytes": 2621
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "c41dd87779db959153dabd3ea28a4d88d5371bb040f9f8f380a6ddcdfe795ee7",
+      "size_bytes": 476
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "2a0fbb01daeb14919daeb551b12942c2c5cff1ea2b6191124d6336d6a61cc1c9",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "london",
+  "finished_at": "2026-10-05T01:07:20.832720Z",
+  "input_sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+  "instance_id": "london-0000030.instance-3bd5c0ea09",
+  "m": 25,
+  "n": 2,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "genetic",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "genetic",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 464.33868650316333,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "genetic",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "genetic",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "genetic",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 3367690986,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.1508,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.3477760541851755,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 344.52213708744694,
+      "instance_id": "london-0000030.instance-3bd5c0ea09",
+      "instance_name": "london-0000030.instance",
+      "integral_cost": 464.33868650316333,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 12,
+      "num_iterations": 6,
+      "num_static_solves": 12,
+      "objective": "minsum",
+      "objective_value": 464.33868650316333,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 1037.1800242816225,
+      "peak_memory_mb": 17.328125,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010720Z__genetic__minsum__london-0000030.instance-3bd5c0ea09__r00__ffeb1eddd8ac",
+      "run_key": "f290a3db36cd24f6cd9857b2bffc7660f873f276111657e3d6a070211bf45df4",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "genetic",
+      "serialization_time_sec": 0.000372542,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.149442958,
+      "solver_name": "genetic",
+      "solver_runtime_sec": 0.149442958,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.150727459,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 464.33868650316333,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.0008944160000000001,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.150727459,
+      "wrapper_wall_time_sec": 0.16538125000000026
+    },
+    "upper_bound": 464.33868650316333
+  },
+  "run_id": "run_20261005T010720Z__genetic__minsum__london-0000030.instance-3bd5c0ea09__r00__ffeb1eddd8ac",
+  "run_key": "f290a3db36cd24f6cd9857b2bffc7660f873f276111657e3d6a070211bf45df4",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "genetic",
+  "started_at": "2026-10-05T01:07:20.656068Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:20.826847Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "9b8a354eb468966863e9e4a97587392885fb52a36aa457b7fd8e50b7a22b3bef",
+    "run_id": "run_20261005T010720Z__genetic__minsum__london-0000030.instance-3bd5c0ea09__r00__ffeb1eddd8ac",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

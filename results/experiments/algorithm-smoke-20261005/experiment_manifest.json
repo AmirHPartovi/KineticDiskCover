@@ -1,0 +1,489 @@
+{
+  "experiment_id": "algorithm-smoke-20261005",
+  "pipeline": "smoke",
+  "experiment_label": "development / smoke validation",
+  "pipeline_config": {
+    "pipeline": "smoke",
+    "label": "development / smoke validation",
+    "dataset_profile": "smoke10",
+    "dataset": "data/instances/public_instance_set",
+    "smoke_count": 10,
+    "smoke_max_n": 50,
+    "smoke_max_m": 25,
+    "algorithms": "all",
+    "exact_backend": "auto",
+    "objectives": "both",
+    "repeats": 1,
+    "seed": 42,
+    "threads": 2,
+    "fast_time_limit_sec": 5,
+    "exact_time_limit_sec": 10,
+    "static_time_limit_sec": 2,
+    "benchmark_profile": "debug",
+    "verify_after": true,
+    "verify_each_iteration": true,
+    "save_traces": true,
+    "save_solutions": true,
+    "tables": true,
+    "figures": true,
+    "animation": {
+      "enabled": true,
+      "policy": "all-algorithms",
+      "top_n": 0,
+      "fps": 12,
+      "frames": 48,
+      "dpi": 90
+    },
+    "artifact_retention_days": 14,
+    "required_stages": [
+      "init",
+      "dataset",
+      "build",
+      "tests",
+      "preflight",
+      "backend_selection",
+      "benchmark",
+      "result_validation",
+      "tables",
+      "figures",
+      "animations",
+      "final_report",
+      "summary"
+    ]
+  },
+  "pipeline_config_sha256": "257faf393d327125f8c4dff784f08276b4cf4d4e2d0ccf5f59632dd520027378",
+  "dataset_profile": "smoke10",
+  "timestamp": "2026-10-05T01:04:30.123338+00:00",
+  "repository": "AmirHPartovi/KineticDiskCover",
+  "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+  "git_dirty": true,
+  "dataset_source": "data/instances/public_instance_set",
+  "dataset_source_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
+  "source_dataset_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
+  "selection_manifest": "dataset_selection_manifest.json",
+  "selected_instance_count": 10,
+  "selection_policy": "select eligible small candidates first, maximizing family coverage, then fill by size; use oversized family representatives only when fewer than the requested count of valid in-limit instances exist",
+  "selection_manifest_fingerprint": "d6b1715b34b0f92e47c6186b67225b573f1d5675f804daabb911b075d1a06987",
+  "selected_files": [
+    {
+      "family": "us-night",
+      "source": "data/instances/public_instance_set/us-night-0000030.instance.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1679,
+      "sha256": "89cc3fc4c0fbe027a9b8759bd278f62531c28aa58f29008e0bfe6c51bb1b2ad9",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 1,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "sbgdb-20200507-pntset",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000030.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1683,
+      "sha256": "ffc4aabe37f9ed2cf60d2a9fcd17bfe484812a9238bdd13a144105c20cff10e6",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 2,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "sbgdb-20200507-fpg-poly",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1723,
+      "sha256": "7493750b7865f0c242247028e6c27da92e8ccb54d73331418b979ea178147b6a",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 3,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "uniform",
+      "source": "data/instances/public_instance_set/uniform-0000030-2.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1779,
+      "sha256": "cbaabccb536ed99942d3b3772832ec3a58187cd716d0fee8b2cca38f98183b9e",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 4,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "london",
+      "source": "data/instances/public_instance_set/london-0000030.instance.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1790,
+      "sha256": "0928f729f52886a6a99b6ff3352347460e0958436f3b7375a63da6788fcd8887",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 5,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "stars",
+      "source": "data/instances/public_instance_set/stars-0000030.instance.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1791,
+      "sha256": "1955c914c7410f738387ff1e95bac363bfb7357b0e5b333159ad3f16dbb4c9c4",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 6,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "euro-night",
+      "source": "data/instances/public_instance_set/euro-night-0000030.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1792,
+      "sha256": "e7069adc74e0bfd0a52c160d05be6be3ab32aae9233d6eb8bf78abe30246f125",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 7,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "att48",
+      "source": "data/instances/public_instance_set/att48.mdc",
+      "n": 11,
+      "m": 25,
+      "file_size_bytes": 2866,
+      "sha256": "8efa61a1d9ab8fa13553ad56c76096e4c1a178a27ce03d87ca080f6c8d58a91f",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 8,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "berlin52",
+      "source": "data/instances/public_instance_set/berlin52.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3106,
+      "sha256": "3939d9e3cc19729916df1e7e8bfb198827657566a94afdd70ba5aa630f47af7d",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 9,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "eil51",
+      "source": "data/instances/public_instance_set/eil51.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3111,
+      "sha256": "f6e4afd678253f29a791daaa73035ab647a9e6c3972e72259f6cde70cb7309c6",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 10,
+      "exceeds_smoke_limits": false
+    }
+  ],
+  "dataset_canonical_path": "dataset",
+  "dataset_fingerprint": "1e0ddb3329f4520e28b5080cc58b7e5b784b9a06f510f8fd3d778db3ef605fa9",
+  "instance_count": 10,
+  "algorithm_list": "all",
+  "algorithm_set": [],
+  "objectives": [
+    "minmax",
+    "minsum"
+  ],
+  "profile": "debug",
+  "benchmark_profile": "debug",
+  "seed": 42,
+  "repeats": 1,
+  "thread_count": 2,
+  "fast_time_limit_sec": 5.0,
+  "exact_time_limit_sec": 10.0,
+  "per_static_time_limit_sec": 2.0,
+  "requested_exact_backend": "auto",
+  "animation_top_n": 0,
+  "animation_mode": "both",
+  "animation_policy": "all-algorithms",
+  "animation_instances_requested": "",
+  "verify_after": true,
+  "verify_each_iteration": true,
+  "save_traces": true,
+  "save_solutions": true,
+  "artifact_retention_days": 14,
+  "selected_exact_backend": "branch-and-bound",
+  "actual_exact_backend": "branch-and-bound",
+  "exact_reference_calibration": {
+    "calibration_instances": [],
+    "successful_runs": [],
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "selected_backend": "branch-and-bound",
+    "actual_backend": "branch-and-bound",
+    "kont_runtime_available": false
+  },
+  "animation_instance_selection": [],
+  "python_version": "3.9.6",
+  "compiler": null,
+  "build_type": null,
+  "host": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpu_count": 8
+  },
+  "commands": [
+    {
+      "stage": "init",
+      "command": "bash scripts/run_experiment.sh --pipeline smoke --output results/experiments/algorithm-smoke-20261005",
+      "recorded_at": "2026-10-05T01:04:31.919837+00:00"
+    },
+    {
+      "stage": "dataset",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005 --source /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/.selection-smoke.2bC0lO/selection.json ",
+      "recorded_at": "2026-10-05T01:04:32.382768+00:00"
+    },
+    {
+      "stage": "build",
+      "command": "bash -c cmake\\ -S\\ \\\"\\$1\\\"\\ -B\\ \\\"\\$1/build\\\"\\ -DCMAKE_BUILD_TYPE=Release\\ \\&\\&\\ cmake\\ --build\\ \\\"\\$1/build\\\"\\ --parallel\\ \\\"\\$2\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork 2 ",
+      "recorded_at": "2026-10-05T01:04:33.204559+00:00"
+    },
+    {
+      "stage": "tests",
+      "command": "ctest --test-dir /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build --output-on-failure ",
+      "recorded_at": "2026-10-05T01:06:22.520816+00:00"
+    },
+    {
+      "stage": "preflight",
+      "command": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build/kdc-solver preflight --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/preflight/preflight_report.md ",
+      "recorded_at": "2026-10-05T01:06:24.947461+00:00"
+    },
+    {
+      "stage": "backend_selection",
+      "command": "bash -c \\\"\\$1/build/kdc-solver\\\"\\ calibrate\\ --dataset\\ \\\"\\$2/dataset\\\"\\ --output\\ \\\"\\$2/calibration\\\"\\ --exact-reference\\ \\\"\\$3\\\"\\ \\&\\&\\ cp\\ \\\"\\$2/calibration/experiment_manifest.json\\\"\\ \\\"\\$2/batch/experiment_manifest.json\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005 auto ",
+      "recorded_at": "2026-10-05T01:06:25.204595+00:00"
+    },
+    {
+      "stage": "benchmark",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset_selection_manifest.json ",
+      "recorded_at": "2026-10-05T01:06:25.423018+00:00"
+    },
+    {
+      "stage": "benchmark",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset_selection_manifest.json ",
+      "recorded_at": "2026-10-05T01:06:58.683473+00:00"
+    }
+  ],
+  "stages": {
+    "init": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:04:31.919797+00:00",
+      "completed_at": "2026-10-05T01:04:31.919797+00:00",
+      "command": "bash scripts/run_experiment.sh --pipeline smoke --output results/experiments/algorithm-smoke-20261005",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "dataset": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:04:32.831256+00:00",
+      "started_at": "2026-10-05T01:04:32.382360+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005 --source /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/.selection-smoke.2bC0lO/selection.json ",
+      "completed_at": "2026-10-05T01:04:32.831256+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "build": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:06:22.400517+00:00",
+      "started_at": "2026-10-05T01:04:33.203272+00:00",
+      "command": "bash -c cmake\\ -S\\ \\\"\\$1\\\"\\ -B\\ \\\"\\$1/build\\\"\\ -DCMAKE_BUILD_TYPE=Release\\ \\&\\&\\ cmake\\ --build\\ \\\"\\$1/build\\\"\\ --parallel\\ \\\"\\$2\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork 2 ",
+      "completed_at": "2026-10-05T01:06:22.400517+00:00",
+      "exit_code": 0,
+      "duration_sec": 110.0
+    },
+    "tests": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:06:24.830340+00:00",
+      "started_at": "2026-10-05T01:06:22.520592+00:00",
+      "command": "ctest --test-dir /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build --output-on-failure ",
+      "completed_at": "2026-10-05T01:06:24.830340+00:00",
+      "exit_code": 0,
+      "duration_sec": 2.0
+    },
+    "preflight": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:06:25.085583+00:00",
+      "started_at": "2026-10-05T01:06:24.947212+00:00",
+      "command": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build/kdc-solver preflight --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/preflight/preflight_report.md ",
+      "completed_at": "2026-10-05T01:06:25.085583+00:00",
+      "exit_code": 0,
+      "duration_sec": 1.0
+    },
+    "backend_selection": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T01:06:25.301073+00:00",
+      "started_at": "2026-10-05T01:06:25.204433+00:00",
+      "command": "bash -c \\\"\\$1/build/kdc-solver\\\"\\ calibrate\\ --dataset\\ \\\"\\$2/dataset\\\"\\ --output\\ \\\"\\$2/calibration\\\"\\ --exact-reference\\ \\\"\\$3\\\"\\ \\&\\&\\ cp\\ \\\"\\$2/calibration/experiment_manifest.json\\\"\\ \\\"\\$2/batch/experiment_manifest.json\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005 auto ",
+      "completed_at": "2026-10-05T01:06:25.301073+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "benchmark": {
+      "status": "FAILED",
+      "updated_at": "2026-10-05T01:06:59.408455+00:00",
+      "started_at": "2026-10-05T01:06:58.683308+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset_selection_manifest.json ",
+      "completed_at": "2026-10-05T01:06:59.408455+00:00",
+      "exit_code": 2,
+      "message": "See logs/benchmark.log"
+    }
+  },
+  "required_stages": [
+    "init",
+    "dataset",
+    "build",
+    "tests",
+    "preflight",
+    "backend_selection",
+    "benchmark",
+    "result_validation",
+    "tables",
+    "figures",
+    "animations",
+    "final_report",
+    "summary"
+  ],
+  "status": "PARTIAL",
+  "reproduction_command": "bash scripts/run_experiment.sh --pipeline smoke --output results/experiments/algorithm-smoke-20261005",
+  "dataset_conversion": "mdc-to-canonical-json",
+  "canonical_instance_files": [
+    "att48/att48.json",
+    "berlin52/berlin52.json",
+    "eil51/eil51.json",
+    "euro-night/euro-night-0000030.json",
+    "london/london-0000030.instance.json",
+    "sbgdb-20200507-fpg-poly/sbgdb-20200507-fpg-poly_0000000030.json",
+    "sbgdb-20200507-pntset/sbgdb-20200507-pntset-0000030.json",
+    "stars/stars-0000030.instance.json",
+    "uniform/uniform-0000030-2.json",
+    "us-night/us-night-0000030.instance.json"
+  ],
+  "solver_manifest": {
+    "actual_backend": "branch-and-bound",
+    "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+    "calibration_decision_version": 4,
+    "calibration_instances": [],
+    "calibration_objectives": [
+      "minmax",
+      "minsum"
+    ],
+    "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset",
+    "dataset_fingerprint": "034602a59aedf1ae",
+    "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+    "fallback_used": false,
+    "kont_runtime_available": false,
+    "kont_version": "7.2.4",
+    "native_kont_available": false,
+    "native_kont_used": false,
+    "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/calibration",
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "requested_backend": "auto",
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "selected_backend": "branch-and-bound",
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "successful_runs": []
+  },
+  "failed_or_skipped_stages": [
+    "benchmark",
+    "result_validation",
+    "tables",
+    "figures",
+    "animations",
+    "final_report",
+    "summary"
+  ]
+}

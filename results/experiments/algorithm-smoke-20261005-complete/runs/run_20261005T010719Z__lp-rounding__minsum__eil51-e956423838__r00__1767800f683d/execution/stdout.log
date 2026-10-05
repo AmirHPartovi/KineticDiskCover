@@ -1,0 +1,104 @@
+[2026-10-05 04:37:19.180] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__lp-rounding__minsum__eil51-e956423838__r00__1767800f683d/input for instances
+2026-10-05 04:37:19 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:19 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:19 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:19.186] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:19.186] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:19.187] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__lp-rounding__minsum__eil51-e956423838__r00__1767800f683d/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:19.188] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__lp-rounding__minsum__eil51-e956423838__r00__1767800f683d/input/instance.json
+[2026-10-05 04:37:19.188] [info] [minsum.cpp:512] MinSum: start n=13, m=25
+[2026-10-05 04:37:19.188] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:19.188] [info] [candidate.cpp:345] build_coverage: nnz=2279
+[2026-10-05 04:37:19.191] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2501.963875217 LB=2501.963875217 ratio=1.0000
+[2026-10-05 04:37:19.192] [info] [solution.cpp:527] extend: 12 intervals over [0, 1]
+[2026-10-05 04:37:19.192] [info] [candidate.cpp:345] build_coverage: nnz=2279
+[2026-10-05 04:37:19.195] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2501.963875217 LB=2501.963875217 ratio=1.0000
+[2026-10-05 04:37:19.195] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.197] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1644.859170105 LB=1644.859170104 ratio=1.0000
+[2026-10-05 04:37:19.197] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.200] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1338.807724324 LB=1338.807724324 ratio=1.0000
+[2026-10-05 04:37:19.200] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.202] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1357.551032465 LB=1357.551032465 ratio=1.0000
+[2026-10-05 04:37:19.202] [info] [candidate.cpp:345] build_coverage: nnz=2277
+[2026-10-05 04:37:19.205] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=3204.570168942 LB=3196.001799506 ratio=1.0027
+[2026-10-05 04:37:19.205] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.5996,0.8525], t_mid=0.7260, int=13027.677874, LB=1797.550191, gap=6.2475
+[2026-10-05 04:37:19.205] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.207] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1288.120686064 LB=1288.120686064 ratio=1.0000
+[2026-10-05 04:37:19.207] [info] [solution.cpp:527] extend: 4 intervals over [0.7260262099220816, 1]
+[2026-10-05 04:37:19.208] [info] [solution.cpp:527] extend: 11 intervals over [0, 0.7260262099220816]
+[2026-10-05 04:37:19.208] [info] [solution.cpp:598] combine: 14 intervals
+[2026-10-05 04:37:19.214] [info] [verify.cpp:992] Verifier: starting certified continuous check on 14 intervals
+[2026-10-05 04:37:19.215] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.215] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.1532,0.2739], t_mid=0.2136, int=3349.252263, LB=1797.550191, gap=0.8632
+[2026-10-05 04:37:19.215] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.218] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1781.740931280 LB=1781.740931280 ratio=1.0000
+[2026-10-05 04:37:19.219] [info] [solution.cpp:527] extend: 6 intervals over [0.21357154162477182, 1]
+[2026-10-05 04:37:19.219] [info] [solution.cpp:527] extend: 4 intervals over [0, 0.21357154162477182]
+[2026-10-05 04:37:19.219] [info] [solution.cpp:598] combine: 15 intervals
+[2026-10-05 04:37:19.227] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:19.229] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.229] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.4072,0.4994], t_mid=0.4533, int=2297.567608, LB=1797.550191, gap=0.2782
+[2026-10-05 04:37:19.229] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.232] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1097.707589047 LB=1097.707589047 ratio=1.0000
+[2026-10-05 04:37:19.232] [info] [solution.cpp:527] extend: 6 intervals over [0.45330277242757133, 1]
+[2026-10-05 04:37:19.232] [info] [solution.cpp:527] extend: 5 intervals over [0, 0.45330277242757133]
+[2026-10-05 04:37:19.233] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:19.244] [info] [verify.cpp:992] Verifier: starting certified continuous check on 18 intervals
+[2026-10-05 04:37:19.246] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.246] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.7667,0.9681], t_mid=0.8674, int=2037.546959, LB=1797.550191, gap=0.1335
+[2026-10-05 04:37:19.246] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.249] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2301.153513050 LB=2301.153513050 ratio=1.0000
+[2026-10-05 04:37:19.249] [info] [solution.cpp:527] extend: 2 intervals over [0.8673732708702677, 1]
+[2026-10-05 04:37:19.249] [info] [solution.cpp:527] extend: 8 intervals over [0, 0.8673732708702677]
+[2026-10-05 04:37:19.249] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:19.261] [info] [verify.cpp:992] Verifier: starting certified continuous check on 18 intervals
+[2026-10-05 04:37:19.263] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.263] [info] [minsum.cpp:633] MinSum iter 5: [t_a,t_b]=[0.8353,0.9895], t_mid=0.9124, int=1969.157193, LB=1797.550191, gap=0.0955
+[2026-10-05 04:37:19.263] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.265] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2653.176923270 LB=2653.176923270 ratio=1.0000
+[2026-10-05 04:37:19.265] [info] [solution.cpp:527] extend: 2 intervals over [0.9123779523409412, 1]
+[2026-10-05 04:37:19.266] [info] [solution.cpp:527] extend: 7 intervals over [0, 0.9123779523409412]
+[2026-10-05 04:37:19.266] [info] [solution.cpp:598] combine: 19 intervals
+[2026-10-05 04:37:19.280] [info] [verify.cpp:992] Verifier: starting certified continuous check on 19 intervals
+[2026-10-05 04:37:19.282] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.282] [info] [minsum.cpp:633] MinSum iter 6: [t_a,t_b]=[0.4412,0.5786], t_mid=0.5099, int=1942.708711, LB=1797.550191, gap=0.0808
+[2026-10-05 04:37:19.282] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.285] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1391.732184824 LB=1391.732184824 ratio=1.0000
+[2026-10-05 04:37:19.285] [info] [solution.cpp:527] extend: 6 intervals over [0.5098941565522244, 1]
+[2026-10-05 04:37:19.285] [info] [solution.cpp:527] extend: 2 intervals over [0, 0.5098941565522244]
+[2026-10-05 04:37:19.285] [info] [solution.cpp:598] combine: 22 intervals
+[2026-10-05 04:37:19.301] [info] [verify.cpp:992] Verifier: starting certified continuous check on 22 intervals
+[2026-10-05 04:37:19.304] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.304] [info] [minsum.cpp:633] MinSum iter 7: [t_a,t_b]=[0.0708,0.1282], t_mid=0.0995, int=1912.921680, LB=1797.550191, gap=0.0642
+[2026-10-05 04:37:19.304] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.307] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2212.677252873 LB=2212.677252873 ratio=1.0000
+[2026-10-05 04:37:19.308] [info] [solution.cpp:527] extend: 11 intervals over [0.09953701162606175, 1]
+[2026-10-05 04:37:19.308] [info] [solution.cpp:527] extend: 3 intervals over [0, 0.09953701162606175]
+[2026-10-05 04:37:19.308] [info] [solution.cpp:598] combine: 25 intervals
+[2026-10-05 04:37:19.325] [info] [verify.cpp:992] Verifier: starting certified continuous check on 25 intervals
+[2026-10-05 04:37:19.327] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.327] [info] [minsum.cpp:633] MinSum iter 8: [t_a,t_b]=[0.5370,0.5983], t_mid=0.5676, int=1861.967299, LB=1797.550191, gap=0.0358
+[2026-10-05 04:37:19.327] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.329] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=1371.497172656 LB=1371.497172656 ratio=1.0000
+[2026-10-05 04:37:19.330] [info] [solution.cpp:527] extend: 6 intervals over [0.5676113400583336, 1]
+[2026-10-05 04:37:19.330] [info] [solution.cpp:527] extend: 8 intervals over [0, 0.5676113400583336]
+[2026-10-05 04:37:19.330] [info] [solution.cpp:598] combine: 25 intervals
+[2026-10-05 04:37:19.347] [info] [verify.cpp:992] Verifier: starting certified continuous check on 25 intervals
+[2026-10-05 04:37:19.349] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.349] [info] [minsum.cpp:633] MinSum iter 9: [t_a,t_b]=[0.8813,0.9895], t_mid=0.9354, int=1825.485604, LB=1797.550191, gap=0.0155
+[2026-10-05 04:37:19.350] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:19.352] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2807.214376165 LB=2807.214376165 ratio=1.0000
+[2026-10-05 04:37:19.352] [info] [solution.cpp:527] extend: 2 intervals over [0.9353670962370231, 1]
+[2026-10-05 04:37:19.352] [info] [solution.cpp:527] extend: 7 intervals over [0, 0.9353670962370231]
+[2026-10-05 04:37:19.352] [info] [solution.cpp:598] combine: 26 intervals
+[2026-10-05 04:37:19.369] [info] [verify.cpp:992] Verifier: starting certified continuous check on 26 intervals
+[2026-10-05 04:37:19.371] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.371] [info] [minsum.cpp:633] MinSum iter 10: [t_a,t_b]=[0.1663,0.3088], t_mid=0.2376, int=1809.760566, LB=1797.550191, gap=0.0068
+[2026-10-05 04:37:19.371] [info] [verify.cpp:992] Verifier: starting certified continuous check on 26 intervals
+[2026-10-05 04:37:19.374] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.374] [info] [minsum.cpp:881] MinSum: done. int=1809.760566, LB=1797.550191, gap=0.0068, iters=10, t=0.130s
+[2026-10-05 04:37:19.374] [info] [trace.cpp:72] TraceWriter: wrote 10 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__lp-rounding__minsum__eil51-e956423838__r00__1767800f683d/execution/solver/runs/eil51/lp-rounding/minsum/trace.csv
+[2026-10-05 04:37:19.374] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 27790 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__lp-rounding__minsum__eil51-e956423838__r00__1767800f683d/execution/solver/runs/eil51/lp-rounding/minsum/solution.json
+[2026-10-05 04:37:19.374] [info] [batch_runner.cpp:1066] BatchRunner: eil51 / lp-rounding / minsum cost=1809.760566 t=0.186s verified=true
+[2026-10-05 04:37:19.375] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

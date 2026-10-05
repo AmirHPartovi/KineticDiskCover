@@ -1,0 +1,109 @@
+{
+  "counts": {
+    "total": 180,
+    "successful": 180,
+    "feasible": 180,
+    "verified": 180,
+    "failed": 0,
+    "timeouts": 0
+  },
+  "statuses": {
+    "OPTIMAL": 0,
+    "FEASIBLE": 180,
+    "TIME_LIMIT": 0,
+    "INFEASIBLE": 0,
+    "FAILED": 0
+  },
+  "by_objective": {
+    "minmax": {
+      "total": 90,
+      "successful": 90,
+      "feasible": 90,
+      "verified": 90,
+      "failed": 0,
+      "timeouts": 0,
+      "OPTIMAL": 0,
+      "FEASIBLE": 90,
+      "TIME_LIMIT": 0,
+      "INFEASIBLE": 0,
+      "FAILED": 0
+    },
+    "minsum": {
+      "total": 90,
+      "successful": 90,
+      "feasible": 90,
+      "verified": 90,
+      "failed": 0,
+      "timeouts": 0,
+      "OPTIMAL": 0,
+      "FEASIBLE": 90,
+      "TIME_LIMIT": 0,
+      "INFEASIBLE": 0,
+      "FAILED": 0
+    }
+  },
+  "expected_runs": 180,
+  "actual_runs": 180,
+  "missing_run_count": 0,
+  "duplicate_run_count": 0,
+  "missing_solution_paths": [],
+  "missing_trace_paths": [],
+  "exact_backend_provenance": [
+    "requested=auto; actual=branch-and-bound"
+  ],
+  "algorithm_count": 9,
+  "instance_count": 10,
+  "canonical_aggregate": {
+    "classifications": {
+      "completed_runs": 180,
+      "expected_runs": 180,
+      "extra_attempts": 0,
+      "failed_runs": 0,
+      "invalid_runs": 0,
+      "latest_completed_runs": 180,
+      "latest_failed_runs": 0,
+      "latest_time_limit_runs": 0,
+      "missing_runs": 0,
+      "rerun_attempt_groups": 0,
+      "time_limit_runs": 0,
+      "unexpected_runs": 0,
+      "valid_runs": 180
+    },
+    "complete": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "exports": {
+      "aggregates/results.csv": {
+        "sha256": "60adf6143f98f5832d92705cd5ebe3c34a39b9b86634b4ce8e75660141c35914",
+        "size_bytes": 302087
+      },
+      "aggregates/results.json": {
+        "sha256": "00d569dca0f9d5ca63c3fd9816d1d87a838743aec54f3ae421cadf9818bcc80b",
+        "size_bytes": 1939643
+      },
+      "aggregates/results.jsonl": {
+        "sha256": "c6d70179a27dbaec226e273b3e51307bcdf1800ccb4a66629c4a05ca819a5183",
+        "size_bytes": 1474520
+      },
+      "batch/master_results.csv": {
+        "sha256": "60adf6143f98f5832d92705cd5ebe3c34a39b9b86634b4ce8e75660141c35914",
+        "size_bytes": 302087
+      },
+      "batch/master_results.json": {
+        "sha256": "1210a215fa70ff689859d8254699c154e8f49acac33e6d4eca26865869eca362",
+        "size_bytes": 657253
+      },
+      "runs/index.jsonl": {
+        "sha256": "b1dcfb42902cdcc4cc1fad81758984f2431949a27fe32760707a7106e9cfaf45",
+        "size_bytes": 101405
+      }
+    },
+    "generated_at": "2026-10-05T01:07:24.929034Z",
+    "invalid_runs": [],
+    "missing_run_keys": [],
+    "plan_sha256": "eab26f988c90c2b875c8dbced48555ef3aa3744e6401a9fac2472915e3dab4aa",
+    "record_count": 180,
+    "rerun_attempts": {},
+    "schema_version": 1,
+    "unexpected_run_keys": []
+  }
+}

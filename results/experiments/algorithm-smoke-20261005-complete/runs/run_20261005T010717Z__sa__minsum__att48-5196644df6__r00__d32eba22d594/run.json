@@ -1,0 +1,292 @@
+{
+  "actual_backend": "sa",
+  "algorithm": "sa",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "a941d6e5938740765c9890f346b511d0ebb3d86d9ad9812e780d7a63afd5d08c",
+      "size_bytes": 877
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "e65ceaa298fce042e4ce4bc017a9db8f55c7fd21750befe4073763396d915d22",
+      "size_bytes": 422
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "5022e2494cc94f3c45579ee1ca4ea46b0e9330629f323ab12960c69957242016",
+      "size_bytes": 3143
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "1b7718234c521c0e927960c8b1d2a8276e0c7a6587bf1fc05943dfdb229bdbf9",
+      "size_bytes": 1760
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "1249818332edcbe733291b57c4105fb3862de8b244c6d4065ec4cc5de73f5a9c",
+      "size_bytes": 3491
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/att48/sa/minsum/result.json",
+      "sha256": "775a8f32fd6f50c8f25571c8d90d09e55c9ff124bc7dca9226af0d1fb9a2d8e3",
+      "size_bytes": 3317
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/att48/sa/minsum/solution.json",
+      "sha256": "8c8c93b2f1ea964ca4d74597714f255d12578ce5c7806bda73a4a7fe76d1234c",
+      "size_bytes": 22784
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/att48/sa/minsum/trace.csv",
+      "sha256": "0a9d64c075dee23f2c7ea3dfeb66bd01243bd5c4610e218b253719f4ea58749f",
+      "size_bytes": 756
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "ce5f510812e90528e22ca6014aad73449dc1513c1e701688753c9d5e142ba3e3",
+      "size_bytes": 9152
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "9fced6fa119bff799acf734c0aff6da7c7bac26b5d4bd38668f53be0e7efcf30",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+      "size_bytes": 5289
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "edd89bc46c1bfef8de594bc67700ffbc7ea786f866de8f0de08ba348bf0eaf85",
+      "size_bytes": 391
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "0a48a16cdaa9fb58a5bff9535a1acf8573984e893ef221459cfb8c7a810873b4",
+      "size_bytes": 1151
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "89f73f739412c495083260431d9b5d71a7229bd9af0f978a0ed2dabc2744ed16",
+      "size_bytes": 3478
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "8c8c93b2f1ea964ca4d74597714f255d12578ce5c7806bda73a4a7fe76d1234c",
+      "size_bytes": 22784
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "0a9d64c075dee23f2c7ea3dfeb66bd01243bd5c4610e218b253719f4ea58749f",
+      "size_bytes": 756
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "4905338a0a88ea6ff5c5d5576b5272f6347f15690158db39a444d3710765937e",
+      "size_bytes": 2477
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "a5b4e1f49c0c785043bd7b5d267f327d24afbb689ec0b57549efb4f1deb2d6b6",
+      "size_bytes": 453
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "8004873252d21ea8ba01a019d14627de24dbe912406d8442d9d891d36d1f97d3",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "att48",
+  "finished_at": "2026-10-05T01:07:17.430666Z",
+  "input_sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+  "instance_id": "att48-5196644df6",
+  "m": 25,
+  "n": 11,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "sa",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "sa",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 1538.2906711792498,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "sa",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "sa",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 275,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "sa",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 1989458193,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.092811,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 2.184418623819605,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 483.0679797162224,
+      "instance_id": "att48-5196644df6",
+      "instance_name": "att48",
+      "integral_cost": 1538.2906711792498,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 11,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 12,
+      "num_iterations": 6,
+      "num_static_solves": 12,
+      "objective": "minsum",
+      "objective_value": 1538.2906711792498,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 2739.5551262630015,
+      "peak_memory_mb": 17.546875,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010717Z__sa__minsum__att48-5196644df6__r00__d32eba22d594",
+      "run_key": "808a09038d45eec3a5228b26085670b2327038528f006cc721dd185450d426a1",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "sa",
+      "serialization_time_sec": 0.000497833,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.075344416,
+      "solver_name": "sa",
+      "solver_runtime_sec": 0.075344416,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.090971,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1538.2906711792498,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.0151085,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.090971,
+      "wrapper_wall_time_sec": 0.10530391700000008
+    },
+    "upper_bound": 1538.2906711792498
+  },
+  "run_id": "run_20261005T010717Z__sa__minsum__att48-5196644df6__r00__d32eba22d594",
+  "run_key": "808a09038d45eec3a5228b26085670b2327038528f006cc721dd185450d426a1",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "sa",
+  "started_at": "2026-10-05T01:07:17.317183Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:17.426801Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "89f73f739412c495083260431d9b5d71a7229bd9af0f978a0ed2dabc2744ed16",
+    "run_id": "run_20261005T010717Z__sa__minsum__att48-5196644df6__r00__d32eba22d594",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

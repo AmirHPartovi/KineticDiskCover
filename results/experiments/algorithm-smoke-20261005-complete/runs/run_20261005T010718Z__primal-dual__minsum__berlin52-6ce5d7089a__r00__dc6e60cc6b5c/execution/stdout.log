@@ -1,0 +1,75 @@
+[2026-10-05 04:37:18.178] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c/input for instances
+2026-10-05 04:37:18 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:18 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:18 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:18.184] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:18.184] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:18.185] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:18.185] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c/input/instance.json
+[2026-10-05 04:37:18.186] [info] [minsum.cpp:512] MinSum: start n=13, m=25
+[2026-10-05 04:37:18.186] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:18.186] [info] [candidate.cpp:345] build_coverage: nnz=2276
+[2026-10-05 04:37:18.186] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2473.684502648 LB=98.947380106 ratio=25.0000 |D|=5
+[2026-10-05 04:37:18.187] [info] [solution.cpp:527] extend: 9 intervals over [0, 1]
+[2026-10-05 04:37:18.187] [info] [candidate.cpp:345] build_coverage: nnz=2276
+[2026-10-05 04:37:18.187] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2473.684502648 LB=98.947380106 ratio=25.0000 |D|=5
+[2026-10-05 04:37:18.187] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.187] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=1468.141753742 LB=58.725670150 ratio=25.0000 |D|=4
+[2026-10-05 04:37:18.187] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.187] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=1559.087997990 LB=62.363519920 ratio=25.0000 |D|=5
+[2026-10-05 04:37:18.188] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.188] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2514.240260027 LB=100.569610401 ratio=25.0000 |D|=6
+[2026-10-05 04:37:18.188] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.188] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4698.533680125 LB=187.941347205 ratio=25.0000 |D|=7
+[2026-10-05 04:37:18.188] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.6812,0.9745], t_mid=0.8279, int=6956.886519, LB=91.275791, gap=75.2183
+[2026-10-05 04:37:18.188] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.188] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=3226.581742743 LB=129.063269710 ratio=25.0000 |D|=8
+[2026-10-05 04:37:18.188] [info] [solution.cpp:527] extend: 2 intervals over [0.8278839818281907, 1]
+[2026-10-05 04:37:18.189] [info] [solution.cpp:527] extend: 14 intervals over [0, 0.8278839818281907]
+[2026-10-05 04:37:18.189] [info] [solution.cpp:598] combine: 11 intervals
+[2026-10-05 04:37:18.194] [info] [verify.cpp:992] Verifier: starting certified continuous check on 11 intervals
+[2026-10-05 04:37:18.195] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.195] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.6555,0.9207], t_mid=0.7881, int=3149.018001, LB=91.435069, gap=33.4399
+[2026-10-05 04:37:18.195] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.195] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2821.873637833 LB=112.874945513 ratio=25.0000 |D|=7
+[2026-10-05 04:37:18.195] [info] [solution.cpp:527] extend: 2 intervals over [0.788106056872018, 1]
+[2026-10-05 04:37:18.196] [info] [solution.cpp:527] extend: 16 intervals over [0, 0.788106056872018]
+[2026-10-05 04:37:18.196] [info] [solution.cpp:598] combine: 15 intervals
+[2026-10-05 04:37:18.202] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:18.203] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.203] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.0000,0.1863], t_mid=0.0932, int=2994.009880, LB=91.435069, gap=31.7447
+[2026-10-05 04:37:18.203] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.203] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2033.911437164 LB=81.356457487 ratio=25.0000 |D|=4
+[2026-10-05 04:37:18.204] [info] [solution.cpp:527] extend: 10 intervals over [0.09315683964225513, 1]
+[2026-10-05 04:37:18.204] [info] [solution.cpp:527] extend: 1 intervals over [0, 0.09315683964225513]
+[2026-10-05 04:37:18.204] [info] [solution.cpp:598] combine: 15 intervals
+[2026-10-05 04:37:18.210] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:18.211] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.211] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.9207,1.0000], t_mid=0.9603, int=2618.561753, LB=91.435069, gap=27.6385
+[2026-10-05 04:37:18.211] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.212] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4204.314331817 LB=168.172573273 ratio=25.0000 |D|=7
+[2026-10-05 04:37:18.212] [info] [solution.cpp:527] extend: 2 intervals over [0.9603408258892636, 1]
+[2026-10-05 04:37:18.213] [info] [solution.cpp:527] extend: 15 intervals over [0, 0.9603408258892636]
+[2026-10-05 04:37:18.213] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:18.220] [info] [verify.cpp:992] Verifier: starting certified continuous check on 18 intervals
+[2026-10-05 04:37:18.222] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:633] MinSum iter 5: [t_a,t_b]=[0.6555,0.7871], t_mid=0.7213, int=2539.986948, LB=91.435069, gap=26.7791
+[2026-10-05 04:37:18.222] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.222] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2481.683390430 LB=85.847741640 ratio=28.9080 |D|=6
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:681] MinSum: no improvement at selected time (1/3)
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:633] MinSum iter 6: [t_a,t_b]=[0.6555,0.7871], t_mid=0.7213, int=2539.986948, LB=91.435069, gap=26.7791
+[2026-10-05 04:37:18.222] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.222] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2481.683390430 LB=85.847741640 ratio=28.9080 |D|=6
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:681] MinSum: no improvement at selected time (2/3)
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:633] MinSum iter 7: [t_a,t_b]=[0.6555,0.7871], t_mid=0.7213, int=2539.986948, LB=91.435069, gap=26.7791
+[2026-10-05 04:37:18.222] [info] [candidate.cpp:345] build_coverage: nnz=2275
+[2026-10-05 04:37:18.222] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2481.683390430 LB=85.847741640 ratio=28.9080 |D|=6
+[2026-10-05 04:37:18.222] [info] [minsum.cpp:681] MinSum: no improvement at selected time (3/3)
+[2026-10-05 04:37:18.222] [info] [verify.cpp:992] Verifier: starting certified continuous check on 18 intervals
+[2026-10-05 04:37:18.224] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.224] [info] [minsum.cpp:881] MinSum: done. int=2539.986948, LB=91.435069, gap=26.7791, iters=7, t=0.021s
+[2026-10-05 04:37:18.224] [info] [trace.cpp:72] TraceWriter: wrote 8 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c/execution/solver/runs/berlin52/primal-dual/minsum/trace.csv
+[2026-10-05 04:37:18.224] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 19367 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c/execution/solver/runs/berlin52/primal-dual/minsum/solution.json
+[2026-10-05 04:37:18.225] [info] [batch_runner.cpp:1066] BatchRunner: berlin52 / primal-dual / minsum cost=2539.986948 t=0.039s verified=true
+[2026-10-05 04:37:18.225] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

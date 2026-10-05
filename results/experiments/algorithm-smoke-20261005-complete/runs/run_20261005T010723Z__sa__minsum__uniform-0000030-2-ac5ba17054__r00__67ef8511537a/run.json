@@ -1,0 +1,292 @@
+{
+  "actual_backend": "sa",
+  "algorithm": "sa",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "b2e4c580e7afca098dc6307063754d4cab0f6d99943922bf98f13d9d32939deb",
+      "size_bytes": 901
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "770b3fb5cd6bfb59031e6417146ec2781cbdd678b4e8a7671f732d751e9e00f2",
+      "size_bytes": 436
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "38710fee5574e6092aa7f1432364a2c601d3a2603cac6e4b70b675167b0ff076",
+      "size_bytes": 3179
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "16d8c39afcc15a06eb47fb2c85696dda3e829222a0162a75976f2b71541cccd6",
+      "size_bytes": 1770
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "e88f7d877ca43e46c19a57b246d409b09405b0c079c5ef59dc5337d619f0f7cd",
+      "size_bytes": 3591
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/sa/minsum/result.json",
+      "sha256": "30db3c50da064b889c7429746e27e9591115477de6616d8ffb5b915831ca4d67",
+      "size_bytes": 3417
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/sa/minsum/solution.json",
+      "sha256": "d06893638bc180758c857c43ea6be3b897d43743e7242c13739c6f2025019b65",
+      "size_bytes": 2001
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/uniform-0000030-2/sa/minsum/trace.csv",
+      "sha256": "e17de38ef839c89a956fd5db414b96f54b7bef942a8b0abf28ee2e14b01e3a3d",
+      "size_bytes": 522
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "8b41a76423c019b741ca28c0feb64b787a0945d26db1e8de62ff54af5d129be9",
+      "size_bytes": 7210
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "eb7f7a1f5ec4229a0a824c56b58aadae028cf26256ec04181e9ad319436b5e41",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+      "size_bytes": 2843
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "fb7d17bf107d4b7290ad68796df8df54b19bf24211fc2a750c17d730e4ff083e",
+      "size_bytes": 416
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "fb88e1f2dfbcbcd89c66e98b6e3ad631eaa82d09f95ea8932370ae0645717e94",
+      "size_bytes": 1175
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "108def10ed2439a1d4e003439bd28670c88c0ccf67fcc38dd83685433501512a",
+      "size_bytes": 3542
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "d06893638bc180758c857c43ea6be3b897d43743e7242c13739c6f2025019b65",
+      "size_bytes": 2001
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "e17de38ef839c89a956fd5db414b96f54b7bef942a8b0abf28ee2e14b01e3a3d",
+      "size_bytes": 522
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "8e493bc6a271508471b4b2f526184b6d380c5846be7f74006484da2c5e17cac8",
+      "size_bytes": 1803
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "373586c6b0402f76c30ef6b929ea45313c7b352763aabd21d7a1f8ee18858d23",
+      "size_bytes": 465
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "8004873252d21ea8ba01a019d14627de24dbe912406d8442d9d891d36d1f97d3",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "uniform",
+  "finished_at": "2026-10-05T01:07:23.226570Z",
+  "input_sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+  "instance_id": "uniform-0000030-2-ac5ba17054",
+  "m": 25,
+  "n": 2,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "sa",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "sa",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 1441.1118281903846,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "sa",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "sa",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "sa",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2732958103,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.035323,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.9793850802294732,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 728.0603671233665,
+      "instance_id": "uniform-0000030-2-ac5ba17054",
+      "instance_name": "uniform-0000030-2",
+      "integral_cost": 1441.1118281903846,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 10,
+      "num_iterations": 4,
+      "num_static_solves": 10,
+      "objective": "minsum",
+      "objective_value": 1441.1118281903846,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 2894.673470277546,
+      "peak_memory_mb": 17.203125,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010723Z__sa__minsum__uniform-0000030-2-ac5ba17054__r00__67ef8511537a",
+      "run_key": "101aedb25e1a489bebf20ef2cc0bf9f53b8e8de892facdfab44a7829651b067c",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "sa",
+      "serialization_time_sec": 0.0020678759999999997,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.034234167,
+      "solver_name": "sa",
+      "solver_runtime_sec": 0.034234167,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.036505084,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1441.1118281903846,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.000186666,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.036505084,
+      "wrapper_wall_time_sec": 0.05564375000000066
+    },
+    "upper_bound": 1441.1118281903846
+  },
+  "run_id": "run_20261005T010723Z__sa__minsum__uniform-0000030-2-ac5ba17054__r00__67ef8511537a",
+  "run_key": "101aedb25e1a489bebf20ef2cc0bf9f53b8e8de892facdfab44a7829651b067c",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "sa",
+  "started_at": "2026-10-05T01:07:23.165273Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:23.222613Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "108def10ed2439a1d4e003439bd28670c88c0ccf67fcc38dd83685433501512a",
+    "run_id": "run_20261005T010723Z__sa__minsum__uniform-0000030-2-ac5ba17054__r00__67ef8511537a",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

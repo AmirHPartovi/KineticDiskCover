@@ -1,0 +1,292 @@
+{
+  "actual_backend": "greedy",
+  "algorithm": "greedy",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "9c1dd885d8d9258cac2ead7321184e4b3ebe06318018f3a7205a80b4964a6902",
+      "size_bytes": 889
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "fd20b782d6f4ef093a0d68611f4f075bd66c8e31887450e1648c8caecebf7dde",
+      "size_bytes": 432
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "df3ea0da4c03a94b7b8c65ce7cdb6d577e221cb731e3ad24f83062ebd7b401fa",
+      "size_bytes": 3159
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "1e24bf629dacafc9656c8dba44c3e7b4cd5085a324aa449478a43dc1832b45ab",
+      "size_bytes": 1785
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "9d7cc6fa52d68fb91ac6c2368573f63c0b9ea546075bea80287fa5c0f60a90c8",
+      "size_bytes": 3575
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/greedy/minmax/result.json",
+      "sha256": "de0923bdebe81d01a665e82cc0a404af3d0261b3f6f45ab600f1fb254e1ff8a8",
+      "size_bytes": 3401
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/greedy/minmax/solution.json",
+      "sha256": "23c7598e2ab38f8834b2dc15f3e8ad7b62135dae46a03e419845d8792eeb642d",
+      "size_bytes": 11891
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/eil51/greedy/minmax/trace.csv",
+      "sha256": "f313913d5119baa7692b870988d5705fd80878c97321b751f44f9c689cdb9139",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "b933b811dc7c75644c20bc06c4460806389624c91d0447161bdea6e2bac37889",
+      "size_bytes": 4359
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "9d35496c04aad07d2cc655c99f2778fb5365eb4093104958522159e7c0c5fec4",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+      "size_bytes": 5836
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "97b2e38338ed78646818a7809676a5e4cabe4563862292389dfd8ae9b7b83f2a",
+      "size_bytes": 391
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "3ead8accc891f2e3469c0a1622b8763c81a6fb072b1655aebb331e73d1a7c60d",
+      "size_bytes": 1167
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "c93496e28a8507e34343e5e8e5591c7fd3c01cc180bebb8e33275cdc2db9b802",
+      "size_bytes": 3548
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "23c7598e2ab38f8834b2dc15f3e8ad7b62135dae46a03e419845d8792eeb642d",
+      "size_bytes": 11891
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "f313913d5119baa7692b870988d5705fd80878c97321b751f44f9c689cdb9139",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "78e5015a280ac5c1a8693f5a1e0e8650137c1e735f187fc74511a121d5ced9cd",
+      "size_bytes": 345
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "205c451ffb9b9bd387d5d2f5ee9e715c944cdac408bd41028be224e5fbdd1eb0",
+      "size_bytes": 457
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "534aa6ebb195e4cae07b4595fdb693e09d5056df8204f7461b73012545b51afd",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "eil51",
+  "finished_at": "2026-10-05T01:07:18.550735Z",
+  "input_sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+  "instance_id": "eil51-e956423838",
+  "m": 25,
+  "n": 13,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "greedy",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "greedy",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 728.3114020322719,
+    "objective_value": 26956.090244629722,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "greedy",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "greedy",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 325,
+      "certified_gap": null,
+      "certified_lower_bound": 728.3114020322719,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "greedy",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 45092783,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.00503,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 36.011764705882335,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 0.0,
+      "instance_id": "eil51-e956423838",
+      "instance_name": "eil51",
+      "integral_cost": 10118.558123564988,
+      "kont_version": "not-applicable",
+      "lower_bound": 728.3114020322719,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 13,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 26956.090244629722,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 26956.090244629722,
+      "peak_memory_mb": 17.4375,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010718Z__greedy__minmax__eil51-e956423838__r00__cee7a137bc78",
+      "run_key": "c2d66cd4f6a2905f32096e81baa00b9fe9c89f450bc049ccbc13c72f4ffc78c3",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "greedy",
+      "serialization_time_sec": 0.000567166,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.0018741250000000001,
+      "solver_name": "greedy",
+      "solver_runtime_sec": 0.0018741250000000001,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.005035416,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 26956.090244629722,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.002577083,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.005035416,
+      "wrapper_wall_time_sec": 0.01967395900000035
+    },
+    "upper_bound": 26956.090244629722
+  },
+  "run_id": "run_20261005T010718Z__greedy__minmax__eil51-e956423838__r00__cee7a137bc78",
+  "run_key": "c2d66cd4f6a2905f32096e81baa00b9fe9c89f450bc049ccbc13c72f4ffc78c3",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "greedy",
+  "started_at": "2026-10-05T01:07:18.518913Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:18.544628Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "c93496e28a8507e34343e5e8e5591c7fd3c01cc180bebb8e33275cdc2db9b802",
+    "run_id": "run_20261005T010718Z__greedy__minmax__eil51-e956423838__r00__cee7a137bc78",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

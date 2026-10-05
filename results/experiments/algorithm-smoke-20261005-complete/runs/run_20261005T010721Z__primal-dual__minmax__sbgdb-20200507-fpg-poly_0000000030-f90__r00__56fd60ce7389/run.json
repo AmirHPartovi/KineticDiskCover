@@ -1,0 +1,292 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "62debab29051cb24d890d20429e0c4e31fccb42d7d8a27d0e1703269dcd219c1",
+      "size_bytes": 948
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "51f029acded0e0e51bc20c1e26647d4eb28a19082a9ebc6f114a39cfc4db7223",
+      "size_bytes": 472
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "207e669bce6c39731cd13eb7ef63e8dcc2e79b6b635c1fa5e42ca0103c62feb0",
+      "size_bytes": 3245
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "5063cece081acbbb635530ad9bf8b98b90d437e8f9bef7e56413be9a91e2ed1f",
+      "size_bytes": 1837
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "6b29be3324d2a7742bff77a3b13b5f30c7e126f51e50709e1e18649e0e9f3a46",
+      "size_bytes": 3827
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/primal-dual/minmax/result.json",
+      "sha256": "85e2fb5237c58b1e51a64b3c516320f2bfabfdb02aa426c6203f759b33589bad",
+      "size_bytes": 3653
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/primal-dual/minmax/solution.json",
+      "sha256": "1a9cf04653e922f978139fb87b87e9695bf7c925a2c08cb2913df78d748f4b3c",
+      "size_bytes": 2800
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/primal-dual/minmax/trace.csv",
+      "sha256": "d336d6c84392b57888190c0143c8a4f4016933525c033ea9377bdb4e32051a26",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "a61c8a6d33bd84526494a20efab7f11d61619bc94f7c9f8f0f64826eb68769c0",
+      "size_bytes": 4740
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "6717aea9d535022c98d8393866126bb8ca96a339068736a356f12afca60df015",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+      "size_bytes": 2636
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "43bfa4acbc29250a9260298c3d128649c7d7fd583a15aaaab982618127ffd878",
+      "size_bytes": 466
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "bdf4f0a7d44ab9af006b3bffb5ec888b39ab63e58c289fa51d70762486f98735",
+      "size_bytes": 1238
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "1f9bb6ccff7a503dad285aee2469ccc48a0aaa6a3fd1c4d632aead44db74e4f9",
+      "size_bytes": 3699
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "1a9cf04653e922f978139fb87b87e9695bf7c925a2c08cb2913df78d748f4b3c",
+      "size_bytes": 2800
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "d336d6c84392b57888190c0143c8a4f4016933525c033ea9377bdb4e32051a26",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "c76b20686e792f4d5af5a71a698b506a9fbc2343c71a47dc29d7082d5122fdd7",
+      "size_bytes": 366
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "5d9fb565455f43621d5855a2f5c4fc441323d8f51d13e556fe44e6f22ccd850c",
+      "size_bytes": 484
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d0047e513e6fa4ef1dbb2ffedcdfd9f5aa3d4be2db7e08721b7414135a50d493",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "sbgdb-20200507-fpg-poly",
+  "finished_at": "2026-10-05T01:07:21.148676Z",
+  "input_sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+  "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+  "m": 25,
+  "n": 1,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 8574.02915280195,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "primal-dual",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "primal-dual",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "primal-dual",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 4085856685,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.000574,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 1338.8421052180033,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 6.399283258385797,
+      "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+      "instance_name": "sbgdb-20200507-fpg-poly_0000000030",
+      "integral_cost": 1903.3162347245036,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 8574.02915280195,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 8574.02915280195,
+      "peak_memory_mb": 17.078125,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010721Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__56fd60ce7389",
+      "run_key": "ce681c3c3b71d4e5afcac70b44e36ff1ee04362706429c35ce690d27ea59903e",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "primal-dual",
+      "serialization_time_sec": 0.00039241600000000003,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 6.387600000000001e-05,
+      "solver_name": "primal-dual",
+      "solver_runtime_sec": 6.387600000000001e-05,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.0005060829999999999,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 8574.02915280195,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 3.4083e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.0005060829999999999,
+      "wrapper_wall_time_sec": 0.015634540999999835
+    },
+    "upper_bound": 8574.02915280195
+  },
+  "run_id": "run_20261005T010721Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__56fd60ce7389",
+  "run_key": "ce681c3c3b71d4e5afcac70b44e36ff1ee04362706429c35ce690d27ea59903e",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "primal-dual",
+  "started_at": "2026-10-05T01:07:21.121081Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:21.143481Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "1f9bb6ccff7a503dad285aee2469ccc48a0aaa6a3fd1c4d632aead44db74e4f9",
+    "run_id": "run_20261005T010721Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__56fd60ce7389",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

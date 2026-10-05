@@ -1,0 +1,28 @@
+[2026-10-05 04:37:18.603] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95/input for instances
+2026-10-05 04:37:18 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:18 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:18 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:18.609] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:18.609] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:18.609] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:18.610] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95/input/instance.json
+[2026-10-05 04:37:18.610] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-05 04:37:18.610] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:18.610] [info] [stationary.cpp:264] NN: cost=2643.341971, feasible=true, active_stations=11
+[2026-10-05 04:37:18.611] [info] [solution.cpp:527] extend: 5 intervals over [0, 1]
+[2026-10-05 04:37:18.611] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=51710.109544, LB=0.000000, gap=51710.1095
+[2026-10-05 04:37:18.611] [info] [stationary.cpp:264] NN: cost=3375.937558, feasible=true, active_stations=10
+[2026-10-05 04:37:18.611] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:18.611] [info] [solution.cpp:527] extend: 8 intervals over [0, 1]
+[2026-10-05 04:37:18.611] [info] [solution.cpp:598] combine: 10 intervals
+[2026-10-05 04:37:18.611] [info] [verify.cpp:992] Verifier: starting certified continuous check on 10 intervals
+[2026-10-05 04:37:18.613] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.613] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:18.613] [info] [verify.cpp:992] Verifier: starting certified continuous check on 10 intervals
+[2026-10-05 04:37:18.614] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.614] [info] [minmax.cpp:373] MinMax: done. peak=51710.109544, LB=0.000000, gap=51710.1095, iters=1, t=0.001s
+[2026-10-05 04:37:18.614] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95/execution/solver/runs/eil51/nn/minmax/trace.csv
+[2026-10-05 04:37:18.614] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 10825 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95/execution/solver/runs/eil51/nn/minmax/solution.json
+[2026-10-05 04:37:18.615] [info] [batch_runner.cpp:1066] BatchRunner: eil51 / nn / minmax cost=51710.109544 t=0.004s verified=true
+[2026-10-05 04:37:18.615] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

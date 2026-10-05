@@ -1,0 +1,30 @@
+[2026-10-05 04:37:16.675] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a/input for instances
+2026-10-05 04:37:16 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:16 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:16 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:16.680] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:16.680] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:16.681] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:16.681] [info] [io.cpp:137] read_json: loaded 11 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a/input/instance.json
+[2026-10-05 04:37:16.682] [info] [minmax.cpp:110] MinMax: start n=11, m=25, T=1
+[2026-10-05 04:37:16.682] [info] [candidate.cpp:199] InstancePrecompute: built 275 candidates
+[2026-10-05 04:37:16.682] [info] [candidate.cpp:345] build_coverage: nnz=1650
+[2026-10-05 04:37:16.682] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2582.056771979 LB=76.024115449 ratio=33.9637 |D|=6
+[2026-10-05 04:37:16.683] [info] [solution.cpp:527] extend: 18 intervals over [0, 1]
+[2026-10-05 04:37:16.683] [info] [minmax.cpp:198] MinMax iter 1: t_max=0.439312, peak=7522.748119, LB=76.024115, gap=97.9521
+[2026-10-05 04:37:16.683] [info] [candidate.cpp:345] build_coverage: nnz=1651
+[2026-10-05 04:37:16.683] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=688.471789235 LB=27.538871569 ratio=25.0000 |D|=6
+[2026-10-05 04:37:16.684] [info] [solution.cpp:527] extend: 9 intervals over [0.4393122633315271, 1]
+[2026-10-05 04:37:16.684] [info] [solution.cpp:527] extend: 7 intervals over [0, 0.4393122633315271]
+[2026-10-05 04:37:16.684] [info] [solution.cpp:598] combine: 19 intervals
+[2026-10-05 04:37:16.684] [info] [verify.cpp:992] Verifier: starting certified continuous check on 19 intervals
+[2026-10-05 04:37:16.685] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:16.685] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:16.685] [info] [verify.cpp:992] Verifier: starting certified continuous check on 19 intervals
+[2026-10-05 04:37:16.687] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:16.687] [info] [minmax.cpp:373] MinMax: done. peak=7522.748119, LB=0.000000, gap=97.9521, iters=1, t=0.002s
+[2026-10-05 04:37:16.687] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a/execution/solver/runs/att48/primal-dual/minmax/trace.csv
+[2026-10-05 04:37:16.687] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 19709 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a/execution/solver/runs/att48/primal-dual/minmax/solution.json
+[2026-10-05 04:37:16.687] [info] [batch_runner.cpp:1066] BatchRunner: att48 / primal-dual / minmax cost=7522.748119 t=0.006s verified=true
+[2026-10-05 04:37:16.688] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

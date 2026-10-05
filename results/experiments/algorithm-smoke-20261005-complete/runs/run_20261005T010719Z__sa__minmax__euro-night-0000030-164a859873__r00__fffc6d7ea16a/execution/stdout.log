@@ -1,0 +1,30 @@
+[2026-10-05 04:37:19.969] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__sa__minmax__euro-night-0000030-164a859873__r00__fffc6d7ea16a/input for instances
+2026-10-05 04:37:19 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:19 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:19 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:19.975] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:19.975] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:19.975] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__sa__minmax__euro-night-0000030-164a859873__r00__fffc6d7ea16a/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:19.976] [info] [io.cpp:137] read_json: loaded 2 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__sa__minmax__euro-night-0000030-164a859873__r00__fffc6d7ea16a/input/instance.json
+[2026-10-05 04:37:19.976] [info] [minmax.cpp:110] MinMax: start n=2, m=25, T=1
+[2026-10-05 04:37:19.976] [info] [candidate.cpp:199] InstancePrecompute: built 50 candidates
+[2026-10-05 04:37:19.976] [info] [stationary.cpp:264] NN: cost=72.112053, feasible=true, active_stations=2
+[2026-10-05 04:37:19.980] [info] [simulated_annealing_solver.cpp:260] SA: cost=72.112053392 LB=46.930725737 final_T=6.653969e-02
+[2026-10-05 04:37:19.980] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:19.980] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=6563.008011, LB=46.930726, gap=138.8446
+[2026-10-05 04:37:19.980] [info] [stationary.cpp:264] NN: cost=387.866526, feasible=true, active_stations=2
+[2026-10-05 04:37:19.983] [info] [simulated_annealing_solver.cpp:260] SA: cost=387.866526065 LB=311.425783039 final_T=6.653969e-02
+[2026-10-05 04:37:19.983] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:19.983] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:19.983] [info] [solution.cpp:598] combine: 3 intervals
+[2026-10-05 04:37:19.983] [info] [verify.cpp:992] Verifier: starting certified continuous check on 3 intervals
+[2026-10-05 04:37:19.983] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.983] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:19.983] [info] [verify.cpp:992] Verifier: starting certified continuous check on 3 intervals
+[2026-10-05 04:37:19.983] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:19.983] [info] [minmax.cpp:373] MinMax: done. peak=6563.008011, LB=311.425783, gap=20.0741, iters=1, t=0.007s
+[2026-10-05 04:37:19.983] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__sa__minmax__euro-night-0000030-164a859873__r00__fffc6d7ea16a/execution/solver/runs/euro-night-0000030/sa/minmax/trace.csv
+[2026-10-05 04:37:19.984] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 2840 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010719Z__sa__minmax__euro-night-0000030-164a859873__r00__fffc6d7ea16a/execution/solver/runs/euro-night-0000030/sa/minmax/solution.json
+[2026-10-05 04:37:19.984] [info] [batch_runner.cpp:1066] BatchRunner: euro-night-0000030 / sa / minmax cost=6563.008011 t=0.007s verified=true
+[2026-10-05 04:37:19.984] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

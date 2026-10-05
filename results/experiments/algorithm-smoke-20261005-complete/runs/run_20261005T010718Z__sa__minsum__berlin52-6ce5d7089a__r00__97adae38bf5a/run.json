@@ -1,0 +1,292 @@
+{
+  "actual_backend": "sa",
+  "algorithm": "sa",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "1c99d2e8a71d4148b47ee25f532243a5c1b7b1c64bf250ccb3ffe5ce1524a6d0",
+      "size_bytes": 883
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "56002969c582887aba60c36fbe50911d0562a94494c293051ba179c680b77d88",
+      "size_bytes": 425
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "99f84bae8b9c45661f4664e4ad6456bfe2ed1c5c4b34f409d34ec3ceb3ca33e0",
+      "size_bytes": 3152
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "e6a6d9d90d3075d41b3a5f37be338a86dff43bb93294553c7a1b80918da315c3",
+      "size_bytes": 1764
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "68e6797352da960e2672c39ca12aecf8c522c7dc144f16788a51c6160eb56489",
+      "size_bytes": 3522
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/sa/minsum/result.json",
+      "sha256": "1983808a931a927850b2855d8ff193060fe8041a2004a37f13353292dac4f5a7",
+      "size_bytes": 3348
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/sa/minsum/solution.json",
+      "sha256": "7973c1e90a91aed136528428ede0a5a1151cd9573f3dac3dc0e78d38d1509f31",
+      "size_bytes": 21467
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/berlin52/sa/minsum/trace.csv",
+      "sha256": "0614bb9b2a84cc993387c547ecf6be38eb3b53fadabef1e9339fabb98e17ca17",
+      "size_bytes": 1152
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "f7897a624cf4624972c58aa872e8fe6d8c4af708796cee2c8f80505badbfbf23",
+      "size_bytes": 13182
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "83a714a860230d7b0803a122706ad5c3d2abfa69b01b614d779dcfd31a369feb",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "size_bytes": 5831
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "6a485bcc33f52416b95931c97a621ca30113d35de98b26848431a2f71d6c576f",
+      "size_bytes": 400
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "ac57dd394e43cdfc41196aea1bb13480b73a45ce48fd3f80790a751b75db303d",
+      "size_bytes": 1157
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "4aa4d8f88715ce0481294bd610be5e7b68adfc16041e2a31a4119bda553e6b7e",
+      "size_bytes": 3500
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "7973c1e90a91aed136528428ede0a5a1151cd9573f3dac3dc0e78d38d1509f31",
+      "size_bytes": 21467
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "0614bb9b2a84cc993387c547ecf6be38eb3b53fadabef1e9339fabb98e17ca17",
+      "size_bytes": 1152
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "ed0dbcdbad102e1701f8ebe4984debdb5b6815974cc022b66b777436607a7b52",
+      "size_bytes": 3944
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "2e7a5c843dee2e078d789003a16f1182670be62e1c6731d183130537db6c3805",
+      "size_bytes": 456
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "8004873252d21ea8ba01a019d14627de24dbe912406d8442d9d891d36d1f97d3",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "berlin52",
+  "finished_at": "2026-10-05T01:07:18.397362Z",
+  "input_sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+  "instance_id": "berlin52-6ce5d7089a",
+  "m": 25,
+  "n": 13,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "sa",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "sa",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 2288.2567269355227,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "sa",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "sa",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 325,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "sa",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 4158704127,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.149341,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 1.0884342039908712,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 1095.6805450527495,
+      "instance_id": "berlin52-6ce5d7089a",
+      "instance_name": "berlin52",
+      "integral_cost": 2288.2567269355227,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 13,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 16,
+      "num_iterations": 10,
+      "num_static_solves": 16,
+      "objective": "minsum",
+      "objective_value": 2288.2567269355227,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 4698.533680124574,
+      "peak_memory_mb": 17.828125,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010718Z__sa__minsum__berlin52-6ce5d7089a__r00__97adae38bf5a",
+      "run_key": "8c14bd475cd36eb0bdbdcf7e486d16138ee11b4df082d37441586a616f62aceb",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "sa",
+      "serialization_time_sec": 0.000519708,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.116898707,
+      "solver_name": "sa",
+      "solver_runtime_sec": 0.116898707,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.149729166,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 2288.2567269355227,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.032280876,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.149729166,
+      "wrapper_wall_time_sec": 0.16382624999999984
+    },
+    "upper_bound": 2288.2567269355227
+  },
+  "run_id": "run_20261005T010718Z__sa__minsum__berlin52-6ce5d7089a__r00__97adae38bf5a",
+  "run_key": "8c14bd475cd36eb0bdbdcf7e486d16138ee11b4df082d37441586a616f62aceb",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "sa",
+  "started_at": "2026-10-05T01:07:18.224836Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:18.393387Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "4aa4d8f88715ce0481294bd610be5e7b68adfc16041e2a31a4119bda553e6b7e",
+    "run_id": "run_20261005T010718Z__sa__minsum__berlin52-6ce5d7089a__r00__97adae38bf5a",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

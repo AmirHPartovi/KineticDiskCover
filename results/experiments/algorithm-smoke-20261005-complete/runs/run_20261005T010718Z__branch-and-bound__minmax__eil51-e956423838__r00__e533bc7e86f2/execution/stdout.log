@@ -1,0 +1,32 @@
+[2026-10-05 04:37:18.415] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__branch-and-bound__minmax__eil51-e956423838__r00__e533bc7e86f2/input for instances
+2026-10-05 04:37:18 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:18 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:18 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:18.421] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:18.421] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:18.421] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__branch-and-bound__minmax__eil51-e956423838__r00__e533bc7e86f2/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:18.422] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__branch-and-bound__minmax__eil51-e956423838__r00__e533bc7e86f2/input/instance.json
+[2026-10-05 04:37:18.422] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-05 04:37:18.422] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:18.422] [info] [stationary.cpp:264] NN: cost=2643.341971, feasible=true, active_stations=11
+[2026-10-05 04:37:18.427] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-05 04:37:18.427] [info] [branch_and_bound_solver.cpp:416] BnB: cost=2501.963875217 LB=2501.963875217 nodes=793 t=0.0042s
+[2026-10-05 04:37:18.428] [info] [solution.cpp:527] extend: 12 intervals over [0, 1]
+[2026-10-05 04:37:18.428] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=26956.090245, LB=2501.963875, gap=9.7740
+[2026-10-05 04:37:18.428] [info] [stationary.cpp:264] NN: cost=3375.937558, feasible=true, active_stations=10
+[2026-10-05 04:37:18.433] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-05 04:37:18.433] [info] [branch_and_bound_solver.cpp:416] BnB: cost=3204.570168942 LB=3204.570168942 nodes=1057 t=0.0052s
+[2026-10-05 04:37:18.433] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:18.434] [info] [solution.cpp:527] extend: 15 intervals over [0, 1]
+[2026-10-05 04:37:18.434] [info] [solution.cpp:598] combine: 13 intervals
+[2026-10-05 04:37:18.434] [info] [verify.cpp:992] Verifier: starting certified continuous check on 13 intervals
+[2026-10-05 04:37:18.435] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.435] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:18.435] [info] [verify.cpp:992] Verifier: starting certified continuous check on 13 intervals
+[2026-10-05 04:37:18.437] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.437] [info] [minmax.cpp:373] MinMax: done. peak=26956.090245, LB=3204.570169, gap=7.4118, iters=1, t=0.011s
+[2026-10-05 04:37:18.437] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__branch-and-bound__minmax__eil51-e956423838__r00__e533bc7e86f2/execution/solver/runs/eil51/branch-and-bound/minmax/trace.csv
+[2026-10-05 04:37:18.437] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 14006 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__branch-and-bound__minmax__eil51-e956423838__r00__e533bc7e86f2/execution/solver/runs/eil51/branch-and-bound/minmax/solution.json
+[2026-10-05 04:37:18.437] [info] [batch_runner.cpp:1066] BatchRunner: eil51 / branch-and-bound / minmax cost=26956.090245 t=0.015s verified=true
+[2026-10-05 04:37:18.438] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed
