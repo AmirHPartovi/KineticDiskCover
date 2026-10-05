@@ -1,0 +1,27 @@
+[2026-10-05 04:37:20.549] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__primal-dual__minmax__london-0000030.instance-3bd5c0ea09__r00__86f7e1c3a196/input for instances
+2026-10-05 04:37:20 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:20 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:20 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:20.555] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:20.555] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:20.555] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__primal-dual__minmax__london-0000030.instance-3bd5c0ea09__r00__86f7e1c3a196/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:20.556] [info] [io.cpp:137] read_json: loaded 2 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__primal-dual__minmax__london-0000030.instance-3bd5c0ea09__r00__86f7e1c3a196/input/instance.json
+[2026-10-05 04:37:20.556] [info] [minmax.cpp:110] MinMax: start n=2, m=25, T=1
+[2026-10-05 04:37:20.556] [info] [candidate.cpp:199] InstancePrecompute: built 50 candidates
+[2026-10-05 04:37:20.556] [info] [candidate.cpp:345] build_coverage: nnz=75
+[2026-10-05 04:37:20.556] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=241.270786976 LB=9.650831479 ratio=25.0000 |D|=2
+[2026-10-05 04:37:20.556] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.556] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=6552.285598, LB=9.650831, gap=677.9348
+[2026-10-05 04:37:20.556] [info] [candidate.cpp:345] build_coverage: nnz=75
+[2026-10-05 04:37:20.556] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=945.587070278 LB=37.823482811 ratio=25.0000 |D|=2
+[2026-10-05 04:37:20.556] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:20.556] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.556] [info] [minmax.cpp:260] MinMax: partial extension is empty, stopping
+[2026-10-05 04:37:20.556] [info] [verify.cpp:992] Verifier: starting certified continuous check on 1 intervals
+[2026-10-05 04:37:20.556] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:20.556] [info] [minmax.cpp:373] MinMax: done. peak=6552.285598, LB=0.000000, gap=172.2333, iters=1, t=0.000s
+[2026-10-05 04:37:20.556] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__primal-dual__minmax__london-0000030.instance-3bd5c0ea09__r00__86f7e1c3a196/execution/solver/runs/london-0000030.instance/primal-dual/minmax/trace.csv
+[2026-10-05 04:37:20.557] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 1157 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__primal-dual__minmax__london-0000030.instance-3bd5c0ea09__r00__86f7e1c3a196/execution/solver/runs/london-0000030.instance/primal-dual/minmax/solution.json
+[2026-10-05 04:37:20.557] [info] [batch_runner.cpp:1066] BatchRunner: london-0000030.instance / primal-dual / minmax cost=6552.285598 t=0.000s verified=true
+[2026-10-05 04:37:20.557] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

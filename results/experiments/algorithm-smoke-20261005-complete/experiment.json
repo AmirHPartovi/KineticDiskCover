@@ -1,0 +1,45 @@
+{
+  "config": {
+    "algorithms": "all",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "objectives": "both",
+    "per_static_time_limit_sec": 2.0,
+    "profile": "debug",
+    "repeats": 1,
+    "requested_backend": "auto",
+    "resolved_algorithms": [
+      "nn",
+      "greedy",
+      "primal-dual",
+      "local-search",
+      "sa",
+      "genetic",
+      "lp-rounding",
+      "shifting",
+      "branch-and-bound"
+    ],
+    "resolved_exact_backend": "branch-and-bound",
+    "safety_timeout_sec": null,
+    "save_solutions": true,
+    "save_traces": true,
+    "seed": 42,
+    "threads": 2
+  },
+  "config_sha256": "505e0e239b551737e6744a4565875b43aa12f499544ec7ee0b291564601fec9a",
+  "created_at": "2026-10-05T01:07:16.382932Z",
+  "dataset_manifest": {
+    "path": "input",
+    "sha256": "2154d4c806f4bae9d7b3975aea72a557abcda55e1be048534042ce3cc1b036c8"
+  },
+  "expected_run_count": 180,
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "profile": "debug",
+  "request_config_sha256": "e84530cb2592368acbf111d72cdc15500dfda2a840907e68792147a217b07184",
+  "run_plan_sha256": "eab26f988c90c2b875c8dbced48555ef3aa3744e6401a9fac2472915e3dab4aa",
+  "schema_version": 1,
+  "source_commit": null,
+  "status": "COMPLETE"
+}

@@ -1,0 +1,292 @@
+{
+  "actual_backend": "local-search",
+  "algorithm": "local-search",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "f6083794013a172ab5276b6930f25d0684da8bf89c0869273b24d554d8c5c308",
+      "size_bytes": 951
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "c6203c8bb2bac8bc275eb5405de7f1a9c2ced6610776d107a7cde9d19fc897dc",
+      "size_bytes": 474
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "9831e63a59bf74b00496468d7b1d19f7fd504ab1fb635834865c9267374e135f",
+      "size_bytes": 3249
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "8a6b1a4a3417e75f10bdd3d505fbe5d781670b055b55221a566615b0414138c2",
+      "size_bytes": 1842
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "bbde647ee9a55f6cac39e41139477b18882454b5361892c9d506bea7a161b1ca",
+      "size_bytes": 3813
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/local-search/minmax/result.json",
+      "sha256": "e03fae84c47e4153be8293cd985a8d60615a0f392c6d46cd28a6a917d5dbbcaa",
+      "size_bytes": 3639
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/local-search/minmax/solution.json",
+      "sha256": "1a9cf04653e922f978139fb87b87e9695bf7c925a2c08cb2913df78d748f4b3c",
+      "size_bytes": 2800
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/local-search/minmax/trace.csv",
+      "sha256": "d99d9bc7447af44c56953ee4728ed1a92b7555420eaeaf7b5b709cea976b38aa",
+      "size_bytes": 135
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "d3ecace232569e0572cef5690f024334971e902d32ce6a78f994bfb389c6094e",
+      "size_bytes": 4814
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "dddb59ec6eaef00868b1f34a43375e7c8d5329d03fab301213cc1960734ae46c",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+      "size_bytes": 2636
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "43bfa4acbc29250a9260298c3d128649c7d7fd583a15aaaab982618127ffd878",
+      "size_bytes": 466
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "f1a2a267e1cafb499382bd09bb59635f4a43c1daceca553f2827f248fc7347e5",
+      "size_bytes": 1242
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "2ee65682508672925abf33323c9bd37e9e2b83bf837fb9c0e7f1a90b1a92ead6",
+      "size_bytes": 3668
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "1a9cf04653e922f978139fb87b87e9695bf7c925a2c08cb2913df78d748f4b3c",
+      "size_bytes": 2800
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "d99d9bc7447af44c56953ee4728ed1a92b7555420eaeaf7b5b709cea976b38aa",
+      "size_bytes": 135
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "dc2461c3588abec15a125c2eaca7dc9454273919573c2ddf717e7728cd14fc28",
+      "size_bytes": 371
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "d20acee48f9ce8df46db31ed3de7f1070ec1f6290ace698bfff00787a4b6fdc4",
+      "size_bytes": 485
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "7cab415e625de3d19bca031aab16b18eff65e52d80d6df7be4d23b25bbe8be34",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "sbgdb-20200507-fpg-poly",
+  "finished_at": "2026-10-05T01:07:21.083420Z",
+  "input_sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+  "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+  "m": 25,
+  "n": 1,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "local-search",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "local-search",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 159.98208145964492,
+    "objective_value": 8574.02915280195,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "local-search",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "local-search",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": null,
+      "certified_lower_bound": 159.98208145964492,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "local-search",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2918332381,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.000649,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 52.593684208720134,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 0.0,
+      "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+      "instance_name": "sbgdb-20200507-fpg-poly_0000000030",
+      "integral_cost": 1903.3162347245036,
+      "kont_version": "not-applicable",
+      "lower_bound": 159.98208145964492,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 8574.02915280195,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 8574.02915280195,
+      "peak_memory_mb": 17.140625,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010721Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__663cd5ed60e6",
+      "run_key": "63a6fbaf2e9155faaf81612e1c81ded4b7d3f8222e4d6349bd4984eaab18081b",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "local-search",
+      "serialization_time_sec": 0.000366833,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 9.5751e-05,
+      "solver_name": "local-search",
+      "solver_runtime_sec": 9.5751e-05,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.000517333,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 8574.02915280195,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 3.575e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.000517333,
+      "wrapper_wall_time_sec": 0.015006582999999907
+    },
+    "upper_bound": 8574.02915280195
+  },
+  "run_id": "run_20261005T010721Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__663cd5ed60e6",
+  "run_key": "63a6fbaf2e9155faaf81612e1c81ded4b7d3f8222e4d6349bd4984eaab18081b",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "local-search",
+  "started_at": "2026-10-05T01:07:21.061013Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:21.079384Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "2ee65682508672925abf33323c9bd37e9e2b83bf837fb9c0e7f1a90b1a92ead6",
+    "run_id": "run_20261005T010721Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__663cd5ed60e6",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

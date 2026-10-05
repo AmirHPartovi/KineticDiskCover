@@ -1,0 +1,292 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "2fc0c2754251bcab39af123478d24a734a894d29fe806a6147823485d2fa85c9",
+      "size_bytes": 932
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "95900da823fbefd934dbe24c6dada53ad2f44c9e644e807d3b93c6818dbd22b5",
+      "size_bytes": 446
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "9d15f969b18f93129b361bf6172be80f0f85782936457816fc957b3075e36230",
+      "size_bytes": 3223
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "fc3a65ae92e30f943721189c688f5f1d8c9831f015741a7f5565716f99176ec7",
+      "size_bytes": 1799
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "b2f7228c980b0ca4abb17c9b0fabd0f51a0c23d8453954e249ca173a3795a812",
+      "size_bytes": 3669
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/us-night-0000030.instance/genetic/minsum/result.json",
+      "sha256": "2167632c44fb9633fcf6b2d186021cbd60d5f315d7359a198fddda1cb5eb6fa5",
+      "size_bytes": 3495
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/us-night-0000030.instance/genetic/minsum/solution.json",
+      "sha256": "1a1b94d8ed89423ecd6f7fe129373dac74d5a37c1697907d9ba6297ab2a8586b",
+      "size_bytes": 1963
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/us-night-0000030.instance/genetic/minsum/trace.csv",
+      "sha256": "9f2f2138bbff4f1e6a0bf2751b02212df256c1428fecad21a09836f87ee60bfa",
+      "size_bytes": 210
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "b64f83ebd05ab53dd757e7b038b9d31c2b39c8b2d0513f8a12b35fe189bf5b3a",
+      "size_bytes": 5710
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "4dea20d49a6fcaf2a5d2c972fef33d088019b821cdbebda9668d57a802f21e6f",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185",
+      "size_bytes": 2592
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "a8ca87ec241dd6dd67764bd19df837a9a0354772eab6018ae6eb5f3343d783b3",
+      "size_bytes": 433
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "a89ae35e283afa3c919b0dff62f642c75dcf236d1f74c49962c32ed39b766f05",
+      "size_bytes": 1211
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "f01f495c6c93739e96f60f4816362c94bd2fabc9b6564d1581719cb29cd46c5f",
+      "size_bytes": 3576
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "1a1b94d8ed89423ecd6f7fe129373dac74d5a37c1697907d9ba6297ab2a8586b",
+      "size_bytes": 1963
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "9f2f2138bbff4f1e6a0bf2751b02212df256c1428fecad21a09836f87ee60bfa",
+      "size_bytes": 210
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "378d73e57ca285d4e63a1b3ed4a730488ab9a89d7d13c22495e253053224a030",
+      "size_bytes": 712
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "707bffcb51af02b5a20f80d2b1c9516a3714d0915fe3e6fa537e31519100923e",
+      "size_bytes": 478
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "2a0fbb01daeb14919daeb551b12942c2c5cff1ea2b6191124d6336d6a61cc1c9",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "us-night",
+  "finished_at": "2026-10-05T01:07:23.633695Z",
+  "input_sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185",
+  "instance_id": "us-night-0000030.instance-3704ac03dc",
+  "m": 25,
+  "n": 1,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "genetic",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "genetic",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 215.120913599749,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "genetic",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "genetic",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "genetic",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 4177859113,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.087589,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.0,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 215.120913599749,
+      "instance_id": "us-night-0000030.instance-3704ac03dc",
+      "instance_name": "us-night-0000030.instance",
+      "integral_cost": 215.120913599749,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 7,
+      "num_iterations": 2,
+      "num_static_solves": 7,
+      "objective": "minsum",
+      "objective_value": 215.120913599749,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 1072.0043652792724,
+      "peak_memory_mb": 17.296875,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010723Z__genetic__minsum__us-night-0000030.instance-3704ac03dc__r00__be8815efe0a8",
+      "run_key": "f44e99ac253897cb99d2415984f5771f8b20a8feec5f1347b28de2c39a824c54",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "genetic",
+      "serialization_time_sec": 0.000336042,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.087166957,
+      "solver_name": "genetic",
+      "solver_runtime_sec": 0.087166957,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.087660959,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 215.120913599749,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.000141168,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.087660959,
+      "wrapper_wall_time_sec": 0.10416033300000027
+    },
+    "upper_bound": 215.120913599749
+  },
+  "run_id": "run_20261005T010723Z__genetic__minsum__us-night-0000030.instance-3704ac03dc__r00__be8815efe0a8",
+  "run_key": "f44e99ac253897cb99d2415984f5771f8b20a8feec5f1347b28de2c39a824c54",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "genetic",
+  "started_at": "2026-10-05T01:07:23.509887Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:23.624458Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "f01f495c6c93739e96f60f4816362c94bd2fabc9b6564d1581719cb29cd46c5f",
+    "run_id": "run_20261005T010723Z__genetic__minsum__us-night-0000030.instance-3704ac03dc__r00__be8815efe0a8",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

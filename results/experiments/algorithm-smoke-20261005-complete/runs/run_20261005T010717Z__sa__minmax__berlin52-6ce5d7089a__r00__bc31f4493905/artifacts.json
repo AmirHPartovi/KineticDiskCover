@@ -1,0 +1,125 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "f02a78cbdcbbaaa5c58ffdfc97dea8991b5014ba5ff0b2f616a876b4c59b9cd0",
+      "size_bytes": 883
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "624e97d2f5dd8a3bd7ce2b862d334fab8e63a48c6f77826a3159fe2fc2873110",
+      "size_bytes": 426
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "9fa3ad2780684b8e92595462ec1e792812f4ef7e203f4e8cd179140f0ad73b3d",
+      "size_bytes": 3152
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "13623d0c740d7189c231be34fecca3a43bb4d700984a679a663ed392d1a4a005",
+      "size_bytes": 1771
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "5c4422a587be37711a07aea32300418f3e20fcb8531934868a0861a043c453ff",
+      "size_bytes": 3557
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/sa/minmax/result.json",
+      "sha256": "24bbfc2a692cf111c1100156c7cf182b8ab2e3dc3750d028adaa06d09279ed83",
+      "size_bytes": 3383
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/sa/minmax/solution.json",
+      "sha256": "b198ba9cd42f654c599c898e8ee6b529e6fd98e238bf9cf3a4f4b906477043eb",
+      "size_bytes": 14070
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/berlin52/sa/minmax/trace.csv",
+      "sha256": "3f622105f894603df0b47f34bc0b5f94e6b87820c2074bf2e250e346cf7d017d",
+      "size_bytes": 164
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "70f6d5a85b6a07e106834912522a0d39eae51d3fb86000aecb766c7a3c98c522",
+      "size_bytes": 4616
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "27127800e334aec5f1db5b35bae4e26e3920a057b119165520618980af26d584",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "size_bytes": 5831
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "6a485bcc33f52416b95931c97a621ca30113d35de98b26848431a2f71d6c576f",
+      "size_bytes": 400
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "7236e38f75ef981969fcc3a0fc13b135428a4533e3b83dd63fedae2169e5545f",
+      "size_bytes": 1157
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "307ba10c1e1ed0321f67d85a3dd645fe80a1c7bf152e687f116979cec70f6074",
+      "size_bytes": 3536
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "b198ba9cd42f654c599c898e8ee6b529e6fd98e238bf9cf3a4f4b906477043eb",
+      "size_bytes": 14070
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "3f622105f894603df0b47f34bc0b5f94e6b87820c2074bf2e250e346cf7d017d",
+      "size_bytes": 164
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "73a9a3fe2ea79fb14a0654dc2aeec269a3ddc46f3fed7d52b0355ae0f09f18f0",
+      "size_bytes": 356
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "03d78609631f2add6154e19a9628ab9c2e028ac108c80652074a991ec38aeccb",
+      "size_bytes": 10029
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "3a87ec2e2e39c2daad8c6e93c09ec304085cd7a3c9101b584aa62899923b26cc",
+      "size_bytes": 456
+    }
+  ],
+  "schema_version": 1
+}

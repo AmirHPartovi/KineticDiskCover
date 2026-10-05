@@ -1,0 +1,27 @@
+[2026-10-05T04:36:25+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset_selection_manifest.json 
+Traceback (most recent call last):
+  File "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py", line 145, in <module>
+    sys.exit(main())
+  File "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py", line 139, in main
+    from run_batch_limited import main as run_immutable_batch
+  File "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch_limited.py", line 23, in <module>
+    from kdc_tools.schemas import dumps_json, loads_json, validate_document
+  File "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/kdc_tools/schemas.py", line 10, in <module>
+    from jsonschema import Draft202012Validator, FormatChecker
+ModuleNotFoundError: No module named 'jsonschema'
+[2026-10-05T04:36:58+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005/dataset_selection_manifest.json 
+usage: run_batch.py [-h] [--instances INSTANCES]
+                    [--dataset-profile {full,smoke10}]
+                    [--dataset-manifest DATASET_MANIFEST] [--output OUTPUT]
+                    [--algorithms ALGORITHMS]
+                    [--profile {fast,exact-reference,debug}] [--seed SEED]
+                    [--repeats REPEATS] [--resume]
+                    [--safety-timeout SAFETY_TIMEOUT]
+                    [--modes {minmax,minsum,both}]
+                    [--exact-reference {ip-kont,branch-and-bound,auto}]
+                    [--threads THREADS] [--time-limit TIME_LIMIT]
+                    [--fast-time-limit FAST_TIME_LIMIT]
+                    [--exact-time-limit EXACT_TIME_LIMIT]
+                    [--minsum-refinement-policy {adaptive,sampled}]
+                    [--save-solutions] [--save-traces]
+run_batch.py: error: cannot resume: experiment has no immutable run plan

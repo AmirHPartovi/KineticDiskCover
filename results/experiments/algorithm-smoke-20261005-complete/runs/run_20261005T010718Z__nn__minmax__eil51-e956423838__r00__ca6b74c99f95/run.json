@@ -1,0 +1,292 @@
+{
+  "actual_backend": "nn",
+  "algorithm": "nn",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "0a9dc13dbe993fb19de901e6e69d26341144e3566cfd1a9ab981b41b61d53f97",
+      "size_bytes": 877
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "b5e78b8afbd484df3a5a5424e8ab2bf6710316713146f80461ab45de3860f277",
+      "size_bytes": 422
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "f7c725465314a18950971fcacde8521e68464614c12ee4989f91f9d7837c5459",
+      "size_bytes": 3143
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "ffd88561cc24f48c1c3c4087ef39a37fe4d7d21c3a757d77d2291880d1a17c7b",
+      "size_bytes": 1770
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "a664a3268c557331b445b734e4fb3f9c23595df6dc1a7a3250465866b8d63e31",
+      "size_bytes": 3479
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/nn/minmax/result.json",
+      "sha256": "8d0b9b008095fa11125fcaa3a5995041318e8248a8e889760e16c8ba4b6ccdfa",
+      "size_bytes": 3305
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/nn/minmax/solution.json",
+      "sha256": "91e3a95da080ea0dfa8430c9f659c345ec741702021ac99ae65d198a1871aa50",
+      "size_bytes": 10825
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/eil51/nn/minmax/trace.csv",
+      "sha256": "18477a3e497687dba5c1817b77b947a9197ed40b930ef03472cda7efb90a13d5",
+      "size_bytes": 130
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "968d8cb2dec61d7021aab45ba34d7e1464b8eeeb324bfd84d2f48791cf0aca43",
+      "size_bytes": 4297
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "cd5f93b4efd863aca16cdefebd7554e43c042fd29991b5fb9853cba7ee3009f4",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+      "size_bytes": 5836
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "97b2e38338ed78646818a7809676a5e4cabe4563862292389dfd8ae9b7b83f2a",
+      "size_bytes": 391
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "b1d182da37d76d0d62211eeacc577766321661bdf1bf473b647bce45133f1912",
+      "size_bytes": 1151
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "dee2aac2fe2a066e1b01f914778696cccee44a2c1d4217151548509320f67162",
+      "size_bytes": 3467
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "91e3a95da080ea0dfa8430c9f659c345ec741702021ac99ae65d198a1871aa50",
+      "size_bytes": 10825
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "18477a3e497687dba5c1817b77b947a9197ed40b930ef03472cda7efb90a13d5",
+      "size_bytes": 130
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "5d6e9c99bd2c7c88cbbd9d73b10d314ebeb7021b3936e74f0af26117f30bd275",
+      "size_bytes": 324
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "ffb2d918d34104d7b44d64c24142ab9118c70ab5e5797d9d4b9707197e9fd0ea",
+      "size_bytes": 453
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d754eb2d6ec241790573cb67e03069519d1630c1d1e2c18717de3ae2393bab5f",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "eil51",
+  "finished_at": "2026-10-05T01:07:18.638882Z",
+  "input_sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+  "instance_id": "eil51-e956423838",
+  "m": 25,
+  "n": 13,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "nn",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "nn",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 51710.10954429128,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "nn",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "nn",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 325,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "nn",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 3434223059,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.004521,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 51710.10954429128,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 0.0,
+      "instance_id": "eil51-e956423838",
+      "instance_name": "eil51",
+      "integral_cost": 16669.998585102316,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 13,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 51710.10954429128,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 51710.10954429128,
+      "peak_memory_mb": 17.28125,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95",
+      "run_key": "482b2cbfda212b3163dd7c2f8db77e4f83b0d7b39e60170ff5aebd20da71e1b5",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "nn",
+      "serialization_time_sec": 0.000582291,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.001033375,
+      "solver_name": "nn",
+      "solver_runtime_sec": 0.001033375,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.004302,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 51710.10954429128,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.002668333,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.004302,
+      "wrapper_wall_time_sec": 0.020520249999999685
+    },
+    "upper_bound": 51710.10954429128
+  },
+  "run_id": "run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95",
+  "run_key": "482b2cbfda212b3163dd7c2f8db77e4f83b0d7b39e60170ff5aebd20da71e1b5",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "nn",
+  "started_at": "2026-10-05T01:07:18.600549Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:18.629730Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "dee2aac2fe2a066e1b01f914778696cccee44a2c1d4217151548509320f67162",
+    "run_id": "run_20261005T010718Z__nn__minmax__eil51-e956423838__r00__ca6b74c99f95",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

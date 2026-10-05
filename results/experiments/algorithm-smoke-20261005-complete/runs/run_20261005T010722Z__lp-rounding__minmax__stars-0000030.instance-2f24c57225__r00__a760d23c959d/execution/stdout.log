@@ -1,0 +1,27 @@
+[2026-10-05 04:37:22.195] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010722Z__lp-rounding__minmax__stars-0000030.instance-2f24c57225__r00__a760d23c959d/input for instances
+2026-10-05 04:37:22 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:22 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:22 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:22.201] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:22.201] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:22.201] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010722Z__lp-rounding__minmax__stars-0000030.instance-2f24c57225__r00__a760d23c959d/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:22.202] [info] [io.cpp:137] read_json: loaded 2 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010722Z__lp-rounding__minmax__stars-0000030.instance-2f24c57225__r00__a760d23c959d/input/instance.json
+[2026-10-05 04:37:22.202] [info] [minmax.cpp:110] MinMax: start n=2, m=25, T=1
+[2026-10-05 04:37:22.202] [info] [candidate.cpp:199] InstancePrecompute: built 50 candidates
+[2026-10-05 04:37:22.202] [info] [candidate.cpp:345] build_coverage: nnz=75
+[2026-10-05 04:37:22.202] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=146.552821423 LB=146.552821423 ratio=1.0000
+[2026-10-05 04:37:22.202] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:22.202] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=13060.878981, LB=146.552821, gap=88.1206
+[2026-10-05 04:37:22.202] [info] [candidate.cpp:345] build_coverage: nnz=75
+[2026-10-05 04:37:22.202] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=356.727868902 LB=356.727868902 ratio=1.0000
+[2026-10-05 04:37:22.202] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:22.202] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:22.202] [info] [minmax.cpp:260] MinMax: partial extension is empty, stopping
+[2026-10-05 04:37:22.202] [info] [verify.cpp:992] Verifier: starting certified continuous check on 1 intervals
+[2026-10-05 04:37:22.202] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:22.202] [info] [minmax.cpp:373] MinMax: done. peak=13060.878981, LB=356.727869, gap=35.6130, iters=1, t=0.000s
+[2026-10-05 04:37:22.202] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010722Z__lp-rounding__minmax__stars-0000030.instance-2f24c57225__r00__a760d23c959d/execution/solver/runs/stars-0000030.instance/lp-rounding/minmax/trace.csv
+[2026-10-05 04:37:22.203] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 1154 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010722Z__lp-rounding__minmax__stars-0000030.instance-2f24c57225__r00__a760d23c959d/execution/solver/runs/stars-0000030.instance/lp-rounding/minmax/solution.json
+[2026-10-05 04:37:22.203] [info] [batch_runner.cpp:1066] BatchRunner: stars-0000030.instance / lp-rounding / minmax cost=13060.878981 t=0.001s verified=true
+[2026-10-05 04:37:22.204] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

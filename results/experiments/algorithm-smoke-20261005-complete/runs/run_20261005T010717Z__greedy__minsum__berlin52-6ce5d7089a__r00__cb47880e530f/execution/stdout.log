@@ -1,0 +1,50 @@
+[2026-10-05 04:37:17.880] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010717Z__greedy__minsum__berlin52-6ce5d7089a__r00__cb47880e530f/input for instances
+2026-10-05 04:37:17 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:17 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:17 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:17.886] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:17.886] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:17.886] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010717Z__greedy__minsum__berlin52-6ce5d7089a__r00__cb47880e530f/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:17.887] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010717Z__greedy__minsum__berlin52-6ce5d7089a__r00__cb47880e530f/input/instance.json
+[2026-10-05 04:37:17.887] [info] [minsum.cpp:512] MinSum: start n=13, m=25
+[2026-10-05 04:37:17.887] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-05 04:37:17.887] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:17.888] [info] [solution.cpp:527] extend: 15 intervals over [0, 1]
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=1518.365550281 LB=1000.308672533 ratio=1.5179
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=1636.232282884 LB=653.559447303 ratio=2.5036
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2569.348083246 LB=962.603319804 ratio=2.6692
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5243.144327500 LB=1934.141241316 ratio=2.7108
+[2026-10-05 04:37:17.888] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.7413,1.0000], t_mid=0.8707, int=7433.928286, LB=1095.680545, gap=5.7848
+[2026-10-05 04:37:17.888] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3663.403844404 LB=1372.073455916 ratio=2.6700
+[2026-10-05 04:37:17.889] [info] [solution.cpp:527] extend: 2 intervals over [0.8706739451398604, 1]
+[2026-10-05 04:37:17.889] [info] [solution.cpp:527] extend: 10 intervals over [0, 0.8706739451398604]
+[2026-10-05 04:37:17.889] [info] [solution.cpp:598] combine: 15 intervals
+[2026-10-05 04:37:17.897] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:17.899] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:17.899] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-05 04:37:17.899] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-05 04:37:17.899] [info] [solution.cpp:527] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-05 04:37:17.900] [info] [solution.cpp:527] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-05 04:37:17.900] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:17.912] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 2 (1/3)
+[2026-10-05 04:37:17.912] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-05 04:37:17.912] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-05 04:37:17.912] [info] [solution.cpp:527] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-05 04:37:17.913] [info] [solution.cpp:527] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-05 04:37:17.913] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:17.924] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 3 (2/3)
+[2026-10-05 04:37:17.924] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-05 04:37:17.924] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-05 04:37:17.924] [info] [solution.cpp:527] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-05 04:37:17.925] [info] [solution.cpp:527] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-05 04:37:17.925] [info] [solution.cpp:598] combine: 18 intervals
+[2026-10-05 04:37:17.937] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 4 (3/3)
+[2026-10-05 04:37:17.937] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:17.939] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:17.939] [info] [minsum.cpp:881] MinSum: done. int=3966.984075, LB=1095.680545, gap=2.6206, iters=4, t=0.037s
+[2026-10-05 04:37:17.939] [info] [trace.cpp:72] TraceWriter: wrote 2 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010717Z__greedy__minsum__berlin52-6ce5d7089a__r00__cb47880e530f/execution/solver/runs/berlin52/greedy/minsum/trace.csv
+[2026-10-05 04:37:17.939] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 16164 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010717Z__greedy__minsum__berlin52-6ce5d7089a__r00__cb47880e530f/execution/solver/runs/berlin52/greedy/minsum/solution.json
+[2026-10-05 04:37:17.939] [info] [batch_runner.cpp:1066] BatchRunner: berlin52 / greedy / minsum cost=3966.984075 t=0.052s verified=true
+[2026-10-05 04:37:17.940] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

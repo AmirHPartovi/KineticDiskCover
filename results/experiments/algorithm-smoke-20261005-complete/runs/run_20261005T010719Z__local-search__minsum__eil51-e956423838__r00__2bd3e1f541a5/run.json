@@ -1,0 +1,292 @@
+{
+  "actual_backend": "local-search",
+  "algorithm": "local-search",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "240812e4eb78dedab1f80fef43adbfd1976eab4a8b1cbe572893a1aecb79c901",
+      "size_bytes": 907
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "255341368d5073791a415dda99b2ee812b9e726f56e85d4f2722f504c2394ebb",
+      "size_bytes": 440
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "e0488c0bdcf2e54dba04770c93ae399ecddf915b46bc089bb1ca410adad563af",
+      "size_bytes": 3183
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "4966ada23b9138f376589ac10494e2181f9e92682d328d729c07d5eb6faebe27",
+      "size_bytes": 1811
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "caab2ef7a4aff0c56e5c70ddeffbe0f3185d82eb00e752ff8b6183ae45ef1d49",
+      "size_bytes": 3631
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/local-search/minsum/result.json",
+      "sha256": "3a1f329f6908c8132d062da1b2e56e5f73e9759da908045aaf124f7a05834fde",
+      "size_bytes": 3457
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/eil51/local-search/minsum/solution.json",
+      "sha256": "1899961a0e8c538548ae146e553f8cb762350f3341141a3e7d82de9a2de31c10",
+      "size_bytes": 23544
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/eil51/local-search/minsum/trace.csv",
+      "sha256": "3b7612a2542e57e1d6a65da2fb6e9e5fb9ed9c6d5726a1067a2e7bcfa0183746",
+      "size_bytes": 1137
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "0927922ebe29915e6ca16a0fd53bb5fb980313ef95c2d2364591e2a3fdf100c8",
+      "size_bytes": 13244
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "35b97fc6a8da0bf61ecb5071b0e59efdbc7112309c46adc0b49faa4b62d6fb4a",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+      "size_bytes": 5836
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "97b2e38338ed78646818a7809676a5e4cabe4563862292389dfd8ae9b7b83f2a",
+      "size_bytes": 391
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "ac669585e209f882d8276c61f0314650546dd584fc3306f1300c86f96a5fc968",
+      "size_bytes": 1191
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "8cf480f1bad37b59ed632ed5e8cdde2cf5b829398bc6f5d1c4f2d66a2181cd8e",
+      "size_bytes": 3578
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "1899961a0e8c538548ae146e553f8cb762350f3341141a3e7d82de9a2de31c10",
+      "size_bytes": 23544
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "3b7612a2542e57e1d6a65da2fb6e9e5fb9ed9c6d5726a1067a2e7bcfa0183746",
+      "size_bytes": 1137
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "cbdf0212af44975101047b0bf9feeae31b6716122debf3900a4b347f4586974f",
+      "size_bytes": 4016
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "9d67a9af6f943d599917abc3d68e91304ff3b6d2b8fc9833b869bd0f204c8cc0",
+      "size_bytes": 463
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "7cab415e625de3d19bca031aab16b18eff65e52d80d6df7be4d23b25bbe8be34",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "eil51",
+  "finished_at": "2026-10-05T01:07:19.256636Z",
+  "input_sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+  "instance_id": "eil51-e956423838",
+  "m": 25,
+  "n": 13,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "local-search",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "local-search",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 1982.7644576153345,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "local-search",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "local-search",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 325,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "local-search",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 3442440910,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.101369,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 3.035799760127026,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 491.2940620108782,
+      "instance_id": "eil51-e956423838",
+      "instance_name": "eil51",
+      "integral_cost": 1982.7644576153345,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 13,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 16,
+      "num_iterations": 10,
+      "num_static_solves": 16,
+      "objective": "minsum",
+      "objective_value": 1982.7644576153345,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 3354.516634066291,
+      "peak_memory_mb": 17.796875,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010719Z__local-search__minsum__eil51-e956423838__r00__2bd3e1f541a5",
+      "run_key": "fb4a39ff6a6c44894eb4ab9d9278c5498f13bf0a1f172036a8813d65614f5796",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "local-search",
+      "serialization_time_sec": 0.0005955,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.06269170800000001,
+      "solver_name": "local-search",
+      "solver_runtime_sec": 0.06269170800000001,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.102819625,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1982.7644576153345,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.03950808399999999,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.102819625,
+      "wrapper_wall_time_sec": 0.11651512499999983
+    },
+    "upper_bound": 1982.7644576153345
+  },
+  "run_id": "run_20261005T010719Z__local-search__minsum__eil51-e956423838__r00__2bd3e1f541a5",
+  "run_key": "fb4a39ff6a6c44894eb4ab9d9278c5498f13bf0a1f172036a8813d65614f5796",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "local-search",
+  "started_at": "2026-10-05T01:07:19.131641Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:19.252743Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "8cf480f1bad37b59ed632ed5e8cdde2cf5b829398bc6f5d1c4f2d66a2181cd8e",
+    "run_id": "run_20261005T010719Z__local-search__minsum__eil51-e956423838__r00__2bd3e1f541a5",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

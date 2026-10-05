@@ -1,0 +1,27 @@
+[2026-10-05 04:37:20.482] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__local-search__minmax__london-0000030.instance-3bd5c0ea09__r00__42338f2400ef/input for instances
+2026-10-05 04:37:20 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:20 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:20 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:20.488] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:20.488] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:20.488] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__local-search__minmax__london-0000030.instance-3bd5c0ea09__r00__42338f2400ef/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:20.489] [info] [io.cpp:137] read_json: loaded 2 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__local-search__minmax__london-0000030.instance-3bd5c0ea09__r00__42338f2400ef/input/instance.json
+[2026-10-05 04:37:20.489] [info] [minmax.cpp:110] MinMax: start n=2, m=25, T=1
+[2026-10-05 04:37:20.489] [info] [candidate.cpp:199] InstancePrecompute: built 50 candidates
+[2026-10-05 04:37:20.489] [info] [stationary.cpp:264] NN: cost=241.270787, feasible=true, active_stations=2
+[2026-10-05 04:37:20.489] [info] [local_search_solver.cpp:283] LocalSearch: cost=241.270786976 LB=182.451375949 iters=9 restarts=9
+[2026-10-05 04:37:20.489] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.489] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=6552.285598, LB=182.451376, gap=34.9125
+[2026-10-05 04:37:20.490] [info] [stationary.cpp:264] NN: cost=945.587070, feasible=true, active_stations=2
+[2026-10-05 04:37:20.490] [info] [local_search_solver.cpp:283] LocalSearch: cost=945.587070278 LB=505.594383547 iters=9 restarts=9
+[2026-10-05 04:37:20.490] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:20.490] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.490] [info] [minmax.cpp:260] MinMax: partial extension is empty, stopping
+[2026-10-05 04:37:20.490] [info] [verify.cpp:992] Verifier: starting certified continuous check on 1 intervals
+[2026-10-05 04:37:20.490] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:20.490] [info] [minmax.cpp:373] MinMax: done. peak=6552.285598, LB=505.594384, gap=11.9596, iters=1, t=0.000s
+[2026-10-05 04:37:20.490] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__local-search__minmax__london-0000030.instance-3bd5c0ea09__r00__42338f2400ef/execution/solver/runs/london-0000030.instance/local-search/minmax/trace.csv
+[2026-10-05 04:37:20.490] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 1157 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__local-search__minmax__london-0000030.instance-3bd5c0ea09__r00__42338f2400ef/execution/solver/runs/london-0000030.instance/local-search/minmax/solution.json
+[2026-10-05 04:37:20.490] [info] [batch_runner.cpp:1066] BatchRunner: london-0000030.instance / local-search / minmax cost=6552.285598 t=0.000s verified=true
+[2026-10-05 04:37:20.491] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

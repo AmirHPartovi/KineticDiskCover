@@ -1,0 +1,94 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm_set": [
+    "nn",
+    "greedy",
+    "primal-dual",
+    "local-search",
+    "sa",
+    "genetic",
+    "lp-rounding",
+    "shifting",
+    "branch-and-bound"
+  ],
+  "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+  "calibration_decision_version": 4,
+  "calibration_instances": [],
+  "calibration_objectives": [
+    "minmax",
+    "minsum"
+  ],
+  "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset",
+  "dataset_fingerprint": "2154d4c806f4bae9d7b3975aea72a557abcda55e1be048534042ce3cc1b036c8",
+  "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+  "dataset_path": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset",
+  "dataset_profile": "smoke10",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "fallback_used": false,
+  "kont_runtime_available": false,
+  "kont_version": "7.2.4",
+  "native_kont_available": false,
+  "native_kont_used": false,
+  "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/calibration",
+  "rejected_runs": [
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    }
+  ],
+  "requested_backend": "auto",
+  "runtime_statistics": {
+    "branch-and-bound_median_sec": -1.0,
+    "by_objective": {
+      "minmax": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      },
+      "minsum": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      }
+    },
+    "ip-kont_median_sec": -1.0,
+    "paired_run_count": 0,
+    "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+  },
+  "seed_policy": {
+    "base_seed": 42,
+    "repeats": 1
+  },
+  "selected_backend": "branch-and-bound",
+  "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+  "successful_runs": [],
+  "time_limits": {
+    "exact_global_sec": 10.0,
+    "fast_global_sec": 5.0,
+    "per_static_solve_sec": 2.0
+  }
+}

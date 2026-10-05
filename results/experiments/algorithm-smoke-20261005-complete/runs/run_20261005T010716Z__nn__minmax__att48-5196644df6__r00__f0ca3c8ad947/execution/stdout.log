@@ -1,0 +1,25 @@
+[2026-10-05 04:37:16.635] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__nn__minmax__att48-5196644df6__r00__f0ca3c8ad947/input for instances
+2026-10-05 04:37:16 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:16 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:16 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:16.641] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:16.641] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:16.641] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__nn__minmax__att48-5196644df6__r00__f0ca3c8ad947/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:16.642] [info] [io.cpp:137] read_json: loaded 11 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__nn__minmax__att48-5196644df6__r00__f0ca3c8ad947/input/instance.json
+[2026-10-05 04:37:16.642] [info] [minmax.cpp:110] MinMax: start n=11, m=25, T=1
+[2026-10-05 04:37:16.642] [info] [candidate.cpp:199] InstancePrecompute: built 275 candidates
+[2026-10-05 04:37:16.642] [info] [stationary.cpp:264] NN: cost=2578.758013, feasible=true, active_stations=7
+[2026-10-05 04:37:16.643] [info] [solution.cpp:527] extend: 14 intervals over [0, 1]
+[2026-10-05 04:37:16.643] [info] [minmax.cpp:198] MinMax iter 1: t_max=0.992896, peak=7388.436059, LB=0.000000, gap=7388.4361
+[2026-10-05 04:37:16.643] [info] [stationary.cpp:264] NN: cost=2435.456660, feasible=true, active_stations=7
+[2026-10-05 04:37:16.643] [info] [solution.cpp:527] extend: 1 intervals over [0.9928964057188946, 1]
+[2026-10-05 04:37:16.643] [info] [solution.cpp:527] extend: 6 intervals over [0, 0.9928964057188946]
+[2026-10-05 04:37:16.643] [info] [minmax.cpp:260] MinMax: partial extension is empty, stopping
+[2026-10-05 04:37:16.643] [info] [verify.cpp:992] Verifier: starting certified continuous check on 14 intervals
+[2026-10-05 04:37:16.645] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:16.645] [info] [minmax.cpp:373] MinMax: done. peak=7388.436059, LB=0.000000, gap=7388.4361, iters=1, t=0.001s
+[2026-10-05 04:37:16.645] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__nn__minmax__att48-5196644df6__r00__f0ca3c8ad947/execution/solver/runs/att48/nn/minmax/trace.csv
+[2026-10-05 04:37:16.645] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 14612 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__nn__minmax__att48-5196644df6__r00__f0ca3c8ad947/execution/solver/runs/att48/nn/minmax/solution.json
+[2026-10-05 04:37:16.645] [info] [batch_runner.cpp:1066] BatchRunner: att48 / nn / minmax cost=7388.436059 t=0.003s verified=true
+[2026-10-05 04:37:16.646] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

@@ -1,0 +1,292 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "fc1ca6cf2cafa4d50040a369b97e67ae0c532c66348f255a28cf2d078f0d63da",
+      "size_bytes": 910
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "43c54385f8d6fa27e20140c496a63dd38fc24fe2c0d614c4c75cb1dca63c3cab",
+      "size_bytes": 443
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "754f46b2aa0e5c7ae1fdc61c30ad22a786ac0e79739674570fdd1099383cc971",
+      "size_bytes": 3188
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "2f0992aacc3587cf10ac8dcc586275075e9c39f3063ff533b0202cfa43559f2d",
+      "size_bytes": 1809
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "03a07fa4e74b5f8b56747a20549c277539ade473bf5407713f4113e0fcf8d6ed",
+      "size_bytes": 3628
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/primal-dual/minsum/result.json",
+      "sha256": "787acaa4fdde7be86ad5be827c859a2e2a75afd07fbc71f8be644a62f10596e6",
+      "size_bytes": 3454
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/primal-dual/minsum/solution.json",
+      "sha256": "57dd3b0130a712610acbc158a4e20936f6f96583986d0e8a38a5c5a1086e2f76",
+      "size_bytes": 19367
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/berlin52/primal-dual/minsum/trace.csv",
+      "sha256": "94fe32c2a2fe00d366637f60255e08cf14d5bce045a3e715668dc655f80d3219",
+      "size_bytes": 855
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "0feaf4e79d4c6af2b31833e0133c48d391d02f2953f050775ddab628344f71b1",
+      "size_bytes": 9821
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "8a965b6bcdbb4b168d0b6a9a54a019606aa7f86554bd7fcd66635241f92edbd2",
+      "size_bytes": 233
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "size_bytes": 5831
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "6a485bcc33f52416b95931c97a621ca30113d35de98b26848431a2f71d6c576f",
+      "size_bytes": 400
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "5007a47e5800f2cad6ff057bfc9ca7320ba8300a5ff059343bfb98696a008099",
+      "size_bytes": 1193
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "2d0a128d34edf94e06727017aac95415695af302f28a1548eb086e03a171c8be",
+      "size_bytes": 3569
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "57dd3b0130a712610acbc158a4e20936f6f96583986d0e8a38a5c5a1086e2f76",
+      "size_bytes": 19367
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "94fe32c2a2fe00d366637f60255e08cf14d5bce045a3e715668dc655f80d3219",
+      "size_bytes": 855
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "aaf1eae3d055c66424e2f9e6535da3940b44792c535b581bc18794cfac0af458",
+      "size_bytes": 2911
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "8c348cde664e84c35e39b4d73c910db8f687e12501251a747fb08247f02aae63",
+      "size_bytes": 465
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d0047e513e6fa4ef1dbb2ffedcdfd9f5aa3d4be2db7e08721b7414135a50d493",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "berlin52",
+  "finished_at": "2026-10-05T01:07:18.237966Z",
+  "input_sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+  "instance_id": "berlin52-6ce5d7089a",
+  "m": 25,
+  "n": 13,
+  "objective": "minsum",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 0.0,
+    "objective_value": 2539.986948033329,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "primal-dual",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "primal-dual",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 325,
+      "certified_gap": null,
+      "certified_lower_bound": 0.0,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "primal-dual",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minsum",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2166746519,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.039258,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 26.779133039732972,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 91.4350690642628,
+      "instance_id": "berlin52-6ce5d7089a",
+      "instance_name": "berlin52",
+      "integral_cost": 2539.986948033329,
+      "kont_version": "not-applicable",
+      "lower_bound": 0.0,
+      "m": 25,
+      "minsum_refinement_policy": "CERTIFIED_BOUND",
+      "n": 13,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 13,
+      "num_iterations": 7,
+      "num_static_solves": 13,
+      "objective": "minsum",
+      "objective_value": 2539.986948033329,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 4698.533680124574,
+      "peak_memory_mb": 17.65625,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "CERTIFIED_BOUND",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c",
+      "run_key": "f6b425d9cf54fc2c3137a80d9c52979d6991f7a3ccf23a7d66e89dc1461dae72",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "primal-dual",
+      "serialization_time_sec": 0.00043679200000000003,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.021278709,
+      "solver_name": "primal-dual",
+      "solver_runtime_sec": 0.021278709,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.038687,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 2539.986948033329,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.016951624000000002,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.038687,
+      "wrapper_wall_time_sec": 0.0536897919999999
+    },
+    "upper_bound": 2539.986948033329
+  },
+  "run_id": "run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c",
+  "run_key": "f6b425d9cf54fc2c3137a80d9c52979d6991f7a3ccf23a7d66e89dc1461dae72",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "primal-dual",
+  "started_at": "2026-10-05T01:07:18.176191Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:18.233728Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "2d0a128d34edf94e06727017aac95415695af302f28a1548eb086e03a171c8be",
+    "run_id": "run_20261005T010718Z__primal-dual__minsum__berlin52-6ce5d7089a__r00__dc6e60cc6b5c",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

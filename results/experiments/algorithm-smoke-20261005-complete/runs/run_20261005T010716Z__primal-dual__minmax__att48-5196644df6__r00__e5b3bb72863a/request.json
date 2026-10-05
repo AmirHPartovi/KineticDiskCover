@@ -1,0 +1,36 @@
+{
+  "algorithm": "primal-dual",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "instance_id": "att48-5196644df6",
+  "objective": "minmax",
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "primal-dual",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "primal-dual",
+    "selected_backend": "branch-and-bound"
+  },
+  "run_id": "run_20261005T010716Z__primal-dual__minmax__att48-5196644df6__r00__e5b3bb72863a",
+  "run_key": "bc127dec4a30cab04bda280f5b2a89fae3f0a8fe3b747d43f80c4224be2af594",
+  "schema_version": 1,
+  "seed": 42
+}

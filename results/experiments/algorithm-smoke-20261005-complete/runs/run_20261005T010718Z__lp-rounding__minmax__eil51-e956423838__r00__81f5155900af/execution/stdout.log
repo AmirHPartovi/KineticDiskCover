@@ -1,0 +1,30 @@
+[2026-10-05 04:37:18.572] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__lp-rounding__minmax__eil51-e956423838__r00__81f5155900af/input for instances
+2026-10-05 04:37:18 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:18 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:18 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:18.578] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:18.578] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:18.578] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__lp-rounding__minmax__eil51-e956423838__r00__81f5155900af/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:18.579] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__lp-rounding__minmax__eil51-e956423838__r00__81f5155900af/input/instance.json
+[2026-10-05 04:37:18.579] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-05 04:37:18.579] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-05 04:37:18.580] [info] [candidate.cpp:345] build_coverage: nnz=2279
+[2026-10-05 04:37:18.582] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2501.963875217 LB=2501.963875217 ratio=1.0000
+[2026-10-05 04:37:18.583] [info] [solution.cpp:527] extend: 12 intervals over [0, 1]
+[2026-10-05 04:37:18.583] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=26956.090245, LB=2501.963875, gap=9.7740
+[2026-10-05 04:37:18.583] [info] [candidate.cpp:345] build_coverage: nnz=2277
+[2026-10-05 04:37:18.587] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=3204.570168942 LB=3196.001799506 ratio=1.0027
+[2026-10-05 04:37:18.587] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:18.588] [info] [solution.cpp:527] extend: 15 intervals over [0, 1]
+[2026-10-05 04:37:18.588] [info] [solution.cpp:598] combine: 13 intervals
+[2026-10-05 04:37:18.588] [info] [verify.cpp:992] Verifier: starting certified continuous check on 13 intervals
+[2026-10-05 04:37:18.590] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.590] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:18.590] [info] [verify.cpp:992] Verifier: starting certified continuous check on 13 intervals
+[2026-10-05 04:37:18.593] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:18.593] [info] [minmax.cpp:373] MinMax: done. peak=26956.090245, LB=3196.001800, gap=7.4343, iters=1, t=0.008s
+[2026-10-05 04:37:18.593] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__lp-rounding__minmax__eil51-e956423838__r00__81f5155900af/execution/solver/runs/eil51/lp-rounding/minmax/trace.csv
+[2026-10-05 04:37:18.593] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 14006 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010718Z__lp-rounding__minmax__eil51-e956423838__r00__81f5155900af/execution/solver/runs/eil51/lp-rounding/minmax/solution.json
+[2026-10-05 04:37:18.594] [info] [batch_runner.cpp:1066] BatchRunner: eil51 / lp-rounding / minmax cost=26956.090245 t=0.014s verified=true
+[2026-10-05 04:37:18.595] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

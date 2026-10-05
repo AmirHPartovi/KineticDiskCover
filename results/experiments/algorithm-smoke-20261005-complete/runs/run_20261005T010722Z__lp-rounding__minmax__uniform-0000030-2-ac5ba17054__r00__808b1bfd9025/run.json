@@ -1,0 +1,292 @@
+{
+  "actual_backend": "lp-rounding",
+  "algorithm": "lp-rounding",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "f5c60fd52f4f569b303893dbc7a861066d2bd6e56914e7c1d802973fd7d6d6f3",
+      "size_bytes": 928
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "86a1c6da4f68f9b9e91f168cdbc2ccff0d184781f9191afc13096308d8cc5f67",
+      "size_bytes": 454
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "88ed26c2fe77d854ab63cba9a133dc8424736238e751728f3df1751b480401a7",
+      "size_bytes": 3215
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "7d0bcd4b649b06f9b2c6d0648935b7573ab854a959a6a6d198b18a3cd791950f",
+      "size_bytes": 1824
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "22427a1415bb47c8acf3fa664be4eb315967228f6a21bef9f02ca5bd0c361777",
+      "size_bytes": 3694
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/lp-rounding/minmax/result.json",
+      "sha256": "2d3ea27e3435df71b5f79fcbc2d490e380b3e56823dc3e2aed173a944a5f4f75",
+      "size_bytes": 3520
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/uniform-0000030-2/lp-rounding/minmax/solution.json",
+      "sha256": "3072315986b30723e0364ab1f2056d0201e434667be45fa1f9d84ce1f26ada32",
+      "size_bytes": 2837
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/uniform-0000030-2/lp-rounding/minmax/trace.csv",
+      "sha256": "ddf4a7bf00378c68fb57d9280b40dd8e30ad26544cde7be7b2dbf442686c662d",
+      "size_bytes": 136
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "7b6b8d90e22418d5475b5d79d6bfd5a39ea2d8eefa3e292e7e4358912569b420",
+      "size_bytes": 4638
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "072e86f04de81e91b31cf1492d50a5e3017b08c3bb1f2af87a9c895b47b04943",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+      "size_bytes": 2843
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "fb7d17bf107d4b7290ad68796df8df54b19bf24211fc2a750c17d730e4ff083e",
+      "size_bytes": 416
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "45438cbb01ec4d36426770bdcca3085805d8b2de9607c37e8cc4bf4319f5ee9b",
+      "size_bytes": 1211
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "ea879ebcbd32c65bb24b50e1eb88156f8e7594bf0ed5dd47fcebb412c25a24e9",
+      "size_bytes": 3610
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "3072315986b30723e0364ab1f2056d0201e434667be45fa1f9d84ce1f26ada32",
+      "size_bytes": 2837
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "ddf4a7bf00378c68fb57d9280b40dd8e30ad26544cde7be7b2dbf442686c662d",
+      "size_bytes": 136
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "e42e6142297f771e640fa470a2427a7ddfd3cbd0217c025d456acb01854505e2",
+      "size_bytes": 363
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "4db7f9dac81b27e8ac5b24f8fe9491a07c7f30358264f4b94e3d5b592b5755fb",
+      "size_bytes": 474
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "da45318e7363bac3345935915b68d2d5e200357b223a67ea0b8735a180593e2b",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "uniform",
+  "finished_at": "2026-10-05T01:07:22.851968Z",
+  "input_sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+  "instance_id": "uniform-0000030-2-ac5ba17054",
+  "m": 25,
+  "n": 2,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "lp-rounding",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "lp-rounding",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 1248.7429003668701,
+    "objective_value": 14972.322700294666,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "lp-rounding",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "lp-rounding",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": null,
+      "certified_lower_bound": 1248.7429003668701,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "lp-rounding",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2991925061,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.00084,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 2,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 10.989916175616234,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 0.0,
+      "instance_id": "uniform-0000030-2-ac5ba17054",
+      "instance_name": "uniform-0000030-2",
+      "integral_cost": 5017.494381311986,
+      "kont_version": "not-applicable",
+      "lower_bound": 1248.7429003668701,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 14972.322700294666,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 14972.322700294666,
+      "peak_memory_mb": 17.15625,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010722Z__lp-rounding__minmax__uniform-0000030-2-ac5ba17054__r00__808b1bfd9025",
+      "run_key": "0ff27ac3f14f9d571f2367437b7e0da5ff3fe414f4e12b4bb16ea44d09c62d0c",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "lp-rounding",
+      "serialization_time_sec": 0.00031375,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.000202584,
+      "solver_name": "lp-rounding",
+      "solver_runtime_sec": 0.000202584,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.00060825,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 14972.322700294666,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 7.3583e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.00060825,
+      "wrapper_wall_time_sec": 0.018273875000000217
+    },
+    "upper_bound": 14972.322700294666
+  },
+  "run_id": "run_20261005T010722Z__lp-rounding__minmax__uniform-0000030-2-ac5ba17054__r00__808b1bfd9025",
+  "run_key": "0ff27ac3f14f9d571f2367437b7e0da5ff3fe414f4e12b4bb16ea44d09c62d0c",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "lp-rounding",
+  "started_at": "2026-10-05T01:07:22.825510Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:22.847431Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "ea879ebcbd32c65bb24b50e1eb88156f8e7594bf0ed5dd47fcebb412c25a24e9",
+    "run_id": "run_20261005T010722Z__lp-rounding__minmax__uniform-0000030-2-ac5ba17054__r00__808b1bfd9025",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

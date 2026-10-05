@@ -1,0 +1,63 @@
+Experiment directory: /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete
+
+========== STAGE dataset START 2026-10-05T04:37:09+0330 ==========
+[2026-10-05T04:37:09+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --source /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/.selection-smoke.BhUmvz/selection.json 
+[2026-10-05T04:37:09+0330] STAGE dataset ENDED exit_status=0 duration_sec=0
+
+========== STAGE build START 2026-10-05T04:37:09+0330 ==========
+[2026-10-05T04:37:09+0330] COMMAND: bash -c cmake\ -S\ \"\$1\"\ -B\ \"\$1/build\"\ -DCMAKE_BUILD_TYPE=Release\ \&\&\ cmake\ --build\ \"\$1/build\"\ --parallel\ \"\$2\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork 2 
+[2026-10-05T04:37:14+0330] STAGE build ENDED exit_status=0 duration_sec=5
+
+========== STAGE tests START 2026-10-05T04:37:14+0330 ==========
+[2026-10-05T04:37:14+0330] COMMAND: ctest --test-dir /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build --output-on-failure 
+[2026-10-05T04:37:15+0330] STAGE tests ENDED exit_status=0 duration_sec=1
+
+========== STAGE preflight START 2026-10-05T04:37:15+0330 ==========
+[2026-10-05T04:37:15+0330] COMMAND: /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/build/kdc-solver preflight --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/preflight/preflight_report.md 
+[2026-10-05T04:37:15+0330] STAGE preflight ENDED exit_status=0 duration_sec=0
+
+========== STAGE backend_selection START 2026-10-05T04:37:15+0330 ==========
+[2026-10-05T04:37:15+0330] COMMAND: bash -c \"\$1/build/kdc-solver\"\ calibrate\ --dataset\ \"\$2/dataset\"\ --output\ \"\$2/calibration\"\ --exact-reference\ \"\$3\"\ \&\&\ cp\ \"\$2/calibration/experiment_manifest.json\"\ \"\$2/batch/experiment_manifest.json\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete auto 
+[2026-10-05T04:37:16+0330] STAGE backend_selection ENDED exit_status=0 duration_sec=1
+
+========== STAGE benchmark START 2026-10-05T04:37:16+0330 ==========
+[2026-10-05T04:37:16+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset_selection_manifest.json 
+[2026-10-05T04:37:24+0330] STAGE benchmark ENDED exit_status=0 duration_sec=8
+
+========== STAGE result_validation START 2026-10-05T04:37:25+0330 ==========
+[2026-10-05T04:37:25+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --results /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/batch/master_results.json 
+[2026-10-05T04:37:25+0330] STAGE result_validation ENDED exit_status=0 duration_sec=0
+
+========== STAGE tables START 2026-10-05T04:37:25+0330 ==========
+[2026-10-05T04:37:25+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/build_tables.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/tables 
+[2026-10-05T04:37:26+0330] STAGE tables ENDED exit_status=0 duration_sec=1
+
+========== STAGE research_summary START 2026-10-05T04:37:26+0330 ==========
+[2026-10-05T04:37:26+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T04:37:26+0330] STAGE research_summary ENDED exit_status=0 duration_sec=0
+
+========== STAGE figures START 2026-10-05T04:37:26+0330 ==========
+[2026-10-05T04:37:26+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/plot_comparisons.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/figures --dpi 300 
+[2026-10-05T04:37:59+0330] STAGE figures ENDED exit_status=0 duration_sec=33
+
+========== STAGE animations START 2026-10-05T04:37:59+0330 ==========
+[2026-10-05T04:37:59+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --modes both --policy all-algorithms --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 
+[2026-10-05T05:36:36+0330] STAGE animations ENDED exit_status=0 duration_sec=3517
+
+========== STAGE final_report START 2026-10-05T05:36:37+0330 ==========
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] STAGE final_report ENDED exit_status=0 duration_sec=0
+
+========== STAGE summary START 2026-10-05T05:36:37+0330 ==========
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] STAGE summary ENDED exit_status=0 duration_sec=0
+
+Experiment status: COMPLETE
+Dataset profile: smoke10
+Selected instances: 10
+Algorithms: nn, greedy, primal-dual, local-search, sa, genetic, lp-rounding, shifting, branch-and-bound
+Objectives: minmax, minsum
+Threads: 2
+Time limits (static/fast/exact): 2.0 / 5.0 / 10.0 seconds
+Selected families: att48, berlin52, eil51, euro-night, london, sbgdb-20200507-fpg-poly, sbgdb-20200507-pntset, stars, uniform, us-night

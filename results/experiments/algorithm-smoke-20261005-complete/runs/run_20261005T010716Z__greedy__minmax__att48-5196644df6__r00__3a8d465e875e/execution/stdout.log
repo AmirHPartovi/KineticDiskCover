@@ -1,0 +1,28 @@
+[2026-10-05 04:37:16.570] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__greedy__minmax__att48-5196644df6__r00__3a8d465e875e/input for instances
+2026-10-05 04:37:16 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:16 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:16 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:16.575] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:16.575] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:16.575] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__greedy__minmax__att48-5196644df6__r00__3a8d465e875e/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:16.576] [info] [io.cpp:137] read_json: loaded 11 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__greedy__minmax__att48-5196644df6__r00__3a8d465e875e/input/instance.json
+[2026-10-05 04:37:16.577] [info] [minmax.cpp:110] MinMax: start n=11, m=25, T=1
+[2026-10-05 04:37:16.577] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2675.374545784 LB=1175.925452839 ratio=2.2751
+[2026-10-05 04:37:16.577] [info] [candidate.cpp:199] InstancePrecompute: built 275 candidates
+[2026-10-05 04:37:16.577] [info] [solution.cpp:527] extend: 10 intervals over [0, 1]
+[2026-10-05 04:37:16.577] [info] [minmax.cpp:198] MinMax iter 1: t_max=0.918079, peak=9665.223572, LB=1175.925453, gap=7.2192
+[2026-10-05 04:37:16.577] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2370.029723000 LB=815.282256722 ratio=2.9070
+[2026-10-05 04:37:16.577] [info] [solution.cpp:527] extend: 3 intervals over [0.9180787220964143, 1]
+[2026-10-05 04:37:16.578] [info] [solution.cpp:527] extend: 13 intervals over [0, 0.9180787220964143]
+[2026-10-05 04:37:16.578] [info] [solution.cpp:598] combine: 15 intervals
+[2026-10-05 04:37:16.578] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:16.579] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:16.579] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:16.579] [info] [verify.cpp:992] Verifier: starting certified continuous check on 15 intervals
+[2026-10-05 04:37:16.581] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:16.581] [info] [minmax.cpp:373] MinMax: done. peak=9665.223572, LB=1175.925453, gap=7.2192, iters=1, t=0.002s
+[2026-10-05 04:37:16.581] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__greedy__minmax__att48-5196644df6__r00__3a8d465e875e/execution/solver/runs/att48/greedy/minmax/trace.csv
+[2026-10-05 04:37:16.581] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 15605 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010716Z__greedy__minmax__att48-5196644df6__r00__3a8d465e875e/execution/solver/runs/att48/greedy/minmax/solution.json
+[2026-10-05 04:37:16.581] [info] [batch_runner.cpp:1066] BatchRunner: att48 / greedy / minmax cost=9665.223572 t=0.004s verified=true
+[2026-10-05 04:37:16.582] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

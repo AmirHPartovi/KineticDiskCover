@@ -1,0 +1,32 @@
+[2026-10-05 04:37:20.955] [info] [batch_runner.cpp:500] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__11ff63ee5e81/input for instances
+2026-10-05 04:37:20 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-05 04:37:20 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-05 04:37:20 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-05 04:37:20.961] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-05 04:37:20.961] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-05 04:37:20.962] [info] [batch_runner.cpp:538] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__11ff63ee5e81/execution/solver/experiment_manifest.json)
+[2026-10-05 04:37:20.962] [info] [io.cpp:137] read_json: loaded 1 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__11ff63ee5e81/input/instance.json
+[2026-10-05 04:37:20.963] [info] [minmax.cpp:110] MinMax: start n=1, m=25, T=1
+[2026-10-05 04:37:20.963] [info] [candidate.cpp:199] InstancePrecompute: built 25 candidates
+[2026-10-05 04:37:20.963] [info] [stationary.cpp:264] NN: cost=159.982081, feasible=true, active_stations=1
+[2026-10-05 04:37:20.963] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-05 04:37:20.963] [info] [branch_and_bound_solver.cpp:416] BnB: cost=159.982081460 LB=159.982081460 nodes=0 t=0.0000s
+[2026-10-05 04:37:20.963] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.963] [info] [minmax.cpp:198] MinMax iter 1: t_max=1.000000, peak=8574.029153, LB=159.982081, gap=52.5937
+[2026-10-05 04:37:20.963] [info] [stationary.cpp:264] NN: cost=2.987425, feasible=true, active_stations=1
+[2026-10-05 04:37:20.963] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-05 04:37:20.963] [info] [branch_and_bound_solver.cpp:416] BnB: cost=2.987425048 LB=2.987425048 nodes=0 t=0.0000s
+[2026-10-05 04:37:20.963] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-05 04:37:20.963] [info] [solution.cpp:527] extend: 1 intervals over [0, 1]
+[2026-10-05 04:37:20.963] [info] [solution.cpp:598] combine: 3 intervals
+[2026-10-05 04:37:20.963] [info] [verify.cpp:992] Verifier: starting certified continuous check on 3 intervals
+[2026-10-05 04:37:20.963] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:20.963] [info] [minmax.cpp:307] MinMax: combined solution did not improve peak, stopping
+[2026-10-05 04:37:20.963] [info] [verify.cpp:992] Verifier: starting certified continuous check on 3 intervals
+[2026-10-05 04:37:20.963] [info] [verify.cpp:1072] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-05 04:37:20.963] [info] [minmax.cpp:373] MinMax: done. peak=8574.029153, LB=159.982081, gap=52.5937, iters=1, t=0.000s
+[2026-10-05 04:37:20.963] [info] [trace.cpp:72] TraceWriter: wrote 1 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__11ff63ee5e81/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/branch-and-bound/minmax/trace.csv
+[2026-10-05 04:37:20.963] [info] [solution_serializer.cpp:122] SolutionSerializer: wrote 2800 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/runs/run_20261005T010720Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__11ff63ee5e81/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/branch-and-bound/minmax/solution.json
+[2026-10-05 04:37:20.963] [info] [batch_runner.cpp:1066] BatchRunner: sbgdb-20200507-fpg-poly_0000000030 / branch-and-bound / minmax cost=8574.029153 t=0.001s verified=true
+[2026-10-05 04:37:20.964] [info] [batch_runner.cpp:811] BatchRunner: 1 runs completed

@@ -1,0 +1,12 @@
+[2026-10-05T04:37:16+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/batch --algorithms all --profile debug --modes both --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset_selection_manifest.json 
+10 instances × 9 algorithms × 2 objectives; 180 new attempts of 180 planned logical runs.
+Finished 25/180 run attempts.
+Finished 50/180 run attempts.
+Finished 75/180 run attempts.
+Finished 100/180 run attempts.
+Finished 125/180 run attempts.
+Finished 150/180 run attempts.
+Finished 175/180 run attempts.
+Finished 180/180 run attempts.
+Aggregate: /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/aggregates/results.json
+Aggregate complete: True

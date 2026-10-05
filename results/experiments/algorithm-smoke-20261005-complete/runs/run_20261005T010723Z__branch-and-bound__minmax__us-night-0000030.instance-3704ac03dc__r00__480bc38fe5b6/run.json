@@ -1,0 +1,292 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm": "branch-and-bound",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "0ca9f0b5cf9b5e9b573898be255dae0d04424ddb612e8b285e5c35116045d64e",
+      "size_bytes": 932
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "eb0fb31dc8659051c620893db9f02b070ae4ed210fc402dcad2595a4c1ae232c",
+      "size_bytes": 473
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "8c098ee9d67f778dbbf6f2ac5a2605792c177d9c95133ab8b2cfc27581766daf",
+      "size_bytes": 3259
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "215e973e218ff175a6c6adbb190b03e9a0ffb08874249272c51f3b318e7b9101",
+      "size_bytes": 1868
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "cd3ad08d2bcb3b85295ae5394cde9e3f55720004c883e8854cd1baefe2449c7e",
+      "size_bytes": 3836
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/us-night-0000030.instance/branch-and-bound/minmax/result.json",
+      "sha256": "13c2ef1538f1793bed9a26c823db32a19a42e80fdc2e299dc4d6380ba36ceb52",
+      "size_bytes": 3662
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/us-night-0000030.instance/branch-and-bound/minmax/solution.json",
+      "sha256": "1074cbae738ba075ec58c50e8a547c66b1d9a6f39fea94b863a46b7be0cc0360",
+      "size_bytes": 2790
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/us-night-0000030.instance/branch-and-bound/minmax/trace.csv",
+      "sha256": "3a16a32f2a8b616578a1a1e2f5f17d0433b675ffc7f323552efbc51a767b7c03",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "910422092328113c65045d65dc215dfb8205c51861e5df65c62e8d6d69db7ec6",
+      "size_bytes": 5012
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "3b22ad18229cd557b383968febb3aed96d9ba977ce82cbc828ffce0b798957e0",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185",
+      "size_bytes": 2592
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "a8ca87ec241dd6dd67764bd19df837a9a0354772eab6018ae6eb5f3343d783b3",
+      "size_bytes": 433
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "4e517858a0104dcbffa9b5e3717b091d8e29a08843fe2bf4b5b5646a01ad6364",
+      "size_bytes": 1249
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "080820d8fb004edd12ac04ca4c93faf57b3dc3ce14a0101b721c201468080265",
+      "size_bytes": 3708
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "1074cbae738ba075ec58c50e8a547c66b1d9a6f39fea94b863a46b7be0cc0360",
+      "size_bytes": 2790
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "3a16a32f2a8b616578a1a1e2f5f17d0433b675ffc7f323552efbc51a767b7c03",
+      "size_bytes": 147
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "53f33cbdb885d225fad71fb2559e5894196911bb426b2413995eb77e0e1c9949",
+      "size_bytes": 373
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "13db0f2efed2b90c30faf0b82d9b3816928e2c0f01549e2d827de2bf86a4462e",
+      "size_bytes": 487
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d5c7994c3d88b461eebae6c7c20324b73c3a38ed0b4e7a50e4afe3fa341900c0",
+  "experiment_id": "algorithm-smoke-20261005-complete",
+  "family": "us-night",
+  "finished_at": "2026-10-05T01:07:23.275997Z",
+  "input_sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185",
+  "instance_id": "us-night-0000030.instance-3704ac03dc",
+  "m": 25,
+  "n": 1,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "88c683f46e83540a43aaab82d355020b429b6a26"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 10.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "branch-and-bound",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 10.0,
+    "resolved_algorithm": "branch-and-bound",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 1072.0043652792735,
+    "objective_value": 5633.372564199187,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "branch-and-bound",
+      "actual_threads": 1,
+      "algorithm_category": "exact_reference",
+      "algorithm_name": "branch-and-bound",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": 4.254990321547438,
+      "certified_lower_bound": 1072.0043652792735,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "branch-and-bound",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 10.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2172475800,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.000679,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": true,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 4.254990321547438,
+      "git_commit": "88c683f46e83540a43aaab82d355020b429b6a26",
+      "global_time_limit_sec": 10.0,
+      "handovers_enabled": true,
+      "heuristic_lower_bound": 0.0,
+      "instance_id": "us-night-0000030.instance-3704ac03dc",
+      "instance_name": "us-night-0000030.instance",
+      "integral_cost": 1121.3048985955477,
+      "kont_version": "not-applicable",
+      "lower_bound": 1072.0043652792735,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 2,
+      "num_iterations": 1,
+      "num_static_solves": 2,
+      "objective": "minmax",
+      "objective_value": 5633.372564199187,
+      "optimality_status": "FEASIBLE",
+      "peak_cost": 5633.372564199187,
+      "peak_memory_mb": 16.96875,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261005T010723Z__branch-and-bound__minmax__us-night-0000030.instance-3704ac03dc__r00__480bc38fe5b6",
+      "run_key": "4e0efd5504ce31cc7b54d47f7ff0203d2fb07a5fb6ac0a64839a25b8d56cb83f",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "branch-and-bound",
+      "serialization_time_sec": 0.000414834,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 7.0626e-05,
+      "solver_name": "branch-and-bound",
+      "solver_runtime_sec": 7.0626e-05,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.000543917,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 5633.372564199187,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 3.8125000000000005e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.000543917,
+      "wrapper_wall_time_sec": 0.015755208999999937
+    },
+    "upper_bound": 5633.372564199187
+  },
+  "run_id": "run_20261005T010723Z__branch-and-bound__minmax__us-night-0000030.instance-3704ac03dc__r00__480bc38fe5b6",
+  "run_key": "4e0efd5504ce31cc7b54d47f7ff0203d2fb07a5fb6ac0a64839a25b8d56cb83f",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "branch-and-bound",
+  "started_at": "2026-10-05T01:07:23.243393Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-05T01:07:23.268514Z",
+    "continuous": true,
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "080820d8fb004edd12ac04ca4c93faf57b3dc3ce14a0101b721c201468080265",
+    "run_id": "run_20261005T010723Z__branch-and-bound__minmax__us-night-0000030.instance-3704ac03dc__r00__480bc38fe5b6",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}
