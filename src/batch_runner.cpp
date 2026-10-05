@@ -93,7 +93,7 @@ class ScopedLogLevel {
 };
 
 Json record_json(const BatchRunRecord& record) {
-  return Json{{"schema_version", 2},
+  return Json{{"schema_version", 3},
               {"instance_name", record.instance_name},
               {"algorithm_name", record.algorithm_name},
               {"algorithm_category", record.algorithm_category},
@@ -102,6 +102,10 @@ Json record_json(const BatchRunRecord& record) {
               {"actual_backend", record.actual_backend},
               {"native_kont", record.native_kont},
               {"fallback_used", record.fallback_used},
+              {"native_solve_count", record.native_solve_count},
+              {"fallback_solve_count", record.fallback_solve_count},
+              {"failed_native_solve_count",
+               record.failed_native_solve_count},
               {"kont_version", record.solver_version},
               {"solver_name", record.solver_name},
               {"solver_runtime_sec", record.solve_time_sec},
@@ -283,6 +287,9 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           record.solver_version,
           record.native_kont ? "true" : "false",
           record.fallback_used ? "true" : "false",
+          std::to_string(record.native_solve_count),
+          std::to_string(record.fallback_solve_count),
+          std::to_string(record.failed_native_solve_count),
           std::to_string(record.solve_time_sec),
           record.objective,
           std::to_string(record.repeat),
@@ -290,6 +297,9 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           std::to_string(record.m),
           std::to_string(record.wall_time_sec),
           std::to_string(record.solve_time_sec),
+          std::to_string(record.cpu_time_sec),
+          std::to_string(record.peak_memory_mb),
+          std::to_string(record.time_limit_per_ip_sec),
           std::to_string(record.peak_cost),
           std::to_string(record.integral_cost),
           record.empirical_ratio_to_exact
@@ -298,9 +308,6 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           record.ratio_to_incumbent
               ? std::to_string(*record.ratio_to_incumbent)
               : "",
-          std::to_string(record.cpu_time_sec),
-          std::to_string(record.peak_memory_mb),
-          std::to_string(record.time_limit_per_ip_sec),
           std::to_string(record.objective_value),
           std::to_string(record.lower_bound),
           bound_status_to_string(record.bound_status),
@@ -367,15 +374,15 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
       record.algorithm_category == "exact_reference"
           ? config.selected_backend
           : algorithm;
-  record.actual_backend = record.algorithm_category == "exact_reference"
-                              ? config.actual_backend
-                              : algorithm;
-  record.native_kont = record.algorithm_category == "exact_reference" &&
-                       config.native_kont;
-  record.fallback_used = record.algorithm_category == "exact_reference" &&
-                         config.fallback_used;
-  record.solver_version = record.native_kont ? config.solver_version
-                                              : "not-applicable";
+  record.actual_backend =
+      algorithm == "ip-kont"
+          ? "native-backend-not-executed"
+          : (record.algorithm_category == "exact_reference"
+                 ? "branch-and-bound"
+                 : algorithm);
+  record.native_kont = false;
+  record.fallback_used = false;
+  record.solver_version = "not-applicable";
   record.solver_name = algorithm;
   record.objective = to_string(objective);
   record.repeat = repeat;
@@ -444,10 +451,14 @@ std::size_t algorithm_phase(const std::string& algorithm) {
   return 2U;
 }
 
-void clear_previous_batch_output(const std::filesystem::path& output) {
+void require_fresh_batch_output(const std::filesystem::path& output) {
   for (const char* artifact : {"runs", "master_results.json",
                                "master_results.csv", "batch_summary.md"}) {
-    std::filesystem::remove_all(output / artifact);
+    if (std::filesystem::exists(output / artifact)) {
+      throw std::invalid_argument(
+          "batch output already contains " + std::string(artifact) +
+          "; use a new output directory");
+    }
   }
 }
 }  // namespace
@@ -528,12 +539,14 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
 
   const auto registered = StaticSolverRegistry::list();
   std::vector<std::string> algorithms;
-  const bool wants_default_selection =
-      config.algorithm_names.empty() ||
-      std::any_of(config.algorithm_names.begin(), config.algorithm_names.end(),
-                  [](const std::string& value) {
-                    return value == "all" || value == "ALL";
-                  });
+  const bool wants_all_registered =
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "all-registered") != config.algorithm_names.end() ||
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "all") != config.algorithm_names.end() ||
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "ALL") != config.algorithm_names.end();
+  const bool wants_default_selection = config.algorithm_names.empty();
 
   const bool wants_fast =
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
@@ -543,6 +556,14 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                 "all-comparison") != config.algorithm_names.end();
   if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     algorithms = {exact_reference_decision.selected_backend};
+  } else if (wants_all_registered) {
+    for (const auto& name : registered) {
+      if ((name == "ip-kont" || name == "branch-and-bound") &&
+          name != exact_reference_decision.selected_backend) {
+        continue;
+      }
+      algorithms.push_back(name);
+    }
   } else if (wants_default_selection || wants_fast || wants_comparison) {
     algorithms = default_benchmark_algorithms(
         exact_reference_decision.selected_backend);
@@ -551,11 +572,6 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
         exact_reference_decision.selected_backend);
   } else {
     for (const auto& requested : config.algorithm_names) {
-      if (requested == "brute-force") {
-        LOG_WARN("BatchRunner: ignoring validation-only algorithm '{}'",
-                 requested);
-        continue;
-      }
       if (std::find(registered.begin(), registered.end(), requested) ==
           registered.end()) {
         LOG_WARN("BatchRunner: ignoring unregistered algorithm '{}'",
@@ -636,6 +652,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
     run_config.experiment_id = experiment_id_for(run_config);
   }
   const std::filesystem::path output(config.output_dir);
+  require_fresh_batch_output(output);
   std::filesystem::create_directories(output);
   Json calibration = Json::object();
   const std::filesystem::path manifest_path =
@@ -680,8 +697,6 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       }
     }
   }
-
-  clear_previous_batch_output(output);
 
   std::vector<BatchRunRecord> records;
   std::size_t total_work = 0U;
@@ -874,6 +889,10 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
 
   const auto wall_start = Clock::now();
   const std::clock_t cpu_start = std::clock();
+  auto* kont_solver = dynamic_cast<KontSolver*>(ilp);
+  const KontExecutionProvenance provenance_before =
+      kont_solver != nullptr ? kont_solver->thread_execution_provenance()
+                             : KontExecutionProvenance{};
   try {
     auto solver = StaticSolverRegistry::create(algorithm_name, ilp);
     if (!solver) {
@@ -1011,6 +1030,29 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
     }
   }
 
+  if (kont_solver != nullptr) {
+    const KontExecutionProvenance provenance =
+        kont_solver->thread_execution_provenance();
+    record.native_solve_count =
+        provenance.native_solve_count - provenance_before.native_solve_count;
+    record.fallback_solve_count =
+        provenance.fallback_solve_count - provenance_before.fallback_solve_count;
+    record.failed_native_solve_count = provenance.failed_native_solve_count -
+                                       provenance_before.failed_native_solve_count;
+    if (algorithm_name == "ip-kont") {
+      record.native_kont = provenance.native_solve_count > 0;
+      record.fallback_used = provenance.fallback_solve_count > 0;
+      record.actual_backend =
+          record.native_kont
+              ? "KONT/COPT"
+              : (record.fallback_used
+                     ? "built-in-branch-and-bound-fallback"
+                     : "native-backend-not-executed");
+      record.solver_version =
+          record.native_kont ? config.solver_version : "not-applicable";
+    }
+  }
+
   record.wall_time_sec =
       std::chrono::duration<double>(Clock::now() - wall_start).count();
   record.timeout = record.time_limited;
@@ -1067,7 +1109,8 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
   csv_output
       << "instance_name,algorithm_name,algorithm_category,requested_backend,"
          "selected_backend,actual_backend,solver_name,kont_version,native_kont,"
-         "fallback_used,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
+         "fallback_used,native_solve_count,fallback_solve_count,"
+         "failed_native_solve_count,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
          "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
          "peak_cost,integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
          "objective_value,lower_bound,bound_status,upper_bound,certified_gap,"

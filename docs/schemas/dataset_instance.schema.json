@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/dataset_instance.schema.json",
+  "title": "Canonical experiment dataset instance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "instance_id",
+    "family",
+    "source_path",
+    "source_sha256",
+    "canonical_path",
+    "canonical_sha256",
+    "format",
+    "canonicalization_version",
+    "n",
+    "m"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "instance_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "family": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "source_sha256": { "$ref": "#/$defs/sha256" },
+    "canonical_path": { "type": "string", "minLength": 1 },
+    "canonical_sha256": { "$ref": "#/$defs/sha256" },
+    "format": { "enum": ["json", "mdc"] },
+    "canonicalization_version": { "type": "string", "minLength": 1 },
+    "n": { "type": "integer", "minimum": 0 },
+    "m": { "type": "integer", "minimum": 0 }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

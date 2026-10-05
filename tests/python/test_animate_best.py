@@ -69,6 +69,24 @@ def test_selects_best_algorithm():
     assert animate_best.select_best(frame, "x", "minmax").algorithm_name == "ip"
 
 
+def test_unproven_exact_results_are_not_selected_for_animation():
+    frame = pd.DataFrame([
+        {"instance_name": "x", "objective": "minmax",
+         "algorithm_name": "heuristic", "algorithm_category": "heuristic",
+         "objective_value": 5, "gap": 0.1, "wall_time_sec": 1,
+         "verified": True, "feasible": True},
+        {"instance_name": "x", "objective": "minmax",
+         "algorithm_name": "branch-and-bound",
+         "algorithm_category": "exact_reference", "objective_value": 1,
+         "gap": 0, "wall_time_sec": 0.5, "verified": True,
+         "feasible": True, "optimality_status": "FEASIBLE",
+         "verification_kind": "CERTIFIED_CONTINUOUS"},
+    ])
+
+    assert (animate_best.select_best(frame, "x", "minmax").algorithm_name
+            == "heuristic")
+
+
 def test_tie_break_gap():
     frame = pd.DataFrame([
         {"instance_name": "x", "objective": "minmax", "algorithm_name": "a",

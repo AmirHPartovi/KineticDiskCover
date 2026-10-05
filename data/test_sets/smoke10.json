@@ -1,109 +1,173 @@
 {
   "name": "smoke10",
-  "selection_policy": "one smallest valid instance per dataset family, then globally smallest remaining candidates; ordered by n, m, n*m, file size, and relative path",
-  "source_root": "data/instances",
-  "source_dataset_fingerprint": "5daacd531a5155ebb2b86d41d8304fc53f765349a27ef840735fc5f72741fc3d",
+  "selection_policy": "select eligible small candidates first, maximizing family coverage, then fill by size; use oversized family representatives only when fewer than the requested count of valid in-limit instances exist",
+  "smoke_limits": {
+    "max_n": 50,
+    "max_m": 25
+  },
+  "source_root": "data/instances/public_instance_set",
+  "source_dataset_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
   "selected_instance_count": 10,
   "instances": [
     {
-      "family": "public_instance_set",
+      "family": "us-night",
       "source": "data/instances/public_instance_set/us-night-0000030.instance.mdc",
-      "relative_source": "public_instance_set/us-night-0000030.instance.mdc",
+      "relative_source": "us-night-0000030.instance.mdc",
       "n": 1,
       "m": 25,
       "file_size_bytes": 1679,
       "sha256": "89cc3fc4c0fbe027a9b8759bd278f62531c28aa58f29008e0bfe6c51bb1b2ad9",
-      "selection_rank": 1
+      "selection_rank": 1,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     },
     {
-      "family": "debug",
-      "source": "data/instances/debug/3_3_debug.mdc",
-      "relative_source": "debug/3_3_debug.mdc",
-      "n": 3,
-      "m": 3,
-      "file_size_bytes": 1038,
-      "sha256": "700f80fd0db09f6f4c37f1afd0e2a301a07ae83ecea78cb6c5a3bb5acc8de928",
-      "selection_rank": 2
-    },
-    {
-      "family": "pretty",
-      "source": "data/instances/pretty/pretty1.mdc",
-      "relative_source": "pretty/pretty1.mdc",
-      "n": 10,
-      "m": 5,
-      "file_size_bytes": 1535,
-      "sha256": "441b41e4064a83cf6ce9b33235da39e3dbf010cf3ef9ecf4fe70dcf2c7ec948d",
-      "selection_rank": 3
-    },
-    {
-      "family": "random_small",
-      "source": "data/instances/random_small/random_100_n_010_m_05_10_20_1.mdc",
-      "relative_source": "random_small/random_100_n_010_m_05_10_20_1.mdc",
-      "n": 10,
-      "m": 5,
-      "file_size_bytes": 1542,
-      "sha256": "b0d5babe9660dcec22c51d3109de36b423c4295406242f9f0fdb3294a6fe3764",
-      "selection_rank": 4
-    },
-    {
-      "family": "fixed_m",
-      "source": "data/instances/fixed_m/random_100_n_050_m_25_25_50_09.mdc",
-      "relative_source": "fixed_m/random_100_n_050_m_25_25_50_09.mdc",
-      "n": 50,
+      "family": "sbgdb-20200507-pntset",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000030.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000030.mdc",
+      "n": 1,
       "m": 25,
-      "file_size_bytes": 7471,
-      "sha256": "b1852cc0ac9b238e54d477b4b0e9639398c9f1846572b98bd56be03a6810be90",
-      "selection_rank": 5
+      "file_size_bytes": 1683,
+      "sha256": "ffc4aabe37f9ed2cf60d2a9fcd17bfe484812a9238bdd13a144105c20cff10e6",
+      "selection_rank": 2,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     },
     {
-      "family": "fixed_n",
-      "source": "data/instances/fixed_n/random_100_n_500_m_05_25_50_03.mdc",
-      "relative_source": "fixed_n/random_100_n_500_m_05_25_50_03.mdc",
-      "n": 500,
-      "m": 5,
-      "file_size_bytes": 60750,
-      "sha256": "0e03b5f14814f2448373c2ec38e295b306f3469ea944ec139c9022eb298318a9",
-      "selection_rank": 6
-    },
-    {
-      "family": "fixed_size_same_start",
-      "source": "data/instances/fixed_size_same_start/random_100_n_500_m_25_25_50_07.mdc",
-      "relative_source": "fixed_size_same_start/random_100_n_500_m_25_25_50_07.mdc",
-      "n": 500,
+      "family": "sbgdb-20200507-fpg-poly",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "n": 1,
       "m": 25,
-      "file_size_bytes": 61125,
-      "sha256": "d8cf34e37ee7a063832e969ffd1caa3ffe4ac7581a2d9b6a2300dc7c851785ad",
-      "selection_rank": 7
+      "file_size_bytes": 1723,
+      "sha256": "7493750b7865f0c242247028e6c27da92e8ccb54d73331418b979ea178147b6a",
+      "selection_rank": 3,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     },
     {
-      "family": "fixed_size_same_end",
-      "source": "data/instances/fixed_size_same_end/random_100_n_500_m_25_25_50_16.mdc",
-      "relative_source": "fixed_size_same_end/random_100_n_500_m_25_25_50_16.mdc",
-      "n": 500,
+      "family": "uniform",
+      "source": "data/instances/public_instance_set/uniform-0000030-2.mdc",
+      "relative_source": "uniform-0000030-2.mdc",
+      "n": 2,
       "m": 25,
-      "file_size_bytes": 61203,
-      "sha256": "c44ae9dd3b79662c0d3c95ea68a5b5f2b376aeac5cd3124d99a3420e4e7920e9",
-      "selection_rank": 8
+      "file_size_bytes": 1779,
+      "sha256": "cbaabccb536ed99942d3b3772832ec3a58187cd716d0fee8b2cca38f98183b9e",
+      "selection_rank": 4,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     },
     {
-      "family": "fixed_size",
-      "source": "data/instances/fixed_size/random_100_n_500_m_25_25_50_04.mdc",
-      "relative_source": "fixed_size/random_100_n_500_m_25_25_50_04.mdc",
-      "n": 500,
+      "family": "london",
+      "source": "data/instances/public_instance_set/london-0000030.instance.mdc",
+      "relative_source": "london-0000030.instance.mdc",
+      "n": 2,
       "m": 25,
-      "file_size_bytes": 61771,
-      "sha256": "86383a45e563a47fdbbfb8aac5b6594e0a5e1d2aa9b81c67cbcfaba5525fcb0a",
-      "selection_rank": 9
+      "file_size_bytes": 1790,
+      "sha256": "0928f729f52886a6a99b6ff3352347460e0958436f3b7375a63da6788fcd8887",
+      "selection_rank": 5,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     },
     {
-      "family": "fixed_size_same_orientation",
-      "source": "data/instances/fixed_size_same_orientation/random_100_n_500_m_25_25_50_05.mdc",
-      "relative_source": "fixed_size_same_orientation/random_100_n_500_m_25_25_50_05.mdc",
-      "n": 500,
+      "family": "stars",
+      "source": "data/instances/public_instance_set/stars-0000030.instance.mdc",
+      "relative_source": "stars-0000030.instance.mdc",
+      "n": 2,
       "m": 25,
-      "file_size_bytes": 61792,
-      "sha256": "87490093bc1bc4cb7019620e4afa86dfb2f8a78f6b122566a1191a9ef73e23de",
-      "selection_rank": 10
+      "file_size_bytes": 1791,
+      "sha256": "1955c914c7410f738387ff1e95bac363bfb7357b0e5b333159ad3f16dbb4c9c4",
+      "selection_rank": 6,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "family": "euro-night",
+      "source": "data/instances/public_instance_set/euro-night-0000030.mdc",
+      "relative_source": "euro-night-0000030.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1792,
+      "sha256": "e7069adc74e0bfd0a52c160d05be6be3ab32aae9233d6eb8bf78abe30246f125",
+      "selection_rank": 7,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "family": "att48",
+      "source": "data/instances/public_instance_set/att48.mdc",
+      "relative_source": "att48.mdc",
+      "n": 11,
+      "m": 25,
+      "file_size_bytes": 2866,
+      "sha256": "8efa61a1d9ab8fa13553ad56c76096e4c1a178a27ce03d87ca080f6c8d58a91f",
+      "selection_rank": 8,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "family": "berlin52",
+      "source": "data/instances/public_instance_set/berlin52.mdc",
+      "relative_source": "berlin52.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3106,
+      "sha256": "3939d9e3cc19729916df1e7e8bfb198827657566a94afdd70ba5aa630f47af7d",
+      "selection_rank": 9,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "family": "eil51",
+      "source": "data/instances/public_instance_set/eil51.mdc",
+      "relative_source": "eil51.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3111,
+      "sha256": "f6e4afd678253f29a791daaa73035ab647a9e6c3972e72259f6cde70cb7309c6",
+      "selection_rank": 10,
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "exceeds_smoke_limits": false,
+      "smoke_limits": {
+        "max_n": 50,
+        "max_m": 25
+      }
     }
   ]
 }

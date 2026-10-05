@@ -23,6 +23,7 @@
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_map>
 #include <utility>
 
 namespace kdc {
@@ -30,6 +31,15 @@ using Index = std::size_t;
 
 namespace {
 constexpr double kEpsilon = 1e-9;
+
+using ExecutionCount = unsigned KontExecutionProvenance::*;
+thread_local std::unordered_map<const KontSolver*, KontExecutionProvenance>
+    execution_counts;
+
+void increment_execution_count(const KontSolver* solver,
+                               ExecutionCount counter) {
+  ++(execution_counts[solver].*counter);
+}
 
 struct NativeRuntimeState {
   std::atomic<bool> initialization_unavailable{false};
@@ -861,6 +871,12 @@ void KontSolver::require_native_for_solves() {
   native_required_ = true;
 }
 
+KontExecutionProvenance KontSolver::thread_execution_provenance() const {
+  const auto found = execution_counts.find(this);
+  return found == execution_counts.end() ? KontExecutionProvenance{}
+                                         : found->second;
+}
+
 ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
                             const Eigen::SparseMatrix<double>& matrix,
                             const Eigen::VectorXd& rhs,
@@ -876,6 +892,8 @@ ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
     fallback.actual_backend = "built-in-branch-and-bound-fallback";
     fallback.fallback_used = true;
     fallback.solver_version = "not-applicable";
+    increment_execution_count(
+        this, &KontExecutionProvenance::fallback_solve_count);
     fallback.solver_message =
         "Native KONT/COPT initialization failed (" + reason +
         "); generic KontSolver used the built-in branch-and-bound fallback";
@@ -885,6 +903,8 @@ ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
   NativeRuntimeState& runtime_state = native_runtime_state();
   if (runtime_state.initialization_unavailable.load()) {
     if (native_required_) {
+      increment_execution_count(
+          this, &KontExecutionProvenance::failed_native_solve_count);
       require_native_backend();
     }
     std::string reason;
@@ -913,6 +933,8 @@ ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
   }
   if (result.status == ILPResult::Status::ERROR &&
       !result.license_runtime_initialization_passed) {
+    increment_execution_count(
+        this, &KontExecutionProvenance::failed_native_solve_count);
     const std::string reason = result.solver_message;
     {
       std::lock_guard<std::mutex> lock(runtime_state.mutex);
@@ -928,12 +950,21 @@ ILPResult KontSolver::solve(const Eigen::VectorXd& costs,
     LOG_WARN("KONT: native initialization failed; generic KontSolver used "
              "the built-in fallback");
   }
+  if (result.native_backend_used) {
+    increment_execution_count(
+        this, &KontExecutionProvenance::native_solve_count);
+  } else if (result.status == ILPResult::Status::ERROR) {
+    increment_execution_count(
+        this, &KontExecutionProvenance::failed_native_solve_count);
+  }
 #else
   ILPResult result = solve_fallback(
       costs, matrix, rhs, integer_vars, time_limit_sec, gap_target,
       "built-in branch-and-bound fallback");
   result.actual_backend = "built-in-branch-and-bound-fallback";
   result.fallback_used = true;
+  increment_execution_count(
+      this, &KontExecutionProvenance::fallback_solve_count);
 #endif
   LOG_INFO("KONT: status={}, obj={:.6f}, lb={:.6f}, gap={:.4f}, t={:.3f}s",
            status_name(result.status), result.objective,

@@ -140,14 +140,16 @@ TEST_CASE("AUTO benchmark profile schedules exactly one exact backend") {
   const auto manifest_path =
       std::filesystem::path(config.output_dir) / "experiment_manifest.json";
   const auto first_manifest = read_json(manifest_path);
+  config.output_dir = (root / "output-second").string();
   kdc::BatchRunner::run(config, &ilp);
-  const auto second_manifest = read_json(manifest_path);
+  const auto second_manifest = read_json(
+      std::filesystem::path(config.output_dir) / "experiment_manifest.json");
   REQUIRE(first_manifest.at("dataset_fingerprint") ==
           second_manifest.at("dataset_fingerprint"));
   REQUIRE(first_manifest.at("selected_backend") ==
           second_manifest.at("selected_backend"));
-  REQUIRE(first_manifest.at("successful_runs") ==
-          second_manifest.at("successful_runs"));
+  REQUIRE(first_manifest.at("successful_runs").size() ==
+          second_manifest.at("successful_runs").size());
   REQUIRE(first_manifest.at("experiment_id") !=
           second_manifest.at("experiment_id"));
 

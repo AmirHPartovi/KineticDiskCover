@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/request.schema.json",
+  "title": "Reserved KineticDiskCover run request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "run_id",
+    "run_key",
+    "instance_id",
+    "algorithm",
+    "objective",
+    "repeat",
+    "seed",
+    "requested_backend",
+    "resolved_configuration",
+    "rerun_of"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "experiment_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "run_key": { "type": "string", "minLength": 1 },
+    "instance_id": { "type": "string", "minLength": 1 },
+    "algorithm": { "type": "string", "minLength": 1 },
+    "objective": { "enum": ["minmax", "minsum"] },
+    "repeat": { "type": "integer", "minimum": 0 },
+    "seed": { "type": "integer", "minimum": 0 },
+    "requested_backend": { "type": "string", "minLength": 1 },
+    "resolved_configuration": { "type": "object" },
+    "rerun_of": { "type": ["string", "null"] }
+  }
+}

@@ -5,59 +5,75 @@ models. Its optimization backend is KONT, which uses the COPT-compatible API.
 
 ## Reproducible experiment pipeline
 
-Run the end-to-end research workflow from any current working directory with:
+Run one of three reproducible pipelines from any current working directory:
 
 ```bash
-bash scripts/run_experiment.sh
+bash scripts/run_experiment.sh --pipeline smoke
+bash scripts/run_experiment.sh --pipeline reference
+bash scripts/run_experiment.sh --pipeline full
 ```
 
-The orchestrator snapshots or converts the dataset, runs preflight and the FAST
-benchmark, validates raw records, generates tables and PNG/PDF figures, then
-uses the selected exact backend for separate animation solves. Each run is
-stored under `results/experiments/<EXPERIMENT_ID>/` with stage logs, a complete
-manifest, integrity checks, and reports. Use `bash scripts/run_experiment.sh --help`
-for dataset, algorithm, objective, time-limit, backend, animation,
-skip, and resume options. Resume requires the same dataset fingerprint and
-benchmark configuration.
+The profiles are defined in `configs/pipeline/` and share the same staged
+runner: dataset snapshot, build, tests, preflight, exact-backend resolution,
+benchmark, result validation, tables, figures, animations, and final report.
+Each run has a unique output under `results/experiments/` with its resolved
+configuration, stage statuses/timings, dataset and selection fingerprints,
+logs, result integrity report, and generated artifacts. Workflow dispatches
+are available separately as **KDC Smoke Validation**, **KDC Full Dataset
+Reference Validation**, and **KDC Full Scientific Benchmark**. Use
+`bash scripts/run_experiment.sh --help` for profile overrides and resume
+options; resume requires matching dataset and benchmark configuration.
 
-### Fast smoke dataset
+### Smoke validation
 
-The checked-in `data/test_sets/smoke10.json` selects one smallest valid source
-instance from each of the ten current dataset families. Original datasets,
-including the 302-instance `public_instance_set`, are not changed. To run a
-quick development validation:
+The smoke profile deterministically selects 10 valid, family-diverse instances
+from the source dataset, preferring instances within `n <= 50` trajectories
+and `m <= 25` stations. The manifest records dimensions, source file size and
+SHA-256, rank, selection rationale, and any size-limit exception. A larger
+instance is included only when there are too few eligible candidates to meet
+the requested count; this is recorded rather than hidden. For development:
 
 ```bash
-bash scripts/run_experiment.sh \
-  --dataset-profile smoke10 \
-  --modes both \
-  --skip-animations
+bash scripts/run_experiment.sh --pipeline smoke
 ```
 
-Smoke runs default to `nn`, `greedy`, and `primal-dual`, two workers,
-2-second static-solve deadlines, 5-second fast-run deadlines, 10-second
-exact-reference deadlines, and skipped animation stages. This keeps fallback
-LP/ILP solvers from making the development run unexpectedly resource-intensive.
-These defaults can be overridden explicitly; use `--algorithms all-fast` or
-`--algorithms all-comparison` to run the broader algorithm sets, and
-`--with-animations` to enable animations. A materialized smoke directory can
-also be created with:
+Smoke uses all registered algorithms, both objectives, one repeat, two
+workers, per-static-solve / heuristic / exact deadlines of 2 / 5 / 10 seconds,
+and the debug verification profile. It generates verified animations for all
+eligible algorithms and selected instances. Override the size bounds with
+`--smoke-max-n` and `--smoke-max-m`; outputs are labeled as development
+validation, not as the full scientific benchmark.
+
+### Full-dataset reference validation
+
+The reference profile runs one heuristic (`greedy` by default) and exactly one
+resolved exact backend on every instance in `data/instances/public_instance_set/`,
+for both objectives. AUTO selects either runtime-ready KONT/COPT or
+branch-and-bound and records the choice and calibration evidence. Use
+`--algorithms` to choose another approximation/heuristic.
+
+### Full scientific benchmark
+
+The full profile runs all registered algorithms across the complete dataset,
+both objectives, and three repeats for stochastic algorithms by default.
+Exact-reference results are produced by one resolved backend, never by
+silently substituting an unreported solver. The CLI and workflow inputs allow
+repeat, worker-count, and time-limit overrides.
+
+To create a separate materialized smoke dataset for another tool:
 
 ```bash
 python3 scripts/select_test_instances.py \
-  --source data/instances --output /tmp/kdc-smoke10 --count 10
+  --source data/instances/public_instance_set \
+  --output /tmp/kdc-smoke10 --count 10 --max-n 50 --max-m 25
 ```
 
-and passed via `--dataset /tmp/kdc-smoke10`. Smoke outputs are labeled
-`smoke / development validation` and must not be interpreted as the full
-scientific benchmark.
-
-FAST keeps the existing low-serialization profile. Exact animations are made
-only when the exact-reference result is feasible, continuously verified, and
-marked `OPTIMAL`; feasible or timed-out results remain reported but are not
-animated as exact. Figure summaries may filter to feasible, verified records;
-the raw integrity report retains timeout and failure counts. Empirical ratios
-are not theoretical approximation guarantees.
+Exact-result animations are generated only for feasible, continuously
+verified `OPTIMAL` solutions; feasible or timed-out exact results remain in
+the reports but are not presented as optimal animations. Heuristic animations
+also require feasibility and continuous verification. Raw integrity reports
+retain timeout and failure counts. Empirical ratios are not theoretical
+approximation guarantees.
 
 ## Prerequisites
 
@@ -172,10 +188,10 @@ kinetic solution when one is available and records `time_limited`; it does not
 claim optimality because of a timeout.
 Batch artifacts are written beneath `results/batch/`, including per-run
 solutions, result metadata, convergence traces, master JSON/CSV, and a summary.
-The manual GitHub Actions pipeline defaults to the 302-instance public dataset
-in `data/instances/public_instance_set/`. It converts the repository's MDC
-files into the solver's canonical JSON format before solving and publishes
-batch results, tables, figures, and animations as workflow artifacts.
+The reference and full pipelines default to the 302-instance public dataset
+in `data/instances/public_instance_set/`. They convert the repository's MDC
+files into the solver's canonical JSON format before solving and publish
+results, tables, figures, animations, and stage reports as workflow artifacts.
 
 `--exact-reference auto` runtime-probes the KONT/COPT API, then calibrates
 KONT/COPT and branch-and-bound as static solvers on the same deterministic

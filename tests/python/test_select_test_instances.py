@@ -84,6 +84,45 @@ def test_global_fill_preserves_family_diversity_and_unique_sources(tmp_path):
     assert selected[-1]["relative_source"] == "beta/00-m-not-small.json"
 
 
+def test_size_limits_and_oversized_fallback_are_explicit():
+    candidates = [
+        {"family": "small-a", "relative_source": "small-a/a.json",
+         "n": 2, "m": 2, "file_size_bytes": 10},
+        {"family": "small-b", "relative_source": "small-b/b.json",
+         "n": 3, "m": 2, "file_size_bytes": 11},
+        {"family": "large", "relative_source": "large/c.json",
+         "n": 60, "m": 2, "file_size_bytes": 12},
+    ]
+
+    selected = selector.select_candidates(
+        candidates, count=3, max_n=3, max_m=2
+    )
+
+    assert [row["relative_source"] for row in selected] == [
+        "small-a/a.json", "small-b/b.json", "large/c.json"
+    ]
+    assert [row["exceeds_smoke_limits"] for row in selected] == [
+        False, False, True
+    ]
+    assert "oversized family fallback" in selected[-1]["selection_reason"]
+    assert all(row["smoke_limits"] == {"max_n": 3, "max_m": 2}
+               for row in selected)
+
+
+def test_flat_public_dataset_filenames_share_family_labels(tmp_path):
+    write_json(tmp_path / "US-night-1.mdc", legacy(1, 1))
+    write_json(tmp_path / "US-night-2.mdc", legacy(2, 1))
+    write_json(tmp_path / "SBGDB-20200101-FPG-poly-1.mdc", legacy(1, 1))
+    write_json(tmp_path / "SBGDB-20200101-PNTset-2.mdc", legacy(1, 1))
+
+    candidates, errors = selector.discover_candidates(tmp_path)
+
+    assert not errors
+    assert {row["family"] for row in candidates} == {
+        "us-night", "sbgdb-20200101-fpg-poly", "sbgdb-20200101-pntset"
+    }
+
+
 def test_materialization_manifest_and_rerun_are_deterministic(tmp_path):
     source = tmp_path / "source"
     output = tmp_path / "materialized"
@@ -105,6 +144,10 @@ def test_materialization_manifest_and_rerun_are_deterministic(tmp_path):
     assert first_manifest["instances"] == second_manifest["instances"]
     assert all(row["materialized_file"] for row in second_manifest["instances"])
     assert len({row["source"] for row in second_manifest["instances"]}) == 3
+    assert all(row["selection_rank"] for row in first_manifest["instances"])
+    assert all(row["sha256"] and row["file_size_bytes"]
+               and row["selection_reason"]
+               for row in first_manifest["instances"])
     assert source_files == {
         path.relative_to(source).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in source.rglob("*") if path.is_file()
@@ -148,6 +191,57 @@ def test_experiment_script_exposes_smoke_profile():
     assert "--dataset-profile full|smoke10" in completed.stdout
 
 
+def test_pipeline_rejects_mismatched_dataset_profile():
+    completed = subprocess.run(
+        ["bash", str(ROOT / "scripts" / "run_experiment.sh"),
+         "--pipeline", "smoke", "--dataset-profile", "full"],
+        cwd=ROOT, text=True, capture_output=True,
+    )
+    assert completed.returncode == 2
+    assert "requires dataset profile smoke10" in completed.stderr
+
+
+def test_reference_pipeline_accepts_only_one_heuristic():
+    completed = subprocess.run(
+        ["bash", str(ROOT / "scripts" / "run_experiment.sh"),
+         "--pipeline", "reference", "--algorithms", "all"],
+        cwd=ROOT, text=True, capture_output=True,
+    )
+    assert completed.returncode == 2
+    assert "exactly one heuristic algorithm" in completed.stderr
+
+
+def test_named_pipeline_profiles_have_stable_required_stages():
+    stages = [
+        "init", "dataset", "build", "tests", "preflight",
+        "backend_selection", "benchmark", "result_validation", "tables",
+        "figures", "animations", "final_report", "summary",
+    ]
+    for name in ("smoke", "reference", "full"):
+        completed = subprocess.run(
+            ["python3", str(ROOT / "scripts" / "experiment_pipeline.py"),
+             "config", "--pipeline", name, "--format", "json"],
+            cwd=ROOT, check=True, text=True, capture_output=True,
+        )
+        profile = json.loads(completed.stdout)
+        assert profile["pipeline"] == name
+        assert profile["required_stages"] == stages
+        assert profile["objectives"] == "both"
+        assert profile["exact_backend"] == "auto"
+        assert profile["tables"] and profile["figures"]
+        if name == "smoke":
+            assert profile["smoke_count"] == 10
+            assert profile["smoke_max_n"] == 50
+            assert profile["smoke_max_m"] == 25
+            assert profile["animation"]["policy"] == "all-algorithms"
+        elif name == "reference":
+            assert profile["algorithms"] == "greedy"
+            assert profile["dataset_profile"] == "full"
+        else:
+            assert profile["algorithms"] == "all"
+            assert profile["repeats"] >= 2
+
+
 def test_smoke_defaults_are_light_and_explicit_values_win():
     smoke = SimpleNamespace(
         dataset_profile="smoke10", threads=None, time_limit=None,
@@ -180,48 +274,47 @@ def test_smoke_defaults_are_light_and_explicit_values_win():
 
 def test_batch_manifest_and_results_keep_smoke_provenance(tmp_path):
     spec = importlib.util.spec_from_file_location(
-        "run_batch_profile_test", ROOT / "scripts" / "run_batch.py"
+        "run_batch_profile_test", ROOT / "scripts" / "run_batch_limited.py"
     )
     assert spec is not None and spec.loader is not None
     run_batch = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = run_batch
     spec.loader.exec_module(run_batch)
-    output = tmp_path / "batch"
-    output.mkdir()
-    selection_manifest = tmp_path / "selection.json"
-    selection_manifest.write_text(json.dumps({
-        "name": "smoke10",
-        "selection_policy": "one per family",
-        "source_dataset_fingerprint": "source-hash",
-        "instances": [{
-            "family": "debug", "source": "debug/tiny.mdc",
-            "n": 1, "m": 1, "selection_rank": 1,
-        }],
-    }))
-    (output / "master_results.json").write_text(json.dumps([{
-        "instance_name": "tiny", "algorithm_name": "nn",
-        "objective": "minmax", "feasible": True,
-    }]))
-    (output / "master_results.csv").write_text(
-        "instance_name,algorithm_name,objective\n"
-        "tiny,nn,minmax\n"
+    source = tmp_path / "debug" / "tiny.json"
+    source.parent.mkdir()
+    source.write_text(json.dumps(canonical(1, 1)))
+    experiment = tmp_path / "experiment"
+    experiment.mkdir()
+    args = SimpleNamespace(
+        profile="fast",
+        time_limit=1.0,
+        fast_time_limit=2.0,
+        exact_time_limit=3.0,
+        minsum_refinement_policy="adaptive",
+        threads=2,
+        dataset_profile="smoke10",
+        exact_reference="auto",
+        repeats=1,
+        seed=7,
     )
-    (output / "batch_summary.md").write_text("# Batch Run Summary\n")
-    (output / "experiment_manifest.json").write_text(json.dumps({
-        "algorithm_set": ["nn"],
-    }))
 
-    run_batch.annotate_dataset(output, "smoke10", str(selection_manifest), 1)
-
-    row = json.loads((output / "master_results.json").read_text())[0]
-    batch_manifest = json.loads(
-        (output / "experiment_manifest.json").read_text()
+    plan, data = run_batch._build_plan(
+        experiment,
+        [source],
+        ["greedy"],
+        ("minmax",),
+        "branch-and-bound",
+        args,
+        {"actual_backend": "branch-and-bound"},
+        {"instances": [{
+            "family": "debug",
+            "source": "debug/tiny.mdc",
+            "selection_policy": "one per family",
+        }]},
     )
-    assert row["dataset_profile"] == "smoke10"
-    assert row["experiment_label"] == "smoke / development validation"
-    assert batch_manifest["selected_instance_count"] == 1
-    assert batch_manifest["selection_policy"] == "one per family"
-    assert "Smoke / development validation" in (
-        output / "batch_summary.md"
-    ).read_text()
-    assert "dataset_profile" in (output / "master_results.csv").read_text()
+
+    config = data[plan[0]["run_key"]]["config"]
+    assert config["dataset_profile"] == "smoke10"
+    assert config["experiment_label"] == "smoke / development validation"
+    assert config["backend_detection"]["selected"] == "branch-and-bound"
+    assert len(plan) == 1
