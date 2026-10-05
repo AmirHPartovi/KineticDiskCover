@@ -15,11 +15,90 @@ import shutil
 import statistics
 import subprocess
 import sys
+from types import SimpleNamespace
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXACT_STATUSES = {"OPTIMAL"}
+PIPELINE_NAMES = {"smoke", "reference", "full"}
+REQUIRED_PIPELINE_STAGES = [
+    "init", "dataset", "build", "tests", "preflight", "backend_selection",
+    "benchmark", "result_validation", "tables", "figures", "animations",
+    "final_report", "summary",
+]
+
+
+def load_pipeline_config(name: str) -> dict[str, Any]:
+    if name not in PIPELINE_NAMES:
+        raise ValueError(
+            f"unknown pipeline {name!r}; expected smoke, reference, or full"
+        )
+    path = ROOT / "configs" / "pipeline" / f"{name}.json"
+    config = load_json(path)
+    if not isinstance(config, dict) or config.get("pipeline") != name:
+        raise ValueError(f"invalid pipeline config: {path}")
+    required = {
+        "label", "dataset_profile", "dataset", "algorithms", "exact_backend",
+        "objectives", "repeats", "seed", "threads", "fast_time_limit_sec",
+        "exact_time_limit_sec", "static_time_limit_sec", "benchmark_profile",
+        "verify_after", "verify_each_iteration", "save_traces",
+        "save_solutions", "tables", "figures", "animation",
+        "artifact_retention_days", "required_stages",
+    }
+    missing = sorted(required - config.keys())
+    if missing:
+        raise ValueError(f"pipeline {name} config missing: {', '.join(missing)}")
+    if config["required_stages"] != REQUIRED_PIPELINE_STAGES:
+        raise ValueError(f"pipeline {name} has an invalid stage sequence")
+    if (name == "reference" and config["algorithms"] != "greedy") or (
+        name == "full" and config["algorithms"] != "all"
+    ):
+        raise ValueError(f"pipeline {name} algorithm policy is invalid")
+    if config["objectives"] != "both" or config["exact_backend"] != "auto":
+        raise ValueError(f"pipeline {name} must use both objectives and AUTO")
+    return config
+
+
+def command_config(args: argparse.Namespace) -> None:
+    config = load_pipeline_config(args.pipeline)
+    if args.format == "json":
+        print(json.dumps(config, sort_keys=True))
+        return
+    values = {
+        "PIPELINE_PROFILE": config["pipeline"],
+        "PIPELINE_LABEL": config["label"],
+        "DATASET_PROFILE": config["dataset_profile"],
+        "DATASET": config["dataset"],
+        "ALGORITHMS": config["algorithms"],
+        "EXACT_REFERENCE": config["exact_backend"],
+        "MODES": config["objectives"],
+        "SEED": config["seed"],
+        "REPEATS": config["repeats"],
+        "THREADS": config["threads"],
+        "FAST_LIMIT": config["fast_time_limit_sec"],
+        "EXACT_LIMIT": config["exact_time_limit_sec"],
+        "STATIC_LIMIT": config["static_time_limit_sec"],
+        "BENCHMARK_PROFILE": config["benchmark_profile"],
+        "VERIFY_AFTER": int(config["verify_after"]),
+        "VERIFY_EACH_ITERATION": int(config["verify_each_iteration"]),
+        "SAVE_TRACES": int(config["save_traces"]),
+        "SAVE_SOLUTIONS": int(config["save_solutions"]),
+        "TABLES_ENABLED": int(config["tables"]),
+        "FIGURES_ENABLED": int(config["figures"]),
+        "ANIMATION_ENABLED": int(config["animation"]["enabled"]),
+        "ANIMATION_POLICY": config["animation"]["policy"],
+        "ANIMATION_TOP_N": config["animation"]["top_n"],
+        "ANIMATION_FPS": config["animation"]["fps"],
+        "ANIMATION_FRAMES": config["animation"]["frames"],
+        "ANIMATION_DPI": config["animation"]["dpi"],
+        "ARTIFACT_RETENTION_DAYS": config["artifact_retention_days"],
+        "SMOKE_COUNT": config.get("smoke_count", 10),
+        "SMOKE_MAX_N": config.get("smoke_max_n", 50),
+        "SMOKE_MAX_M": config.get("smoke_max_m", 25),
+    }
+    for key, value in values.items():
+        print(f"{key}\t{value}")
 
 
 def sha256_files(directory: Path, suffixes: set[str]) -> str:
@@ -81,7 +160,11 @@ def command_init(args: argparse.Namespace) -> None:
             "source": row.get("source"),
             "n": row.get("n"),
             "m": row.get("m"),
+            "file_size_bytes": row.get("file_size_bytes"),
+            "sha256": row.get("sha256"),
+            "selection_reason": row.get("selection_reason"),
             "selection_rank": row.get("selection_rank"),
+            "exceeds_smoke_limits": row.get("exceeds_smoke_limits", False),
         }
         for row in (selection_manifest or {}).get("instances", [])
     ]
@@ -92,6 +175,7 @@ def command_init(args: argparse.Namespace) -> None:
         if manifest.get("dataset_source_fingerprint") != args.dataset_fingerprint:
             raise ValueError("resume refused: source dataset fingerprint changed")
         expected = {
+            "pipeline": args.pipeline,
             "algorithm_list": args.algorithms,
             "objectives": ["minmax", "minsum"] if args.modes == "both"
             else [args.modes],
@@ -104,8 +188,10 @@ def command_init(args: argparse.Namespace) -> None:
             "requested_exact_backend": args.exact_reference,
             "animation_top_n": args.animation_top_n,
             "animation_mode": args.animation_mode,
+            "animation_policy": args.animation_policy,
             "animation_instances_requested": args.animation_instances,
             "dataset_profile": args.dataset_profile,
+            "benchmark_profile": args.benchmark_profile,
             "selection_manifest_fingerprint": args.selection_fingerprint,
         }
         changed = [key for key, value in expected.items()
@@ -117,8 +203,17 @@ def command_init(args: argparse.Namespace) -> None:
             )
         return
 
+    pipeline_config = load_pipeline_config(args.pipeline)
+    config_payload = json.dumps(
+        pipeline_config, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
     manifest = {
         "experiment_id": experiment.name,
+        "pipeline": args.pipeline,
+        "experiment_label": pipeline_config["label"],
+        "pipeline_config": pipeline_config,
+        "pipeline_config_sha256": hashlib.sha256(config_payload).hexdigest(),
+        "dataset_profile": args.dataset_profile,
         "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
         "repository": "AmirHPartovi/KineticDiskCover",
         "git_commit": subprocess.run(
@@ -141,12 +236,14 @@ def command_init(args: argparse.Namespace) -> None:
         "selection_manifest_fingerprint": args.selection_fingerprint,
         "selected_files": selected_files,
         "dataset_canonical_path": "dataset",
+        "dataset_fingerprint": None,
         "instance_count": None,
         "algorithm_list": args.algorithms,
         "algorithm_set": [],
         "objectives": ["minmax", "minsum"] if args.modes == "both"
         else [args.modes],
-        "profile": "fast",
+        "profile": args.benchmark_profile,
+        "benchmark_profile": args.benchmark_profile,
         "seed": args.seed,
         "repeats": args.repeats,
         "thread_count": args.threads,
@@ -156,7 +253,13 @@ def command_init(args: argparse.Namespace) -> None:
         "requested_exact_backend": args.exact_reference,
         "animation_top_n": args.animation_top_n,
         "animation_mode": args.animation_mode,
+        "animation_policy": args.animation_policy,
         "animation_instances_requested": args.animation_instances,
+        "verify_after": bool(args.verify_after),
+        "verify_each_iteration": bool(args.verify_each_iteration),
+        "save_traces": bool(args.save_traces),
+        "save_solutions": bool(args.save_solutions),
+        "artifact_retention_days": pipeline_config["artifact_retention_days"],
         "selected_exact_backend": None,
         "actual_exact_backend": None,
         "exact_reference_calibration": None,
@@ -171,20 +274,36 @@ def command_init(args: argparse.Namespace) -> None:
         },
         "commands": [],
         "stages": {},
+        "required_stages": pipeline_config["required_stages"],
         "status": "RUNNING",
         "reproduction_command": args.reproduction_command,
     }
+    if selection_manifest is not None:
+        write_json(experiment / "dataset_selection_manifest.json",
+                   selection_manifest)
+        manifest["selection_manifest"] = "dataset_selection_manifest.json"
+        manifest["selection_manifest_fingerprint"] = args.selection_fingerprint
+        manifest["selected_files"] = selected_files
     write_json(manifest_path, manifest)
+    command_stage(SimpleNamespace(
+        experiment=str(experiment), name="init", status="COMPLETED",
+        command=args.reproduction_command, exit_code=0, message=None,
+        duration_sec=0.0,
+    ))
 
 
 def command_stage(args: argparse.Namespace) -> None:
     path = Path(args.experiment).resolve() / "experiment_manifest.json"
     manifest = load_json(path)
     stage = manifest.setdefault("stages", {}).setdefault(args.name, {})
-    stage.update({
-        "status": args.status.upper(),
-        "updated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-    })
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
+    status = args.status.upper()
+    stage["status"] = status
+    stage["updated_at"] = now
+    if status == "RUNNING":
+        stage["started_at"] = now
+    else:
+        stage["completed_at"] = now
     if args.command:
         stage["command"] = args.command
         manifest.setdefault("commands", []).append({
@@ -194,9 +313,19 @@ def command_stage(args: argparse.Namespace) -> None:
         })
     if args.exit_code is not None:
         stage["exit_code"] = args.exit_code
+    if args.duration_sec is not None:
+        stage["duration_sec"] = args.duration_sec
     if args.message:
         stage["message"] = args.message
     write_json(path, manifest)
+
+
+def command_emit_summary(args: argparse.Namespace) -> None:
+    manifest = load_json(Path(args.experiment).resolve()
+                         / "experiment_manifest.json")
+    for name in manifest.get("required_stages", []):
+        item = manifest.get("stages", {}).get(name, {})
+        print(f"{name}: {item.get('status', 'MISSING')}")
 
 
 def command_dataset(args: argparse.Namespace) -> None:
@@ -276,6 +405,12 @@ def command_dataset(args: argparse.Namespace) -> None:
         ],
         "selected_instance_count": len(files),
     })
+    manifest["dataset_profile"] = manifest.get(
+        "dataset_profile", "full"
+    )
+    manifest["experiment_label"] = manifest.get(
+        "experiment_label", "full scientific benchmark"
+    )
     write_json(manifest_path, manifest)
 
 
@@ -418,6 +553,11 @@ def status_value(record: dict[str, Any]) -> str:
 
 def command_validate(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
+    aggregate_manifest_path = exp / "aggregates" / "aggregate_manifest.json"
+    aggregate_manifest = (
+        load_json(aggregate_manifest_path)
+        if aggregate_manifest_path.is_file() else None
+    )
     source = Path(args.results)
     records = load_json(source)
     if not isinstance(records, list):
@@ -480,7 +620,8 @@ def command_validate(args: argparse.Namespace) -> None:
                 declared_paths += 1
                 path = Path(value)
                 if not path.is_absolute():
-                    path = ROOT / path
+                    experiment_path = exp / path
+                    path = experiment_path if experiment_path.is_file() else ROOT / path
                 if not path.is_file():
                     detail = (
                         f"{row.get('instance_name')}/{row.get('algorithm_name')}/"
@@ -511,6 +652,11 @@ def command_validate(args: argparse.Namespace) -> None:
         f"- Missing trace files among declared paths: {len(missing_traces)}",
         f"- Declared solution/trace paths checked: {declared_paths}",
         f"- Missing records against expected count: {max(0, expected - counts['total'])}",
+        (
+            f"- Canonical aggregate complete: {aggregate_manifest.get('complete')}"
+            if aggregate_manifest is not None
+            else "- Canonical aggregate: legacy input (not available)"
+        ),
         "",
         "## By objective", "",
         "| Objective | Runs | Successful | Feasible | Verified | Failed | Timeouts | OPTIMAL | FEASIBLE | TIME_LIMIT | INFEASIBLE | FAILED |",
@@ -546,7 +692,13 @@ def command_validate(args: argparse.Namespace) -> None:
         "exact_backend_provenance": provenance,
         "algorithm_count": len(set(str(r.get("algorithm_name", "")) for r in records)),
         "instance_count": instances,
+        "canonical_aggregate": aggregate_manifest,
     })
+    if aggregate_manifest is not None and aggregate_manifest.get("complete") is not True:
+        raise ValueError(
+            "canonical aggregate is incomplete; see aggregate_manifest.json "
+            "and result_integrity_report.md"
+        )
 
 
 def q(values: list[float], fraction: float) -> float:
@@ -734,96 +886,45 @@ def exact_proven(row: dict[str, Any]) -> bool:
 
 def command_animations(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
-    selected = [line.strip() for line in
-                (exp / "exact" / "animation_instances.txt").read_text(encoding="utf-8").splitlines()
-                if line.strip()]
-    exact_dir = exp / "exact" / "solves"
-    decision_path = exp / "batch" / "experiment_manifest.json"
-    decision_manifest = load_json(decision_path) if decision_path.is_file() else {}
-    decision_actual_backend = str(decision_manifest.get("actual_backend", "") or "")
-    records: list[dict[str, Any]] = []
-    if (exact_dir / "master_results.json").is_file():
-        loaded = load_json(exact_dir / "master_results.json")
-        if isinstance(loaded, list):
-            records = [r for r in loaded if isinstance(r, dict)]
-    index = instance_index(exp / "dataset")
-    report = ["# Exact animation report", ""]
-    made = 0
-    for instance_name in selected:
-        for mode in args.modes.split(","):
-            mode = mode.strip().lower()
-            matching = [row for row in records
-                        if str(row.get("instance_name", "")) == instance_name
-                        and str(row.get("objective", "")).lower() == mode]
-            if not matching:
-                report.extend([
-                    f"## {instance_name} / {mode}", "",
-                    "- Exact backend: unavailable",
-                    "- Solution status: no exact run record",
-                    "- Verification status: unavailable",
-                    "- Optimality status: FAILED",
-                    "- Animation generated: no",
-                    "- Reason: exact solve did not produce a record", "",
-                ])
-                continue
-            row = matching[0]
-            solution_value = str(row.get("solution_json_path", "") or "")
-            solution_path = Path(solution_value)
-            if not solution_path.is_absolute():
-                solution_path = ROOT / solution_path
-            proof = exact_proven(row)
-            generated = False
-            animation_path = ""
-            reason = ""
-            if not proof:
-                reason = ("result does not satisfy exact-reference proof gate "
-                          "(category, feasibility, continuous verification, and OPTIMAL required)")
-            elif not solution_path.is_file():
-                reason = "proven result has no retained solution JSON"
-            else:
-                try:
-                    import pandas as pd
-                    from animate_best import load_instance as load_animation_instance
-                    from animate_best import make_animation
-                except ImportError:
-                    try:
-                        from scripts.animate_best import load_instance as load_animation_instance
-                        from scripts.animate_best import make_animation
-                        import pandas as pd
-                    except ImportError as error:
-                        raise RuntimeError(f"animation dependencies unavailable: {error}") from error
-                source_instance = load_json(index[instance_name])
-                instance = load_animation_instance(index[instance_name])
-                solution_payload = load_json(solution_path)
-                solution_payload["_instance"] = instance
-                record = pd.Series(dict(row))
-                record["algorithm_name"] = (
-                    f"proven exact reference | backend="
-                    f"{decision_actual_backend or row.get('actual_backend')} | "
-                    f"status={status_value(row)}"
-                )
-                output = exp / "animations"
-                result_path = make_animation(
-                    instance, solution_payload, record, output, mode, fps=15,
-                    frames=60, dpi=100,
-                )
-                animation_path = result_path.relative_to(exp).as_posix()
-                generated = True
-                made += 1
-            report.extend([
-                f"## {instance_name} / {mode}", "",
-                f"- Exact backend: {decision_actual_backend or row.get('actual_backend') or 'unreported'}",
-                f"- Solution status: feasible={bool_value(row.get('feasible'))}",
-                f"- Verification status: {row.get('verification_kind') or 'unreported'}; verified={bool_value(row.get('verified'))}",
-                f"- Optimality status: {status_value(row)}",
-                f"- Animation generated: {'yes' if generated else 'no'}",
-                f"- Animation path: {animation_path or 'N/A'}",
-                f"- Reason if skipped: {reason or 'N/A'}", "",
-            ])
-    (exp / "reports" / "exact_animation_report.md").write_text(
-        "\n".join(report), encoding="utf-8"
+    if args.policy not in {"best", "all-algorithms"}:
+        raise ValueError("animation policy must be best or all-algorithms")
+    try:
+        from animate_best import run as run_animations
+    except ImportError:
+        from scripts.animate_best import run as run_animations
+    selected = [part.strip() for part in args.instances.split(",") if part.strip()]
+    generated = run_animations(
+        exp / "batch", exp / "dataset", exp / "animations",
+        mode=args.modes, fps=args.fps, frames=args.frames, dpi=args.dpi,
+        top_n=args.top_n, all_algorithms=args.policy == "all-algorithms",
+        selected_instances=selected or None,
     )
-    print(f"Generated {made} proven exact animation(s)")
+    report = [
+        "# Animation report", "",
+        f"- Policy: `{args.policy}`",
+        f"- Objectives: `{args.modes}`",
+        f"- Instance selection: "
+        f"{', '.join(selected) if selected else 'all benchmark instances'}",
+        f"- Generated animations: {len(generated)}",
+        "- Heuristic animations require feasible, continuously verified results.",
+        "- Exact animations require feasibility, continuous verification, and OPTIMAL status.",
+        "",
+    ]
+    report.extend(
+        f"- Animation path: {path.relative_to(exp).as_posix()}"
+        for path in generated
+    )
+    if not generated:
+        report.append("- Animation path: N/A")
+    (exp / "reports" / "exact_animation_report.md").write_text(
+        "\n".join(report) + "\n", encoding="utf-8"
+    )
+    manifest_path = exp / "experiment_manifest.json"
+    manifest = load_json(manifest_path)
+    manifest["animation_policy"] = args.policy
+    manifest["animation_instance_selection"] = selected
+    write_json(manifest_path, manifest)
+    print(f"Generated {len(generated)} verified animation(s)")
 
 
 def command_finalize(args: argparse.Namespace) -> None:
@@ -861,8 +962,16 @@ def command_finalize(args: argparse.Namespace) -> None:
     if integrity_path.is_file():
         manifest["result_integrity"] = load_json(integrity_path)
     state = manifest.get("stages", {})
-    failures = [name for name, item in state.items()
-                if item.get("status") in {"FAILED", "SKIPPED"}]
+    required_stages = manifest.get("required_stages", REQUIRED_PIPELINE_STAGES)
+    failures = [
+        name for name in required_stages
+        if state.get(name, {}).get("status") != "COMPLETED"
+    ]
+    failures.extend(
+        name for name, item in state.items()
+        if name not in required_stages
+        and item.get("status") in {"FAILED", "SKIPPED"}
+    )
     manifest["status"] = "PARTIAL" if failures else "COMPLETE"
     manifest["failed_or_skipped_stages"] = failures
     write_json(main_manifest_path, manifest)
@@ -882,10 +991,14 @@ def command_finalize(args: argparse.Namespace) -> None:
                      if p.is_file())
     animations = sorted(p.relative_to(exp).as_posix() for p in (exp / "animations").rglob("*")
                         if p.is_file())
-    is_smoke = manifest.get("dataset_profile") == "smoke10"
+    pipeline_name = manifest.get("pipeline", "full")
+    is_smoke = pipeline_name == "smoke"
     sections = [
-        "# Smoke / development validation report" if is_smoke
-        else "# Final experiment report", "",
+        {
+            "smoke": "# Development / smoke validation report",
+            "reference": "# Full dataset reference validation report",
+            "full": "# Full scientific benchmark report",
+        }.get(pipeline_name, "# Final experiment report"), "",
         *(
             ["This is a smoke / development validation run and must not be "
              "interpreted as the full scientific benchmark.", ""]
@@ -895,8 +1008,10 @@ def command_finalize(args: argparse.Namespace) -> None:
         f"- Status: **{manifest['status']}**",
         f"- Experiment ID: `{manifest['experiment_id']}`",
         f"- Reproduction command: `{manifest.get('reproduction_command', 'bash scripts/run_experiment.sh')}`",
+        f"- Pipeline: `{pipeline_name}` ({manifest.get('experiment_label')})",
         f"- Algorithms/profile: "
-        f"`{', '.join(manifest.get('algorithm_set', [])) or manifest.get('algorithm_list')}` / FAST",
+        f"`{', '.join(manifest.get('algorithm_set', [])) or manifest.get('algorithm_list')}` / "
+        f"{manifest.get('benchmark_profile', 'debug')}",
         f"- Objectives: {', '.join(manifest.get('objectives', []))}",
         f"- Seed/repeats/threads: {manifest.get('seed')} / {manifest.get('repeats')} / {manifest.get('thread_count')}",
         "", "## 2. Dataset description", "",
@@ -1029,13 +1144,22 @@ def command_resume(args: argparse.Namespace) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
+    config = subparsers.add_parser("config")
+    config.add_argument("--pipeline", choices=sorted(PIPELINE_NAMES), required=True)
+    config.add_argument("--format", choices=("json", "shell"), default="json")
+    config.set_defaults(func=command_config)
     init = subparsers.add_parser("init")
     init.add_argument("--experiment", required=True)
+    init.add_argument("--pipeline", choices=sorted(PIPELINE_NAMES),
+                      default="full")
     init.add_argument("--dataset", required=True)
     init.add_argument("--dataset-label", required=True)
     init.add_argument("--dataset-fingerprint", required=True)
     init.add_argument("--dataset-profile", choices=("full", "smoke10"),
                       default="full")
+    init.add_argument("--benchmark-profile",
+                      choices=("fast", "exact-reference", "debug"),
+                      default="debug")
     init.add_argument("--source-dataset-fingerprint", default="")
     init.add_argument("--selection-fingerprint", default="")
     init.add_argument("--selection-manifest", default="")
@@ -1050,7 +1174,14 @@ def main() -> int:
     init.add_argument("--exact-reference", required=True)
     init.add_argument("--animation-top-n", type=int, required=True)
     init.add_argument("--animation-mode", required=True)
+    init.add_argument("--animation-policy",
+                      choices=("best", "all-algorithms"), default="best")
     init.add_argument("--animation-instances", default="")
+    init.add_argument("--verify-after", type=int, choices=(0, 1), default=1)
+    init.add_argument("--verify-each-iteration", type=int,
+                      choices=(0, 1), default=0)
+    init.add_argument("--save-traces", type=int, choices=(0, 1), default=1)
+    init.add_argument("--save-solutions", type=int, choices=(0, 1), default=1)
     init.add_argument("--resume", action="store_true")
     init.add_argument("--reproduction-command", required=True)
     init.set_defaults(func=command_init)
@@ -1061,6 +1192,7 @@ def main() -> int:
     stage.add_argument("--command")
     stage.add_argument("--exit-code", type=int)
     stage.add_argument("--message")
+    stage.add_argument("--duration-sec", type=float)
     stage.set_defaults(func=command_stage)
     dataset_parser = subparsers.add_parser("dataset")
     dataset_parser.add_argument("--experiment", required=True)
@@ -1078,6 +1210,9 @@ def main() -> int:
     summary = subparsers.add_parser("summary")
     summary.add_argument("--experiment", required=True)
     summary.set_defaults(func=command_summary)
+    emit_summary = subparsers.add_parser("emit-summary")
+    emit_summary.add_argument("--experiment", required=True)
+    emit_summary.set_defaults(func=command_emit_summary)
     select = subparsers.add_parser("select")
     select.add_argument("--experiment", required=True)
     select.add_argument("--names", default="")
@@ -1086,6 +1221,13 @@ def main() -> int:
     animations = subparsers.add_parser("animations")
     animations.add_argument("--experiment", required=True)
     animations.add_argument("--modes", required=True)
+    animations.add_argument("--policy", choices=("best", "all-algorithms"),
+                            default="best")
+    animations.add_argument("--instances", default="")
+    animations.add_argument("--top-n", type=int, default=0)
+    animations.add_argument("--fps", type=int, default=24)
+    animations.add_argument("--frames", type=int, default=120)
+    animations.add_argument("--dpi", type=int, default=120)
     animations.set_defaults(func=command_animations)
     finalize = subparsers.add_parser("finalize")
     finalize.add_argument("--experiment", required=True)

@@ -30,12 +30,14 @@ TEST_CASE("SanityCheck: registry populated") {
   REQUIRE(item->passed);
 }
 
-TEST_CASE("SanityCheck: every registered algorithm is callable") {
+TEST_CASE("SanityCheck: registered algorithms run or report optional backend unavailable") {
   for (const auto& name : kdc::StaticSolverRegistry::list()) {
     const auto* item = find_item("algorithm:" + name);
     REQUIRE(item != nullptr);
-    if (name == "ip-kont" && !kdc::KontSolver::probe_native_backend()) {
-      REQUIRE_FALSE(item->passed);
+    if (name == "ip-kont" &&
+        (!kdc::KontSolver::probe_native_backend())) {
+      REQUIRE(item->passed);
+      REQUIRE(item->detail.find("skipped") != std::string::npos);
       REQUIRE_FALSE(item->detail.empty());
     } else {
       REQUIRE(item->passed);

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/trace_event.schema.json",
+  "title": "KineticDiskCover structured trace event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "sequence",
+    "timestamp",
+    "event",
+    "data"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "event": {
+      "enum": [
+        "run_started",
+        "iteration",
+        "support_change",
+        "handover",
+        "verification",
+        "run_finished"
+      ]
+    },
+    "data": { "type": "object" }
+  }
+}

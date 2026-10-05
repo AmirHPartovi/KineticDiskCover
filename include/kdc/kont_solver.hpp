@@ -28,6 +28,12 @@ struct KontBackendDiagnostics {
   bool native_backend_available{false};
 };
 
+struct KontExecutionProvenance {
+  unsigned native_solve_count{0};
+  unsigned fallback_solve_count{0};
+  unsigned failed_native_solve_count{0};
+};
+
 class KontSolver final : public ILPSolver {
  public:
   KontSolver();
@@ -37,6 +43,7 @@ class KontSolver final : public ILPSolver {
   static bool probe_native_backend();
   static void require_native_backend();
   void require_native_for_solves();
+  KontExecutionProvenance thread_execution_provenance() const;
 
   ILPResult solve(const Eigen::VectorXd& c,
                   const Eigen::SparseMatrix<double>& A,

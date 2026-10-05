@@ -26,6 +26,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kdc_tools.storage import validate_results_input
+
 
 COLORS = {"minmax": "#1f77b4", "minsum": "#d62728"}
 LABELS = {"minmax": "Min-Max", "minsum": "Min-Sum"}
@@ -51,6 +54,7 @@ def _number(record: dict[str, Any], *keys: str) -> float | None:
 
 def load_results(path: Path) -> pd.DataFrame:
     """Load an array of benchmark records into a normalized DataFrame."""
+    validate_results_input(path)
     with path.open("r", encoding="utf-8") as source:
         payload = json.load(source)
     if isinstance(payload, dict):

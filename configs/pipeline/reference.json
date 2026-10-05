@@ -1,0 +1,36 @@
+{
+  "pipeline": "reference",
+  "label": "full dataset reference validation",
+  "dataset_profile": "full",
+  "dataset": "data/instances/public_instance_set",
+  "algorithms": "greedy",
+  "exact_backend": "auto",
+  "objectives": "both",
+  "repeats": 1,
+  "seed": 42,
+  "threads": 4,
+  "fast_time_limit_sec": 30,
+  "exact_time_limit_sec": 600,
+  "static_time_limit_sec": 60,
+  "benchmark_profile": "debug",
+  "verify_after": true,
+  "verify_each_iteration": false,
+  "save_traces": true,
+  "save_solutions": true,
+  "tables": true,
+  "figures": true,
+  "animation": {
+    "enabled": true,
+    "policy": "best",
+    "top_n": 0,
+    "fps": 24,
+    "frames": 120,
+    "dpi": 120
+  },
+  "artifact_retention_days": 30,
+  "required_stages": [
+    "init", "dataset", "build", "tests", "preflight", "backend_selection",
+    "benchmark", "result_validation", "tables", "figures", "animations",
+    "final_report", "summary"
+  ]
+}

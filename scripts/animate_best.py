@@ -21,6 +21,13 @@ from matplotlib.patches import Circle
 import numpy as np
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kdc_tools.storage import (
+    sha256_file,
+    validate_results_input,
+    write_derived_json,
+)
+
 np.random.seed(0)
 
 LOGGER = logging.getLogger("animate_best")
@@ -37,6 +44,22 @@ def select_best(frame: pd.DataFrame, instance: str, mode: str) -> pd.Series | No
         rows = rows[rows["verified"].map(_as_bool)]
     if "feasible" in rows:
         rows = rows[rows["feasible"].map(_as_bool)]
+    categories = rows.get(
+        "algorithm_category", pd.Series("", index=rows.index)
+    ).astype(str)
+    exact_rows = rows[categories == "exact_reference"]
+    if not exact_rows.empty:
+        exact_proven = (
+            exact_rows["optimality_status"].astype(str).eq("OPTIMAL")
+            & exact_rows["verification_kind"].astype(str)
+            .str.upper().eq("CERTIFIED_CONTINUOUS")
+            & exact_rows["verified"].map(_as_bool)
+            & exact_rows["feasible"].map(_as_bool)
+        )
+        rows = pd.concat([
+            rows[categories != "exact_reference"],
+            exact_rows[exact_proven],
+        ]).sort_index()
     if rows.empty:
         return None
     rows["objective_value"] = pd.to_numeric(rows["objective_value"], errors="coerce")
@@ -212,6 +235,14 @@ def _find_instance_file(directory: Path, name: str) -> Path | None:
 
 
 def _solution_path(batch_dir: Path, record: pd.Series) -> Path:
+    run_id = str(record.get("run_id", ""))
+    if run_id:
+        experiment_dir = batch_dir.parent if batch_dir.name == "batch" else batch_dir
+        canonical = (
+            experiment_dir / "runs" / run_id / "result" / "solution.json"
+        )
+        if canonical.is_file():
+            return canonical
     candidate = batch_dir / "runs" / str(record.instance_name) / \
         str(record.algorithm_name) / str(record.objective) / "solution.json"
     if candidate.is_file():
@@ -220,8 +251,11 @@ def _solution_path(batch_dir: Path, record: pd.Series) -> Path:
     if declared:
         path = Path(declared)
         if not path.is_absolute():
-            path = Path.cwd() / path
-        if path.is_file():
+            experiment_dir = batch_dir.parent if batch_dir.name == "batch" else batch_dir
+            for candidate in (experiment_dir / path, Path.cwd() / path):
+                if candidate.is_file():
+                    return candidate
+        elif path.is_file():
             return path
     return candidate
 
@@ -433,8 +467,12 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         blit=False, repeat=False,
     )
     output.mkdir(parents=True, exist_ok=True)
+    run_id = str(record.get("run_id", ""))
+    suffix = f"__{_safe_filename(run_id)}" if run_id else ""
     if animation.writers.is_available("ffmpeg"):
-        destination = output / f"{_safe_filename(instance_name)}_{mode}.mp4"
+        destination = output / (
+            f"{_safe_filename(instance_name)}_{mode}{suffix}.mp4"
+        )
         writer = animation.FFMpegWriter(fps=fps, metadata={"artist": "kdc-solver"})
         movie.save(destination, writer=writer, dpi=dpi)
     else:
@@ -443,9 +481,33 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
             "(for example, `brew install ffmpeg` or `apt install ffmpeg`) "
             "to produce MP4 files."
         )
-        destination = output / f"{_safe_filename(instance_name)}_{mode}.gif"
+        destination = output / (
+            f"{_safe_filename(instance_name)}_{mode}{suffix}.gif"
+        )
         movie.save(destination, writer=animation.PillowWriter(fps=fps), dpi=dpi)
     plt.close(figure)
+    write_derived_json(destination.with_suffix(
+        destination.suffix + ".metadata.json"
+    ), {
+        "schema_version": 1,
+        "experiment_id": record.get("experiment_id"),
+        "run_id": record.get("run_id"),
+        "instance_id": record.get("instance_id"),
+        "instance_name": instance_name,
+        "algorithm": algorithm,
+        "objective": mode,
+        "actual_backend": record.get("actual_backend"),
+        "verification_status": (
+            "PASSED" if bool(record.get("verified")) else "NOT_PASSED"
+        ),
+        "verification_kind": record.get("verification_kind"),
+        "source_result_path": record.get("result_json_path"),
+        "source_solution_path": record.get("solution_json_path"),
+        "source_commit": record.get("git_commit"),
+        "animation_path": destination.name,
+        "animation_sha256": sha256_file(destination),
+        "generator": "scripts/animate_best.py",
+    })
     return destination
 
 
@@ -457,8 +519,10 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
         output_dir: str | Path, mode: str = "minmax", fps: int = 30,
         frames: int = 200, dpi: int = 150, top_n: int = 0,
         all_algorithms: bool = False,
-        algorithm: str | None = None) -> list[Path]:
+        algorithm: str | None = None,
+        selected_instances: list[str] | None = None) -> list[Path]:
     batch_path = Path(batch_dir)
+    validate_results_input(batch_path / "master_results.json")
     with (batch_path / "master_results.json").open(encoding="utf-8") as source:
         records = json.load(source)
     if not isinstance(records, list):
@@ -476,6 +540,12 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
             raise ValueError(f"No results found for algorithm {algorithm!r}")
     modes = ("minmax", "minsum") if mode == "both" else (mode,)
     instances = sorted(dataframe["instance_name"].astype(str).unique())
+    if selected_instances:
+        missing = sorted(set(selected_instances) - set(instances))
+        if missing:
+            raise ValueError("unknown animation instance(s): " +
+                             ", ".join(missing))
+        instances = [name for name in selected_instances if name in instances]
     if top_n > 0:
         instances = instances[:top_n]
     output = Path(output_dir)
@@ -561,6 +631,10 @@ def main(argv: list[str] | None = None) -> int:
         "--algorithm",
         help="restrict animation generation to this algorithm",
     )
+    parser.add_argument(
+        "--selected-instances",
+        help="comma-separated instance names to animate",
+    )
     args = parser.parse_args(argv)
     if args.fps <= 0 or args.frames < 2 or args.dpi <= 0 or args.top_n < 0:
         parser.error("--fps/--dpi must be positive, --frames >= 2, --top-n >= 0")
@@ -569,7 +643,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         files = run(args.batch, args.instances, args.output, args.mode,
                     args.fps, args.frames, args.dpi, args.top_n,
-                        args.all_algorithms, args.algorithm)
+                        args.all_algorithms, args.algorithm,
+                        [name.strip() for name in args.selected_instances.split(",")
+                         if name.strip()] if args.selected_instances else None)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         LOGGER.error("%s", error)
         return 1

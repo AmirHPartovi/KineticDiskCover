@@ -34,14 +34,22 @@ TEST_CASE("KontSolver reports whether a generic solve used native or fallback") 
   kdc::KontSolver solver;
   const auto result = solver.solve(costs, constraints, rhs, {0}, 5.0, 0.0);
   REQUIRE(result.status == kdc::ILPResult::Status::OPTIMAL);
+  const auto provenance = solver.thread_execution_provenance();
+  REQUIRE(provenance.native_solve_count +
+              provenance.fallback_solve_count ==
+          1U);
   if (native_available && result.native_backend_used) {
     REQUIRE(result.actual_backend == "KONT/COPT");
     REQUIRE_FALSE(result.fallback_used);
+    REQUIRE(provenance.native_solve_count == 1U);
+    REQUIRE(provenance.fallback_solve_count == 0U);
   } else {
     REQUIRE(result.actual_backend == "built-in-branch-and-bound-fallback");
     REQUIRE_FALSE(result.native_backend_used);
     REQUIRE(result.fallback_used);
     REQUIRE(solver.name() == "built-in-branch-and-bound-fallback");
+    REQUIRE(provenance.native_solve_count == 0U);
+    REQUIRE(provenance.fallback_solve_count == 1U);
   }
 }
 

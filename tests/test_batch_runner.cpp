@@ -86,7 +86,7 @@ TEST_CASE("BatchRunConfig: defaults to a 60-second IP limit") {
   REQUIRE(config.num_threads >= 1);
 }
 
-TEST_CASE("BatchRunner: clears previous results but preserves other output files") {
+TEST_CASE("BatchRunner: refuses to overwrite existing batch artifacts") {
   const auto root = temporary_directory("kdc-batch-clean-");
   write_instance(root / "instances");
   auto config = one_run_config(root, "output");
@@ -98,15 +98,17 @@ TEST_CASE("BatchRunner: clears previous results but preserves other output files
   std::ofstream(output / "unrelated.txt") << "keep\n";
 
   kdc::MockILPSolver mock;
-  kdc::BatchRunner::run(config, &mock);
+  REQUIRE_THROWS_AS(kdc::BatchRunner::run(config, &mock),
+                    std::invalid_argument);
 
-  REQUIRE_FALSE(std::filesystem::exists(stale_run));
+  REQUIRE(std::filesystem::exists(stale_run / "result.json"));
+  std::ifstream stale_input(stale_run / "result.json");
+  const auto stale = nlohmann::json::parse(stale_input);
+  REQUIRE(stale.at("stale").get<bool>());
+  std::ifstream old_master(output / "master_results.json");
+  const auto master = nlohmann::json::parse(old_master);
+  REQUIRE(master.at(0).at("stale").get<bool>());
   REQUIRE(std::filesystem::exists(output / "unrelated.txt"));
-  std::ifstream result_input(output / "master_results.json");
-  const auto records = nlohmann::json::parse(result_input);
-  REQUIRE(records.size() == 2U);
-  REQUIRE(records.back().at("algorithm_name") == "nn");
-  REQUIRE(records.back().at("time_limit_per_ip_sec").get<double>() == 10.0);
   std::filesystem::remove_all(root);
 }
 
@@ -129,6 +131,10 @@ TEST_CASE("BatchRunner: multiple algorithms and modes") {
   std::map<std::string, int> exact_count_by_objective;
   std::map<std::string, std::string> exact_status_by_objective;
   for (const auto& record : records) {
+    REQUIRE(record.at("schema_version") == 3);
+    REQUIRE(record.at("native_solve_count").is_number_unsigned());
+    REQUIRE(record.at("fallback_solve_count").is_number_unsigned());
+    REQUIRE(record.at("failed_native_solve_count").is_number_unsigned());
     REQUIRE(record.at("result_json_path").get<std::string>() != "");
     REQUIRE(std::filesystem::exists(
         record.at("result_json_path").get<std::string>()));
@@ -175,6 +181,9 @@ TEST_CASE("BatchRunner: multiple algorithms and modes") {
   std::getline(csv, header);
   REQUIRE(header.find("error_message") != std::string::npos);
   REQUIRE(header.find("time_limit_per_ip_sec") != std::string::npos);
+  REQUIRE(header.find("native_solve_count") != std::string::npos);
+  REQUIRE(header.find("fallback_solve_count") != std::string::npos);
+  REQUIRE(header.find("failed_native_solve_count") != std::string::npos);
   std::filesystem::remove_all(root);
 }
 

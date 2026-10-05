@@ -1,0 +1,39 @@
+{
+  "pipeline": "smoke",
+  "label": "development / smoke validation",
+  "dataset_profile": "smoke10",
+  "dataset": "data/instances/public_instance_set",
+  "smoke_count": 10,
+  "smoke_max_n": 50,
+  "smoke_max_m": 25,
+  "algorithms": "all",
+  "exact_backend": "auto",
+  "objectives": "both",
+  "repeats": 1,
+  "seed": 42,
+  "threads": 2,
+  "fast_time_limit_sec": 5,
+  "exact_time_limit_sec": 10,
+  "static_time_limit_sec": 2,
+  "benchmark_profile": "debug",
+  "verify_after": true,
+  "verify_each_iteration": true,
+  "save_traces": true,
+  "save_solutions": true,
+  "tables": true,
+  "figures": true,
+  "animation": {
+    "enabled": true,
+    "policy": "all-algorithms",
+    "top_n": 0,
+    "fps": 12,
+    "frames": 48,
+    "dpi": 90
+  },
+  "artifact_retention_days": 14,
+  "required_stages": [
+    "init", "dataset", "build", "tests", "preflight", "backend_selection",
+    "benchmark", "result_validation", "tables", "figures", "animations",
+    "final_report", "summary"
+  ]
+}

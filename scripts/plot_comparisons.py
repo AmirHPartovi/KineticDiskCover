@@ -21,6 +21,9 @@ import pandas as pd
 import seaborn as sns
 from scipy import stats
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kdc_tools.storage import validate_results_input
+
 
 PALETTE = {"minmax": "#1f77b4", "minsum": "#d62728", "baseline": "#7f7f7f"}
 OBJECTIVE_MARKERS = {"minmax": "o", "minsum": "s"}
@@ -61,6 +64,7 @@ def _bool_value(value: object) -> bool:
 
 
 def load_frame(path: str | Path) -> pd.DataFrame:
+    validate_results_input(path)
     with Path(path).open(encoding="utf-8") as input_file:
         raw = json.load(input_file)
     if not isinstance(raw, list):

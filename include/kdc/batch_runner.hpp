@@ -30,6 +30,9 @@ struct BatchRunRecord {
   std::string solver_version{"unknown"};
   bool native_kont{false};
   bool fallback_used{false};
+  unsigned native_solve_count{0};
+  unsigned fallback_solve_count{0};
+  unsigned failed_native_solve_count{0};
   std::string objective;
   int repeat{0};
   int n{0};

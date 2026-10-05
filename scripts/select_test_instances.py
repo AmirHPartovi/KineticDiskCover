@@ -18,8 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 SUPPORTED_SUFFIXES = {".mdc", ".json"}
 SELECTION_POLICY = (
-    "one smallest valid instance per dataset family, then globally smallest "
-    "remaining candidates; ordered by n, m, n*m, file size, and relative path"
+    "select eligible small candidates first, maximizing family coverage, "
+    "then fill by size; use oversized family representatives only when fewer "
+    "than the requested count of valid in-limit instances exist"
 )
 
 
@@ -126,22 +127,59 @@ def _source_path(source_root: Path, source_label: str, relative: str) -> str:
     return f"{source_label.rstrip('/')}/{relative}"
 
 
+def _flat_family(path: Path) -> str:
+    stem = path.name.lower()
+    if stem.endswith(".instance.mdc"):
+        stem = stem[:-len(".instance.mdc")]
+    else:
+        stem = path.stem.lower()
+    patterns = (
+        r"^(euro-night|london|paris|stars|uniform|us-night)(?:[-_].*)?$",
+        r"^(sbgdb-\d{8}-(?:fpg-poly|pntset))(?:[-_].*)?$",
+        r"^(many_holes)(?:[_-].*)?$",
+    )
+    for pattern in patterns:
+        match = re.match(pattern, stem, re.IGNORECASE)
+        if match:
+            return match.group(1).lower()
+    return re.sub(r"[-_]\d+(?:[-_].*)?$", "", stem).lower() or stem
+
+
 def discover_candidates(source: Path) -> tuple[list[dict[str, Any]], list[str]]:
     if not source.is_dir():
         raise ValueError(f"source dataset directory not found: {source}")
     candidates: list[dict[str, Any]] = []
     errors: list[str] = []
     source_label = _root_label(source)
-    families = sorted(
-        path for path in source.iterdir() if path.is_dir()
+    family_dirs = sorted(path for path in source.iterdir() if path.is_dir())
+    scopes: list[tuple[str | None, list[Path]]] = []
+    for family_dir in family_dirs:
+        scopes.append((
+            family_dir.name,
+            sorted(
+                path for path in family_dir.rglob("*")
+                if path.is_file() and path.suffix.lower() in SUPPORTED_SUFFIXES
+            ),
+        ))
+    root_files = sorted(
+        path for path in source.iterdir()
+        if path.is_file() and path.suffix.lower() in SUPPORTED_SUFFIXES
     )
-    for family_dir in families:
-        family = family_dir.name
-        files = sorted(
-            path for path in family_dir.rglob("*")
+    if root_files:
+        scopes.append((None, root_files))
+    if not scopes:
+        nested_files = sorted(
+            path for path in source.rglob("*")
             if path.is_file() and path.suffix.lower() in SUPPORTED_SUFFIXES
         )
+        if nested_files:
+            scopes.append((None, nested_files))
+    for directory_family, files in scopes:
+        files = sorted(
+            files
+        )
         for path in files:
+            family = directory_family or _flat_family(path)
             relative_path = path.relative_to(source).as_posix()
             try:
                 payload = _canonical_payload(path)
@@ -173,31 +211,84 @@ def selection_key(candidate: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
-def select_candidates(candidates: list[dict[str, Any]], count: int
+def select_candidates(candidates: list[dict[str, Any]], count: int,
+                      max_n: int = 50, max_m: int = 25
                       ) -> list[dict[str, Any]]:
-    if count <= 0:
-        raise ValueError("count must be positive")
+    if count <= 0 or max_n <= 0 or max_m <= 0:
+        raise ValueError("count and smoke limits must be positive")
     if len(candidates) < count:
         raise ValueError(
             f"requested {count} instances, but only {len(candidates)} valid "
             "instances were found"
         )
+    eligible = [
+        row for row in candidates
+        if row["n"] <= max_n and row["m"] <= max_m
+    ]
     by_family: dict[str, list[dict[str, Any]]] = {}
-    for candidate in candidates:
+    for candidate in eligible:
         by_family.setdefault(candidate["family"], []).append(candidate)
 
-    representatives = sorted(
-        (rows[0] for rows in by_family.values()),
-        key=selection_key,
+    selected: list[dict[str, Any]] = []
+    selected_sources: set[str] = set()
+    family_representatives = sorted(
+        (rows[0] for rows in by_family.values()), key=selection_key
     )
-    selected = representatives[:count]
-    selected_sources = {row["relative_source"] for row in selected}
-    for candidate in candidates:
-        if len(selected) == count:
+    for candidate in family_representatives[:count]:
+        selected.append(candidate)
+        selected_sources.add(candidate["relative_source"])
+        candidate["selection_reason"] = (
+            "smallest in-limit valid candidate selected for family coverage"
+        )
+    for candidate in eligible:
+        if len(selected) >= count:
             break
         if candidate["relative_source"] not in selected_sources:
+            candidate["selection_reason"] = (
+                "small valid candidate used to fill the smoke set"
+            )
             selected.append(candidate)
             selected_sources.add(candidate["relative_source"])
+
+    if len(selected) < count:
+        selected_families = {row["family"] for row in selected}
+        oversized_representatives: list[dict[str, Any]] = []
+        by_oversized_family: dict[str, list[dict[str, Any]]] = {}
+        for candidate in candidates:
+            if candidate["family"] not in selected_families:
+                by_oversized_family.setdefault(
+                    candidate["family"], []
+                ).append(candidate)
+        oversized_representatives = sorted(
+            (rows[0] for rows in by_oversized_family.values()),
+            key=selection_key,
+        )
+        for candidate in oversized_representatives:
+            if len(selected) >= count:
+                break
+            candidate["selection_reason"] = (
+                "oversized family fallback: no valid in-limit candidate; "
+                "included only to preserve family coverage"
+            )
+            selected.append(candidate)
+            selected_sources.add(candidate["relative_source"])
+            selected_families.add(candidate["family"])
+        for candidate in candidates:
+            if len(selected) >= count:
+                break
+            if candidate["relative_source"] not in selected_sources:
+                candidate["selection_reason"] = (
+                    "smallest remaining valid candidate; smoke limits exceeded "
+                    "because fewer in-limit candidates exist than requested"
+                )
+                selected.append(candidate)
+                selected_sources.add(candidate["relative_source"])
+
+    for candidate in selected:
+        candidate["exceeds_smoke_limits"] = (
+            candidate["n"] > max_n or candidate["m"] > max_m
+        )
+        candidate["smoke_limits"] = {"max_n": max_n, "max_m": max_m}
     return selected
 
 
@@ -312,7 +403,8 @@ def apply_execution_defaults(args: Any) -> None:
 
 
 def make_manifest(source: Path, selected: list[dict[str, Any]],
-                  count: int) -> dict[str, Any]:
+                  count: int, max_n: int = 50,
+                  max_m: int = 25) -> dict[str, Any]:
     source_label = _root_label(source)
     rows = []
     for rank, candidate in enumerate(selected, 1):
@@ -326,10 +418,19 @@ def make_manifest(source: Path, selected: list[dict[str, Any]],
             "file_size_bytes": candidate["file_size_bytes"],
             "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "selection_rank": rank,
+            "selection_reason": candidate.get(
+                "selection_reason", "provided selection manifest"
+            ),
+            "exceeds_smoke_limits": bool(candidate.get(
+                "exceeds_smoke_limits",
+                candidate["n"] > max_n or candidate["m"] > max_m,
+            )),
+            "smoke_limits": {"max_n": max_n, "max_m": max_m},
         })
     return {
         "name": f"smoke{count}",
         "selection_policy": SELECTION_POLICY,
+        "smoke_limits": {"max_n": max_n, "max_m": max_m},
         "source_root": source_label,
         "source_dataset_fingerprint": _dataset_fingerprint(source),
         "selected_instance_count": len(rows),
@@ -348,7 +449,8 @@ def _print_selection(rows: list[dict[str, Any]], count: int) -> None:
 
 
 def materialize(source: Path, output: Path, count: int,
-                manifest_path: Path | None = None) -> dict[str, Any]:
+                manifest_path: Path | None = None,
+                max_n: int = 50, max_m: int = 25) -> dict[str, Any]:
     source = source.resolve()
     output = output.resolve()
     previous_manifest = output / "manifest.json"
@@ -365,8 +467,8 @@ def materialize(source: Path, output: Path, count: int,
                     prior_file.unlink(missing_ok=True)
     if manifest_path is None:
         candidates, _errors = discover_candidates(source)
-        selected = select_candidates(candidates, count)
-        manifest = make_manifest(source, selected, count)
+        selected = select_candidates(candidates, count, max_n, max_m)
+        manifest = make_manifest(source, selected, count, max_n, max_m)
         payloads = [candidate["_payload"] for candidate in selected]
     else:
         manifest = read_manifest(manifest_path)
@@ -443,6 +545,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", required=True,
                         help="output directory for selected canonical JSON")
     parser.add_argument("--count", type=int, default=10)
+    parser.add_argument("--max-n", type=int, default=50)
+    parser.add_argument("--max-m", type=int, default=25)
     parser.add_argument("--manifest",
                         help="reuse a checked-in selection manifest")
     parser.add_argument("--manifest-output",
@@ -452,6 +556,7 @@ def main(argv: list[str] | None = None) -> int:
         manifest = materialize(
             Path(args.source), Path(args.output), args.count,
             Path(args.manifest) if args.manifest else None,
+            args.max_n, args.max_m,
         )
         if args.manifest_output:
             destination = Path(args.manifest_output)

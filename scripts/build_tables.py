@@ -13,6 +13,7 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 REQUIRED_COLUMNS = [
     "instance_name",
@@ -93,6 +94,9 @@ def instance_family(name: str) -> str:
 
 def load_results(path: str | Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     source = Path(path)
+    from kdc_tools.storage import validate_results_input
+
+    validate_results_input(source)
     with source.open(encoding="utf-8") as input_file:
         raw = json.load(input_file)
     if not isinstance(raw, list):

@@ -142,6 +142,14 @@ SanityCheckReport SanityChecker::run(ILPSolver* ilp) {
   }
 
   for (const auto& name : StaticSolverRegistry::list()) {
+    if (name == "ip-kont" &&
+        (!KontSolver::probe_native_backend() ||
+         dynamic_cast<KontSolver*>(active_ilp) == nullptr)) {
+      report.items.push_back(make_item(
+          "algorithm:ip-kont", true,
+          "skipped: optional native KONT/COPT backend is unavailable"));
+      continue;
+    }
     report.items.push_back(run_timed("algorithm:" + name, [name, active_ilp] {
       return check_algorithm_callable(name, active_ilp);
     }));

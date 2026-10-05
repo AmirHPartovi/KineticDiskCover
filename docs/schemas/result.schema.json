@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/result.schema.json",
+  "title": "Canonical KineticDiskCover run result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "experiment_id",
+    "run_key",
+    "execution_status",
+    "solver_result",
+    "error_message"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "experiment_id": { "type": "string", "minLength": 1 },
+    "run_key": { "type": "string", "minLength": 1 },
+    "execution_status": {
+      "enum": [
+        "COMPLETED",
+        "FAILED",
+        "TIME_LIMIT",
+        "INVALID",
+        "TIMED_OUT",
+        "CANCELLED",
+        "SKIPPED",
+        "ABANDONED"
+      ]
+    },
+    "solver_result": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "error_message": { "type": ["string", "null"] }
+  }
+}

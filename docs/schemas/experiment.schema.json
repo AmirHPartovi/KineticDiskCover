@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/experiment.schema.json",
+  "title": "KineticDiskCover experiment manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "created_at",
+    "profile",
+    "status",
+    "config",
+    "config_sha256",
+    "request_config_sha256",
+    "source_commit",
+    "dataset_manifest",
+    "expected_run_count"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "experiment_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "profile": { "type": "string", "minLength": 1 },
+    "status": {
+      "enum": ["CREATED", "RUNNING", "COMPLETE", "PARTIAL", "FAILED"]
+    },
+    "config": { "type": "object" },
+    "config_sha256": { "$ref": "#/$defs/sha256" },
+    "request_config_sha256": { "$ref": "#/$defs/sha256" },
+    "source_commit": { "type": ["string", "null"] },
+    "run_plan_sha256": { "$ref": "#/$defs/sha256" },
+    "dataset_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "expected_run_count": { "type": "integer", "minimum": 0 }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
