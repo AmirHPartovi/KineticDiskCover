@@ -42,3 +42,22 @@ Experiment directory: /Users/amirpartovi/.copilot/repos/copilot-worktrees/Kineti
 
 ========== STAGE animations START 2026-10-05T04:37:59+0330 ==========
 [2026-10-05T04:37:59+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --modes both --policy all-algorithms --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 
+[2026-10-05T05:36:36+0330] STAGE animations ENDED exit_status=0 duration_sec=3517
+
+========== STAGE final_report START 2026-10-05T05:36:37+0330 ==========
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] STAGE final_report ENDED exit_status=0 duration_sec=0
+
+========== STAGE summary START 2026-10-05T05:36:37+0330 ==========
+[2026-10-05T05:36:37+0330] COMMAND: python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete 
+[2026-10-05T05:36:37+0330] STAGE summary ENDED exit_status=0 duration_sec=0
+
+Experiment status: COMPLETE
+Dataset profile: smoke10
+Selected instances: 10
+Algorithms: nn, greedy, primal-dual, local-search, sa, genetic, lp-rounding, shifting, branch-and-bound
+Objectives: minmax, minsum
+Threads: 2
+Time limits (static/fast/exact): 2.0 / 5.0 / 10.0 seconds
+Selected families: att48, berlin52, eil51, euro-night, london, sbgdb-20200507-fpg-poly, sbgdb-20200507-pntset, stars, uniform, us-night

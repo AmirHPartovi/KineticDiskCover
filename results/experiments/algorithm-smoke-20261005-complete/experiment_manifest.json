@@ -215,7 +215,62 @@
   "artifact_retention_days": 14,
   "selected_exact_backend": "branch-and-bound",
   "actual_exact_backend": "branch-and-bound",
-  "exact_reference_calibration": null,
+  "exact_reference_calibration": {
+    "calibration_instances": [],
+    "successful_runs": [],
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "selected_backend": "branch-and-bound",
+    "actual_backend": "branch-and-bound",
+    "kont_runtime_available": false
+  },
   "animation_instance_selection": [],
   "python_version": "3.9.6",
   "compiler": null,
@@ -285,6 +340,16 @@
       "stage": "animations",
       "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --modes both --policy all-algorithms --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 ",
       "recorded_at": "2026-10-05T01:07:59.361675+00:00"
+    },
+    {
+      "stage": "final_report",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete ",
+      "recorded_at": "2026-10-05T02:06:37.218024+00:00"
+    },
+    {
+      "stage": "summary",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete ",
+      "recorded_at": "2026-10-05T02:06:37.531194+00:00"
     }
   ],
   "stages": {
@@ -387,10 +452,31 @@
       "duration_sec": 33.0
     },
     "animations": {
-      "status": "RUNNING",
-      "updated_at": "2026-10-05T01:07:59.361507+00:00",
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T02:06:37.132489+00:00",
       "started_at": "2026-10-05T01:07:59.361507+00:00",
-      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --modes both --policy all-algorithms --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 "
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete --modes both --policy all-algorithms --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 ",
+      "completed_at": "2026-10-05T02:06:37.132489+00:00",
+      "exit_code": 0,
+      "duration_sec": 3517.0
+    },
+    "final_report": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T02:06:37.446811+00:00",
+      "started_at": "2026-10-05T02:06:37.217846+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete ",
+      "completed_at": "2026-10-05T02:06:37.446811+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "summary": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-05T02:06:37.691010+00:00",
+      "started_at": "2026-10-05T02:06:37.530984+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete ",
+      "completed_at": "2026-10-05T02:06:37.691010+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
     }
   },
   "required_stages": [
@@ -408,7 +494,7 @@
     "final_report",
     "summary"
   ],
-  "status": "RUNNING",
+  "status": "COMPLETE",
   "reproduction_command": "bash scripts/run_experiment.sh --pipeline smoke --output results/experiments/algorithm-smoke-20261005-complete",
   "dataset_conversion": "mdc-to-canonical-json",
   "canonical_instance_files": [
@@ -422,5 +508,209 @@
     "stars/stars-0000030.instance.json",
     "uniform/uniform-0000030-2.json",
     "us-night/us-night-0000030.instance.json"
-  ]
+  ],
+  "solver_manifest": {
+    "actual_backend": "branch-and-bound",
+    "algorithm_set": [
+      "nn",
+      "greedy",
+      "primal-dual",
+      "local-search",
+      "sa",
+      "genetic",
+      "lp-rounding",
+      "shifting",
+      "branch-and-bound"
+    ],
+    "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+    "calibration_decision_version": 4,
+    "calibration_instances": [],
+    "calibration_objectives": [
+      "minmax",
+      "minsum"
+    ],
+    "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset",
+    "dataset_fingerprint": "2154d4c806f4bae9d7b3975aea72a557abcda55e1be048534042ce3cc1b036c8",
+    "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+    "dataset_path": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/dataset",
+    "dataset_profile": "smoke10",
+    "experiment_id": "algorithm-smoke-20261005-complete",
+    "fallback_used": false,
+    "kont_runtime_available": false,
+    "kont_version": "7.2.4",
+    "native_kont_available": false,
+    "native_kont_used": false,
+    "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-vigilant-spork/results/experiments/algorithm-smoke-20261005-complete/calibration",
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "requested_backend": "auto",
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "seed_policy": {
+      "base_seed": 42,
+      "repeats": 1
+    },
+    "selected_backend": "branch-and-bound",
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "successful_runs": [],
+    "time_limits": {
+      "exact_global_sec": 10.0,
+      "fast_global_sec": 5.0,
+      "per_static_solve_sec": 2.0
+    }
+  },
+  "result_integrity": {
+    "counts": {
+      "total": 180,
+      "successful": 180,
+      "feasible": 180,
+      "verified": 180,
+      "failed": 0,
+      "timeouts": 0
+    },
+    "statuses": {
+      "OPTIMAL": 0,
+      "FEASIBLE": 180,
+      "TIME_LIMIT": 0,
+      "INFEASIBLE": 0,
+      "FAILED": 0
+    },
+    "by_objective": {
+      "minmax": {
+        "total": 90,
+        "successful": 90,
+        "feasible": 90,
+        "verified": 90,
+        "failed": 0,
+        "timeouts": 0,
+        "OPTIMAL": 0,
+        "FEASIBLE": 90,
+        "TIME_LIMIT": 0,
+        "INFEASIBLE": 0,
+        "FAILED": 0
+      },
+      "minsum": {
+        "total": 90,
+        "successful": 90,
+        "feasible": 90,
+        "verified": 90,
+        "failed": 0,
+        "timeouts": 0,
+        "OPTIMAL": 0,
+        "FEASIBLE": 90,
+        "TIME_LIMIT": 0,
+        "INFEASIBLE": 0,
+        "FAILED": 0
+      }
+    },
+    "expected_runs": 180,
+    "actual_runs": 180,
+    "missing_run_count": 0,
+    "duplicate_run_count": 0,
+    "missing_solution_paths": [],
+    "missing_trace_paths": [],
+    "exact_backend_provenance": [
+      "requested=auto; actual=branch-and-bound"
+    ],
+    "algorithm_count": 9,
+    "instance_count": 10,
+    "canonical_aggregate": {
+      "classifications": {
+        "completed_runs": 180,
+        "expected_runs": 180,
+        "extra_attempts": 0,
+        "failed_runs": 0,
+        "invalid_runs": 0,
+        "latest_completed_runs": 180,
+        "latest_failed_runs": 0,
+        "latest_time_limit_runs": 0,
+        "missing_runs": 0,
+        "rerun_attempt_groups": 0,
+        "time_limit_runs": 0,
+        "unexpected_runs": 0,
+        "valid_runs": 180
+      },
+      "complete": true,
+      "experiment_id": "algorithm-smoke-20261005-complete",
+      "exports": {
+        "aggregates/results.csv": {
+          "sha256": "60adf6143f98f5832d92705cd5ebe3c34a39b9b86634b4ce8e75660141c35914",
+          "size_bytes": 302087
+        },
+        "aggregates/results.json": {
+          "sha256": "00d569dca0f9d5ca63c3fd9816d1d87a838743aec54f3ae421cadf9818bcc80b",
+          "size_bytes": 1939643
+        },
+        "aggregates/results.jsonl": {
+          "sha256": "c6d70179a27dbaec226e273b3e51307bcdf1800ccb4a66629c4a05ca819a5183",
+          "size_bytes": 1474520
+        },
+        "batch/master_results.csv": {
+          "sha256": "60adf6143f98f5832d92705cd5ebe3c34a39b9b86634b4ce8e75660141c35914",
+          "size_bytes": 302087
+        },
+        "batch/master_results.json": {
+          "sha256": "1210a215fa70ff689859d8254699c154e8f49acac33e6d4eca26865869eca362",
+          "size_bytes": 657253
+        },
+        "runs/index.jsonl": {
+          "sha256": "b1dcfb42902cdcc4cc1fad81758984f2431949a27fe32760707a7106e9cfaf45",
+          "size_bytes": 101405
+        }
+      },
+      "generated_at": "2026-10-05T01:07:24.929034Z",
+      "invalid_runs": [],
+      "missing_run_keys": [],
+      "plan_sha256": "eab26f988c90c2b875c8dbced48555ef3aa3744e6401a9fac2472915e3dab4aa",
+      "record_count": 180,
+      "rerun_attempts": {},
+      "schema_version": 1,
+      "unexpected_run_keys": []
+    }
+  },
+  "failed_or_skipped_stages": []
 }
