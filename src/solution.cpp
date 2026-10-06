@@ -250,7 +250,8 @@ KineticSolution KineticSolution::extend(
     ObjectiveType objective_type, SolverBudget* budget,
     KineticEventEngine event_engine,
     KineticEventDiagnostics* diagnostics,
-    KineticIntervalEmission interval_emission) {
+    KineticIntervalEmission interval_emission,
+    HandoverEvaluation handover_evaluation) {
   KDC_PROFILE_PHASE(ProfilePhase::KINETIC_EXTENSION);
   ExtensionDiagnosticsTimer diagnostics_timer(diagnostics);
   if (event_engine != KineticEventEngine::REFERENCE_EXHAUSTIVE) {
@@ -596,7 +597,7 @@ KineticSolution KineticSolution::extend(
     if (use_handovers) {
       handover_event = KineticCore::find_next_handover(
           instance, supports, owners, current_time, t_end, forward, budget,
-          event_engine, diagnostics);
+          event_engine, diagnostics, handover_evaluation);
       if (handover_event.valid &&
           direction * (handover_event.time - current_time) > 0.0 &&
           direction * (handover_event.time - next_time) < 0.0) {

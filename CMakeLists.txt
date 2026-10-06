@@ -339,6 +339,14 @@ if(BUILD_BENCHMARK)
   add_executable(kdc-kinetic-interval-benchmark
     benchmarks/kinetic_interval_emission.cpp)
   target_link_libraries(kdc-kinetic-interval-benchmark PRIVATE kdc-core)
+  add_executable(kdc-kinetic-handover-benchmark
+    benchmarks/kinetic_handover.cpp)
+  target_link_libraries(kdc-kinetic-handover-benchmark PRIVATE kdc-core)
+  target_compile_definitions(kdc-kinetic-handover-benchmark PRIVATE
+    KDC_BENCH_GIT_COMMIT="${KDC_GIT_COMMIT}"
+    KDC_BENCH_GIT_DIRTY="${KDC_GIT_DIRTY}"
+    KDC_BENCH_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+  )
 endif()
 
 if(BUILD_TESTS)
