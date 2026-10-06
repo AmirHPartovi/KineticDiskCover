@@ -92,7 +92,8 @@ void print_usage(const std::string& subcommand) {
   if (subcommand == "solve") {
     std::cout << "Usage: kdc-solver solve [OPTIONS]\n"
                  "  --instance FILE          Path to instance JSON (required)\n"
-                 "  --mode minmax|minsum     Objective (default: minmax)\n"
+                 "  --mode minmax|minsum|minmaxsum "
+                 "Objective (default: minmax)\n"
                  "  --algorithm NAME         Static solver (default: ip-kont)\n"
                  "  --output FILE            Write KineticSolution as JSON to FILE\n"
                  "  --time-limit SEC         Per-IP time limit (default: 600)\n"
@@ -101,6 +102,10 @@ void print_usage(const std::string& subcommand) {
                  "  --gap TARGET             Target optimality gap (default: 0.01)\n"
                  "  --minsum-refinement-policy adaptive|sampled "
                  "(default: adaptive)\n"
+                 "  --minmax-budget-fraction F Component time share "
+                 "(default: 0.5)\n"
+                 "  --minsum-budget-fraction F Component time share "
+                 "(default: 0.5)\n"
                  "  --verify-each-iteration  Verify every accepted iteration\n"
                  "  --no-verify              Skip post-solve verification\n"
                  "  --no-handovers           Disable handover-based extension\n"
@@ -113,7 +118,7 @@ void print_usage(const std::string& subcommand) {
     std::cout << "Usage: kdc-solver verify --instance FILE --solution FILE\n";
   } else if (subcommand == "benchmark") {
     std::cout << "Usage: kdc-solver benchmark --dataset DIR --output DIR "
-                 "--mode both|minmax|minsum\n";
+                 "--mode both|minmax|minsum|minmaxsum\n";
   } else if (subcommand == "compare") {
     std::cout << "Usage: kdc-solver compare --algorithms a,b --dataset DIR "
                  "--output DIR [--mode static|minmax|minsum]\n";

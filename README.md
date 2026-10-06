@@ -255,12 +255,12 @@ subsets.
 ## Commands
 
 ```text
-kdc-solver solve --instance FILE [--mode minmax|minsum] [--algorithm NAME]
+kdc-solver solve --instance FILE [--mode minmax|minsum|minmaxsum] [--algorithm NAME]
                   [--output FILE] [--time-limit SEC] [--gap TARGET]
                   [--verify-each-iteration] [--no-verify]
                   [--no-handovers] [--no-dedup] [--no-partial]
 kdc-solver verify --instance FILE --solution FILE
-kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum \
+kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum|minmaxsum \
                     [--profile fast|exact-reference|debug]
                     [--algorithms all-fast|all-comparison]
                     [--seed N] [--repeats N]
@@ -270,6 +270,12 @@ kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum \
 The `solve` command defaults to the `minmax` objective and `ip-kont` static
 solver. Its optional output is a JSON `KineticSolution` that can be loaded with
 `SolutionSerializer`. `--help` displays command usage.
+
+`minmaxsum` runs both component solvers and combines their verified solutions
+using the pointwise lower envelope. It reports `peak_cost` and `integral_cost`
+as a vector, not as a scalar objective; batch and benchmark records preserve
+the component statuses, dominance checks, and source identifiers. See
+[`docs/minmaxsum.md`](docs/minmaxsum.md) for result and certification semantics.
 
 ## Dataset I/O
 

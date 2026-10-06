@@ -6,8 +6,10 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <chrono>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -98,6 +100,68 @@ TEST_CASE("Benchmark runner measures and persists results") {
     REQUIRE(loaded.front().minsum_refinement_policy ==
             kdc::MinSumRefinementPolicy::CERTIFIED_BOUND);
     std::filesystem::remove(json_path);
+  }
+
+  SECTION("MinMaxSum persists a vector without a scalar objective") {
+    kdc::BenchmarkResult joint;
+    joint.instance_name = "joint";
+    joint.algorithm_name = "exact-reference";
+    joint.n = 1;
+    joint.m = 1;
+    joint.objective = kdc::ObjectiveType::MIN_MAX_SUM;
+    joint.objective_value = std::numeric_limits<double>::quiet_NaN();
+    joint.lower_bound = std::numeric_limits<double>::quiet_NaN();
+    joint.certified_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    joint.heuristic_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    joint.gap = std::numeric_limits<double>::quiet_NaN();
+    joint.peak_cost = 2.0;
+    joint.integral_cost = 1.25;
+    joint.minmax_component_peak = 3.0;
+    joint.minmax_component_integral = 2.0;
+    joint.minsum_component_peak = 4.0;
+    joint.minsum_component_integral = 1.5;
+    joint.minmaxsum_minmax_status =
+        kdc::MinMaxSumComponentStatus::COMPLETED;
+    joint.minmaxsum_minsum_status =
+        kdc::MinMaxSumComponentStatus::COMPLETED;
+    joint.minmaxsum_minmax_optimality =
+        kdc::OptimalityStatus::OPTIMAL;
+    joint.minmaxsum_minsum_optimality =
+        kdc::OptimalityStatus::OPTIMAL;
+    joint.dominates_minmax = true;
+    joint.dominates_minsum = true;
+    joint.dominance_invariants_ok = true;
+    joint.minmax_source_run = "joint:minmax";
+    joint.minsum_source_run = "joint:minsum";
+    joint.feasible = true;
+    joint.verified = true;
+    joint.optimality_status = kdc::OptimalityStatus::OPTIMAL;
+    joint.timestamp = "test";
+
+    const auto json_path = unique_temp_stem() + ".json";
+    const auto csv_path = unique_temp_stem() + ".csv";
+    kdc::BenchmarkRunner::save_json({joint}, json_path);
+    kdc::BenchmarkRunner::save_csv({joint}, csv_path);
+    std::ifstream json_input(json_path);
+    const auto json = nlohmann::json::parse(json_input);
+    REQUIRE(json.front().at("objective_value").is_null());
+    REQUIRE(json.front().at("lower_bound").is_null());
+    const auto loaded = kdc::BenchmarkRunner::load_json(json_path);
+    REQUIRE(loaded.size() == 1U);
+    REQUIRE(loaded.front().objective == kdc::ObjectiveType::MIN_MAX_SUM);
+    REQUIRE_FALSE(std::isfinite(loaded.front().objective_value));
+    REQUIRE(loaded.front().peak_cost == 2.0);
+    REQUIRE(loaded.front().integral_cost == 1.25);
+    REQUIRE(loaded.front().minmax_component_peak == 3.0);
+    REQUIRE(loaded.front().minsum_component_integral == 1.5);
+    REQUIRE(loaded.front().dominance_invariants_ok);
+    REQUIRE(loaded.front().minmax_source_run == "joint:minmax");
+    REQUIRE(loaded.front().optimality_status ==
+            kdc::OptimalityStatus::OPTIMAL);
+    std::filesystem::remove(json_path);
+    std::filesystem::remove(csv_path);
   }
 
   SECTION("memory") {

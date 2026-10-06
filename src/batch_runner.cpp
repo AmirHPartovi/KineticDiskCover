@@ -8,6 +8,7 @@
 #include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
 #include "kdc/minmax.hpp"
+#include "kdc/minmaxsum.hpp"
 #include "kdc/minsum.hpp"
 #include "kdc/profiling.hpp"
 #include "kdc/solution_serializer.hpp"
@@ -121,6 +122,46 @@ Json record_json(const BatchRunRecord& record) {
               {"heuristic_gap", record.heuristic_gap},
               {"peak_consistent", record.peak_consistent},
               {"integral_cost", record.integral_cost},
+              {"minmaxsum_minmax_status",
+               to_string(record.minmaxsum_minmax_status)},
+              {"minmaxsum_minsum_status",
+               to_string(record.minmaxsum_minsum_status)},
+              {"minmaxsum_minmax_optimality",
+               optimality_status_to_string(
+                   record.minmaxsum_minmax_optimality)},
+              {"minmaxsum_minsum_optimality",
+               optimality_status_to_string(
+                   record.minmaxsum_minsum_optimality)},
+              {"dominates_minmax", record.dominates_minmax},
+              {"dominates_minsum", record.dominates_minsum},
+              {"dominance_invariants_ok",
+               record.dominance_invariants_ok},
+              {"minmax_component_peak",
+               record.minmax_component_peak
+                   ? Json(*record.minmax_component_peak)
+                   : Json(nullptr)},
+              {"minmax_component_integral",
+               record.minmax_component_integral
+                   ? Json(*record.minmax_component_integral)
+                   : Json(nullptr)},
+              {"minsum_component_peak",
+               record.minsum_component_peak
+                   ? Json(*record.minsum_component_peak)
+                   : Json(nullptr)},
+              {"minsum_component_integral",
+               record.minsum_component_integral
+                   ? Json(*record.minsum_component_integral)
+                   : Json(nullptr)},
+              {"minmax_component_certified_gap",
+               record.minmax_component_certified_gap
+                   ? Json(*record.minmax_component_certified_gap)
+                   : Json(nullptr)},
+              {"minsum_component_certified_gap",
+               record.minsum_component_certified_gap
+                   ? Json(*record.minsum_component_certified_gap)
+                   : Json(nullptr)},
+              {"minmax_source_run", record.minmax_source_run},
+              {"minsum_source_run", record.minsum_source_run},
               {"empirical_ratio_to_exact",
                record.empirical_ratio_to_exact
                    ? Json(*record.empirical_ratio_to_exact)
@@ -131,8 +172,14 @@ Json record_json(const BatchRunRecord& record) {
               {"cpu_time_sec", record.cpu_time_sec},
               {"peak_memory_mb", record.peak_memory_mb},
               {"time_limit_per_ip_sec", record.time_limit_per_ip_sec},
-              {"objective_value", record.objective_value},
-              {"lower_bound", record.lower_bound},
+              {"objective_value",
+               std::isfinite(record.objective_value)
+                   ? Json(record.objective_value)
+                   : Json(nullptr)},
+              {"lower_bound",
+               std::isfinite(record.lower_bound)
+                   ? Json(record.lower_bound)
+                   : Json(nullptr)},
               {"bound_status", bound_status_to_string(record.bound_status)},
               {"upper_bound", std::isfinite(record.upper_bound)
                                   ? Json(record.upper_bound)
@@ -146,7 +193,8 @@ Json record_json(const BatchRunRecord& record) {
               {"optimality_status",
                optimality_status_to_string(
                    record.time_limited ? OptimalityStatus::TIME_LIMIT
-                   : (!record.exact_solver &&
+                   : (record.objective != "minmaxsum" &&
+                              !record.exact_solver &&
                               record.optimality_status ==
                                   OptimalityStatus::OPTIMAL
                           ? OptimalityStatus::FEASIBLE
@@ -155,8 +203,14 @@ Json record_json(const BatchRunRecord& record) {
                minsum_refinement_policy_to_string(
                    record.minsum_refinement_policy)},
               {"exact_solver", record.exact_solver},
-              {"certified_lower_bound", record.certified_lower_bound},
-              {"heuristic_lower_bound", record.heuristic_lower_bound},
+              {"certified_lower_bound",
+               std::isfinite(record.certified_lower_bound)
+                   ? Json(record.certified_lower_bound)
+                   : Json(nullptr)},
+              {"heuristic_lower_bound",
+               std::isfinite(record.heuristic_lower_bound)
+                   ? Json(record.heuristic_lower_bound)
+                   : Json(nullptr)},
               {"gap", record.gap},
               {"num_iterations", record.num_iterations},
               {"num_ip_solves", record.num_ip_solves},
@@ -281,6 +335,9 @@ std::string median_text(std::vector<double> values) {
 }
 
 std::vector<std::string> csv_fields(const BatchRunRecord& record) {
+  const auto finite_string = [](double value) {
+    return std::isfinite(value) ? std::to_string(value) : std::string{};
+  };
   return {record.instance_name,
           record.algorithm_name,
           record.algorithm_category,
@@ -304,20 +361,53 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           std::to_string(record.cpu_time_sec),
           std::to_string(record.peak_memory_mb),
           std::to_string(record.time_limit_per_ip_sec),
-          std::to_string(record.peak_cost),
-          std::to_string(record.peak_time),
-          std::to_string(record.initial_peak_cost),
-          std::to_string(record.heuristic_gap),
+          finite_string(record.peak_cost),
+          finite_string(record.peak_time),
+          finite_string(record.initial_peak_cost),
+          finite_string(record.heuristic_gap),
           record.peak_consistent ? "true" : "false",
-          std::to_string(record.integral_cost),
+          finite_string(record.integral_cost),
+          to_string(record.minmaxsum_minmax_status),
+          to_string(record.minmaxsum_minsum_status),
+          optimality_status_to_string(
+              record.minmaxsum_minmax_optimality),
+          optimality_status_to_string(
+              record.minmaxsum_minsum_optimality),
+          record.dominates_minmax ? "true" : "false",
+          record.dominates_minsum ? "true" : "false",
+          record.dominance_invariants_ok ? "true" : "false",
+          record.minmax_component_peak
+              ? std::to_string(*record.minmax_component_peak)
+              : "",
+          record.minmax_component_integral
+              ? std::to_string(*record.minmax_component_integral)
+              : "",
+          record.minsum_component_peak
+              ? std::to_string(*record.minsum_component_peak)
+              : "",
+          record.minsum_component_integral
+              ? std::to_string(*record.minsum_component_integral)
+              : "",
+          record.minmax_component_certified_gap
+              ? std::to_string(*record.minmax_component_certified_gap)
+              : "",
+          record.minsum_component_certified_gap
+              ? std::to_string(*record.minsum_component_certified_gap)
+              : "",
+          record.minmax_source_run,
+          record.minsum_source_run,
           record.empirical_ratio_to_exact
               ? std::to_string(*record.empirical_ratio_to_exact)
               : "",
           record.ratio_to_incumbent
               ? std::to_string(*record.ratio_to_incumbent)
               : "",
-          std::to_string(record.objective_value),
-          std::to_string(record.lower_bound),
+          std::isfinite(record.objective_value)
+              ? std::to_string(record.objective_value)
+              : "",
+          std::isfinite(record.lower_bound)
+              ? std::to_string(record.lower_bound)
+              : "",
           bound_status_to_string(record.bound_status),
           std::isfinite(record.upper_bound) ? std::to_string(record.upper_bound)
                                             : "",
@@ -328,14 +418,15 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
               : "",
           optimality_status_to_string(
               record.time_limited ? OptimalityStatus::TIME_LIMIT
-              : (!record.exact_solver &&
+              : (record.objective != "minmaxsum" &&
+                         !record.exact_solver &&
                          record.optimality_status == OptimalityStatus::OPTIMAL
                      ? OptimalityStatus::FEASIBLE
                      : record.optimality_status)),
           minsum_refinement_policy_to_string(
               record.minsum_refinement_policy),
           record.exact_solver ? "true" : "false",
-          std::to_string(record.gap),
+          std::isfinite(record.gap) ? std::to_string(record.gap) : "",
           std::to_string(record.num_iterations),
           std::to_string(record.num_ip_solves),
           record.verified ? "true" : "false",
@@ -393,6 +484,15 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
   record.solver_version = "not-applicable";
   record.solver_name = algorithm;
   record.objective = to_string(objective);
+  if (objective == ObjectiveType::MIN_MAX_SUM) {
+    record.objective_value = std::numeric_limits<double>::quiet_NaN();
+    record.lower_bound = std::numeric_limits<double>::quiet_NaN();
+    record.certified_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    record.heuristic_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    record.gap = std::numeric_limits<double>::quiet_NaN();
+  }
   record.repeat = repeat;
   record.failed = true;
   record.error_message = error;
@@ -493,6 +593,18 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   }
   if (config.objectives.empty()) {
     throw std::invalid_argument("batch runner requires at least one objective");
+  }
+  if (std::find(config.objectives.begin(), config.objectives.end(),
+                ObjectiveType::MIN_MAX_SUM) != config.objectives.end() &&
+      (!std::isfinite(config.minmaxsum_config.minmax_budget_fraction) ||
+       !std::isfinite(config.minmaxsum_config.minsum_budget_fraction) ||
+       config.minmaxsum_config.minmax_budget_fraction <= 0.0 ||
+       config.minmaxsum_config.minsum_budget_fraction <= 0.0 ||
+       std::abs(config.minmaxsum_config.minmax_budget_fraction +
+                    config.minmaxsum_config.minsum_budget_fraction -
+                1.0) > 1e-9)) {
+    throw std::invalid_argument(
+        "MinMaxSum batch budget fractions must be positive and sum to one");
   }
   const bool explicitly_selects_both_exact_backends =
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
@@ -881,6 +993,10 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       {"verify_after", record.verify_after},
       {"minsum_refinement_policy",
        minsum_refinement_policy_to_string(config.minsum_refinement_policy)},
+      {"minmaxsum_minmax_budget_fraction",
+       config.minmaxsum_config.minmax_budget_fraction},
+      {"minmaxsum_minsum_budget_fraction",
+       config.minmaxsum_config.minsum_budget_fraction},
       {"handovers_enabled", record.handovers_enabled},
       {"cache_policy", "auto"}};
 
@@ -937,6 +1053,9 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       record.peak_time = result.peak_time;
       record.heuristic_gap = result.heuristic_gap;
       record.peak_consistent = result.peak_consistent;
+      record.verification_kind =
+          result.verified ? VerificationKind::CERTIFIED_CONTINUOUS
+                          : VerificationKind::NONE;
       record.gap = result.gap;
       record.num_iterations = result.num_iterations;
       record.num_ip_solves = result.num_ip_solves;
@@ -947,7 +1066,7 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       record.feasible = result.feasible;
       solution = result.solution;
       trace_rows = result.trace;
-    } else {
+    } else if (objective == ObjectiveType::MIN_SUM) {
       MinSumSolver::Config solver_config;
       solver_config.time_limit_per_ip = config.per_ip_time_limit_sec;
       solver_config.global_time_limit_sec = global_limit;
@@ -980,6 +1099,75 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       record.feasible = result.feasible;
       solution = result.solution;
       trace_rows = result.trace;
+    } else {
+      auto solver_config = config.minmaxsum_config;
+      solver_config.global_time_limit_sec = global_limit;
+      solver_config.minmax_config.time_limit_per_ip =
+          config.per_ip_time_limit_sec;
+      solver_config.minsum_config.time_limit_per_ip =
+          config.per_ip_time_limit_sec;
+      solver_config.minmax_config.gap_target = config.gap_target;
+      solver_config.minsum_config.gap_target = config.gap_target;
+      solver_config.minsum_config.refinement_policy =
+          config.minsum_refinement_policy;
+      solver_config.minmax_config.verify_each_iteration =
+          config.verify_each_iteration;
+      solver_config.minsum_config.verify_each_iteration =
+          config.verify_each_iteration;
+      solver_config.seed = record.seed;
+      solver_config.minmax_source_run =
+          (run_dir / "component-minmax").string();
+      solver_config.minsum_source_run =
+          (run_dir / "component-minsum").string();
+      const auto result =
+          MinMaxSumSolver::solve(instance, *solver, solver_config, budget);
+      record.objective_value =
+          std::numeric_limits<double>::quiet_NaN();
+      record.lower_bound = std::numeric_limits<double>::quiet_NaN();
+      record.certified_lower_bound =
+          std::numeric_limits<double>::quiet_NaN();
+      record.heuristic_lower_bound =
+          std::numeric_limits<double>::quiet_NaN();
+      record.gap = std::numeric_limits<double>::quiet_NaN();
+      record.peak_cost = result.peak_cost;
+      record.initial_peak_cost =
+          std::numeric_limits<double>::quiet_NaN();
+      record.heuristic_gap = std::numeric_limits<double>::quiet_NaN();
+      record.peak_time =
+          result.feasible ? result.solution.peak_time()
+                          : std::numeric_limits<double>::quiet_NaN();
+      record.integral_cost = result.integral_cost;
+      record.peak_consistent = result.peak_consistent;
+      record.minmaxsum_minmax_status = result.minmax_component_status;
+      record.minmaxsum_minsum_status = result.minsum_component_status;
+      record.minmaxsum_minmax_optimality =
+          result.minmax_component_optimality;
+      record.minmaxsum_minsum_optimality =
+          result.minsum_component_optimality;
+      record.dominates_minmax = result.dominates_minmax;
+      record.dominates_minsum = result.dominates_minsum;
+      record.dominance_invariants_ok = result.dominance_invariants_ok;
+      record.minmax_component_peak = result.minmax_component_peak;
+      record.minmax_component_integral = result.minmax_component_integral;
+      record.minsum_component_peak = result.minsum_component_peak;
+      record.minsum_component_integral = result.minsum_component_integral;
+      record.minmax_component_certified_gap =
+          result.minmax_component_certified_gap;
+      record.minsum_component_certified_gap =
+          result.minsum_component_certified_gap;
+      record.minmax_source_run = result.minmax_source_run;
+      record.minsum_source_run = result.minsum_source_run;
+      record.optimality_status = result.joint_optimality_status;
+      record.solve_time_sec = result.total_time_sec;
+      record.verification_time_sec = result.verification_time_sec;
+      record.verified = result.verified;
+      record.feasible = result.feasible;
+      record.time_limited = result.time_limited;
+      if (!result.minmax_error.empty() || !result.minsum_error.empty()) {
+        record.error_message = "MinMax: " + result.minmax_error +
+                               "; MinSum: " + result.minsum_error;
+      }
+      solution = result.solution;
     }
 
     if (!record.feasible) {
@@ -1002,11 +1190,15 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
     if (config.save_traces) {
       TraceWriter::write_csv(trace_rows, record.trace_csv_path);
     }
-    record.peak_cost = solution.peak_cost();
-    if (objective == ObjectiveType::MIN_MAX) {
+    if (solution.is_well_formed()) {
+      record.peak_cost = solution.peak_cost();
+      record.integral_cost = solution.total_integral();
+    }
+    if ((objective == ObjectiveType::MIN_MAX ||
+         objective == ObjectiveType::MIN_MAX_SUM) &&
+        solution.is_well_formed()) {
       record.peak_time = solution.peak_time();
     }
-    record.integral_cost = solution.total_integral();
     record.candidate_count =
         CandidateSet::precompute(instance)->candidates.size();
     if (config.save_solutions && record.feasible) {
@@ -1078,7 +1270,9 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
   write_result(record);
   LOG_INFO("BatchRunner: {} / {} / {} cost={:.6f} t={:.3f}s verified={}",
            record.instance_name, algorithm_name, record.objective,
-           record.objective_value, record.wall_time_sec, record.verified);
+           objective == ObjectiveType::MIN_MAX_SUM ? record.peak_cost
+                                                    : record.objective_value,
+           record.wall_time_sec, record.verified);
   return record;
 }
 
@@ -1128,7 +1322,14 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
          "failed_native_solve_count,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
          "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
          "peak_cost,peak_time,initial_peak_cost,heuristic_gap,peak_consistent,"
-         "integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
+         "integral_cost,minmaxsum_minmax_status,minmaxsum_minsum_status,"
+         "minmaxsum_minmax_optimality,minmaxsum_minsum_optimality,"
+         "dominates_minmax,dominates_minsum,dominance_invariants_ok,"
+         "minmax_component_peak,minmax_component_integral,"
+         "minsum_component_peak,minsum_component_integral,"
+         "minmax_component_certified_gap,minsum_component_certified_gap,"
+         "minmax_source_run,"
+         "minsum_source_run,empirical_ratio_to_exact,ratio_to_incumbent,"
          "objective_value,lower_bound,bound_status,upper_bound,certified_gap,"
          "optimality_status,minsum_refinement_policy,exact_solver,gap,"
          "num_iterations,num_ip_solves,verified,verification_kind,"
@@ -1251,8 +1452,13 @@ void BatchRunner::write_summary(const std::vector<BatchRunRecord>& records,
         if (!first) {
           values << "; ";
         }
-        values << record->objective << ": " << std::setprecision(6)
-               << record->objective_value;
+        values << record->objective << ": " << std::setprecision(6);
+        if (record->objective == "minmaxsum") {
+          values << '(' << record->peak_cost << ", "
+                 << record->integral_cost << ')';
+        } else {
+          values << record->objective_value;
+        }
         first = false;
       }
       output << ' ' << (first ? "n/a" : values.str()) << " |";

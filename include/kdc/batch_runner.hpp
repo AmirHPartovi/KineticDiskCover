@@ -3,6 +3,7 @@
 #include "kdc/istatic_solver.hpp"
 #include "kdc/benchmark_protocol.hpp"
 #include "kdc/minsum.hpp"
+#include "kdc/minmaxsum.hpp"
 #include "kdc/objective.hpp"
 #include "kdc/result_status.hpp"
 #include "kdc/solver_interface.hpp"
@@ -67,6 +68,23 @@ struct BatchRunRecord {
   double heuristic_gap{0.0};
   bool peak_consistent{false};
   double integral_cost{0.0};
+  MinMaxSumComponentStatus minmaxsum_minmax_status{
+      MinMaxSumComponentStatus::NOT_RUN};
+  MinMaxSumComponentStatus minmaxsum_minsum_status{
+      MinMaxSumComponentStatus::NOT_RUN};
+  OptimalityStatus minmaxsum_minmax_optimality{OptimalityStatus::FAILED};
+  OptimalityStatus minmaxsum_minsum_optimality{OptimalityStatus::FAILED};
+  bool dominates_minmax{false};
+  bool dominates_minsum{false};
+  bool dominance_invariants_ok{false};
+  std::optional<double> minmax_component_peak;
+  std::optional<double> minmax_component_integral;
+  std::optional<double> minsum_component_peak;
+  std::optional<double> minsum_component_integral;
+  std::optional<double> minmax_component_certified_gap;
+  std::optional<double> minsum_component_certified_gap;
+  std::string minmax_source_run;
+  std::string minsum_source_run;
   std::optional<double> empirical_ratio_to_exact;
   std::optional<double> ratio_to_incumbent;
   std::optional<std::size_t> candidate_count;
@@ -122,6 +140,7 @@ struct BatchRunConfig {
   double gap_target{0.01};
   MinSumRefinementPolicy minsum_refinement_policy{
       MinSumRefinementPolicy::HEURISTIC_ADAPTIVE};
+  MinMaxSumSolver::Config minmaxsum_config;
   std::string experiment_id;
   std::string actual_backend;
 };

@@ -88,7 +88,7 @@ Options:
   --dataset-profile full|smoke10   Built-in dataset profile (default: full)
   --output PATH                    Experiment directory (default: unique results/experiments/<ID>)
   --algorithms all-fast|all-comparison|LIST
-  --modes minmax|minsum|both
+  --modes minmax|minsum|minmaxsum|both
   --seed N
   --repeats N
   --threads N
@@ -198,7 +198,7 @@ if [[ "$PIPELINE_PROFILE" == reference ]]; then
     *) fail_usage "reference pipeline requires exactly one heuristic algorithm" ;;
   esac
 fi
-case "$MODES" in minmax|minsum|both) ;; *) fail_usage "invalid --modes value" ;; esac
+case "$MODES" in minmax|minsum|minmaxsum|both) ;; *) fail_usage "invalid --modes value" ;; esac
 case "$ANIMATION_MODE" in minmax|minsum|both) ;; *) fail_usage "invalid --animation-mode value" ;; esac
 case "$ANIMATION_POLICY" in best|all-algorithms) ;; *) fail_usage "invalid --animation-policy value" ;; esac
 case "$EXACT_REFERENCE" in auto|ip-kont|branch-and-bound) ;; *) fail_usage "invalid --exact-reference value" ;; esac

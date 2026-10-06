@@ -9,6 +9,7 @@ import csv
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -265,6 +266,10 @@ def run_one(
         "--fast-time-limit", str(config["fast_time_limit_sec"]),
         "--exact-time-limit", str(config["exact_time_limit_sec"]),
         "--minsum-refinement-policy", minsum_refinement_policy,
+        "--minmax-budget-fraction",
+        str(config.get("minmax_budget_fraction", 0.5)),
+        "--minsum-budget-fraction",
+        str(config.get("minsum_budget_fraction", 0.5)),
         "--exact-reference", exact_backend,
         "--profile", profile,
         "--seed", str(seed),
@@ -496,6 +501,12 @@ def _build_plan(
         "fast_time_limit_sec": args.fast_time_limit,
         "exact_time_limit_sec": args.exact_time_limit,
         "minsum_refinement_policy": args.minsum_refinement_policy,
+        "minmax_budget_fraction": getattr(
+            args, "minmax_budget_fraction", 0.5
+        ),
+        "minsum_budget_fraction": getattr(
+            args, "minsum_budget_fraction", 0.5
+        ),
         "requested_threads": args.threads,
         "actual_threads": 1,
         "dataset_profile": args.dataset_profile,
@@ -661,7 +672,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--safety-timeout", type=float, default=None)
-    parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
+    parser.add_argument("--modes",
+                        choices=("minmax", "minsum", "minmaxsum", "both"),
                         default="both")
     parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
                         default="auto")
@@ -671,10 +683,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--exact-time-limit", type=float, default=None)
     parser.add_argument("--minsum-refinement-policy",
                         choices=("adaptive", "sampled"), default="adaptive")
+    parser.add_argument("--minmax-budget-fraction", type=float, default=0.5)
+    parser.add_argument("--minsum-budget-fraction", type=float, default=0.5)
     parser.add_argument("--save-solutions", action="store_true")
     parser.add_argument("--save-traces", action="store_true")
     args = parser.parse_args(argv)
 
+    if (not math.isfinite(args.minmax_budget_fraction)
+            or not math.isfinite(args.minsum_budget_fraction)
+            or args.minmax_budget_fraction <= 0
+            or args.minsum_budget_fraction <= 0):
+        parser.error("MinMaxSum budget fractions must be positive finite numbers")
+    if (args.modes == "minmaxsum"
+            and not math.isclose(args.minmax_budget_fraction
+                                 + args.minsum_budget_fraction,
+                                 1.0, rel_tol=0.0, abs_tol=1e-9)):
+        parser.error("MinMaxSum budget fractions must sum to one")
     if not SOLVER.is_file():
         parser.error(f"solver executable not found: {SOLVER}")
     source_instances = Path(args.instances).resolve()

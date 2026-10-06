@@ -90,7 +90,8 @@ void SolutionSerializer::save_json(const Instance& instance,
   const double peak_cost = solution.peak_cost();
   const double peak_time = solution.peak_time();
   const bool peak_consistent =
-      solution.objective != ObjectiveType::MIN_MAX ||
+      (solution.objective != ObjectiveType::MIN_MAX &&
+       solution.objective != ObjectiveType::MIN_MAX_SUM) ||
       Verifier::check_peak_consistency(solution, peak_cost, peak_time);
   if (!peak_consistent) {
     invalid_solution("MinMax peak is inconsistent with the solution");
@@ -206,7 +207,8 @@ KineticSolution SolutionSerializer::load_json(const Instance& instance,
                  1e-6 * std::max(1.0, std::abs(computed));
     };
     const bool peak_consistent =
-        solution.objective != ObjectiveType::MIN_MAX ||
+        (solution.objective != ObjectiveType::MIN_MAX &&
+         solution.objective != ObjectiveType::MIN_MAX_SUM) ||
         Verifier::check_peak_consistency(solution, stored_peak,
                                          stored_peak_time);
     if (stored_intervals != solution.intervals.size() ||

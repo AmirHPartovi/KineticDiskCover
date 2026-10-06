@@ -8,6 +8,7 @@
 #include "kdc/kont_solver.hpp"
 #include "kdc/logging.hpp"
 #include "kdc/minmax.hpp"
+#include "kdc/minmaxsum.hpp"
 #include "kdc/minsum.hpp"
 #include "kdc/objective.hpp"
 #include "kdc/profiling.hpp"
@@ -36,12 +37,12 @@ void usage() {
   std::cout
       << "Usage: kdc-solver <command> [options]\n"
       << "\nCommands:\n"
-      << "  solve     --instance FILE --mode minmax|minsum --output FILE "
+      << "  solve     --instance FILE --mode minmax|minsum|minmaxsum --output FILE "
          "[--algorithm nn|ip-kont|brute-force|branch-and-bound|greedy|"
          "lp-rounding|primal-dual|local-search|sa|genetic|shifting]\n"
          "         [--verify-each-iteration] [--no-verify]\n"
       << "  verify    --instance FILE --solution FILE\n"
-      << "  benchmark --dataset DIR --output DIR --mode both|minmax|minsum "
+      << "  benchmark --dataset DIR --output DIR --mode both|minmax|minsum|minmaxsum "
          "[--parallel] [--threads N] [--exact-reference ip-kont|"
          "branch-and-bound|auto] [--fast-time-limit SEC] "
          "[--exact-time-limit SEC] "
@@ -57,11 +58,12 @@ void usage() {
          "[--exact-reference auto|ip-kont|branch-and-bound]\n"
       << "  batch     [--instances DIR] [--output DIR] [--algorithms LIST] "
          "[--profile fast|exact-reference|debug] [--seed N] [--repeats N] "
-         "[--modes minmax|minsum|both] [--parallel] [--threads N] "
+         "[--modes minmax|minsum|minmaxsum|both] [--parallel] [--threads N] "
          "[--exact-reference ip-kont|branch-and-bound|auto] "
          "[--verify-each-iteration] [--no-verify]\n"
       << "            [--fast-time-limit SEC] [--exact-time-limit SEC]\n"
       << "            [--minsum-refinement-policy adaptive|sampled]\n"
+      << "            [--minmax-budget-fraction F --minsum-budget-fraction F]\n"
       << "  --help    Show this help message\n";
 }
 
@@ -72,7 +74,7 @@ void command_help(const std::string& command) {
     std::cout << "Usage: kdc-solver verify --instance FILE --solution FILE\n";
   } else if (command == "benchmark") {
     std::cout << "Usage: kdc-solver benchmark --dataset DIR --output DIR "
-                 "--mode both|minmax|minsum [--parallel] [--threads N] "
+                 "--mode both|minmax|minsum|minmaxsum [--parallel] [--threads N] "
                  "[--exact-reference ip-kont|branch-and-bound|auto] "
                  "[--minsum-refinement-policy adaptive|sampled] "
                  "[--verify-each-iteration] [--no-verify]\n"
@@ -96,7 +98,7 @@ void command_help(const std::string& command) {
         << "  --output DIR         Output directory (default: results/batch)\n"
         << "  --algorithms LIST    Comma-separated algorithm names (default: "
            "main benchmark set)\n"
-        << "  --modes MODE         minmax|minsum|both (default: both)\n"
+        << "  --modes MODE         minmax|minsum|minmaxsum|both (default: both)\n"
         << "  --parallel           Run instances concurrently\n"
         << "  --threads N          Worker threads (default: available CPU cores)\n"
         << "  --time-limit SEC     Per static/IP solve timeout (default: 60)\n"
@@ -104,6 +106,8 @@ void command_help(const std::string& command) {
         << "  --exact-time-limit SEC Global limit for exact runs (default: 600)\n"
         << "  --exact-reference    ip-kont|branch-and-bound|auto (default: auto)\n"
         << "  --minsum-refinement-policy adaptive|sampled (default: adaptive)\n"
+        << "  --minmax-budget-fraction F (default: 0.5)\n"
+        << "  --minsum-budget-fraction F (default: 0.5)\n"
         << "  --no-verify          Skip solution verification\n"
         << "  --verify-each-iteration  Verify every accepted iteration\n"
         << "  --save-solutions     Retain solutions (opt-in for FAST profile)\n"
@@ -322,6 +326,10 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   config.exact_time_limit_sec = args.get_double(
       "exact-time-limit", config.exact_time_limit_sec);
   config.verify_each_iteration = args.has("verify-each-iteration");
+  config.minmaxsum_cfg.minmax_budget_fraction =
+      args.get_double("minmax-budget-fraction", 0.5);
+  config.minmaxsum_cfg.minsum_budget_fraction =
+      args.get_double("minsum-budget-fraction", 0.5);
   const std::string minsum_policy =
       args.get("minsum-refinement-policy", "adaptive");
   if (minsum_policy == "adaptive") {
@@ -343,10 +351,12 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   if (config.dataset_dir.empty() || config.output_dir.empty() || mode.empty()) {
     throw std::invalid_argument(
         "benchmark requires --dataset DIR --output DIR --mode "
-        "both|minmax|minsum");
+        "both|minmax|minsum|minmaxsum");
   }
-  if (mode != "both" && mode != "minmax" && mode != "minsum") {
-    throw std::invalid_argument("benchmark mode must be both, minmax, or minsum");
+  if (mode != "both" && mode != "minmax" && mode != "minsum" &&
+      mode != "minmaxsum") {
+    throw std::invalid_argument(
+        "benchmark mode must be both, minmax, minsum, or minmaxsum");
   }
   if (config.exact_reference != "auto" &&
       config.exact_reference != "ip-kont" &&
@@ -456,6 +466,55 @@ int handle_solve(int argc, char** argv) {
               << kdc::verification_kind_to_string(result.verification_kind)
               << " verification_time=" << result.verification_time_sec << "s\n";
     solution = std::move(result.solution);
+  } else if (objective == kdc::ObjectiveType::MIN_MAX_SUM) {
+    kdc::MinMaxSumSolver::Config config;
+    config.global_time_limit_sec =
+        static_solver->is_exact() ? exact_time_limit : fast_time_limit;
+    config.minmax_budget_fraction =
+        args.get_double("minmax-budget-fraction", 0.5);
+    config.minsum_budget_fraction =
+        args.get_double("minsum-budget-fraction", 0.5);
+    config.minmax_config.time_limit_per_ip = time_limit;
+    config.minsum_config.time_limit_per_ip = time_limit;
+    config.minmax_config.gap_target = gap_target;
+    config.minsum_config.gap_target = gap_target;
+    config.minmax_config.use_handovers = use_handovers;
+    config.minmax_config.use_no_dup = use_no_dup;
+    config.minmax_config.use_partial_ext = use_partial_ext;
+    config.minsum_config.use_handovers = use_handovers;
+    config.minsum_config.use_no_dup = use_no_dup;
+    config.minsum_config.use_partial_ext = use_partial_ext;
+    config.minsum_config.verify_each_iteration = verify_each_iteration;
+    const std::string minsum_policy =
+        args.get("minsum-refinement-policy", "adaptive");
+    if (minsum_policy == "adaptive") {
+      config.minsum_config.refinement_policy =
+          kdc::MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+    } else if (minsum_policy == "sampled") {
+      config.minsum_config.refinement_policy =
+          kdc::MinSumRefinementPolicy::CERTIFIED_BOUND;
+    } else {
+      throw std::invalid_argument(
+          "--minsum-refinement-policy must be adaptive or sampled");
+    }
+    config.minmax_config.verify_each_iteration = verify_each_iteration;
+    auto result =
+        kdc::MinMaxSumSolver::solve(instance, *static_solver, config);
+    std::cout << "minmaxsum peak_cost=" << result.peak_cost
+              << " integral_cost=" << result.integral_cost
+              << " minmax_status="
+              << kdc::to_string(result.minmax_component_status)
+              << " minsum_status="
+              << kdc::to_string(result.minsum_component_status)
+              << " joint_status="
+              << kdc::optimality_status_to_string(
+                     result.joint_optimality_status)
+              << " verified=" << (result.verified ? "true" : "false")
+              << " time=" << result.total_time_sec << "s\n";
+    if (!result.feasible) {
+      return 1;
+    }
+    solution = std::move(result.solution);
   } else {
     kdc::MinSumSolver::Config config;
     config.global_time_limit_sec =
@@ -493,6 +552,10 @@ int handle_solve(int argc, char** argv) {
   }
 
   if (!output_path.empty()) {
+    if (!solution.is_well_formed()) {
+      std::cerr << "error: no feasible solution is available to save\n";
+      return 1;
+    }
     kdc::SolutionSerializer::save_json(instance, solution, output_path);
     std::cout << "solution saved to " << output_path << '\n';
   }
@@ -598,6 +661,10 @@ int handle_batch(int argc, char** argv) {
   config.num_threads = args.get_int("threads", 1);
   config.verify_after = !args.has("no-verify");
   config.verify_each_iteration = args.has("verify-each-iteration");
+  config.minmaxsum_config.minmax_budget_fraction =
+      args.get_double("minmax-budget-fraction", 0.5);
+  config.minmaxsum_config.minsum_budget_fraction =
+      args.get_double("minsum-budget-fraction", 0.5);
   config.strict_exact_reference = !args.has("allow-no-exact-reference");
   config.save_solutions = args.has("save-solutions");
   config.save_traces = args.has("save-traces");
@@ -644,9 +711,12 @@ int handle_batch(int argc, char** argv) {
   if (modes == "minsum" || modes == "both") {
     config.objectives.push_back(kdc::ObjectiveType::MIN_SUM);
   }
+  if (modes == "minmaxsum") {
+    config.objectives.push_back(kdc::ObjectiveType::MIN_MAX_SUM);
+  }
   if (config.objectives.empty()) {
     throw std::invalid_argument(
-        "--modes must be minmax, minsum, or both");
+        "--modes must be minmax, minsum, minmaxsum, or both");
   }
   if (config.exact_reference != "auto" &&
       config.exact_reference != "ip-kont" &&

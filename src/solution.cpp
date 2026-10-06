@@ -621,9 +621,10 @@ KineticSolution KineticSolution::partial_extend(
                              current.intervals.back().t_end);
   KineticSolution result;
   result.objective = objective_type;
-  if (objective_type == ObjectiveType::MIN_MAX) {
+  if (objective_type == ObjectiveType::MIN_MAX ||
+      objective_type == ObjectiveType::MIN_MAX_SUM) {
     // MinMax refinement is peak-based: the actual decision is made later by
-    // `combine(..., MIN_MAX)`, which constructs the pointwise lower envelope.
+    // `combine`, which constructs the pointwise lower envelope.
     // Carrying the whole candidate through the common domain preserves the
     // correct MinMax semantics and avoids rejecting a candidate solely because
     // its cumulative integral is larger than the incumbent's.
