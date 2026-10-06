@@ -1,0 +1,707 @@
+{
+  "experiment_id": "minmax-correctness-20261006-run03",
+  "pipeline": "smoke",
+  "experiment_label": "development / smoke validation",
+  "pipeline_config": {
+    "pipeline": "smoke",
+    "label": "development / smoke validation",
+    "dataset_profile": "smoke10",
+    "dataset": "data/instances/public_instance_set",
+    "smoke_count": 10,
+    "smoke_max_n": 50,
+    "smoke_max_m": 25,
+    "algorithms": "all",
+    "exact_backend": "auto",
+    "objectives": "both",
+    "repeats": 1,
+    "seed": 42,
+    "threads": 2,
+    "fast_time_limit_sec": 5,
+    "exact_time_limit_sec": 10,
+    "static_time_limit_sec": 2,
+    "benchmark_profile": "debug",
+    "verify_after": true,
+    "verify_each_iteration": true,
+    "save_traces": true,
+    "save_solutions": true,
+    "tables": true,
+    "figures": true,
+    "animation": {
+      "enabled": true,
+      "policy": "all-algorithms",
+      "top_n": 0,
+      "fps": 12,
+      "frames": 48,
+      "dpi": 90
+    },
+    "artifact_retention_days": 14,
+    "required_stages": [
+      "init",
+      "dataset",
+      "build",
+      "tests",
+      "preflight",
+      "backend_selection",
+      "benchmark",
+      "result_validation",
+      "tables",
+      "figures",
+      "animations",
+      "final_report",
+      "summary"
+    ]
+  },
+  "pipeline_config_sha256": "257faf393d327125f8c4dff784f08276b4cf4d4e2d0ccf5f59632dd520027378",
+  "dataset_profile": "smoke10",
+  "timestamp": "2026-10-06T02:42:16.996750+00:00",
+  "repository": "AmirHPartovi/KineticDiskCover",
+  "git_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426",
+  "git_dirty": true,
+  "dataset_source": "data/instances/public_instance_set",
+  "dataset_source_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
+  "source_dataset_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
+  "selection_manifest": "dataset_selection_manifest.json",
+  "selected_instance_count": 10,
+  "selection_policy": "select eligible small candidates first, maximizing family coverage, then fill by size; use oversized family representatives only when fewer than the requested count of valid in-limit instances exist",
+  "selection_manifest_fingerprint": "d6b1715b34b0f92e47c6186b67225b573f1d5675f804daabb911b075d1a06987",
+  "selected_files": [
+    {
+      "family": "us-night",
+      "source": "data/instances/public_instance_set/us-night-0000030.instance.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1679,
+      "sha256": "89cc3fc4c0fbe027a9b8759bd278f62531c28aa58f29008e0bfe6c51bb1b2ad9",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 1,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "sbgdb-20200507-pntset",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000030.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1683,
+      "sha256": "ffc4aabe37f9ed2cf60d2a9fcd17bfe484812a9238bdd13a144105c20cff10e6",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 2,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "sbgdb-20200507-fpg-poly",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "n": 1,
+      "m": 25,
+      "file_size_bytes": 1723,
+      "sha256": "7493750b7865f0c242247028e6c27da92e8ccb54d73331418b979ea178147b6a",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 3,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "uniform",
+      "source": "data/instances/public_instance_set/uniform-0000030-2.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1779,
+      "sha256": "cbaabccb536ed99942d3b3772832ec3a58187cd716d0fee8b2cca38f98183b9e",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 4,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "london",
+      "source": "data/instances/public_instance_set/london-0000030.instance.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1790,
+      "sha256": "0928f729f52886a6a99b6ff3352347460e0958436f3b7375a63da6788fcd8887",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 5,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "stars",
+      "source": "data/instances/public_instance_set/stars-0000030.instance.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1791,
+      "sha256": "1955c914c7410f738387ff1e95bac363bfb7357b0e5b333159ad3f16dbb4c9c4",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 6,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "euro-night",
+      "source": "data/instances/public_instance_set/euro-night-0000030.mdc",
+      "n": 2,
+      "m": 25,
+      "file_size_bytes": 1792,
+      "sha256": "e7069adc74e0bfd0a52c160d05be6be3ab32aae9233d6eb8bf78abe30246f125",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 7,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "att48",
+      "source": "data/instances/public_instance_set/att48.mdc",
+      "n": 11,
+      "m": 25,
+      "file_size_bytes": 2866,
+      "sha256": "8efa61a1d9ab8fa13553ad56c76096e4c1a178a27ce03d87ca080f6c8d58a91f",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 8,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "berlin52",
+      "source": "data/instances/public_instance_set/berlin52.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3106,
+      "sha256": "3939d9e3cc19729916df1e7e8bfb198827657566a94afdd70ba5aa630f47af7d",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 9,
+      "exceeds_smoke_limits": false
+    },
+    {
+      "family": "eil51",
+      "source": "data/instances/public_instance_set/eil51.mdc",
+      "n": 13,
+      "m": 25,
+      "file_size_bytes": 3111,
+      "sha256": "f6e4afd678253f29a791daaa73035ab647a9e6c3972e72259f6cde70cb7309c6",
+      "selection_reason": "smallest in-limit valid candidate selected for family coverage",
+      "selection_rank": 10,
+      "exceeds_smoke_limits": false
+    }
+  ],
+  "dataset_canonical_path": "dataset",
+  "dataset_fingerprint": "1e0ddb3329f4520e28b5080cc58b7e5b784b9a06f510f8fd3d778db3ef605fa9",
+  "instance_count": 10,
+  "algorithm_list": "branch-and-bound,greedy,nn",
+  "algorithm_set": [
+    "nn",
+    "greedy",
+    "branch-and-bound"
+  ],
+  "objectives": [
+    "minmax"
+  ],
+  "profile": "debug",
+  "benchmark_profile": "debug",
+  "seed": 42,
+  "repeats": 1,
+  "thread_count": 2,
+  "fast_time_limit_sec": 5.0,
+  "exact_time_limit_sec": 10.0,
+  "per_static_time_limit_sec": 2.0,
+  "requested_exact_backend": "auto",
+  "animation_top_n": 0,
+  "animation_mode": "both",
+  "animation_policy": "all-algorithms",
+  "animation_instances_requested": "berlin52,att48,eil51",
+  "verify_after": true,
+  "verify_each_iteration": true,
+  "save_traces": true,
+  "save_solutions": true,
+  "artifact_retention_days": 14,
+  "selected_exact_backend": "branch-and-bound",
+  "actual_exact_backend": "branch-and-bound",
+  "exact_reference_calibration": {
+    "calibration_instances": [],
+    "successful_runs": [],
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "selected_backend": "branch-and-bound",
+    "actual_backend": "branch-and-bound",
+    "kont_runtime_available": false
+  },
+  "animation_instance_selection": [
+    "berlin52",
+    "att48",
+    "eil51"
+  ],
+  "python_version": "3.9.6",
+  "compiler": null,
+  "build_type": null,
+  "host": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpu_count": 8
+  },
+  "commands": [
+    {
+      "stage": "init",
+      "command": "bash scripts/run_experiment.sh --pipeline smoke --algorithms branch-and-bound\\,greedy\\,nn --modes minmax --output results/experiments/minmax-correctness-20261006-run03 --animation-instances berlin52\\,att48\\,eil51 --with-animations",
+      "recorded_at": "2026-10-06T02:42:17.140277+00:00"
+    },
+    {
+      "stage": "dataset",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --source /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/.selection-smoke.utNEQu/selection.json ",
+      "recorded_at": "2026-10-06T02:42:17.295396+00:00"
+    },
+    {
+      "stage": "build",
+      "command": "bash -c cmake\\ -S\\ \\\"\\$1\\\"\\ -B\\ \\\"\\$1/build\\\"\\ -DCMAKE_BUILD_TYPE=Release\\ \\&\\&\\ cmake\\ --build\\ \\\"\\$1/build\\\"\\ --parallel\\ \\\"\\$2\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon 2 ",
+      "recorded_at": "2026-10-06T02:42:17.571807+00:00"
+    },
+    {
+      "stage": "tests",
+      "command": "ctest --test-dir /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build --output-on-failure ",
+      "recorded_at": "2026-10-06T02:42:22.453415+00:00"
+    },
+    {
+      "stage": "preflight",
+      "command": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build/kdc-solver preflight --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/preflight/preflight_report.md ",
+      "recorded_at": "2026-10-06T02:42:23.446932+00:00"
+    },
+    {
+      "stage": "backend_selection",
+      "command": "bash -c \\\"\\$1/build/kdc-solver\\\"\\ calibrate\\ --dataset\\ \\\"\\$2/dataset\\\"\\ --output\\ \\\"\\$2/calibration\\\"\\ --exact-reference\\ \\\"\\$3\\\"\\ \\&\\&\\ cp\\ \\\"\\$2/calibration/experiment_manifest.json\\\"\\ \\\"\\$2/batch/experiment_manifest.json\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 auto ",
+      "recorded_at": "2026-10-06T02:42:23.720360+00:00"
+    },
+    {
+      "stage": "benchmark",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch --algorithms branch-and-bound\\,greedy\\,nn --profile debug --modes minmax --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset_selection_manifest.json ",
+      "recorded_at": "2026-10-06T02:42:23.968807+00:00"
+    },
+    {
+      "stage": "result_validation",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --results /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json ",
+      "recorded_at": "2026-10-06T02:42:25.558989+00:00"
+    },
+    {
+      "stage": "tables",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/build_tables.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/tables ",
+      "recorded_at": "2026-10-06T02:42:25.862985+00:00"
+    },
+    {
+      "stage": "research_summary",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "recorded_at": "2026-10-06T02:42:26.834794+00:00"
+    },
+    {
+      "stage": "figures",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/plot_comparisons.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/figures --dpi 300 ",
+      "recorded_at": "2026-10-06T02:42:27.335085+00:00"
+    },
+    {
+      "stage": "animations",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --modes both --policy all-algorithms --instances berlin52\\,att48\\,eil51 --top-n 0 --fps 12 --frames 48 --dpi 90 ",
+      "recorded_at": "2026-10-06T02:42:50.315606+00:00"
+    },
+    {
+      "stage": "final_report",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "recorded_at": "2026-10-06T02:43:48.323465+00:00"
+    },
+    {
+      "stage": "summary",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "recorded_at": "2026-10-06T02:43:48.546723+00:00"
+    }
+  ],
+  "stages": {
+    "init": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:17.140266+00:00",
+      "completed_at": "2026-10-06T02:42:17.140266+00:00",
+      "command": "bash scripts/run_experiment.sh --pipeline smoke --algorithms branch-and-bound\\,greedy\\,nn --modes minmax --output results/experiments/minmax-correctness-20261006-run03 --animation-instances berlin52\\,att48\\,eil51 --with-animations",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "dataset": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:17.447572+00:00",
+      "started_at": "2026-10-06T02:42:17.295202+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --source /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/.selection-smoke.utNEQu/selection.json ",
+      "completed_at": "2026-10-06T02:42:17.447572+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "build": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:22.329616+00:00",
+      "started_at": "2026-10-06T02:42:17.571615+00:00",
+      "command": "bash -c cmake\\ -S\\ \\\"\\$1\\\"\\ -B\\ \\\"\\$1/build\\\"\\ -DCMAKE_BUILD_TYPE=Release\\ \\&\\&\\ cmake\\ --build\\ \\\"\\$1/build\\\"\\ --parallel\\ \\\"\\$2\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon 2 ",
+      "completed_at": "2026-10-06T02:42:22.329616+00:00",
+      "exit_code": 0,
+      "duration_sec": 5.0
+    },
+    "tests": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:23.329481+00:00",
+      "started_at": "2026-10-06T02:42:22.453196+00:00",
+      "command": "ctest --test-dir /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build --output-on-failure ",
+      "completed_at": "2026-10-06T02:42:23.329481+00:00",
+      "exit_code": 0,
+      "duration_sec": 1.0
+    },
+    "preflight": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:23.592371+00:00",
+      "started_at": "2026-10-06T02:42:23.446705+00:00",
+      "command": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build/kdc-solver preflight --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/preflight/preflight_report.md ",
+      "completed_at": "2026-10-06T02:42:23.592371+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "backend_selection": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:23.820571+00:00",
+      "started_at": "2026-10-06T02:42:23.720159+00:00",
+      "command": "bash -c \\\"\\$1/build/kdc-solver\\\"\\ calibrate\\ --dataset\\ \\\"\\$2/dataset\\\"\\ --output\\ \\\"\\$2/calibration\\\"\\ --exact-reference\\ \\\"\\$3\\\"\\ \\&\\&\\ cp\\ \\\"\\$2/calibration/experiment_manifest.json\\\"\\ \\\"\\$2/batch/experiment_manifest.json\\\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 auto ",
+      "completed_at": "2026-10-06T02:42:23.820571+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "benchmark": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:25.386313+00:00",
+      "started_at": "2026-10-06T02:42:23.968606+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/run_batch.py --instances /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch --algorithms branch-and-bound\\,greedy\\,nn --profile debug --modes minmax --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --force --dataset-profile smoke10 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset_selection_manifest.json ",
+      "completed_at": "2026-10-06T02:42:25.386313+00:00",
+      "exit_code": 0,
+      "duration_sec": 2.0
+    },
+    "result_validation": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:25.723237+00:00",
+      "started_at": "2026-10-06T02:42:25.558752+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --results /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json ",
+      "completed_at": "2026-10-06T02:42:25.723237+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "tables": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:26.666186+00:00",
+      "started_at": "2026-10-06T02:42:25.862619+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/build_tables.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/tables ",
+      "completed_at": "2026-10-06T02:42:26.666186+00:00",
+      "exit_code": 0,
+      "duration_sec": 1.0
+    },
+    "research_summary": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:27.170909+00:00",
+      "started_at": "2026-10-06T02:42:26.834627+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "completed_at": "2026-10-06T02:42:27.170909+00:00",
+      "exit_code": 0,
+      "duration_sec": 1.0
+    },
+    "figures": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:42:50.197110+00:00",
+      "started_at": "2026-10-06T02:42:27.334891+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/plot_comparisons.py --input /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/batch/master_results.json --output /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/figures --dpi 300 ",
+      "completed_at": "2026-10-06T02:42:50.197110+00:00",
+      "exit_code": 0,
+      "duration_sec": 23.0
+    },
+    "animations": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:43:48.246139+00:00",
+      "started_at": "2026-10-06T02:42:50.315424+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 --modes both --policy all-algorithms --instances berlin52\\,att48\\,eil51 --top-n 0 --fps 12 --frames 48 --dpi 90 ",
+      "completed_at": "2026-10-06T02:43:48.246139+00:00",
+      "exit_code": 0,
+      "duration_sec": 58.0
+    },
+    "final_report": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:43:48.469263+00:00",
+      "started_at": "2026-10-06T02:43:48.323288+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "completed_at": "2026-10-06T02:43:48.469263+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    },
+    "summary": {
+      "status": "COMPLETED",
+      "updated_at": "2026-10-06T02:43:48.687620+00:00",
+      "started_at": "2026-10-06T02:43:48.546547+00:00",
+      "command": "python3 /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03 ",
+      "completed_at": "2026-10-06T02:43:48.687620+00:00",
+      "exit_code": 0,
+      "duration_sec": 0.0
+    }
+  },
+  "required_stages": [
+    "init",
+    "dataset",
+    "build",
+    "tests",
+    "preflight",
+    "backend_selection",
+    "benchmark",
+    "result_validation",
+    "tables",
+    "figures",
+    "animations",
+    "final_report",
+    "summary"
+  ],
+  "status": "COMPLETE",
+  "reproduction_command": "bash scripts/run_experiment.sh --pipeline smoke --algorithms branch-and-bound\\,greedy\\,nn --modes minmax --output results/experiments/minmax-correctness-20261006-run03 --animation-instances berlin52\\,att48\\,eil51 --with-animations",
+  "dataset_conversion": "mdc-to-canonical-json",
+  "canonical_instance_files": [
+    "att48/att48.json",
+    "berlin52/berlin52.json",
+    "eil51/eil51.json",
+    "euro-night/euro-night-0000030.json",
+    "london/london-0000030.instance.json",
+    "sbgdb-20200507-fpg-poly/sbgdb-20200507-fpg-poly_0000000030.json",
+    "sbgdb-20200507-pntset/sbgdb-20200507-pntset-0000030.json",
+    "stars/stars-0000030.instance.json",
+    "uniform/uniform-0000030-2.json",
+    "us-night/us-night-0000030.instance.json"
+  ],
+  "solver_manifest": {
+    "actual_backend": "branch-and-bound",
+    "algorithm_set": [
+      "nn",
+      "greedy",
+      "branch-and-bound"
+    ],
+    "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+    "calibration_decision_version": 4,
+    "calibration_instances": [],
+    "calibration_objectives": [
+      "minmax",
+      "minsum"
+    ],
+    "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset",
+    "dataset_fingerprint": "2154d4c806f4bae9d7b3975aea72a557abcda55e1be048534042ce3cc1b036c8",
+    "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+    "dataset_path": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/dataset",
+    "dataset_profile": "smoke10",
+    "experiment_id": "minmax-correctness-20261006-run03",
+    "fallback_used": false,
+    "kont_runtime_available": false,
+    "kont_version": "7.2.4",
+    "native_kont_available": false,
+    "native_kont_used": false,
+    "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run03/calibration",
+    "rejected_runs": [
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "ip-kont",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minmax",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      },
+      {
+        "accepted": false,
+        "backend": "branch-and-bound",
+        "instance": null,
+        "objective": "minsum",
+        "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+      }
+    ],
+    "requested_backend": "auto",
+    "runtime_statistics": {
+      "branch-and-bound_median_sec": -1.0,
+      "by_objective": {
+        "minmax": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        },
+        "minsum": {
+          "branch-and-bound_median_sec": -1.0,
+          "ip-kont_median_sec": -1.0,
+          "paired_run_count": 0
+        }
+      },
+      "ip-kont_median_sec": -1.0,
+      "paired_run_count": 0,
+      "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+    },
+    "seed_policy": {
+      "base_seed": 42,
+      "repeats": 1
+    },
+    "selected_backend": "branch-and-bound",
+    "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+    "successful_runs": [],
+    "time_limits": {
+      "exact_global_sec": 10.0,
+      "fast_global_sec": 5.0,
+      "per_static_solve_sec": 2.0
+    }
+  },
+  "result_integrity": {
+    "counts": {
+      "total": 30,
+      "successful": 30,
+      "feasible": 30,
+      "verified": 30,
+      "failed": 0,
+      "timeouts": 0
+    },
+    "statuses": {
+      "OPTIMAL": 7,
+      "FEASIBLE": 23,
+      "TIME_LIMIT": 0,
+      "INFEASIBLE": 0,
+      "FAILED": 0
+    },
+    "by_objective": {
+      "minmax": {
+        "total": 30,
+        "successful": 30,
+        "feasible": 30,
+        "verified": 30,
+        "failed": 0,
+        "timeouts": 0,
+        "OPTIMAL": 7,
+        "FEASIBLE": 23,
+        "TIME_LIMIT": 0,
+        "INFEASIBLE": 0,
+        "FAILED": 0
+      },
+      "minsum": {
+        "total": 0,
+        "successful": 0,
+        "feasible": 0,
+        "verified": 0,
+        "failed": 0,
+        "timeouts": 0,
+        "OPTIMAL": 0,
+        "FEASIBLE": 0,
+        "TIME_LIMIT": 0,
+        "INFEASIBLE": 0,
+        "FAILED": 0
+      }
+    },
+    "expected_runs": 30,
+    "actual_runs": 30,
+    "missing_run_count": 0,
+    "duplicate_run_count": 0,
+    "missing_solution_paths": [],
+    "missing_trace_paths": [],
+    "exact_backend_provenance": [
+      "requested=auto; actual=branch-and-bound"
+    ],
+    "algorithm_count": 3,
+    "instance_count": 10,
+    "canonical_aggregate": {
+      "classifications": {
+        "completed_runs": 30,
+        "expected_runs": 30,
+        "extra_attempts": 0,
+        "failed_runs": 0,
+        "invalid_runs": 0,
+        "latest_completed_runs": 30,
+        "latest_failed_runs": 0,
+        "latest_time_limit_runs": 0,
+        "missing_runs": 0,
+        "rerun_attempt_groups": 0,
+        "time_limit_runs": 0,
+        "unexpected_runs": 0,
+        "valid_runs": 30
+      },
+      "complete": true,
+      "experiment_id": "minmax-correctness-20261006-run03",
+      "exports": {
+        "aggregates/results.csv": {
+          "sha256": "c88efa09aa16f512cea8b57d6230bfa108f206f820ae4e0e558ab24b565e5985",
+          "size_bytes": 53309
+        },
+        "aggregates/results.json": {
+          "sha256": "0b6247b97cf91a3d214ea9adc3a37ad781421eea89e086a05d14c170eeb6d8b9",
+          "size_bytes": 328417
+        },
+        "aggregates/results.jsonl": {
+          "sha256": "20581454fb9d8def0fe1bdadb3b4d916891d8fd14304156b347ca943ce4c72ac",
+          "size_bytes": 249694
+        },
+        "batch/master_results.csv": {
+          "sha256": "c88efa09aa16f512cea8b57d6230bfa108f206f820ae4e0e558ab24b565e5985",
+          "size_bytes": 53309
+        },
+        "batch/master_results.json": {
+          "sha256": "b2e7390d31a376d34bee3d04a3b63f09960574522c0ea37d9062c3cc8a2280e4",
+          "size_bytes": 114089
+        },
+        "runs/index.jsonl": {
+          "sha256": "421b8d7f1d5038f7fb8c0dbf3baad0298c55c0093226fa6ec0f46b8197d0a393",
+          "size_bytes": 16912
+        }
+      },
+      "generated_at": "2026-10-06T02:42:25.296782Z",
+      "invalid_runs": [],
+      "missing_run_keys": [],
+      "plan_sha256": "f152f1549e4166e8f526aa26d99527b8fba8f213e1c6bebb0bff2702d2fee35e",
+      "record_count": 30,
+      "rerun_attempts": {},
+      "schema_version": 1,
+      "unexpected_run_keys": []
+    }
+  },
+  "failed_or_skipped_stages": []
+}

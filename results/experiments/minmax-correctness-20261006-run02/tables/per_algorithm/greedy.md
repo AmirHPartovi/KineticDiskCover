@@ -1,0 +1,12 @@
+| instance_name                      | minmax_objective | minsum_objective | minmax_time | minsum_time | minmax_gap_pct | minsum_gap_pct | minmax_mem | minsum_mem | minmax_verified | minsum_verified |
+| ---------------------------------- | ---------------- | ---------------- | ----------- | ----------- | -------------- | -------------- | ---------- | ---------- | --------------- | --------------- |
+| euro-night-0000030                 | 387.867          |                  | 0.001s      |             | 24.55%         |                | 17.1 MB    |            | true            |                 |
+| stars-0000030.instance             | 488.32           |                  | 0.001s      |             | 17.87%         |                | 17.2 MB    |            | true            |                 |
+| london-0000030.instance            | 945.587          |                  | 0.001s      |             | 77.61%         |                | 17.1 MB    |            | true            |                 |
+| us-night-0000030.instance          | 1072             |                  | 0.001s      |             | 0.00%          |                | 17.0 MB    |            | true            |                 |
+| sbgdb-20200507-fpg-poly_0000000030 | 1092.12          |                  | 0.001s      |             | 0.00%          |                | 17.0 MB    |            | true            |                 |
+| uniform-0000030-2                  | 1541.13          |                  | 0.001s      |             | 24.94%         |                | 17.2 MB    |            | true            |                 |
+| sbgdb-20200507-pntset-0000030      | 1781.07          |                  | 0.001s      |             | 0.00%          |                | 17.0 MB    |            | true            |                 |
+| att48                              | 2675.37          |                  | 0.017s      |             | 127.51%        |                | 17.4 MB    |            | true            |                 |
+| eil51                              | 3217.42          |                  | 0.022s      |             | 341.76%        |                | 17.4 MB    |            | true            |                 |
+| berlin52                           | 5079.12          |                  | 0.013s      |             | 162.60%        |                | 17.4 MB    |            | true            |                 |

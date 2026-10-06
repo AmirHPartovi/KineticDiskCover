@@ -1,0 +1,296 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm": "branch-and-bound",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "53f4b995942a4f404e00f666554701a16908eaaff37073bab8e1e3cee197f086",
+      "size_bytes": 933
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "cbc09da064ce0c489f4c3f9147f6bfe516f332201f1a67882799543b36bbec38",
+      "size_bytes": 485
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "8362ca0b3f7b2b9937c30961222430c568ef36e2d183aee2d2c2d5f703e8c22e",
+      "size_bytes": 3261
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "aaeec784fe80060c7d2b416264367b6317fd877d225bb86879a16e8abafc4560",
+      "size_bytes": 1976
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "62f1606e74f120293aef66b56f8a5585f80cef06e84624f7310b555332e41216",
+      "size_bytes": 4045
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/branch-and-bound/minmax/result.json",
+      "sha256": "f83fe28c4527b21ace6ffb528360183d6ec4deb0ecdc52f89581502b632bf4c1",
+      "size_bytes": 3863
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/branch-and-bound/minmax/solution.json",
+      "sha256": "06bc0949bfd07c71e1bbb0f6a9e83c3766cb2e324bcee669a26cddb303005eef",
+      "size_bytes": 2849
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/branch-and-bound/minmax/trace.csv",
+      "sha256": "13b35c32a8df99cdd4c1f4eab7f02498467a988bf2140d7d0f9f7f64d5df16eb",
+      "size_bytes": 1092
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "f08fe044af1b80744967e4f74d546ab9878c00d41fc73465d19b02be0a243d6c",
+      "size_bytes": 7220
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "dd213002440d505e5bad7052e8af8287f7ef8d007299ca9848195895e766ed54",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+      "size_bytes": 2636
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "43bfa4acbc29250a9260298c3d128649c7d7fd583a15aaaab982618127ffd878",
+      "size_bytes": 466
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "9ad099a68dc059ff83850010531b249522a10ac7cf85ef0cc270d6e0505cd3fc",
+      "size_bytes": 1260
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "32859e8b23fe44e410f4e04bc9795d4588856538c13739ae665dd60317d1fcba",
+      "size_bytes": 3902
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "06bc0949bfd07c71e1bbb0f6a9e83c3766cb2e324bcee669a26cddb303005eef",
+      "size_bytes": 2849
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "13b35c32a8df99cdd4c1f4eab7f02498467a988bf2140d7d0f9f7f64d5df16eb",
+      "size_bytes": 1092
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "e0aacf16d279d84e279021ce0781383e76c1a8a98df7f9acd1a9537e6b1129f6",
+      "size_bytes": 2390
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "f207bc3daa4a8095e62ca582825eefe148f35ed2c5327cea8306621e81f8de2d",
+      "size_bytes": 489
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d5c7994c3d88b461eebae6c7c20324b73c3a38ed0b4e7a50e4afe3fa341900c0",
+  "experiment_id": "minmax-correctness-20261006-run02",
+  "family": "sbgdb-20200507-fpg-poly",
+  "finished_at": "2026-10-06T02:38:57.514157Z",
+  "input_sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+  "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+  "m": 25,
+  "n": 1,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 10.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "branch-and-bound",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 10.0,
+    "resolved_algorithm": "branch-and-bound",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 1092.124813622803,
+    "objective_value": 1092.124813622804,
+    "optimality_status": "OPTIMAL",
+    "solver_result": {
+      "actual_backend": "branch-and-bound",
+      "actual_threads": 1,
+      "algorithm_category": "exact_reference",
+      "algorithm_name": "branch-and-bound",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": 8.327754212963506e-16,
+      "certified_lower_bound": 1092.124813622803,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "branch-and-bound",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 10.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 890800462,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.000645,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": 1.0,
+      "error_message": "",
+      "exact_solver": true,
+      "experiment_id": "minmax-correctness-20261006-run02",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 8.327754212963506e-16,
+      "git_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426",
+      "global_time_limit_sec": 10.0,
+      "handovers_enabled": true,
+      "heuristic_gap": 1092.124813622804,
+      "heuristic_lower_bound": 0.0,
+      "initial_peak_cost": 8574.02915280195,
+      "instance_id": "sbgdb-20200507-fpg-poly_0000000030-f90cd72a4c",
+      "instance_name": "sbgdb-20200507-fpg-poly_0000000030",
+      "integral_cost": 317.0544819893408,
+      "kont_version": "not-applicable",
+      "lower_bound": 1092.124813622803,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 4,
+      "num_iterations": 3,
+      "num_static_solves": 4,
+      "objective": "minmax",
+      "objective_value": 1092.124813622804,
+      "optimality_status": "OPTIMAL",
+      "peak_consistent": true,
+      "peak_cost": 1092.124813622804,
+      "peak_memory_mb": 16.96875,
+      "peak_time": 0.2671995266958317,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261006T023857Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__30d0c5123130",
+      "run_key": "cba331806185b024fd1f78135bf49c0706cd9cd1d4162df62061efa3fa7c7066",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "branch-and-bound",
+      "serialization_time_sec": 0.00043229200000000003,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.000105458,
+      "solver_name": "branch-and-bound",
+      "solver_runtime_sec": 0.000105458,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.0006132500000000001,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1092.124813622804,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 5.9208e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.0006132500000000001,
+      "wrapper_wall_time_sec": 0.014529709000000057
+    },
+    "upper_bound": 1092.124813622804
+  },
+  "run_id": "run_20261006T023857Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__30d0c5123130",
+  "run_key": "cba331806185b024fd1f78135bf49c0706cd9cd1d4162df62061efa3fa7c7066",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "branch-and-bound",
+  "started_at": "2026-10-06T02:38:57.485223Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-06T02:38:57.508167Z",
+    "continuous": true,
+    "experiment_id": "minmax-correctness-20261006-run02",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "32859e8b23fe44e410f4e04bc9795d4588856538c13739ae665dd60317d1fcba",
+    "run_id": "run_20261006T023857Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-f90__r00__30d0c5123130",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

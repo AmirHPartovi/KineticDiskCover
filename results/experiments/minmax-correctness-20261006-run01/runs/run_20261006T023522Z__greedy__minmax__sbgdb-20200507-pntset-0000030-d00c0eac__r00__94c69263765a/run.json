@@ -1,0 +1,296 @@
+{
+  "actual_backend": "greedy",
+  "algorithm": "greedy",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "b2a78c302217203eb361a670d1876acfc5112a1e3138dd653657841c08a75c7a",
+      "size_bytes": 930
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "c964de819a4147d071283bc44685b93751d858a2aa04cad4f854f25d9f6ee97d",
+      "size_bytes": 451
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "dfae71a291ad67301c19e2e335855b93a13ee77924548a2d11130c4d4fb92954",
+      "size_bytes": 3221
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "0521197f590b66cf398e2828967fdfe6304eed0978b87338a3c5638691756fb3",
+      "size_bytes": 1901
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "01223ac8be3b5f1c6470e71b7ede9f965969113c9506288d180f695f1f8a68b8",
+      "size_bytes": 3892
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-pntset-0000030/greedy/minmax/result.json",
+      "sha256": "0ab27fc93ee6d29255a0f8fc4098d41652cce7b7ac3479163a6b6454a4ba6555",
+      "size_bytes": 3710
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/sbgdb-20200507-pntset-0000030/greedy/minmax/solution.json",
+      "sha256": "78a85ea1a574061de655ac50a6b6e0760ea143a61c9d9aea6ce63a3f109bda7c",
+      "size_bytes": 2832
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/sbgdb-20200507-pntset-0000030/greedy/minmax/trace.csv",
+      "sha256": "eed046bc2d6114e8ad71979596283c6b6f2664b6fbdd5c2b8ba6023377cd3944",
+      "size_bytes": 987
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "1a809376caa68c910f4d19fc6fa34654c39850830c551750dd0ed058d0f24609",
+      "size_bytes": 6067
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "6897a18d6603af6f4dce65c589b1374aa53d70d66fa1c13ad446f80c28e98bb9",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "d00c0eac6bbe042c04afc34c9da251b437bacbec21d7b2b5b61d846e903b8ad9",
+      "size_bytes": 2596
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "ef668e1172673fef4db2231dc31b0d214d75b74d8297cfcafb6560b942a46242",
+      "size_bytes": 454
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "bcc7054a32b775e433c4bcc9c4842428bef9ae595a5ee5287f913562c63af069",
+      "size_bytes": 1213
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "b6d5ae82ae3700dac35337df6b801935ba5a71eb6dbf170758aa643655b15f6f",
+      "size_bytes": 3798
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "78a85ea1a574061de655ac50a6b6e0760ea143a61c9d9aea6ce63a3f109bda7c",
+      "size_bytes": 2832
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "eed046bc2d6114e8ad71979596283c6b6f2664b6fbdd5c2b8ba6023377cd3944",
+      "size_bytes": 987
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "a3a005f52d8a751aebf41903b7892d4696ce3ebe934d1c2cf1bf1eaa9f332e15",
+      "size_bytes": 2299
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "5b8b84be75bde3bd0fb62fe524ac88390767657d8c7e886662fbd8ad8dfe2d21",
+      "size_bytes": 479
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "534aa6ebb195e4cae07b4595fdb693e09d5056df8204f7461b73012545b51afd",
+  "experiment_id": "minmax-correctness-20261006-run01",
+  "family": "sbgdb-20200507-pntset",
+  "finished_at": "2026-10-06T02:35:22.080852Z",
+  "input_sha256": "d00c0eac6bbe042c04afc34c9da251b437bacbec21d7b2b5b61d846e903b8ad9",
+  "instance_id": "sbgdb-20200507-pntset-0000030-d00c0eac6b",
+  "m": 25,
+  "n": 1,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 5.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "greedy",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 5.0,
+    "resolved_algorithm": "greedy",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 1781.0715122467986,
+    "objective_value": 1781.0715122467982,
+    "optimality_status": "FEASIBLE",
+    "solver_result": {
+      "actual_backend": "greedy",
+      "actual_threads": 1,
+      "algorithm_category": "heuristic",
+      "algorithm_name": "greedy",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 25,
+      "certified_gap": null,
+      "certified_lower_bound": 1781.0715122467986,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "greedy",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 5.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 1949925699,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.000852,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": null,
+      "error_message": "",
+      "exact_solver": false,
+      "experiment_id": "minmax-correctness-20261006-run01",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.0,
+      "git_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426",
+      "global_time_limit_sec": 5.0,
+      "handovers_enabled": true,
+      "heuristic_gap": 1781.0715122467982,
+      "heuristic_lower_bound": 0.0,
+      "initial_peak_cost": 4331.8928798410025,
+      "instance_id": "sbgdb-20200507-pntset-0000030-d00c0eac6b",
+      "instance_name": "sbgdb-20200507-pntset-0000030",
+      "integral_cost": 816.4165496758981,
+      "kont_version": "not-applicable",
+      "lower_bound": 1781.0715122467986,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 1,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 3,
+      "num_iterations": 3,
+      "num_static_solves": 3,
+      "objective": "minmax",
+      "objective_value": 1781.0715122467982,
+      "optimality_status": "FEASIBLE",
+      "peak_consistent": true,
+      "peak_cost": 1781.0715122467982,
+      "peak_memory_mb": 17.03125,
+      "peak_time": 1.0,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261006T023522Z__greedy__minmax__sbgdb-20200507-pntset-0000030-d00c0eac__r00__94c69263765a",
+      "run_key": "72cf8b55a344e4ed1371fb5aeee04271e76f5d588bdb08f36ba93b3de2f5640f",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "greedy",
+      "serialization_time_sec": 0.000371292,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.00018499999999999997,
+      "solver_name": "greedy",
+      "solver_runtime_sec": 0.00018499999999999997,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.0006768330000000001,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 1781.0715122467982,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 9.924900000000001e-05,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.0006768330000000001,
+      "wrapper_wall_time_sec": 0.015439541999999973
+    },
+    "upper_bound": 1781.0715122467982
+  },
+  "run_id": "run_20261006T023522Z__greedy__minmax__sbgdb-20200507-pntset-0000030-d00c0eac__r00__94c69263765a",
+  "run_key": "72cf8b55a344e4ed1371fb5aeee04271e76f5d588bdb08f36ba93b3de2f5640f",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "greedy",
+  "started_at": "2026-10-06T02:35:22.051576Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-06T02:35:22.074592Z",
+    "continuous": true,
+    "experiment_id": "minmax-correctness-20261006-run01",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "b6d5ae82ae3700dac35337df6b801935ba5a71eb6dbf170758aa643655b15f6f",
+    "run_id": "run_20261006T023522Z__greedy__minmax__sbgdb-20200507-pntset-0000030-d00c0eac__r00__94c69263765a",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

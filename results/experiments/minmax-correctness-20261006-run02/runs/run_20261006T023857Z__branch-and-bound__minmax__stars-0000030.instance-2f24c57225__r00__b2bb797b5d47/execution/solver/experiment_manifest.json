@@ -1,0 +1,77 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm_set": [
+    "branch-and-bound"
+  ],
+  "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+  "benchmark_profile": "DEBUG",
+  "build_type": "Release",
+  "cache_policy": "auto",
+  "calibration_decision_version": 4,
+  "calibration_instances": [],
+  "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+  "compiler_flags": " -O3 -DNDEBUG",
+  "compiler_id": "Clang",
+  "dataset": {
+    "fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+    "identity": "b2ae0bc7be81e45a",
+    "path": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run02/runs/run_20261006T023857Z__branch-and-bound__minmax__stars-0000030.instance-2f24c57225__r00__b2bb797b5d47/input"
+  },
+  "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run02/runs/run_20261006T023857Z__branch-and-bound__minmax__stars-0000030.instance-2f24c57225__r00__b2bb797b5d47/input",
+  "experiment_id": "kdc-20261006T023857Z-seed42-2621167862125",
+  "fallback_used": false,
+  "git_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426",
+  "handovers_enabled": true,
+  "hardware": {
+    "architecture": "aarch64",
+    "logical_cpu_count": 8,
+    "thread_count": 1
+  },
+  "kont_runtime_available": false,
+  "kont_version": "7.2.4",
+  "native_kont_available": false,
+  "native_kont_used": false,
+  "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run02/runs/run_20261006T023857Z__branch-and-bound__minmax__stars-0000030.instance-2f24c57225__r00__b2bb797b5d47/execution/solver",
+  "refinement_policy": "CERTIFIED_BOUND",
+  "rejected_runs": [],
+  "requested_backend": "branch-and-bound",
+  "runtime_statistics": {
+    "branch-and-bound_median_sec": -1.0,
+    "by_objective": {
+      "minmax": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0
+      },
+      "minsum": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0
+      }
+    },
+    "ip-kont_median_sec": -1.0
+  },
+  "seed_policy": {
+    "base_seed": 42,
+    "description": "deterministic per-instance/objective/algorithm/repeat derivation from the base seed; exact reference is run once per instance/objective",
+    "repeats": 1
+  },
+  "selected_backend": "branch-and-bound",
+  "selected_exact_reference": "branch-and-bound",
+  "selection_rule": "explicit user selection",
+  "source_tree_dirty": true,
+  "successful_runs": [],
+  "time_limits": {
+    "exact_global_sec": 10.0,
+    "fast_global_sec": 5.0,
+    "per_static_solve_sec": 2.0
+  },
+  "timestamp": "2026-10-06T02:38:57Z",
+  "tolerances": {
+    "comparison_relative": 1e-06,
+    "verification_absolute": 1e-06
+  },
+  "verification_policy": {
+    "verification_type": "certified_continuous",
+    "verify_after": true,
+    "verify_each_iteration": true
+  }
+}

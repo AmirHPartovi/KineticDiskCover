@@ -1,0 +1,56 @@
+[2026-10-06 06:05:21.552] [info] [batch_runner.cpp:508] BatchRunner: scanning /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/runs/run_20261006T023521Z__branch-and-bound__minmax__berlin52-6ce5d7089a__r00__edf061281b0a/input for instances
+2026-10-06 06:05:21 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-06 06:05:21 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-06 06:05:21 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-06 06:05:21.558] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-06 06:05:21.558] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-06 06:05:21.559] [info] [batch_runner.cpp:546] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/runs/run_20261006T023521Z__branch-and-bound__minmax__berlin52-6ce5d7089a__r00__edf061281b0a/execution/solver/experiment_manifest.json)
+[2026-10-06 06:05:21.560] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/runs/run_20261006T023521Z__branch-and-bound__minmax__berlin52-6ce5d7089a__r00__edf061281b0a/input/instance.json
+[2026-10-06 06:05:21.561] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-06 06:05:21.561] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-06 06:05:21.561] [info] [stationary.cpp:264] NN: cost=3207.388661, feasible=true, active_stations=7
+[2026-10-06 06:05:21.562] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-06 06:05:21.562] [info] [branch_and_bound_solver.cpp:416] BnB: cost=2473.684502648 LB=2473.684502648 nodes=253 t=0.0016s
+[2026-10-06 06:05:21.563] [info] [solution.cpp:527] extend: 9 intervals over [0, 1]
+[2026-10-06 06:05:21.563] [info] [minmax.cpp:199] MinMax iter 1: t_max=0.974542, peak=17390.777505, LB=2473.684503, gap=6.0303
+[2026-10-06 06:05:21.563] [info] [stationary.cpp:264] NN: cost=4322.215807, feasible=true, active_stations=7
+[2026-10-06 06:05:21.572] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-06 06:05:21.572] [info] [branch_and_bound_solver.cpp:416] BnB: cost=4322.215806632 LB=4318.091400442 nodes=2194 t=0.0090s
+[2026-10-06 06:05:21.572] [info] [solution.cpp:527] extend: 1 intervals over [0.974542450376094, 1]
+[2026-10-06 06:05:21.573] [info] [solution.cpp:527] extend: 15 intervals over [0, 0.974542450376094]
+[2026-10-06 06:05:21.573] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 16 intervals
+[2026-10-06 06:05:21.574] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.574] [info] [solution.cpp:598] combine: 12 intervals
+[2026-10-06 06:05:21.574] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 12 intervals
+[2026-10-06 06:05:21.575] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.575] [info] [minmax.cpp:199] MinMax iter 2: t_max=0.514343, peak=6024.686830, LB=4318.091400, gap=0.3952
+[2026-10-06 06:05:21.575] [info] [stationary.cpp:264] NN: cost=1764.378748, feasible=true, active_stations=8
+[2026-10-06 06:05:21.576] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-06 06:05:21.576] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1542.894590229 LB=1542.894590229 nodes=162 t=0.0008s
+[2026-10-06 06:05:21.576] [info] [solution.cpp:527] extend: 9 intervals over [0.5143426730350751, 1]
+[2026-10-06 06:05:21.577] [info] [solution.cpp:527] extend: 8 intervals over [0, 0.5143426730350751]
+[2026-10-06 06:05:21.577] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 16 intervals
+[2026-10-06 06:05:21.578] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.578] [info] [solution.cpp:598] combine: 17 intervals
+[2026-10-06 06:05:21.578] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 17 intervals
+[2026-10-06 06:05:21.580] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.580] [info] [minmax.cpp:199] MinMax iter 3: t_max=1.000000, peak=4698.533680, LB=4318.091400, gap=0.0881
+[2026-10-06 06:05:21.580] [info] [stationary.cpp:264] NN: cost=4698.533680, feasible=true, active_stations=7
+[2026-10-06 06:05:21.588] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-06 06:05:21.588] [info] [branch_and_bound_solver.cpp:416] BnB: cost=4698.533680125 LB=4693.999703139 nodes=2253 t=0.0082s
+[2026-10-06 06:05:21.588] [info] [solution.cpp:527] extend: 0 intervals over [1, 1]
+[2026-10-06 06:05:21.589] [info] [solution.cpp:527] extend: 16 intervals over [0, 1]
+[2026-10-06 06:05:21.589] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 16 intervals
+[2026-10-06 06:05:21.590] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.590] [info] [solution.cpp:598] combine: 17 intervals
+[2026-10-06 06:05:21.590] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 17 intervals
+[2026-10-06 06:05:21.591] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.591] [info] [minmax.cpp:372] MinMax: combined solution did not improve peak, stopping
+[2026-10-06 06:05:21.591] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 17 intervals
+[2026-10-06 06:05:21.592] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-06 06:05:21.592] [info] [minmax.cpp:453] MinMax: done. peak=4698.533680, certified_LB=4693.999703, gap=0.0010, iters=3, t=0.023s
+[2026-10-06 06:05:21.592] [info] [trace.cpp:93] TraceWriter: wrote 3 rows to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/runs/run_20261006T023521Z__branch-and-bound__minmax__berlin52-6ce5d7089a__r00__edf061281b0a/execution/solver/runs/berlin52/branch-and-bound/minmax/trace.csv
+[2026-10-06 06:05:21.593] [info] [solution_serializer.cpp:132] SolutionSerializer: wrote 18327 bytes to /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/runs/run_20261006T023521Z__branch-and-bound__minmax__berlin52-6ce5d7089a__r00__edf061281b0a/execution/solver/runs/berlin52/branch-and-bound/minmax/solution.json
+[2026-10-06 06:05:21.593] [info] [batch_runner.cpp:1081] BatchRunner: berlin52 / branch-and-bound / minmax cost=4698.533680 t=0.032s verified=true
+[2026-10-06 06:05:21.594] [info] [batch_runner.cpp:819] BatchRunner: 1 runs completed

@@ -1,0 +1,71 @@
+{
+  "actual_backend": "branch-and-bound",
+  "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+  "calibration_decision_version": 4,
+  "calibration_instances": [],
+  "calibration_objectives": [
+    "minmax",
+    "minsum"
+  ],
+  "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/dataset",
+  "dataset_fingerprint": "034602a59aedf1ae",
+  "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
+  "fallback_used": false,
+  "kont_runtime_available": false,
+  "kont_version": "7.2.4",
+  "native_kont_available": false,
+  "native_kont_used": false,
+  "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results/experiments/minmax-correctness-20261006-run01/calibration",
+  "rejected_runs": [
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    }
+  ],
+  "requested_backend": "auto",
+  "runtime_statistics": {
+    "branch-and-bound_median_sec": -1.0,
+    "by_objective": {
+      "minmax": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      },
+      "minsum": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      }
+    },
+    "ip-kont_median_sec": -1.0,
+    "paired_run_count": 0,
+    "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+  },
+  "selected_backend": "branch-and-bound",
+  "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+  "successful_runs": []
+}
