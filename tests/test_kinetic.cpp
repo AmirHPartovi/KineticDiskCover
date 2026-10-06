@@ -1,11 +1,17 @@
 #include "test_utils.hpp"
 
 #include "kdc/kinetic.hpp"
+#include "kdc/solution.hpp"
+#include "kdc/stationary.hpp"
+#include "kdc/verify.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <limits>
+#include <random>
 #include <tuple>
 #include <vector>
 
@@ -178,6 +184,29 @@ void require_same_events(
   }
 }
 
+void require_same_trace(
+    const std::vector<kdc::KineticEventTraceEntry>& actual,
+    const std::vector<kdc::KineticEventTraceEntry>& expected) {
+  REQUIRE(actual.size() == expected.size());
+  for (kdc::Index index = 0; index < actual.size(); ++index) {
+    REQUIRE(kdc::event_times_simultaneous(actual[index].time,
+                                          expected[index].time));
+    REQUIRE(actual[index].type == expected[index].type);
+    REQUIRE(actual[index].station_id == expected[index].station_id);
+    REQUIRE(actual[index].old_support == expected[index].old_support);
+    REQUIRE(actual[index].new_support == expected[index].new_support);
+    REQUIRE(actual[index].from_station == expected[index].from_station);
+    REQUIRE(actual[index].to_station == expected[index].to_station);
+    REQUIRE(actual[index].affected_point == expected[index].affected_point);
+    REQUIRE(actual[index].tie_breaking_outcome ==
+            expected[index].tie_breaking_outcome);
+    REQUIRE(actual[index].from_station_support_after ==
+            expected[index].from_station_support_after);
+    REQUIRE(actual[index].to_station_support_after ==
+            expected[index].to_station_support_after);
+  }
+}
+
 kdc::Instance make_piecewise_instance() {
   kdc::Instance instance;
   instance.id = 51;
@@ -199,6 +228,62 @@ kdc::Instance make_piecewise_instance() {
       std::vector<kdc::Point>{{5.0, 0.0}, {4.0, 0.4}, {3.0, -0.4},
                               {2.0, 0.0}});
   return instance;
+}
+
+kdc::Instance make_handover_differential_instance(
+    std::uint32_t seed, int point_count = 12, int station_count = 3,
+    int segment_count = 4, bool sparse = false) {
+  std::mt19937 generator(seed);
+  std::uniform_real_distribution<double> offset(sparse ? -0.01 : -3.0,
+                                                sparse ? 0.01 : 3.0);
+
+  kdc::Instance instance;
+  instance.id = static_cast<int>(seed);
+  instance.name = "handover-differential-" + std::to_string(seed);
+  instance.n = point_count;
+  instance.m = station_count;
+  instance.T_end = 1.0;
+  for (int station = 0; station < station_count; ++station) {
+    instance.stations.push_back(
+        {station, {8.0 * static_cast<double>(station), 0.0}});
+  }
+  std::vector<double> breaks;
+  for (int segment = 0; segment <= segment_count; ++segment) {
+    breaks.push_back(static_cast<double>(segment) / segment_count);
+  }
+  for (int point = 0; point < point_count; ++point) {
+    const int owner = point % station_count;
+    std::vector<kdc::Point> waypoints;
+    for (int segment = 0; segment <= segment_count; ++segment) {
+      const double x = 8.0 * static_cast<double>(owner) + offset(generator);
+      const double y = offset(generator);
+      waypoints.emplace_back(x, y);
+    }
+    instance.trajectories.emplace_back(breaks, std::move(waypoints));
+  }
+  return instance;
+}
+
+std::vector<int> farthest_supports(const kdc::Instance& instance,
+                                   const std::vector<int>& owners,
+                                   double time) {
+  std::vector<int> supports(static_cast<kdc::Index>(instance.m), -1);
+  std::vector<double> maximum(static_cast<kdc::Index>(instance.m), -1.0);
+  for (int point = 0; point < instance.n; ++point) {
+    const int station = owners[static_cast<kdc::Index>(point)];
+    const double distance =
+        (instance.trajectories[static_cast<kdc::Index>(point)].position(time) -
+         instance.stations[static_cast<kdc::Index>(station)].pos)
+            .norm2();
+    if (supports[static_cast<kdc::Index>(station)] < 0 ||
+        distance > maximum[static_cast<kdc::Index>(station)] ||
+        (distance == maximum[static_cast<kdc::Index>(station)] &&
+         point < supports[static_cast<kdc::Index>(station)])) {
+      supports[static_cast<kdc::Index>(station)] = point;
+      maximum[static_cast<kdc::Index>(station)] = distance;
+    }
+  }
+  return supports;
 }
 }
 
@@ -227,6 +312,65 @@ TEST_CASE("KineticCore solves quadratic equations robustly") {
     REQUIRE(roots.size() == 1U);
     REQUIRE(kdc::test::near(roots[0], -1.0));
   }
+}
+
+TEST_CASE("Event time comparison uses one scale-aware policy") {
+  REQUIRE(kdc::event_times_simultaneous(0.5, 0.5 + 1e-9));
+  REQUIRE_FALSE(kdc::event_times_simultaneous(0.5, 0.5 + 2e-9));
+  REQUIRE(kdc::event_times_simultaneous(1e8, 1e8 + 1e-6));
+  REQUIRE_FALSE(kdc::event_times_simultaneous(1e8, 1e8 + 1e-4));
+}
+
+TEST_CASE("KineticFarthestTournament matches exhaustive support winners") {
+  kdc::Instance instance;
+  instance.id = 42;
+  instance.name = "tournament-baseline";
+  instance.n = 3;
+  instance.m = 1;
+  instance.T_end = 2.0;
+  instance.stations = {{0, {0.0, 0.0}}};
+  instance.trajectories.emplace_back(
+      std::vector<double>{0.0, 1.0, 2.0},
+      std::vector<kdc::Point>{{1.0, 0.0}, {3.0, 0.0}, {5.0, 0.0}});
+  instance.trajectories.emplace_back(
+      std::vector<double>{0.0, 1.0, 2.0},
+      std::vector<kdc::Point>{{0.5, 0.0}, {1.0, 0.0}, {1.5, 0.0}});
+  instance.trajectories.emplace_back(
+      std::vector<double>{0.0, 1.0, 2.0},
+      std::vector<kdc::Point>{{2.5, 0.0}, {2.0, 0.0}, {1.5, 0.0}});
+
+  std::vector<int> assigned{0, 1, 2};
+  kdc::KineticFarthestTournament tournament;
+  tournament.initialize(instance, 0, assigned, 0.0);
+  for (double time : {0.0, 0.25, 0.5, 1.0, 1.5, 2.0}) {
+    int expected = -1;
+    double best_distance = -std::numeric_limits<double>::infinity();
+    for (int point_id : assigned) {
+      const double distance =
+          (instance.trajectories[static_cast<kdc::Index>(point_id)].position(time) -
+           instance.stations[0].pos)
+              .norm2();
+      if (expected < 0 || distance > best_distance + 1e-12 ||
+          (std::abs(distance - best_distance) <= 1e-12 && point_id < expected)) {
+        expected = point_id;
+        best_distance = distance;
+      }
+    }
+    tournament.process_until(time);
+    REQUIRE(tournament.validate(time));
+    REQUIRE(tournament.current_winner() == expected);
+  }
+
+  tournament.insert(2, 0.5);
+  REQUIRE(tournament.validate(0.5));
+  tournament.erase(0, 1.0);
+  REQUIRE(tournament.validate(1.0));
+
+  const auto support_events = kdc::KineticCore::find_support_changes(
+      instance, 0, 0, 0.0, 2.0, true, nullptr,
+      kdc::KineticEventEngine::KINETIC_TOURNAMENT);
+  const auto reference = reference_support_changes(instance, 0, 0, 0.0, 2.0, true);
+  require_same_events(support_events, reference);
 }
 
 TEST_CASE("Precomputed event geometry preserves breakpoint semantics") {
@@ -336,6 +480,148 @@ TEST_CASE("Precomputed handover sets match the reference derivation") {
   if (expected_next.valid) {
     require_same_handovers({actual_next}, {expected_next});
   }
+}
+
+TEST_CASE("Local handover evaluation is differentially equivalent to global reference") {
+  const auto fixture = kdc::test::make_instance_linear(
+      {{kdc::Point(2, 0), kdc::Point(2, 0)},
+       {kdc::Point(1, 0), kdc::Point(1, 0)},
+       {kdc::Point(7, 0), kdc::Point(1, 0)}},
+      {{0, 0}, {10, 0}});
+  for (std::uint32_t seed = 1; seed <= 16; ++seed) {
+    const auto instance =
+        seed == 1 ? fixture : make_handover_differential_instance(seed);
+    std::vector<int> owners(static_cast<kdc::Index>(instance.n));
+    for (int point = 0; point < instance.n; ++point) {
+      owners[static_cast<kdc::Index>(point)] =
+          seed == 1 ? (point < 2 ? 0 : 1) : point % instance.m;
+    }
+
+    for (const bool forward : {true, false}) {
+      const double start = forward ? 0.0 : instance.T_end;
+      const double end = forward ? instance.T_end : 0.0;
+      const auto supports = farthest_supports(instance, owners, start);
+      const auto expected = kdc::KineticCore::find_next_handover(
+          instance, supports, owners, start, end, forward, nullptr,
+          kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+          kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+      kdc::KineticEventDiagnostics diagnostics;
+      const auto actual = kdc::KineticCore::find_next_handover(
+          instance, supports, owners, start, end, forward, nullptr,
+          kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics,
+          kdc::HandoverEvaluation::LOCAL_EXACT);
+      REQUIRE(actual.valid == expected.valid);
+      if (expected.valid) {
+        require_same_handovers({actual}, {expected});
+      }
+      for (int station_from = 0; station_from < instance.m; ++station_from) {
+        for (int station_to = 0; station_to < instance.m; ++station_to) {
+          if (station_from == station_to) {
+            continue;
+          }
+          const auto reference_pair = kdc::KineticCore::find_handovers(
+              instance, station_from, station_to, supports, owners, start,
+              end, forward, nullptr,
+              kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+              kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+          const auto optimized_pair = kdc::KineticCore::find_handovers(
+              instance, station_from, station_to, supports, owners, start,
+              end, forward, nullptr,
+              kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+              kdc::HandoverEvaluation::LOCAL_EXACT);
+          require_same_handovers(optimized_pair, reference_pair);
+        }
+      }
+      for (int station_from = 0; station_from < instance.m; ++station_from) {
+        const auto reference_from = kdc::KineticCore::find_handovers_from(
+            instance, station_from, supports, owners, start, end, forward,
+            nullptr, kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+            kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+        const auto optimized_from = kdc::KineticCore::find_handovers_from(
+            instance, station_from, supports, owners, start, end, forward,
+            nullptr, kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+            kdc::HandoverEvaluation::LOCAL_EXACT);
+        require_same_handovers(optimized_from, reference_from);
+      }
+    }
+  }
+}
+
+TEST_CASE("Local handover certification covers adversarial size and event families") {
+  const std::vector<std::tuple<std::uint32_t, int, int, int, bool>> families{
+      {11U, 60, 2, 12, false},   // Dense events, large n and small m.
+      {12U, 40, 8, 6, true},     // Sparse events.
+      {13U, 120, 2, 4, false},   // Large n, small m.
+      {14U, 36, 12, 4, false}};  // Moderate n, large m.
+
+  for (const auto& [seed, point_count, station_count, segments, sparse] :
+       families) {
+    const auto instance = make_handover_differential_instance(
+        seed, point_count, station_count, segments, sparse);
+    std::vector<int> owners(static_cast<kdc::Index>(instance.n));
+    for (int point = 0; point < instance.n; ++point) {
+      owners[static_cast<kdc::Index>(point)] = point % instance.m;
+    }
+    for (const bool forward : {true, false}) {
+      const double start = forward ? 0.0 : instance.T_end;
+      const double end = forward ? instance.T_end : 0.0;
+      const auto supports = farthest_supports(instance, owners, start);
+      const auto reference = kdc::KineticCore::find_next_handover(
+          instance, supports, owners, start, end, forward, nullptr,
+          kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+          kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+      const auto optimized = kdc::KineticCore::find_next_handover(
+          instance, supports, owners, start, end, forward, nullptr,
+          kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+          kdc::HandoverEvaluation::LOCAL_EXACT);
+      REQUIRE(optimized.valid == reference.valid);
+      if (reference.valid) {
+        require_same_handovers({optimized}, {reference});
+      }
+    }
+  }
+}
+
+TEST_CASE("Local and global handover evaluation preserve extended solution state") {
+  const auto instance = make_handover_differential_instance(20261006);
+  const auto assignment = kdc::StationarySolver::solve_nn(instance, 0.0);
+  REQUIRE(assignment.feasible);
+  kdc::KineticEventDiagnostics local_diagnostics;
+  const auto local = kdc::KineticSolution::extend(
+      instance, assignment, 0.0, 1.0, true, true,
+      kdc::ObjectiveType::MIN_SUM, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &local_diagnostics,
+      kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+      kdc::HandoverEvaluation::LOCAL_EXACT);
+  kdc::KineticEventDiagnostics reference_diagnostics;
+  const auto reference = kdc::KineticSolution::extend(
+      instance, assignment, 0.0, 1.0, true, true,
+      kdc::ObjectiveType::MIN_SUM, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE,
+      &reference_diagnostics,
+      kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+      kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+
+  REQUIRE(local.is_well_formed());
+  REQUIRE(reference.is_well_formed());
+  REQUIRE(local.intervals.size() == reference.intervals.size());
+  for (kdc::Index index = 0; index < local.intervals.size(); ++index) {
+    const auto& actual = local.intervals[index];
+    const auto& expected = reference.intervals[index];
+    REQUIRE(actual.t_start == expected.t_start);
+    REQUIRE(actual.t_end == expected.t_end);
+    REQUIRE(actual.supporting_point == expected.supporting_point);
+    REQUIRE(actual.assigned_points == expected.assigned_points);
+    REQUIRE(kdc::test::near(actual.a, expected.a));
+    REQUIRE(kdc::test::near(actual.b, expected.b));
+    REQUIRE(kdc::test::near(actual.c, expected.c));
+  }
+  REQUIRE(kdc::test::near(local.peak_cost(), reference.peak_cost()));
+  REQUIRE(kdc::test::near(local.peak_time(), reference.peak_time()));
+  REQUIRE(kdc::test::near(local.total_integral(), reference.total_integral()));
+  require_same_trace(local_diagnostics.trace, reference_diagnostics.trace);
+  REQUIRE(kdc::Verifier::verify_continuous(instance, local).all_ok());
+  REQUIRE(kdc::Verifier::verify_continuous(instance, reference).all_ok());
 }
 
 TEST_CASE("KineticCore finds support changes and resolves ties") {

@@ -44,7 +44,9 @@ class KineticSolution {
                                     KineticEventEngine::REFERENCE_EXHAUSTIVE,
                                 KineticEventDiagnostics* diagnostics = nullptr,
                                 KineticIntervalEmission interval_emission =
-                                    KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES);
+                                    KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+                                HandoverEvaluation handover_evaluation =
+                                    HandoverEvaluation::LOCAL_EXACT);
   static KineticSolution combine(const KineticSolution& s1,
                                  const KineticSolution& s2,
                                  ObjectiveType objective,

@@ -87,8 +87,20 @@ class DiagnosticsTimer {
   std::chrono::steady_clock::time_point start_{};
 };
 
+bool is_supported_event_engine(KineticEventEngine engine) {
+  return engine == KineticEventEngine::REFERENCE_EXHAUSTIVE ||
+         engine == KineticEventEngine::KINETIC_TOURNAMENT;
+}
+
+void require_supported_event_engine(KineticEventEngine engine) {
+  if (!is_supported_event_engine(engine)) {
+    throw std::invalid_argument("unsupported kinetic event engine");
+  }
+}
+
 void require_reference_engine(KineticEventEngine engine) {
-  if (engine != KineticEventEngine::REFERENCE_EXHAUSTIVE) {
+  if (engine != KineticEventEngine::REFERENCE_EXHAUSTIVE &&
+      engine != KineticEventEngine::KINETIC_TOURNAMENT) {
     throw std::invalid_argument("unsupported kinetic event engine");
   }
 }
@@ -99,6 +111,33 @@ void validate_instance_shapes(const Instance& instance) {
       static_cast<Index>(instance.m) != instance.stations.size()) {
     throw std::invalid_argument("kinetic operation received inconsistent instance dimensions");
   }
+}
+
+int exact_support_winner(const Instance& instance, int station_id,
+                        const std::vector<int>& assigned_points, double time,
+                        SolverBudget* budget) {
+  const auto precomputed = CandidateSet::precompute(instance, budget);
+  const Point station = instance.stations[static_cast<Index>(station_id)].pos;
+  int winner = -1;
+  double winner_distance_sq = -std::numeric_limits<double>::infinity();
+  for (const int point_id : assigned_points) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    if (point_id < 0 || point_id >= instance.n) {
+      throw std::out_of_range("assigned point is outside the instance");
+    }
+    const Point position =
+        precomputed->position(static_cast<Index>(point_id), time);
+    const double distance_sq = (position - station).norm2();
+    if (winner < 0 || distance_sq > winner_distance_sq + 1e-12 ||
+        (std::abs(distance_sq - winner_distance_sq) <= 1e-12 &&
+         point_id < winner)) {
+      winner = point_id;
+      winner_distance_sq = distance_sq;
+    }
+  }
+  return winner;
 }
 
 void validate_station_support(const Instance& instance, int station_id,
@@ -119,7 +158,7 @@ std::vector<SupportChangeEvent> support_changes_impl(
     KineticEventEngine engine =
         KineticEventEngine::REFERENCE_EXHAUSTIVE,
     KineticEventDiagnostics* diagnostics = nullptr) {
-  require_reference_engine(engine);
+  require_supported_event_engine(engine);
   DiagnosticsTimer timer(
       diagnostics,
       &KineticEventDiagnostics::support_event_detection_nanoseconds);
@@ -296,22 +335,21 @@ std::vector<SupportChangeEvent> support_changes_impl(
                               const SupportChangeEvent& rhs) {
                              return lhs.new_supporting_point ==
                                         rhs.new_supporting_point &&
-                                    std::abs(lhs.time - rhs.time) <=
-                                        kTimeEpsilon;
+                                    event_times_simultaneous(lhs.time,
+                                                             rhs.time);
                            }),
                events.end());
   return events;
 }
 
-std::vector<int> points_owned_by(const std::vector<int>& owners,
-                                 int station_id) {
-  std::vector<int> points;
+std::vector<std::vector<int>> points_grouped_by_owner(
+    const std::vector<int>& owners, int station_count) {
+  std::vector<std::vector<int>> grouped(static_cast<Index>(station_count));
   for (Index point = 0; point < owners.size(); ++point) {
-    if (owners[point] == station_id) {
-      points.push_back(static_cast<int>(point));
-    }
+    grouped[static_cast<Index>(owners[point])].push_back(
+        static_cast<int>(point));
   }
-  return points;
+  return grouped;
 }
 
 void validate_owners(const Instance& instance,
@@ -348,10 +386,74 @@ bool enters_receiving_disk(const InstancePrecompute& precompute,
   return (forward ? 1.0 : -1.0) * derivative < -tolerance;
 }
 
-HandoverEvent make_nonincreasing_handover(
+struct StationSupportAtTime {
+  int point{-1};
+  Value distance_squared{0.0};
+};
+
+StationSupportAtTime station_support_at_time(
+    const Instance& instance, const InstancePrecompute& precompute,
+    int station_id, const std::vector<int>& station_points, Value time,
+    bool forward, int excluded_point, int included_point,
+    SolverBudget* budget, KineticEventDiagnostics* diagnostics) {
+  const Point station = instance.stations[static_cast<Index>(station_id)].pos;
+  const Value direction = forward ? 1.0 : -1.0;
+  StationSupportAtTime best;
+  Value best_tie_breaker = 0.0;
+  const auto consider = [&](int point_id, StationSupportAtTime& current,
+                            Value& tie_breaker) {
+    if (budget != nullptr) {
+      budget->checkpoint();
+    }
+    if (diagnostics != nullptr) {
+      ++diagnostics->handover_local_support_points_inspected;
+    }
+    const Point position =
+        precompute.position(static_cast<Index>(point_id), time);
+    const Value distance_squared = (position - station).norm2();
+    const Value rate =
+        2.0 * (position - station)
+                  .dot(precompute.velocity(static_cast<Index>(point_id), time,
+                                           forward));
+    const Value candidate_tie_breaker = direction * rate;
+    const Value tolerance =
+        64.0 * std::numeric_limits<Value>::epsilon() *
+        std::max({1.0, distance_squared, current.distance_squared});
+    if (current.point < 0 ||
+        distance_squared > current.distance_squared + tolerance ||
+        (std::abs(distance_squared - current.distance_squared) <= tolerance &&
+         candidate_tie_breaker > tie_breaker)) {
+      current.point = point_id;
+      current.distance_squared = distance_squared;
+      tie_breaker = candidate_tie_breaker;
+    }
+  };
+
+  bool included = false;
+  for (const int point_id : station_points) {
+    if (point_id == excluded_point) {
+      continue;
+    }
+    if (included_point >= 0 && !included && included_point < point_id) {
+      consider(included_point, best, best_tie_breaker);
+      included = true;
+    }
+    consider(point_id, best, best_tie_breaker);
+    if (point_id == included_point) {
+      included = true;
+    }
+  }
+  if (included_point >= 0 && !included) {
+    consider(included_point, best, best_tie_breaker);
+  }
+  return best;
+}
+
+HandoverEvent make_nonincreasing_handover_global(
     const Instance& instance, const InstancePrecompute& precompute,
     const std::vector<int>& owners, int station_from, int station_to,
-    int point_id, Value time, bool forward) {
+    int point_id, Value time, bool forward,
+    KineticEventDiagnostics* diagnostics = nullptr) {
   if (point_id < 0 || point_id >= instance.n || station_from < 0 ||
       station_from >= instance.m || station_to < 0 ||
       station_to >= instance.m || station_from == station_to ||
@@ -368,6 +470,9 @@ HandoverEvent make_nonincreasing_handover(
   const Value direction = forward ? 1.0 : -1.0;
 
   for (int current_point = 0; current_point < instance.n; ++current_point) {
+    if (diagnostics != nullptr) {
+      ++diagnostics->handover_global_point_scans;
+    }
     const int owner = owners[static_cast<Index>(current_point)];
     const Index owner_index = static_cast<Index>(owner);
     const Point position =
@@ -444,6 +549,71 @@ HandoverEvent make_nonincreasing_handover(
           after_supports[static_cast<Index>(station_to)], true};
 }
 
+HandoverEvent make_nonincreasing_handover(
+    const Instance& instance, const InstancePrecompute& precompute,
+    const std::vector<int>& owners,
+    const std::vector<std::vector<int>>& station_points, int station_from,
+    int station_to, int point_id, Value time, bool forward,
+    SolverBudget* budget, KineticEventDiagnostics* diagnostics,
+    HandoverEvaluation evaluation) {
+  if (evaluation == HandoverEvaluation::REFERENCE_GLOBAL) {
+    return make_nonincreasing_handover_global(
+        instance, precompute, owners, station_from, station_to, point_id, time,
+        forward, diagnostics);
+  }
+  if (evaluation != HandoverEvaluation::LOCAL_EXACT) {
+    throw std::invalid_argument("unsupported handover evaluation mode");
+  }
+  if (point_id < 0 || point_id >= instance.n || station_from < 0 ||
+      station_from >= instance.m || station_to < 0 ||
+      station_to >= instance.m || station_from == station_to ||
+      owners.size() != static_cast<Index>(instance.n) ||
+      station_points.size() != static_cast<Index>(instance.m) ||
+      owners[static_cast<Index>(point_id)] != station_from) {
+    return {};
+  }
+
+  const auto before_from = station_support_at_time(
+      instance, precompute, station_from,
+      station_points[static_cast<Index>(station_from)], time, !forward, -1, -1,
+      budget, diagnostics);
+  const auto before_to = station_support_at_time(
+      instance, precompute, station_to,
+      station_points[static_cast<Index>(station_to)], time, !forward, -1, -1,
+      budget, diagnostics);
+  const auto after_from = station_support_at_time(
+      instance, precompute, station_from,
+      station_points[static_cast<Index>(station_from)], time, forward, point_id,
+      -1, budget, diagnostics);
+  const auto after_to = station_support_at_time(
+      instance, precompute, station_to,
+      station_points[static_cast<Index>(station_to)], time, forward, -1,
+      point_id, budget, diagnostics);
+  if (before_from.point != point_id || after_from.point < 0 ||
+      after_to.point < 0) {
+    return {};
+  }
+
+  const Value before_local =
+      before_from.distance_squared + before_to.distance_squared;
+  const Value after_local =
+      after_from.distance_squared + after_to.distance_squared;
+  if (after_local <= before_local) {
+    if (diagnostics != nullptr) {
+      ++diagnostics->handover_local_acceptances;
+    }
+    return {time, station_from, station_to, point_id, after_from.point,
+            after_to.point, true};
+  }
+
+  if (diagnostics != nullptr) {
+    ++diagnostics->handover_global_fallbacks;
+  }
+  return make_nonincreasing_handover_global(
+      instance, precompute, owners, station_from, station_to, point_id, time,
+      forward, diagnostics);
+}
+
 void record_handover_trace(KineticEventDiagnostics* diagnostics,
                            const HandoverEvent& handover) {
   if (diagnostics == nullptr || !handover.valid) {
@@ -455,6 +625,161 @@ void record_handover_trace(KineticEventDiagnostics* diagnostics,
        "station-pair ties use ascending ids; support-root ties use point id",
        handover.new_support_from, handover.new_support_to});
 }
+
+}  // namespace
+
+bool event_times_simultaneous(double first, double second) noexcept {
+  if (!std::isfinite(first) || !std::isfinite(second)) {
+    return first == second;
+  }
+  const Value scale = std::max({1.0, std::abs(first), std::abs(second)});
+  const Value tolerance =
+      kTimeEpsilon + 64.0 * std::numeric_limits<Value>::epsilon() * scale;
+  return std::abs(first - second) <= tolerance;
+}
+
+void KineticFarthestTournament::initialize(
+    const Instance& instance, int station_id,
+    const std::vector<int>& assigned_points, double time,
+    SolverBudget* budget) {
+  validate_instance_shapes(instance);
+  if (station_id < 0 || station_id >= instance.m) {
+    throw std::out_of_range("station id is outside the instance");
+  }
+  if (!std::isfinite(time) || time < 0.0 || time > instance.T_end) {
+    throw std::out_of_range("tournament time is outside [0, T_end]");
+  }
+  instance_ = &instance;
+  station_id_ = station_id;
+  points_.clear();
+  points_.reserve(assigned_points.size());
+  for (const int point_id : assigned_points) {
+    if (point_id < 0 || point_id >= instance.n) {
+      throw std::out_of_range("assigned point is outside the instance");
+    }
+    if (std::find(points_.begin(), points_.end(), point_id) == points_.end()) {
+      points_.push_back(point_id);
+    }
+  }
+  winner_ = exact_support_winner(instance, station_id_, points_, time, budget);
+}
+
+void KineticFarthestTournament::insert(int point_id, double time,
+                                       SolverBudget* budget) {
+  if (instance_ == nullptr) {
+    throw std::logic_error("tournament is not initialized");
+  }
+  if (point_id < 0 || point_id >= instance_->n) {
+    throw std::out_of_range("assigned point is outside the instance");
+  }
+  if (std::find(points_.begin(), points_.end(), point_id) == points_.end()) {
+    points_.push_back(point_id);
+  }
+  winner_ = exact_support_winner(*instance_, station_id_, points_, time, budget);
+}
+
+void KineticFarthestTournament::erase(int point_id, double time,
+                                      SolverBudget* budget) {
+  if (instance_ == nullptr) {
+    throw std::logic_error("tournament is not initialized");
+  }
+  const auto found = std::find(points_.begin(), points_.end(), point_id);
+  if (found != points_.end()) {
+    points_.erase(found);
+  }
+  winner_ = exact_support_winner(*instance_, station_id_, points_, time, budget);
+}
+
+void KineticFarthestTournament::update_motion(int point_id, double time,
+                                              SolverBudget* budget) {
+  if (instance_ == nullptr) {
+    throw std::logic_error("tournament is not initialized");
+  }
+  if (point_id < 0 || point_id >= instance_->n) {
+    throw std::out_of_range("assigned point is outside the instance");
+  }
+  if (std::find(points_.begin(), points_.end(), point_id) == points_.end()) {
+    return;
+  }
+  winner_ = exact_support_winner(*instance_, station_id_, points_, time, budget);
+}
+
+int KineticFarthestTournament::current_winner() const { return winner_; }
+
+double KineticFarthestTournament::next_event_time(double time, bool forward,
+                                                  SolverBudget* budget) const {
+  if (instance_ == nullptr || points_.empty()) {
+    return -1.0;
+  }
+  const auto precomputed = CandidateSet::precompute(*instance_, budget);
+  const Point station =
+      instance_->stations[static_cast<Index>(station_id_)].pos;
+  double next_time = forward ? std::numeric_limits<double>::infinity()
+                             : -std::numeric_limits<double>::infinity();
+  for (Index i = 0; i < points_.size(); ++i) {
+    for (Index j = i + 1; j < points_.size(); ++j) {
+      const int point_i = points_[i];
+      const int point_j = points_[j];
+      const auto& traj_i = precomputed->trajectories[static_cast<Index>(point_i)];
+      const auto& traj_j = precomputed->trajectories[static_cast<Index>(point_j)];
+      std::vector<double> breaks{time};
+      breaks.insert(breaks.end(), traj_i.t_breaks.begin(), traj_i.t_breaks.end());
+      breaks.insert(breaks.end(), traj_j.t_breaks.begin(), traj_j.t_breaks.end());
+      std::sort(breaks.begin(), breaks.end());
+      breaks.erase(std::unique(breaks.begin(), breaks.end()), breaks.end());
+      for (Index k = 0; k + 1U < breaks.size(); ++k) {
+        const double start = breaks[k];
+        const double end = breaks[k + 1U];
+        const double duration = end - start;
+        if (duration <= 0.0) {
+          continue;
+        }
+        const auto p_i_start = precomputed->position(static_cast<Index>(point_i), start);
+        const auto p_j_start = precomputed->position(static_cast<Index>(point_j), start);
+        const auto v_i = precomputed->velocity(static_cast<Index>(point_i), start);
+        const auto v_j = precomputed->velocity(static_cast<Index>(point_j), start);
+        const auto d_i = station - p_i_start;
+        const auto d_j = station - p_j_start;
+        const double a = v_i.dot(v_i) - v_j.dot(v_j);
+        const double b = -2.0 * d_i.dot(v_i) + 2.0 * d_j.dot(v_j);
+        const double c = d_i.dot(d_i) - d_j.dot(d_j);
+        for (const double offset : KineticCore::solve_quadratic(a, b, c)) {
+          if (offset < -1e-9 || offset > duration + 1e-9) {
+            continue;
+          }
+          const double candidate = std::clamp(start + offset, start, end);
+          if ((forward && candidate > time + 1e-12) ||
+              (!forward && candidate < time - 1e-12)) {
+            next_time = forward ? std::min(next_time, candidate)
+                               : std::max(next_time, candidate);
+          }
+        }
+      }
+    }
+  }
+  if (!std::isfinite(next_time)) {
+    return -1.0;
+  }
+  return next_time;
+}
+
+bool KineticFarthestTournament::process_until(double time, SolverBudget* budget) {
+  if (instance_ == nullptr) {
+    throw std::logic_error("tournament is not initialized");
+  }
+  const int previous = winner_;
+  winner_ = exact_support_winner(*instance_, station_id_, points_, time, budget);
+  return winner_ != previous;
+}
+
+bool KineticFarthestTournament::validate(double time,
+                                          SolverBudget* budget) const {
+  if (instance_ == nullptr || points_.empty()) {
+    return winner_ == -1;
+  }
+  const int expected = exact_support_winner(*instance_, station_id_, points_, time,
+                                           budget);
+  return expected == winner_;
 }
 
 std::vector<Value> KineticCore::solve_quadratic(
@@ -647,7 +972,7 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
     const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
     bool forward, SolverBudget* budget, KineticEventEngine engine,
-    KineticEventDiagnostics* diagnostics) {
+    KineticEventDiagnostics* diagnostics, HandoverEvaluation evaluation) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   DiagnosticsTimer timer(
       diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
@@ -675,7 +1000,10 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
     throw std::invalid_argument(
         "handover supports must belong to their respective stations");
   }
-  const auto source_points = points_owned_by(assigned_points, station_from);
+  const auto station_points =
+      points_grouped_by_owner(assigned_points, instance.m);
+  const auto& source_points =
+      station_points[static_cast<Index>(station_from)];
   if (source_points.size() < 2U) {
     return {};
   }
@@ -696,8 +1024,9 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
         enters_receiving_disk(*precomputed, station_to, support_from,
                               support_to, event.time, forward)) {
       const auto handover = make_nonincreasing_handover(
-          instance, *precomputed, assigned_points, station_from, station_to,
-          support_from, event.time, forward);
+          instance, *precomputed, assigned_points, station_points,
+          station_from, station_to, support_from, event.time, forward, budget,
+          diagnostics, evaluation);
       if (handover.valid) {
         handovers.push_back(handover);
         record_handover_trace(diagnostics, handover);
@@ -712,7 +1041,7 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
     bool forward, SolverBudget* budget, KineticEventEngine engine,
-    KineticEventDiagnostics* diagnostics) {
+    KineticEventDiagnostics* diagnostics, HandoverEvaluation evaluation) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   DiagnosticsTimer timer(
       diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
@@ -733,7 +1062,10 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     throw std::invalid_argument(
         "handover source support must belong to its station");
   }
-  const auto source_points = points_owned_by(assigned_points, station_from);
+  const auto station_points =
+      points_grouped_by_owner(assigned_points, instance.m);
+  const auto& source_points =
+      station_points[static_cast<Index>(station_from)];
   if (source_points.size() < 2U) {
     return {};
   }
@@ -768,8 +1100,9 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
           enters_receiving_disk(*precomputed, station_to, support_from,
                                 support_to, event.time, forward)) {
         const auto handover = make_nonincreasing_handover(
-            instance, *precomputed, assigned_points, station_from, station_to,
-            support_from, event.time, forward);
+            instance, *precomputed, assigned_points, station_points,
+            station_from, station_to, support_from, event.time, forward, budget,
+            diagnostics, evaluation);
         if (handover.valid) {
           handovers.push_back(handover);
           record_handover_trace(diagnostics, handover);
@@ -784,7 +1117,7 @@ HandoverEvent KineticCore::find_next_handover(
     const Instance& instance, const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
     bool forward, SolverBudget* budget, KineticEventEngine engine,
-    KineticEventDiagnostics* diagnostics) {
+    KineticEventDiagnostics* diagnostics, HandoverEvaluation evaluation) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
   DiagnosticsTimer timer(
       diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
@@ -795,6 +1128,8 @@ HandoverEvent KineticCore::find_next_handover(
         "current_supports size must match the number of stations");
   }
   validate_owners(instance, assigned_points);
+  const auto station_points =
+      points_grouped_by_owner(assigned_points, instance.m);
   HandoverEvent nearest;
   const auto precomputed = CandidateSet::precompute(instance, budget);
   for (int station_from = 0; station_from < instance.m; ++station_from) {
@@ -811,7 +1146,8 @@ HandoverEvent KineticCore::find_next_handover(
       throw std::invalid_argument(
           "handover source support must belong to its station");
     }
-    const auto source_points = points_owned_by(assigned_points, station_from);
+    const auto& source_points =
+        station_points[static_cast<Index>(station_from)];
     if (source_points.size() < 2U) {
       continue;
     }
@@ -842,8 +1178,9 @@ HandoverEvent KineticCore::find_next_handover(
           continue;
         }
         const auto handover = make_nonincreasing_handover(
-            instance, *precomputed, assigned_points, station_from, station_to,
-            support_from, event.time, forward);
+            instance, *precomputed, assigned_points, station_points,
+            station_from, station_to, support_from, event.time, forward,
+            budget, diagnostics, evaluation);
         if (budget != nullptr) {
           budget->checkpoint();
         }

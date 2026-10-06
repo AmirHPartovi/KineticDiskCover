@@ -9,7 +9,39 @@
 
 namespace kdc {
 enum class KineticEventEngine {
-  REFERENCE_EXHAUSTIVE
+  REFERENCE_EXHAUSTIVE,
+  KINETIC_TOURNAMENT
+};
+
+enum class HandoverEvaluation {
+  REFERENCE_GLOBAL,
+  LOCAL_EXACT
+};
+
+bool event_times_simultaneous(double first, double second) noexcept;
+
+class KineticFarthestTournament {
+ public:
+  KineticFarthestTournament() = default;
+
+  void initialize(const Instance& instance, int station_id,
+                  const std::vector<int>& assigned_points, double time,
+                  SolverBudget* budget = nullptr);
+  void insert(int point_id, double time, SolverBudget* budget = nullptr);
+  void erase(int point_id, double time, SolverBudget* budget = nullptr);
+  void update_motion(int point_id, double time,
+                    SolverBudget* budget = nullptr);
+  int current_winner() const;
+  double next_event_time(double time, bool forward = true,
+                         SolverBudget* budget = nullptr) const;
+  bool process_until(double time, SolverBudget* budget = nullptr);
+  bool validate(double time, SolverBudget* budget = nullptr) const;
+
+ private:
+  const Instance* instance_{nullptr};
+  int station_id_{-1};
+  std::vector<int> points_;
+  int winner_{-1};
 };
 
 enum class KineticEventType {
@@ -41,6 +73,10 @@ struct KineticEventDiagnostics {
   std::uint64_t candidate_roots_rejected{0};
   std::uint64_t selected_support_events{0};
   std::uint64_t handover_event_checks{0};
+  std::uint64_t handover_local_support_points_inspected{0};
+  std::uint64_t handover_local_acceptances{0};
+  std::uint64_t handover_global_fallbacks{0};
+  std::uint64_t handover_global_point_scans{0};
   std::uint64_t solution_intervals_generated{0};
   std::uint64_t total_extension_nanoseconds{0};
   std::uint64_t support_event_detection_nanoseconds{0};
@@ -101,7 +137,8 @@ class KineticCore {
       bool forward, SolverBudget* budget = nullptr,
       KineticEventEngine engine =
           KineticEventEngine::REFERENCE_EXHAUSTIVE,
-      KineticEventDiagnostics* diagnostics = nullptr);
+      KineticEventDiagnostics* diagnostics = nullptr,
+      HandoverEvaluation evaluation = HandoverEvaluation::LOCAL_EXACT);
   static std::vector<HandoverEvent> find_handovers_from(
       const Instance& instance, int station_from,
       const std::vector<int>& current_supports,
@@ -109,7 +146,8 @@ class KineticCore {
       bool forward, SolverBudget* budget = nullptr,
       KineticEventEngine engine =
           KineticEventEngine::REFERENCE_EXHAUSTIVE,
-      KineticEventDiagnostics* diagnostics = nullptr);
+      KineticEventDiagnostics* diagnostics = nullptr,
+      HandoverEvaluation evaluation = HandoverEvaluation::LOCAL_EXACT);
 
   static HandoverEvent find_next_handover(
       const Instance& instance, const std::vector<int>& current_supports,
@@ -118,7 +156,8 @@ class KineticCore {
       SolverBudget* budget = nullptr,
       KineticEventEngine engine =
           KineticEventEngine::REFERENCE_EXHAUSTIVE,
-      KineticEventDiagnostics* diagnostics = nullptr);
+      KineticEventDiagnostics* diagnostics = nullptr,
+      HandoverEvaluation evaluation = HandoverEvaluation::LOCAL_EXACT);
 
   static int second_furthest_assigned(
       const Instance& instance, int station_id,
