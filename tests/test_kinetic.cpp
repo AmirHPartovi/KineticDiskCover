@@ -414,3 +414,68 @@ TEST_CASE("KineticCore selects assigned supports for handovers") {
                 .empty());
   }
 }
+
+TEST_CASE("Exhaustive reference engine exposes deterministic diagnostics") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)}},
+      {{0.0, 0.0}});
+  kdc::KineticEventDiagnostics first_diagnostics;
+  const auto event = kdc::KineticCore::find_next_event(
+      instance, {0}, 0.0, 1.0, true, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &first_diagnostics);
+  kdc::KineticEventDiagnostics repeated_diagnostics;
+  const auto repeated = kdc::KineticCore::find_next_event(
+      instance, {0}, 0.0, 1.0, true, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &repeated_diagnostics);
+
+  REQUIRE(event.valid);
+  REQUIRE(kdc::test::near(event.time, 0.5));
+  REQUIRE(event.new_supporting_point == 1);
+  REQUIRE(first_diagnostics.station_support_event_searches == 1U);
+  REQUIRE(first_diagnostics.point_vs_support_comparisons == 1U);
+  REQUIRE(first_diagnostics.trajectory_segment_pair_examinations == 1U);
+  REQUIRE(first_diagnostics.quadratic_equations_solved == 1U);
+  REQUIRE(first_diagnostics.real_roots_found == 2U);
+  REQUIRE(first_diagnostics.candidate_roots_rejected == 1U);
+  REQUIRE(first_diagnostics.selected_support_events == 1U);
+  REQUIRE(first_diagnostics.trace.size() == 1U);
+  REQUIRE(first_diagnostics.trace.front().type ==
+          kdc::KineticEventType::SUPPORT_CHANGE);
+  REQUIRE(first_diagnostics.trace.front().old_support == 0);
+  REQUIRE(first_diagnostics.trace.front().new_support == 1);
+  REQUIRE(first_diagnostics.trace.front().tie_breaking_outcome ==
+          repeated_diagnostics.trace.front().tie_breaking_outcome);
+  REQUIRE(first_diagnostics.trace.front().time ==
+          repeated_diagnostics.trace.front().time);
+}
+
+TEST_CASE("Tangent support equality is an event candidate but no transition") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(1.0, -1.0), kdc::Point(1.0, 1.0)}},
+      {{0.0, 0.0}});
+  const auto candidates = kdc::KineticCore::find_support_changes(
+      instance, 0, 1, 0.0, 1.0, true);
+
+  REQUIRE(candidates.size() == 1U);
+  REQUIRE(kdc::test::near(candidates.front().time, 0.5));
+  REQUIRE(candidates.front().new_supporting_point == 0);
+}
+
+TEST_CASE("Zero-duration support search emits no event") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)}},
+      {{0.0, 0.0}});
+  kdc::KineticEventDiagnostics diagnostics;
+  const auto event = kdc::KineticCore::find_next_event(
+      instance, {0}, 0.5, 0.5, true, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+  REQUIRE_FALSE(event.valid);
+  REQUIRE(diagnostics.station_support_event_searches == 1U);
+  REQUIRE(diagnostics.trajectory_segment_pair_examinations == 0U);
+  REQUIRE(diagnostics.selected_support_events == 0U);
+  REQUIRE(diagnostics.trace.empty());
+}

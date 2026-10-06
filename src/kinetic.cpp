@@ -5,6 +5,7 @@
 #include "kdc/profiling.hpp"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iterator>
 #include <limits>
@@ -60,6 +61,38 @@ Point Trajectory::position(Value time) const {
 namespace {
 constexpr Value kTimeEpsilon = 1e-9;
 
+class DiagnosticsTimer {
+ public:
+  DiagnosticsTimer(KineticEventDiagnostics* diagnostics,
+                   std::uint64_t KineticEventDiagnostics::*field) noexcept
+      : diagnostics_(diagnostics), field_(field) {
+    if (diagnostics_ != nullptr) {
+      start_ = std::chrono::steady_clock::now();
+    }
+  }
+
+  ~DiagnosticsTimer() {
+    if (diagnostics_ != nullptr) {
+      const auto elapsed =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(
+              std::chrono::steady_clock::now() - start_)
+              .count();
+      diagnostics_->*field_ += static_cast<std::uint64_t>(elapsed);
+    }
+  }
+
+ private:
+  KineticEventDiagnostics* diagnostics_;
+  std::uint64_t KineticEventDiagnostics::*field_;
+  std::chrono::steady_clock::time_point start_{};
+};
+
+void require_reference_engine(KineticEventEngine engine) {
+  if (engine != KineticEventEngine::REFERENCE_EXHAUSTIVE) {
+    throw std::invalid_argument("unsupported kinetic event engine");
+  }
+}
+
 void validate_instance_shapes(const Instance& instance) {
   if (instance.n < 0 || instance.m < 0 ||
       static_cast<Index>(instance.n) != instance.trajectories.size() ||
@@ -82,7 +115,17 @@ std::vector<SupportChangeEvent> support_changes_impl(
     const Instance& instance, const InstancePrecompute& precompute,
     int station_id, int current_support, Value t_start, Value t_end,
     bool forward, SolverBudget* budget, bool nearest_only = false,
-    int candidate_filter = -1) {
+    int candidate_filter = -1,
+    KineticEventEngine engine =
+        KineticEventEngine::REFERENCE_EXHAUSTIVE,
+    KineticEventDiagnostics* diagnostics = nullptr) {
+  require_reference_engine(engine);
+  DiagnosticsTimer timer(
+      diagnostics,
+      &KineticEventDiagnostics::support_event_detection_nanoseconds);
+  if (diagnostics != nullptr) {
+    ++diagnostics->station_support_event_searches;
+  }
   std::vector<SupportChangeEvent> events;
   SupportChangeEvent nearest;
   const auto& support_trajectory =
@@ -98,6 +141,9 @@ std::vector<SupportChangeEvent> support_changes_impl(
     if (other_support == current_support) {
       continue;
     }
+    if (diagnostics != nullptr) {
+      ++diagnostics->point_vs_support_comparisons;
+    }
     const auto& other_trajectory =
         precompute.trajectories[static_cast<Index>(other_support)];
     if (interval_start < support_trajectory.t_breaks.front() ||
@@ -108,9 +154,9 @@ std::vector<SupportChangeEvent> support_changes_impl(
           "support change interval exceeds a trajectory's time domain");
     }
 
-    std::vector<Value> breaks{interval_start};
-    breaks.reserve(support_trajectory.t_breaks.size() +
-                   other_trajectory.t_breaks.size() + 2U);
+    std::vector<Value> event_breakpoints{interval_start};
+    event_breakpoints.reserve(support_trajectory.t_breaks.size() +
+                              other_trajectory.t_breaks.size() + 2U);
     auto support_break =
         std::upper_bound(support_trajectory.t_breaks.begin(),
                          support_trajectory.t_breaks.end(), interval_start);
@@ -135,23 +181,28 @@ std::vector<SupportChangeEvent> support_changes_impl(
       } else {
         next_break = *other_break++;
       }
-      if (next_break != breaks.back()) {
-        breaks.push_back(next_break);
+      if (next_break != event_breakpoints.back()) {
+        event_breakpoints.push_back(next_break);
       }
     }
-    if (interval_end != breaks.back()) {
-      breaks.push_back(interval_end);
+    if (interval_end != event_breakpoints.back()) {
+      event_breakpoints.push_back(interval_end);
     }
 
-    for (Index segment = 0; segment + 1U < breaks.size(); ++segment) {
+    for (Index segment = 0; segment + 1U < event_breakpoints.size();
+         ++segment) {
       if (budget != nullptr) {
         budget->checkpoint();
       }
-      const Value segment_start = breaks[segment];
-      const Value segment_end = breaks[segment + 1U];
+      const Value segment_start = event_breakpoints[segment];
+      const Value segment_end = event_breakpoints[segment + 1U];
       const Value duration = segment_end - segment_start;
       if (duration <= 0.0) {
         continue;
+      }
+      if (diagnostics != nullptr) {
+        ++diagnostics->trajectory_segment_pair_examinations;
+        ++diagnostics->quadratic_equations_solved;
       }
       const Value midpoint = segment_start + duration / 2.0;
       const Index support_segment = precompute.segment_index(
@@ -179,12 +230,20 @@ std::vector<SupportChangeEvent> support_changes_impl(
       const Value b = -2.0 * d1.dot(p1_velocity) +
                       2.0 * d2.dot(p2_velocity);
       const Value c = d1.dot(d1) - d2.dot(d2);
-      for (const Value offset : KineticCore::solve_quadratic(a, b, c)) {
+      const auto roots = KineticCore::solve_quadratic(a, b, c);
+      if (diagnostics != nullptr) {
+        diagnostics->real_roots_found +=
+            static_cast<std::uint64_t>(roots.size());
+      }
+      for (const Value offset : roots) {
         if (budget != nullptr) {
           budget->checkpoint();
         }
         if (offset < -kTimeEpsilon ||
             offset > duration + kTimeEpsilon) {
+          if (diagnostics != nullptr) {
+            ++diagnostics->candidate_roots_rejected;
+          }
           continue;
         }
         const Value event_time =
@@ -194,6 +253,9 @@ std::vector<SupportChangeEvent> support_changes_impl(
             (!forward && event_time < t_start - kTimeEpsilon &&
              event_time >= t_end - kTimeEpsilon)) {
           if (candidate_filter >= 0 && candidate_filter != other_support) {
+            if (diagnostics != nullptr) {
+              ++diagnostics->candidate_roots_rejected;
+            }
             continue;
           }
           const SupportChangeEvent candidate{
@@ -208,6 +270,8 @@ std::vector<SupportChangeEvent> support_changes_impl(
                           nearest.new_supporting_point)) {
             nearest = candidate;
           }
+        } else if (diagnostics != nullptr) {
+          ++diagnostics->candidate_roots_rejected;
         }
       }
     }
@@ -379,6 +443,18 @@ HandoverEvent make_nonincreasing_handover(
           after_supports[static_cast<Index>(station_from)],
           after_supports[static_cast<Index>(station_to)], true};
 }
+
+void record_handover_trace(KineticEventDiagnostics* diagnostics,
+                           const HandoverEvent& handover) {
+  if (diagnostics == nullptr || !handover.valid) {
+    return;
+  }
+  diagnostics->trace.push_back(
+      {handover.time, KineticEventType::HANDOVER, -1, -1, -1,
+       handover.from_station, handover.to_station, handover.point_id,
+       "station-pair ties use ascending ids; support-root ties use point id",
+       handover.new_support_from, handover.new_support_to});
+}
 }
 
 std::vector<Value> KineticCore::solve_quadratic(
@@ -418,7 +494,8 @@ std::vector<Value> KineticCore::solve_quadratic(
 
 std::vector<SupportChangeEvent> KineticCore::find_support_changes(
     const Instance& instance, int station_id, int current_support,
-    Value t_start, Value t_end, bool forward, SolverBudget* budget) {
+    Value t_start, Value t_end, bool forward, SolverBudget* budget,
+    KineticEventEngine engine, KineticEventDiagnostics* diagnostics) {
   KDC_PROFILE_PHASE(ProfilePhase::SUPPORT_EVENT_DETECTION);
   LOG_DEBUG("find_support_changes: station={}, support={}, direction={}",
             station_id, current_support, forward ? "forward" : "backward");
@@ -439,12 +516,13 @@ std::vector<SupportChangeEvent> KineticCore::find_support_changes(
   const auto precomputed = CandidateSet::precompute(instance, budget);
   return support_changes_impl(instance, *precomputed, station_id,
                               current_support, t_start, t_end, forward,
-                              budget);
+                              budget, false, -1, engine, diagnostics);
 }
 
 SupportChangeEvent KineticCore::find_next_event(
     const Instance& instance, const std::vector<int>& current_supports,
-    Value t_start, Value t_end, bool forward, SolverBudget* budget) {
+    Value t_start, Value t_end, bool forward, SolverBudget* budget,
+    KineticEventEngine engine, KineticEventDiagnostics* diagnostics) {
   KDC_PROFILE_PHASE(ProfilePhase::SUPPORT_EVENT_DETECTION);
   validate_instance_shapes(instance);
   if (current_supports.size() != static_cast<Index>(instance.m)) {
@@ -465,7 +543,7 @@ SupportChangeEvent KineticCore::find_next_event(
     }
     const auto events = support_changes_impl(
         instance, *precomputed, station_id, support, t_start, t_end, forward,
-        budget, true);
+        budget, true, -1, engine, diagnostics);
     if (!events.empty() &&
         ((!nearest.valid && forward) ||
          (forward && events.front().time < nearest.time) ||
@@ -476,6 +554,14 @@ SupportChangeEvent KineticCore::find_next_event(
   }
   if (!nearest.valid) {
     nearest.time = -1.0;
+  } else if (diagnostics != nullptr) {
+    ++diagnostics->selected_support_events;
+    diagnostics->trace.push_back(
+        {nearest.time, KineticEventType::SUPPORT_CHANGE, nearest.station_id,
+         current_supports[static_cast<Index>(nearest.station_id)],
+         nearest.new_supporting_point, -1, -1,
+         nearest.new_supporting_point,
+         "earliest time; station and equal-time candidate ids ordered ascending"});
   }
   return nearest;
 }
@@ -560,8 +646,12 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
     const Instance& instance, int station_from, int station_to,
     const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
-    bool forward, SolverBudget* budget) {
+    bool forward, SolverBudget* budget, KineticEventEngine engine,
+    KineticEventDiagnostics* diagnostics) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
+  DiagnosticsTimer timer(
+      diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
+  require_reference_engine(engine);
   LOG_DEBUG("find_handovers: y1={}, y2={}", station_from, station_to);
   validate_instance_shapes(instance);
   if (station_from < 0 || station_from >= instance.m || station_to < 0 ||
@@ -593,9 +683,12 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
   const auto precomputed = CandidateSet::precompute(instance, budget);
   const auto support_events = support_changes_impl(
       instance, *precomputed, station_to, support_to, t_start, t_end,
-      forward, budget, false, support_from);
+      forward, budget, false, support_from, engine, diagnostics);
   std::vector<HandoverEvent> handovers;
   for (const auto& event : support_events) {
+    if (diagnostics != nullptr) {
+      ++diagnostics->handover_event_checks;
+    }
     if (budget != nullptr) {
       budget->checkpoint();
     }
@@ -607,6 +700,7 @@ std::vector<HandoverEvent> KineticCore::find_handovers(
           support_from, event.time, forward);
       if (handover.valid) {
         handovers.push_back(handover);
+        record_handover_trace(diagnostics, handover);
       }
     }
   }
@@ -617,8 +711,12 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     const Instance& instance, int station_from,
     const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
-    bool forward, SolverBudget* budget) {
+    bool forward, SolverBudget* budget, KineticEventEngine engine,
+    KineticEventDiagnostics* diagnostics) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
+  DiagnosticsTimer timer(
+      diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
+  require_reference_engine(engine);
   validate_instance_shapes(instance);
   if (station_from < 0 || station_from >= instance.m) {
     throw std::out_of_range("handover source station is invalid");
@@ -658,8 +756,11 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
     }
     const auto support_events = support_changes_impl(
         instance, *precomputed, station_to, support_to, t_start, t_end,
-        forward, budget, false, support_from);
+        forward, budget, false, support_from, engine, diagnostics);
     for (const auto& event : support_events) {
+      if (diagnostics != nullptr) {
+        ++diagnostics->handover_event_checks;
+      }
       if (budget != nullptr) {
         budget->checkpoint();
       }
@@ -671,6 +772,7 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
             support_from, event.time, forward);
         if (handover.valid) {
           handovers.push_back(handover);
+          record_handover_trace(diagnostics, handover);
         }
       }
     }
@@ -681,8 +783,12 @@ std::vector<HandoverEvent> KineticCore::find_handovers_from(
 HandoverEvent KineticCore::find_next_handover(
     const Instance& instance, const std::vector<int>& current_supports,
     const std::vector<int>& assigned_points, Value t_start, Value t_end,
-    bool forward, SolverBudget* budget) {
+    bool forward, SolverBudget* budget, KineticEventEngine engine,
+    KineticEventDiagnostics* diagnostics) {
   KDC_PROFILE_PHASE(ProfilePhase::HANDOVER_DETECTION);
+  DiagnosticsTimer timer(
+      diagnostics, &KineticEventDiagnostics::handover_detection_nanoseconds);
+  require_reference_engine(engine);
   validate_instance_shapes(instance);
   if (current_supports.size() != static_cast<Index>(instance.m)) {
     throw std::invalid_argument(
@@ -726,8 +832,11 @@ HandoverEvent KineticCore::find_next_handover(
       }
       const auto support_events = support_changes_impl(
           instance, *precomputed, station_to, support_to, t_start, t_end,
-          forward, budget, false, support_from);
+          forward, budget, false, support_from, engine, diagnostics);
       for (const auto& event : support_events) {
+        if (diagnostics != nullptr) {
+          ++diagnostics->handover_event_checks;
+        }
         if (!enters_receiving_disk(*precomputed, station_to, support_from,
                                    support_to, event.time, forward)) {
           continue;
@@ -747,6 +856,7 @@ HandoverEvent KineticCore::find_next_handover(
       }
     }
   }
+  record_handover_trace(diagnostics, nearest);
   return nearest;
 }
 }

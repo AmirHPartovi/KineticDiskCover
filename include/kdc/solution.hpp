@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kdc/objective.hpp"
+#include "kdc/kinetic.hpp"
 #include "kdc/solver_budget.hpp"
 #include "kdc/types.hpp"
 
@@ -19,6 +20,11 @@ struct SolutionInterval {
   double c{0.0};
 };
 
+enum class KineticIntervalEmission {
+  REFERENCE_ALL_TRAJECTORY_BREAKPOINTS,
+  EXACT_RELEVANT_BOUNDARIES
+};
+
 class KineticSolution {
  public:
   std::vector<SolutionInterval> intervals;
@@ -33,7 +39,12 @@ class KineticSolution {
                                 const StaticAssignment& init_assignment,
                                 double t_start, double t_end, bool forward,
                                 bool use_handovers, ObjectiveType objective,
-                                SolverBudget* budget = nullptr);
+                                SolverBudget* budget = nullptr,
+                                KineticEventEngine event_engine =
+                                    KineticEventEngine::REFERENCE_EXHAUSTIVE,
+                                KineticEventDiagnostics* diagnostics = nullptr,
+                                KineticIntervalEmission interval_emission =
+                                    KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES);
   static KineticSolution combine(const KineticSolution& s1,
                                  const KineticSolution& s2,
                                  ObjectiveType objective,
