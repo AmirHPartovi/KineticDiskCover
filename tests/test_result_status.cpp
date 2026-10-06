@@ -71,6 +71,28 @@ class ExactTimeoutSolver final : public kdc::IStaticSolver {
 
   int calls{0};
 };
+
+class NoBoundHeuristicSolver final : public kdc::IStaticSolver {
+ public:
+  kdc::StaticSolution solve(const kdc::Instance& instance,
+                            double time) override {
+    const auto assignment = kdc::StationarySolver::solve_nn(instance, time);
+    kdc::StaticSolution result;
+    result.supporting_point = assignment.supporting_point;
+    result.radius = assignment.radius;
+    result.assigned_points = assignment.assigned_points;
+    result.cost = assignment.cost;
+    result.feasible = assignment.feasible;
+    result.solver_name = name();
+    kdc::set_static_result_status(result, kdc::BoundStatus::NONE,
+                                  kdc::OptimalityStatus::FEASIBLE, false);
+    return result;
+  }
+
+  std::string name() const override { return "no-bound-heuristic"; }
+  bool is_exact() const override { return false; }
+  bool provides_lower_bound() const override { return false; }
+};
 }  // namespace
 
 TEST_CASE("Result status enum values round-trip") {
@@ -197,6 +219,21 @@ TEST_CASE("Heuristic kinetic runs do not report certified gaps or optimality") {
   REQUIRE(sum_result.optimality_status == kdc::OptimalityStatus::FEASIBLE);
   REQUIRE(sum_result.bound_status == kdc::BoundStatus::CERTIFIED);
   REQUIRE(sum_result.heuristic_lower_bound_integral >= 0.0);
+}
+
+TEST_CASE("MinMax does not infer a certified bound from feasibility") {
+  NoBoundHeuristicSolver solver;
+  kdc::MinMaxSolver::Config config;
+  config.verify_after = false;
+  config.gap_target = 0.0;
+  const auto result =
+      kdc::MinMaxSolver::solve(status_instance(), solver, config);
+
+  REQUIRE(result.feasible);
+  REQUIRE(result.bound_status == kdc::BoundStatus::NONE);
+  REQUIRE(result.certified_lower_bound == 0.0);
+  REQUIRE_FALSE(result.certified_gap.has_value());
+  REQUIRE(result.peak_consistent);
 }
 
 TEST_CASE("A timed-out exact child solve cannot make MinMax optimal") {

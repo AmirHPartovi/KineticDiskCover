@@ -134,6 +134,10 @@ Json result_to_json(const BenchmarkResult& result) {
               {"wall_time_sec", result.wall_time_sec},
               {"solve_time_sec", result.solve_time_sec},
               {"peak_cost", result.peak_cost},
+              {"peak_time", result.peak_time},
+              {"initial_peak_cost", result.initial_peak_cost},
+              {"heuristic_gap", result.heuristic_gap},
+              {"peak_consistent", result.peak_consistent},
               {"integral_cost", result.integral_cost},
               {"empirical_ratio_to_exact",
                result.empirical_ratio_to_exact
@@ -235,6 +239,10 @@ BenchmarkResult result_from_json(const Json& json) {
   result.peak_memory_mb = json.at("peak_memory_mb").get<double>();
   result.objective_value = json.at("objective_value").get<double>();
   result.peak_cost = json.value("peak_cost", result.objective_value);
+  result.peak_time = json.value("peak_time", 0.0);
+  result.initial_peak_cost = json.value("initial_peak_cost", 0.0);
+  result.heuristic_gap = json.value("heuristic_gap", 0.0);
+  result.peak_consistent = json.value("peak_consistent", false);
   result.integral_cost = json.value("integral_cost", result.objective_value);
   result.lower_bound = json.at("lower_bound").get<double>();
   result.bound_status =
@@ -456,6 +464,10 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
     benchmark.certified_lower_bound = result.certified_lower_bound;
     benchmark.heuristic_lower_bound = result.heuristic_lower_bound;
     benchmark.gap = result.gap;
+    benchmark.peak_time = result.peak_time;
+    benchmark.initial_peak_cost = result.initial_peak_cost;
+    benchmark.heuristic_gap = result.heuristic_gap;
+    benchmark.peak_consistent = result.peak_consistent;
     benchmark.num_ip_solves = result.num_ip_solves;
     benchmark.num_iterations = result.num_iterations;
     benchmark.verified = result.verified;

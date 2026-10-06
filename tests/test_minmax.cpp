@@ -3,6 +3,7 @@
 #include "kdc/kont_solver.hpp"
 #include "kdc/minmax.hpp"
 #include "kdc/stationary.hpp"
+#include "kdc/verify.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -89,4 +90,35 @@ TEST_CASE("MinMax solver updates the bound at a later peak time") {
   for (kdc::Index index = 1; index < result.gap_trace.size(); ++index) {
     REQUIRE(result.gap_trace[index] <= result.gap_trace[index - 1U] + 1e-9);
   }
+}
+
+TEST_CASE("MinMax exact refinement lowers a moving point's global peak") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(0.0, 0.0), kdc::Point(10.0, 0.0)}},
+      {{0.0, 0.0}, {10.0, 0.0}});
+  const auto initial_assignment =
+      kdc::StationarySolver::solve_nn(instance, 0.0);
+  const auto initial_solution = kdc::KineticSolution::extend(
+      instance, initial_assignment, 0.0, instance.T_end, true, false,
+      kdc::ObjectiveType::MIN_MAX);
+  const double initial_peak = initial_solution.peak_cost();
+
+  kdc::KontSolver solver;
+  kdc::MinMaxSolver::Config config;
+  config.time_limit_per_ip = 10.0;
+  config.gap_target = 0.0;
+  config.use_handovers = false;
+  const auto result = kdc::MinMaxSolver::solve(instance, solver, config);
+
+  REQUIRE(result.verified);
+  REQUIRE(result.peak_consistent);
+  REQUIRE(result.solution.is_well_formed());
+  REQUIRE(kdc::test::near(result.initial_peak_cost, initial_peak));
+  REQUIRE(result.peak_cost < initial_peak);
+  REQUIRE(result.peak_cost < result.initial_peak_cost);
+  REQUIRE_FALSE(result.trace.empty());
+  REQUIRE(result.trace.front().static_solver_status ==
+          kdc::optimality_status_to_string(kdc::OptimalityStatus::OPTIMAL));
+  REQUIRE(kdc::test::near(result.trace.front().static_cost_at_peak_time, 0.0));
+  REQUIRE(result.trace.front().combined_peak < initial_peak);
 }

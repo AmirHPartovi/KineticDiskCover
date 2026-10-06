@@ -48,6 +48,15 @@ lower bound on the kinetic peak objective. The solver carries only such bounds
 into `certified_lower_bound`; heuristic progress estimates stay in the legacy
 heuristic field.
 
+MinMax minimizes the maximum instantaneous area over time. Candidate selection
+therefore uses pointwise lower-envelope combination and peak comparisons; it
+does not use integrated area to discard candidates. A certified continuous
+verification establishes that the returned piecewise solution is feasible and
+that its cost representation is consistent, but it is not a proof of global
+MinMax optimality. A certified optimality gap is reported only when a feasible
+kinetic upper bound and an independently certified lower bound are both
+available.
+
 For MinSum, `HEURISTIC_ADAPTIVE` performs no initial bound-sampling phase. At
 each refinement it chooses the incumbent solution interval with the largest
 integral contribution and solves statically at that interval's midpoint.
@@ -63,10 +72,9 @@ optimality proof, and the sampled estimate is not a continuous-time
 certificate.
 
 Kinetic results additionally require a feasible incumbent before an upper
-bound or certified gap is recorded. Existing verifier checks sample time and
-therefore do not establish continuous feasibility; result feasibility
-reflects the solver's constructed solution, not a new continuous-verification
-proof.
+bound or certified gap is recorded. Continuous verification and the separate
+peak-consistency check concern the returned solution; neither establishes
+global optimality.
 
 ## Compatibility
 

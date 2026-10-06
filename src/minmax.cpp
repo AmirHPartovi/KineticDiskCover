@@ -60,7 +60,7 @@ void validate_config(const MinMaxSolver::Config& config) {
 }
 }
 
-double MinMaxSolver::find_max_area_time(const KineticSolution& solution) {
+double MinMaxSolver::find_peak_time(const KineticSolution& solution) {
   return solution.peak_time();
 }
 
@@ -140,13 +140,7 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
             .count();
     return result;
   }
-  double lower_bound = initial_assignment.bound_status != BoundStatus::NONE
-                           ? initial_assignment.lower_bound
-                           : 0.0;
-  result.bound_status =
-      initial_assignment.bound_status == BoundStatus::NONE
-          ? BoundStatus::CERTIFIED
-          : initial_assignment.bound_status;
+  result.bound_status = initial_assignment.bound_status;
   result.certified_lower_bound =
       initial_assignment.bound_status == BoundStatus::CERTIFIED
           ? initial_assignment.lower_bound
@@ -168,7 +162,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   if (!solution.is_well_formed()) {
     throw std::runtime_error("MinMax initial extension is malformed");
   }
-  double current_gap = relative_gap(solution.peak_cost(), lower_bound);
+  result.initial_peak_cost = solution.peak_cost();
+  double current_gap =
+      relative_gap(result.initial_peak_cost, result.certified_lower_bound);
   result.gap_trace.push_back(current_gap);
 
   try {
@@ -179,14 +175,21 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       result.num_iterations = iteration;
       const double peak = solution.peak_cost();
       const double previous_peak = peak;
-      const double maximum_time = find_max_area_time(solution);
-      current_gap = relative_gap(peak, lower_bound);
+      const double maximum_time = find_peak_time(solution);
+      current_gap = relative_gap(peak, result.certified_lower_bound);
       IterTrace row;
       row.iter = iteration;
       row.t_max = maximum_time;
       row.objective_value = peak;
-      row.lower_bound = lower_bound;
+      row.lower_bound = result.certified_lower_bound;
       row.gap = current_gap;
+      row.certified_gap =
+          result.bound_status == BoundStatus::CERTIFIED ? current_gap : 0.0;
+      row.has_certified_gap =
+          result.bound_status == BoundStatus::CERTIFIED;
+      row.heuristic_gap =
+          relative_gap(peak, result.heuristic_lower_bound);
+      row.combined_peak = peak;
       row.wall_time_sec =
           std::chrono::duration<double>(std::chrono::steady_clock::now() -
                                         solve_start)
@@ -195,38 +198,65 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       result.trace.push_back(row);
       LOG_INFO("MinMax iter {}: t_max={:.6f}, peak={:.6f}, LB={:.6f}, "
                "gap={:.4f}",
-               iteration, maximum_time, peak, lower_bound, current_gap);
-      if (current_gap < config.gap_target) {
+               iteration, maximum_time, peak, result.certified_lower_bound,
+               current_gap);
+      if (result.bound_status == BoundStatus::CERTIFIED &&
+          current_gap < config.gap_target) {
+        result.trace.back().stop_reason =
+            "gap_target_reached_with_certified_bound";
         break;
       }
 
       const StaticSolution assignment = static_solver.solve_with_budget(
           instance, maximum_time, budget, config.time_limit_per_ip);
       ++result.num_ip_solves;
+      result.trace.back().num_ip_solves = result.num_ip_solves;
+      result.trace.back().static_solver_status =
+          optimality_status_to_string(assignment.optimality_status);
+      result.trace.back().static_solver_exact = assignment.exact_solver;
+      result.trace.back().static_cost_at_peak_time = assignment.cost;
+      result.trace.back().static_lower_bound = assignment.lower_bound;
+      result.trace.back().static_upper_bound = assignment.upper_bound;
       if (!assignment.feasible) {
         if (assignment.time_limited ||
             assignment.optimality_status == OptimalityStatus::TIME_LIMIT) {
           result.time_limited = true;
+          result.trace.back().stop_reason = "global_time_limit";
           break;
         }
+        result.trace.back().stop_reason = "static_solve_failed";
         throw std::runtime_error("MinMax iteration static solve is infeasible");
       }
       if (assignment.bound_status == BoundStatus::CERTIFIED) {
         result.certified_lower_bound =
             std::max(result.certified_lower_bound, assignment.lower_bound);
+        result.bound_status = BoundStatus::CERTIFIED;
       } else if (assignment.bound_status == BoundStatus::HEURISTIC) {
         result.heuristic_lower_bound =
             std::max(result.heuristic_lower_bound, assignment.lower_bound);
+        if (result.bound_status != BoundStatus::CERTIFIED) {
+          result.bound_status = BoundStatus::HEURISTIC;
+        }
       }
-      if (assignment.bound_status != BoundStatus::NONE &&
-          assignment.lower_bound > lower_bound) {
-        lower_bound = assignment.lower_bound;
-        result.bound_status = assignment.bound_status;
-      }
+      result.trace.back().lower_bound = result.certified_lower_bound;
+      result.trace.back().has_certified_gap =
+          result.bound_status == BoundStatus::CERTIFIED;
+      result.trace.back().certified_gap =
+          result.trace.back().has_certified_gap
+              ? relative_gap(peak, result.certified_lower_bound)
+              : 0.0;
+      result.trace.back().heuristic_gap =
+          relative_gap(peak, result.heuristic_lower_bound);
       result.time_limited = result.time_limited || assignment.time_limited;
-      if (assignment.cost >= peak - 1e-9) {
+      const bool static_optimum_proven =
+          assignment.exact_solver && !assignment.time_limited &&
+          assignment.optimality_status == OptimalityStatus::OPTIMAL;
+      if (static_optimum_proven && assignment.cost >= peak - 1e-9) {
         LOG_INFO("MinMax: no improvement at t_max, stopping");
-        const double updated_gap = relative_gap(peak, lower_bound);
+        result.trace.back().stop_reason =
+            "static_optimum_not_better_than_peak";
+        const double updated_gap =
+            relative_gap(peak, result.certified_lower_bound);
         if (updated_gap < current_gap - 1e-12) {
           result.gap_trace.push_back(updated_gap);
         }
@@ -258,13 +288,52 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       }
       if (candidate.intervals.empty()) {
         LOG_INFO("MinMax: partial extension is empty, stopping");
-        const double updated_gap = relative_gap(peak, lower_bound);
+        result.trace.back().stop_reason = "candidate_empty";
+        const double updated_gap =
+            relative_gap(peak, result.certified_lower_bound);
         if (updated_gap < current_gap - 1e-12) {
           result.gap_trace.push_back(updated_gap);
         }
         break;
       }
 
+      const double candidate_domain_tolerance =
+          1e-9 * std::max(1.0, instance.T_end);
+      if (!candidate.is_well_formed() ||
+          std::abs(candidate.intervals.front().t_start) >
+              candidate_domain_tolerance ||
+          std::abs(candidate.intervals.back().t_end - instance.T_end) >
+              candidate_domain_tolerance) {
+        result.trace.back().stop_reason = "candidate_domain_invalid";
+        throw std::runtime_error(
+            "MinMax candidate does not cover the complete time domain");
+      }
+      const auto candidate_verification_start =
+          std::chrono::steady_clock::now();
+      VerificationReport candidate_report;
+      try {
+        candidate_report =
+            Verifier::verify_continuous(instance, candidate, 1e-6, &budget);
+      } catch (const SolverBudgetExpired&) {
+        result.verification_time_sec +=
+            std::chrono::duration<double>(
+                std::chrono::steady_clock::now() -
+                candidate_verification_start)
+                .count();
+        throw;
+      }
+      result.verification_time_sec += std::chrono::duration<double>(
+                                          std::chrono::steady_clock::now() -
+                                          candidate_verification_start)
+                                          .count();
+      result.verification_kind = candidate_report.kind;
+      if (!candidate_report.all_ok()) {
+        result.trace.back().stop_reason = "verification_failure";
+        throw std::runtime_error(
+            "MinMax candidate verification failed: " +
+            candidate_report.errors.front());
+      }
+      result.trace.back().candidate_peak = candidate.peak_cost();
       solution = KineticSolution::combine(solution, candidate,
                                           ObjectiveType::MIN_MAX, &budget);
       if (config.verify_each_iteration ||
@@ -288,6 +357,7 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
                 .count();
         result.verification_kind = report.kind;
         if (!report.all_ok()) {
+          result.trace.back().stop_reason = "verification_failure";
           LOG_ERROR("MinMax: verification failed at iter {}", iteration);
           for (const auto& error : report.errors) {
             LOG_ERROR("  {}", error);
@@ -297,7 +367,14 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       }
 
       const double new_peak = solution.peak_cost();
-      const double new_gap = relative_gap(new_peak, lower_bound);
+      if (new_peak > previous_peak + 1e-9 * std::max(1.0, std::abs(previous_peak))) {
+        throw std::runtime_error("MinMax combination increased the peak");
+      }
+      result.trace.back().combined_peak = new_peak;
+      result.trace.back().peak_improvement = previous_peak - new_peak;
+      result.trace.back().candidate_accepted = true;
+      const double new_gap =
+          relative_gap(new_peak, result.certified_lower_bound);
       if (new_gap > current_gap + 1e-10) {
         throw std::runtime_error("MinMax relative gap increased");
       }
@@ -305,12 +382,22 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
       current_gap = new_gap;
       if (new_peak >= previous_peak - 1e-9) {
         LOG_INFO("MinMax: combined solution did not improve peak, stopping");
+        result.trace.back().stop_reason =
+            static_optimum_proven ? "no_peak_improvement_after_exact_candidate"
+                                  : "heuristic_no_improvement";
         break;
       }
+      result.trace.back().stop_reason = "candidate_accepted";
     }
   } catch (const SolverBudgetExpired&) {
     result.time_limited = true;
+    if (!result.trace.empty()) {
+      result.trace.back().stop_reason = "global_time_limit";
+    }
     LOG_WARN("MinMax: global solver budget expired");
+  }
+  if (!result.trace.empty() && result.trace.back().stop_reason == "pending") {
+    result.trace.back().stop_reason = "iteration_limit";
   }
 
   const auto finish = std::chrono::high_resolution_clock::now();
@@ -318,13 +405,20 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   result.feasible = result.solution.is_well_formed();
   result.exact_solver = static_solver.is_exact();
   result.peak_cost = result.solution.peak_cost();
+  result.peak_time = result.solution.peak_time();
+  result.peak_consistent = Verifier::check_peak_consistency(
+      result.solution, result.peak_cost, result.peak_time);
+  if (!result.peak_consistent) {
+    throw std::runtime_error(
+        "MinMax reported peak is inconsistent with the solution");
+  }
   result.lower_bound = result.certified_lower_bound;
-  result.bound_status =
-      result.feasible ? BoundStatus::CERTIFIED : BoundStatus::NONE;
   result.upper_bound = result.feasible
                            ? result.peak_cost
                            : std::numeric_limits<double>::infinity();
-  result.gap = relative_gap(result.peak_cost, lower_bound);
+  result.gap = relative_gap(result.peak_cost, result.certified_lower_bound);
+  result.heuristic_gap =
+      relative_gap(result.peak_cost, result.heuristic_lower_bound);
   if (result.exact_solver && result.feasible &&
       result.bound_status == BoundStatus::CERTIFIED &&
       std::isfinite(result.upper_bound)) {
@@ -367,9 +461,9 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
                             *result.certified_gap <= 1e-12
                         ? OptimalityStatus::OPTIMAL
                         : OptimalityStatus::FEASIBLE));
-  LOG_INFO("MinMax: done. peak={:.6f}, LB={:.6f}, gap={:.4f}, iters={}, "
-           "t={:.3f}s",
-           result.peak_cost, result.lower_bound, result.gap,
+  LOG_INFO("MinMax: done. peak={:.6f}, certified_LB={:.6f}, gap={:.4f}, "
+           "iters={}, t={:.3f}s",
+           result.peak_cost, result.certified_lower_bound, result.gap,
            result.num_iterations, result.total_time_sec);
   if (!config.trace_csv_path.empty()) {
     try {

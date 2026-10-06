@@ -12,6 +12,19 @@ struct IterTrace {
   double gap{0.0};
   double wall_time_sec{0.0};
   int num_ip_solves{0};
+  double candidate_peak{0.0};
+  double combined_peak{0.0};
+  double peak_improvement{0.0};
+  double static_cost_at_peak_time{0.0};
+  double static_lower_bound{0.0};
+  double static_upper_bound{0.0};
+  double certified_gap{0.0};
+  double heuristic_gap{0.0};
+  std::string static_solver_status{"not_run"};
+  std::string stop_reason{"pending"};
+  bool static_solver_exact{false};
+  bool candidate_accepted{false};
+  bool has_certified_gap{false};
 };
 
 class TraceWriter {

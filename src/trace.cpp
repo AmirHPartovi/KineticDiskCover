@@ -14,6 +14,12 @@
 namespace kdc {
 namespace {
 constexpr const char* kCsvHeader =
+    "iter,t_max,objective,lower_bound,gap,wall_time,num_ip_solves,"
+    "static_cost_at_peak_time,static_solver_status,static_solver_exact,"
+    "static_lower_bound,static_upper_bound,candidate_peak,combined_peak,"
+    "peak_improvement,certified_gap,heuristic_gap,candidate_accepted,"
+    "has_certified_gap,stop_reason";
+constexpr const char* kLegacyCsvHeader =
     "iter,t_max,objective,lower_bound,gap,wall_time,num_ip_solves";
 
 std::vector<std::string> split_fields(const std::string& line) {
@@ -45,7 +51,14 @@ bool valid_row(const IterTrace& row) {
          std::isfinite(row.objective_value) &&
          std::isfinite(row.lower_bound) && std::isfinite(row.gap) &&
          std::isfinite(row.wall_time_sec) && row.wall_time_sec >= 0.0 &&
-         row.num_ip_solves >= 0;
+         row.num_ip_solves >= 0 && std::isfinite(row.candidate_peak) &&
+         std::isfinite(row.combined_peak) &&
+         std::isfinite(row.peak_improvement) &&
+         std::isfinite(row.static_cost_at_peak_time) &&
+         std::isfinite(row.static_lower_bound) &&
+         std::isfinite(row.static_upper_bound) &&
+         std::isfinite(row.certified_gap) &&
+         std::isfinite(row.heuristic_gap);
 }
 }  // namespace
 
@@ -64,7 +77,15 @@ void TraceWriter::write_csv(const std::vector<IterTrace>& trace,
     }
     output << row.iter << ',' << row.t_max << ',' << row.objective_value << ','
            << row.lower_bound << ',' << row.gap << ',' << row.wall_time_sec
-           << ',' << row.num_ip_solves << '\n';
+           << ',' << row.num_ip_solves << ',' << row.static_cost_at_peak_time
+           << ',' << row.static_solver_status << ','
+           << (row.static_solver_exact ? 1 : 0) << ','
+           << row.static_lower_bound << ',' << row.static_upper_bound << ','
+           << row.candidate_peak << ',' << row.combined_peak << ','
+           << row.peak_improvement << ',' << row.certified_gap << ','
+           << row.heuristic_gap << ','
+           << (row.candidate_accepted ? 1 : 0) << ','
+           << (row.has_certified_gap ? 1 : 0) << ',' << row.stop_reason << '\n';
   }
   if (!output) {
     throw std::runtime_error("failed writing trace CSV: " + path);
@@ -78,9 +99,11 @@ std::vector<IterTrace> TraceWriter::read_csv(const std::string& path) {
     throw std::runtime_error("cannot open trace CSV for reading: " + path);
   }
   std::string line;
-  if (!std::getline(input, line) || line != kCsvHeader) {
+  if (!std::getline(input, line) || (line != kCsvHeader &&
+                                     line != kLegacyCsvHeader)) {
     throw std::runtime_error("invalid trace CSV header");
   }
+  const bool legacy = line == kLegacyCsvHeader;
 
   std::vector<IterTrace> trace;
   std::size_t line_number = 1U;
@@ -91,8 +114,8 @@ std::vector<IterTrace> TraceWriter::read_csv(const std::string& path) {
                                std::to_string(line_number));
     }
     const auto fields = split_fields(line);
-    if (fields.size() != 7U) {
-      throw std::runtime_error("trace CSV row must have 7 fields at line " +
+    if (fields.size() != (legacy ? 7U : 20U)) {
+      throw std::runtime_error("trace CSV row has an invalid field count at line " +
                                std::to_string(line_number));
     }
     try {
@@ -104,6 +127,30 @@ std::vector<IterTrace> TraceWriter::read_csv(const std::string& path) {
       row.gap = parse_field<double>(fields[4], "gap");
       row.wall_time_sec = parse_field<double>(fields[5], "wall_time");
       row.num_ip_solves = parse_field<int>(fields[6], "num_ip_solves");
+      if (!legacy) {
+        row.static_cost_at_peak_time =
+            parse_field<double>(fields[7], "static_cost_at_peak_time");
+        row.static_solver_status = fields[8];
+        row.static_solver_exact =
+            parse_field<int>(fields[9], "static_solver_exact") != 0;
+        row.static_lower_bound =
+            parse_field<double>(fields[10], "static_lower_bound");
+        row.static_upper_bound =
+            parse_field<double>(fields[11], "static_upper_bound");
+        row.candidate_peak =
+            parse_field<double>(fields[12], "candidate_peak");
+        row.combined_peak =
+            parse_field<double>(fields[13], "combined_peak");
+        row.peak_improvement =
+            parse_field<double>(fields[14], "peak_improvement");
+        row.certified_gap = parse_field<double>(fields[15], "certified_gap");
+        row.heuristic_gap = parse_field<double>(fields[16], "heuristic_gap");
+        row.candidate_accepted =
+            parse_field<int>(fields[17], "candidate_accepted") != 0;
+        row.has_certified_gap =
+            parse_field<int>(fields[18], "has_certified_gap") != 0;
+        row.stop_reason = fields[19];
+      }
       if (!valid_row(row)) {
         throw std::runtime_error("trace row contains invalid values");
       }

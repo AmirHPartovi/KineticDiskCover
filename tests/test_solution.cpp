@@ -43,6 +43,23 @@ kdc::KineticSolution make_polynomial_solution(double a, double b, double c,
   solution.intervals.push_back(std::move(interval));
   return solution;
 }
+
+kdc::KineticSolution make_piecewise_constant_solution(
+    const std::vector<std::pair<double, double>>& intervals) {
+  kdc::KineticSolution solution;
+  for (const auto& [end, cost] : intervals) {
+    kdc::SolutionInterval interval;
+    interval.t_start = solution.intervals.empty()
+                           ? 0.0
+                           : solution.intervals.back().t_end;
+    interval.t_end = end;
+    interval.supporting_point = {0};
+    interval.assigned_points = {0};
+    interval.c = cost;
+    solution.intervals.push_back(interval);
+  }
+  return solution;
+}
 }
 
 TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
@@ -73,6 +90,39 @@ TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
     REQUIRE(kdc::test::near(solution.peak_cost(),
                             2.0 * std::acos(-1.0)));
     REQUIRE(kdc::test::near(solution.peak_time(), 1.0));
+  }
+
+  SECTION("peak evaluates quadratic vertices and closed-interval endpoints") {
+    const auto concave = make_polynomial_solution(-2.0, 2.0, 0.0);
+    REQUIRE(kdc::test::near(concave.peak_cost(), 0.5));
+    REQUIRE(kdc::test::near(concave.peak_time(), 0.5));
+
+    const auto convex = make_polynomial_solution(2.0, -2.0, 0.0);
+    REQUIRE(kdc::test::near(convex.peak_cost(), 0.0));
+    REQUIRE(kdc::test::near(convex.peak_time(), 0.0));
+
+    const auto increasing = make_polynomial_solution(0.0, 2.0, 1.0);
+    REQUIRE(kdc::test::near(increasing.peak_cost(), 3.0));
+    REQUIRE(kdc::test::near(increasing.peak_time(), 1.0));
+
+    const auto constant = make_polynomial_solution(0.0, 0.0, 4.0);
+    REQUIRE(kdc::test::near(constant.peak_cost(), 4.0));
+    REQUIRE(kdc::test::near(constant.peak_time(), 0.0));
+
+    const auto boundary_vertex = make_polynomial_solution(-1.0, 0.0, 0.0);
+    REQUIRE(kdc::test::near(boundary_vertex.peak_cost(), 0.0));
+    REQUIRE(kdc::test::near(boundary_vertex.peak_time(), 0.0));
+
+    const auto small_curvature =
+        make_polynomial_solution(-1e-16, 1e-16, 0.0);
+    REQUIRE(kdc::test::near(small_curvature.peak_time(), 0.5));
+  }
+
+  SECTION("independent MinMax peak consistency check") {
+    const auto concave = make_polynomial_solution(-2.0, 2.0, 0.0);
+    REQUIRE(kdc::Verifier::check_peak_consistency(concave, 0.5, 0.5));
+    REQUIRE_FALSE(kdc::Verifier::check_peak_consistency(concave, 0.4, 0.5));
+    REQUIRE_FALSE(kdc::Verifier::check_peak_consistency(concave, 0.5, 0.0));
   }
 
   SECTION("well formed") {
@@ -260,6 +310,32 @@ TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
             std::min(first.total_integral(), second.total_integral()) + 1e-9);
   }
 
+  SECTION("combine handles no crossing and a touching root") {
+    const auto lower = make_polynomial_solution(0.0, 0.0, 1.0);
+    const auto higher = make_polynomial_solution(0.0, 0.0, 2.0);
+    const auto no_crossing = kdc::KineticSolution::combine(
+        lower, higher, kdc::ObjectiveType::MIN_MAX);
+    REQUIRE(kdc::test::solutions_equal(no_crossing, lower));
+
+    const auto tangent =
+        make_polynomial_solution(1.0, -1.0, 0.25, 1, 1);
+    const auto touching = make_polynomial_solution(0.0, 0.0, 0.25);
+    const auto combined = kdc::KineticSolution::combine(
+        tangent, touching, kdc::ObjectiveType::MIN_MAX);
+    REQUIRE(combined.is_well_formed());
+    REQUIRE(kdc::test::near(combined.cost_at(0.5), 0.0));
+    REQUIRE(kdc::test::near(combined.cost_at(0.0), 0.25));
+    REQUIRE(kdc::test::near(combined.cost_at(1.0), 0.25));
+  }
+
+  SECTION("peak_time finds global maxima across multiple intervals") {
+    const auto multiple_peaks =
+        make_piecewise_constant_solution({{0.25, 1.0}, {0.5, 0.0},
+                                          {0.75, 1.0}, {1.0, 0.0}});
+    REQUIRE(kdc::test::near(multiple_peaks.peak_cost(), 1.0));
+    REQUIRE(kdc::test::near(multiple_peaks.peak_time(), 0.0));
+  }
+
   SECTION("MinSum combination uses the pointwise lower envelope") {
     const auto first = make_polynomial_solution(0.0, 0.0, 2.0);
     const auto second = make_polynomial_solution(8.0, -8.0, 3.0, 1, 1);
@@ -318,13 +394,34 @@ TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
     REQUIRE(combined.total_integral() < second.total_integral());
   }
 
-  SECTION("partial_extend") {
+  SECTION("partial_extend keeps the full MinMax candidate through the shared domain") {
     const auto new_solution = make_polynomial_solution(0.0, 4.0, 0.0);
     const auto current_solution = make_polynomial_solution(0.0, 0.0, 1.0);
     const auto partial = kdc::KineticSolution::partial_extend(
         new_solution, current_solution, kdc::ObjectiveType::MIN_MAX);
     REQUIRE(partial.is_well_formed());
-    REQUIRE(partial.intervals.back().t_end < 1.0);
-    REQUIRE(kdc::test::near(partial.intervals.back().t_end, 0.5, 1e-8));
+    REQUIRE(kdc::test::near(partial.intervals.front().t_start, 0.0));
+    REQUIRE(kdc::test::near(partial.intervals.back().t_end, 1.0));
+    REQUIRE(kdc::test::near(partial.cost_at(0.75), new_solution.cost_at(0.75)));
+  }
+
+  SECTION("MinMax refinement retains a candidate with a worse integral") {
+    const auto current =
+        make_piecewise_constant_solution({{0.8, 5.0}, {1.0, 20.0}});
+    const auto candidate =
+        make_piecewise_constant_solution({{0.8, 30.0}, {1.0, 10.0}});
+
+    REQUIRE(candidate.total_integral() > current.total_integral());
+    REQUIRE(kdc::test::near(current.peak_cost(), 20.0));
+    REQUIRE(kdc::test::near(candidate.peak_cost(), 30.0));
+
+    const auto partial = kdc::KineticSolution::partial_extend(
+        candidate, current, kdc::ObjectiveType::MIN_MAX);
+    const auto combined = kdc::KineticSolution::combine(
+        current, partial, kdc::ObjectiveType::MIN_MAX);
+
+    REQUIRE(combined.is_well_formed());
+    REQUIRE(kdc::test::near(combined.peak_cost(), 10.0));
+    REQUIRE(combined.peak_cost() < current.peak_cost());
   }
 }

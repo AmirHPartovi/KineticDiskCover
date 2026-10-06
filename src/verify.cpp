@@ -871,6 +871,51 @@ bool Verifier::check_integral(const Instance& instance,
          std::abs(analytic - numeric) <= tolerance * scale;
 }
 
+bool Verifier::check_peak_consistency(const KineticSolution& solution,
+                                     double reported_peak,
+                                     double reported_peak_time,
+                                     double tolerance) {
+  if (!solution.is_well_formed() || !std::isfinite(reported_peak) ||
+      !std::isfinite(reported_peak_time) || !std::isfinite(tolerance) ||
+      tolerance < 0.0 || reported_peak_time <
+                            solution.intervals.front().t_start ||
+      reported_peak_time > solution.intervals.back().t_end) {
+    return false;
+  }
+  const auto value_at = [](const SolutionInterval& interval, double time) {
+    return (interval.a * time + interval.b) * time + interval.c;
+  };
+  double reconstructed_peak = -std::numeric_limits<double>::infinity();
+  for (const auto& interval : solution.intervals) {
+    reconstructed_peak =
+        std::max(reconstructed_peak, value_at(interval, interval.t_start));
+    reconstructed_peak =
+        std::max(reconstructed_peak, value_at(interval, interval.t_end));
+    if (interval.a < 0.0) {
+      const double vertex = -interval.b / (2.0 * interval.a);
+      if (vertex > interval.t_start && vertex < interval.t_end) {
+        reconstructed_peak =
+            std::max(reconstructed_peak, value_at(interval, vertex));
+      }
+    }
+  }
+  const double reported_at_time =
+      value_at(*find_interval(solution, reported_peak_time),
+               reported_peak_time);
+  const double peak_scale =
+      std::max({1.0, std::abs(reconstructed_peak), std::abs(reported_peak)});
+  const double time_scale =
+      std::max({1.0, std::abs(solution.intervals.front().t_start),
+                std::abs(solution.intervals.back().t_end)});
+  const double cost_tolerance = tolerance * peak_scale;
+  return std::abs(reconstructed_peak - reported_peak) <= cost_tolerance &&
+         std::abs(reported_at_time - reconstructed_peak) <= cost_tolerance &&
+         reported_peak_time >= solution.intervals.front().t_start -
+                                   tolerance * time_scale &&
+         reported_peak_time <= solution.intervals.back().t_end +
+                                   tolerance * time_scale;
+}
+
 VerificationReport Verifier::verify(const Instance& instance,
                                     const KineticSolution& solution,
                                     int samples_per_interval,

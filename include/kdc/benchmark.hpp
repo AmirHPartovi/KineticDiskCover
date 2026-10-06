@@ -88,6 +88,10 @@ struct BenchmarkResult {
   double serialization_time_sec{0.0};
   double total_wall_time_sec{0.0};
   double peak_cost{0.0};
+  double peak_time{0.0};
+  double initial_peak_cost{0.0};
+  double heuristic_gap{0.0};
+  bool peak_consistent{false};
   double integral_cost{0.0};
   std::optional<double> empirical_ratio_to_exact;
   std::optional<double> ratio_to_incumbent;

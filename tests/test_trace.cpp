@@ -25,9 +25,22 @@ std::filesystem::path temporary_path(const std::string& suffix) {
 }
 
 TEST_CASE("TraceWriter: CSV round-trip preserves values") {
-  const std::vector<kdc::IterTrace> expected{
+  std::vector<kdc::IterTrace> expected{
       {1, 0.5, 100.0, 90.0, 0.111, 1.2, 3},
       {2, 0.4, 95.0, 92.0, 0.0326, 2.5, 4}};
+  expected[0].static_cost_at_peak_time = 91.0;
+  expected[0].static_solver_status = "OPTIMAL";
+  expected[0].static_solver_exact = true;
+  expected[0].static_lower_bound = 90.0;
+  expected[0].static_upper_bound = 91.0;
+  expected[0].candidate_peak = 94.0;
+  expected[0].combined_peak = 94.0;
+  expected[0].peak_improvement = 6.0;
+  expected[0].certified_gap = 0.044;
+  expected[0].heuristic_gap = 0.05;
+  expected[0].candidate_accepted = true;
+  expected[0].has_certified_gap = true;
+  expected[0].stop_reason = "candidate_accepted";
   const auto path = temporary_path(".csv");
 
   kdc::TraceWriter::write_csv(expected, path.string());
@@ -46,7 +59,31 @@ TEST_CASE("TraceWriter: CSV round-trip preserves values") {
     REQUIRE(kdc::test::near(actual[index].wall_time_sec,
                             expected[index].wall_time_sec, 1e-12));
     REQUIRE(actual[index].num_ip_solves == expected[index].num_ip_solves);
+    REQUIRE(kdc::test::near(actual[index].candidate_peak,
+                            expected[index].candidate_peak, 1e-12));
+    REQUIRE(actual[index].static_solver_status ==
+            expected[index].static_solver_status);
+    REQUIRE(actual[index].candidate_accepted ==
+            expected[index].candidate_accepted);
+    REQUIRE(actual[index].has_certified_gap ==
+            expected[index].has_certified_gap);
+    REQUIRE(actual[index].stop_reason == expected[index].stop_reason);
   }
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("TraceWriter reads the legacy seven-column format") {
+  const auto path = temporary_path("-legacy.csv");
+  {
+    std::ofstream output(path);
+    output << "iter,t_max,objective,lower_bound,gap,wall_time,num_ip_solves\n"
+              "1,0.5,10,4,1.5,0.2,3\n";
+  }
+  const auto trace = kdc::TraceWriter::read_csv(path.string());
+  REQUIRE(trace.size() == 1U);
+  REQUIRE(trace.front().iter == 1);
+  REQUIRE_FALSE(trace.front().has_certified_gap);
+  REQUIRE(trace.front().stop_reason == "pending");
   std::filesystem::remove(path);
 }
 
@@ -76,6 +113,9 @@ TEST_CASE("MinMax: trace rows and CSV are populated when enabled") {
   REQUIRE(std::filesystem::exists(path));
   const auto csv_trace = kdc::TraceWriter::read_csv(path.string());
   REQUIRE(csv_trace.size() == result.trace.size());
+  REQUIRE(csv_trace.front().static_solver_status != "not_run");
+  REQUIRE(csv_trace.front().stop_reason != "pending");
+  REQUIRE(csv_trace.front().has_certified_gap);
   std::filesystem::remove(path);
 }
 

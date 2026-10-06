@@ -57,6 +57,10 @@ class Verifier {
                              const KineticSolution& solution,
                              int num_samples, double tolerance,
                              SolverBudget* budget = nullptr);
+  static bool check_peak_consistency(const KineticSolution& solution,
+                                     double reported_peak,
+                                     double reported_peak_time,
+                                     double tolerance = 1e-6);
 };
 
 bool verify_solution(const KineticSolution& solution);
