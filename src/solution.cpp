@@ -7,6 +7,8 @@
 #include "kdc/stationary.hpp"
 
 #include <algorithm>
+#include <cassert>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
@@ -33,6 +35,63 @@ void validate_interval_request(const KineticSolution& solution, Value start,
 }
 
 constexpr Value kIntervalTolerance = 1e-9;
+
+class ExtensionDiagnosticsTimer {
+ public:
+  explicit ExtensionDiagnosticsTimer(
+      KineticEventDiagnostics* diagnostics) noexcept
+      : diagnostics_(diagnostics) {
+    if (diagnostics_ != nullptr) {
+      start_ = std::chrono::steady_clock::now();
+    }
+  }
+
+  ~ExtensionDiagnosticsTimer() {
+    if (diagnostics_ != nullptr) {
+      const auto elapsed =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(
+              std::chrono::steady_clock::now() - start_)
+              .count();
+      diagnostics_->total_extension_nanoseconds +=
+          static_cast<std::uint64_t>(elapsed);
+    }
+  }
+
+ private:
+  KineticEventDiagnostics* diagnostics_;
+  std::chrono::steady_clock::time_point start_{};
+};
+
+class IntervalConstructionTimer {
+ public:
+  explicit IntervalConstructionTimer(
+      KineticEventDiagnostics* diagnostics) noexcept
+      : diagnostics_(diagnostics) {
+    if (diagnostics_ != nullptr) {
+      start_ = std::chrono::steady_clock::now();
+    }
+  }
+
+  ~IntervalConstructionTimer() {
+    stop();
+  }
+
+  void stop() noexcept {
+    if (diagnostics_ != nullptr) {
+      const auto elapsed =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(
+              std::chrono::steady_clock::now() - start_)
+              .count();
+      diagnostics_->interval_construction_nanoseconds +=
+          static_cast<std::uint64_t>(elapsed);
+      diagnostics_ = nullptr;
+    }
+  }
+
+ private:
+  KineticEventDiagnostics* diagnostics_;
+  std::chrono::steady_clock::time_point start_{};
+};
 
 bool same_coefficients(const SolutionInterval& lhs,
                        const SolutionInterval& rhs) {
@@ -188,8 +247,21 @@ void KineticSolution::compute_quadratic_coeffs(
 KineticSolution KineticSolution::extend(
     const Instance& instance, const StaticAssignment& init_assignment,
     double t_start, double t_end, bool forward, bool use_handovers,
-    ObjectiveType objective_type, SolverBudget* budget) {
+    ObjectiveType objective_type, SolverBudget* budget,
+    KineticEventEngine event_engine,
+    KineticEventDiagnostics* diagnostics,
+    KineticIntervalEmission interval_emission) {
   KDC_PROFILE_PHASE(ProfilePhase::KINETIC_EXTENSION);
+  ExtensionDiagnosticsTimer diagnostics_timer(diagnostics);
+  if (event_engine != KineticEventEngine::REFERENCE_EXHAUSTIVE) {
+    throw std::invalid_argument("unsupported kinetic event engine");
+  }
+  if (interval_emission !=
+          KineticIntervalEmission::REFERENCE_ALL_TRAJECTORY_BREAKPOINTS &&
+      interval_emission !=
+          KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES) {
+    throw std::invalid_argument("unsupported kinetic interval emission mode");
+  }
   LOG_DEBUG("extend: t_start={}, t_end={}, forward={}", t_start, t_end,
             forward);
   if (!std::isfinite(t_start) || !std::isfinite(t_end) ||
@@ -271,19 +343,25 @@ KineticSolution KineticSolution::extend(
   solution.objective = objective_type;
   Value current_time = t_start;
   const Value direction = forward ? 1.0 : -1.0;
-  std::vector<Value> breakpoints;
+  std::vector<Value> event_breakpoints;
   for (const auto& trajectory : precomputed->trajectories) {
-    for (const Value breakpoint : trajectory.t_breaks) {
-      if (budget != nullptr) {
-        budget->checkpoint();
-      }
-      breakpoints.push_back(breakpoint);
+    if (budget != nullptr) {
+      budget->checkpoint();
     }
+    if (diagnostics != nullptr) {
+      diagnostics->raw_trajectory_breakpoints +=
+          static_cast<std::uint64_t>(trajectory.t_breaks.size());
+    }
+    event_breakpoints.insert(event_breakpoints.end(),
+                             trajectory.t_breaks.begin(),
+                             trajectory.t_breaks.end());
   }
-  std::sort(breakpoints.begin(), breakpoints.end());
-  breakpoints.erase(std::unique(breakpoints.begin(), breakpoints.end()),
-                    breakpoints.end());
+  std::sort(event_breakpoints.begin(), event_breakpoints.end());
+  event_breakpoints.erase(
+      std::unique(event_breakpoints.begin(), event_breakpoints.end()),
+      event_breakpoints.end());
   std::size_t event_count = 0U;
+  bool have_previous_supports = diagnostics != nullptr;
   while (direction * (t_end - current_time) > kIntervalTolerance) {
     if (budget != nullptr) {
       budget->checkpoint();
@@ -292,6 +370,10 @@ KineticSolution KineticSolution::extend(
     const Value probe_time =
         std::clamp(current_time + direction * std::min(1e-8, remaining / 4.0),
                    0.0, instance.T_end);
+    std::vector<int> previous_supports;
+    if (diagnostics != nullptr) {
+      previous_supports = supports;
+    }
     for (int& support : supports) {
       if (budget != nullptr) {
         budget->checkpoint();
@@ -314,6 +396,19 @@ KineticSolution KineticSolution::extend(
         supports[station_index] = point_id;
       }
     }
+    if (have_previous_supports && diagnostics != nullptr) {
+      for (Index station = 0; station < supports.size(); ++station) {
+        if (supports[station] != previous_supports[station]) {
+          ++diagnostics->selected_support_events;
+          diagnostics->trace.push_back(
+              {current_time, KineticEventType::SUPPORT_CHANGE,
+               static_cast<int>(station), previous_supports[station],
+               supports[station], -1, -1, supports[station],
+               "equal distances retain the lowest point id in ascending scan"});
+        }
+      }
+    }
+    have_previous_supports = diagnostics != nullptr;
     if (use_handovers) {
       bool transferred = false;
       for (int station_from = 0; station_from < instance.m && !transferred;
@@ -399,6 +494,13 @@ KineticSolution KineticSolution::extend(
           }
           if (receiver_accepts) {
             owners[static_cast<Index>(support_from)] = station_to;
+            if (diagnostics != nullptr) {
+              diagnostics->trace.push_back(
+                  {current_time, KineticEventType::HANDOVER, -1, -1, -1,
+                   station_from, station_to, support_from,
+                   "source stations then receiver stations scanned in ascending id order",
+                   second_support, support_to});
+            }
             transferred = true;
             break;
           }
@@ -413,24 +515,43 @@ KineticSolution KineticSolution::extend(
     }
 
     Value next_time = t_end;
-    if (forward) {
-      const auto breakpoint = std::upper_bound(
-          breakpoints.begin(), breakpoints.end(),
-          current_time + kIntervalTolerance);
-      if (breakpoint != breakpoints.end() && *breakpoint < next_time) {
-        next_time = *breakpoint;
-      }
-    } else {
-      const auto breakpoint = std::lower_bound(
-          breakpoints.begin(), breakpoints.end(),
-          current_time - kIntervalTolerance);
-      if (breakpoint != breakpoints.begin()) {
-        const Value previous = *std::prev(breakpoint);
-        if (previous > next_time) {
-          next_time = previous;
+    const auto select_previous_breakpoint = [&](const auto& breaks) {
+      if (forward) {
+        const auto breakpoint = std::upper_bound(
+            breaks.begin(), breaks.end(), current_time + kIntervalTolerance);
+        if (breakpoint != breaks.end() &&
+            *breakpoint < next_time) {
+          next_time = *breakpoint;
+        }
+      } else {
+        const auto breakpoint = std::lower_bound(
+            breaks.begin(), breaks.end(), current_time - kIntervalTolerance);
+        if (breakpoint != breaks.begin()) {
+          const Value previous = *std::prev(breakpoint);
+          if (previous > next_time) {
+            next_time = previous;
+          }
         }
       }
+    };
+    if (interval_emission ==
+        KineticIntervalEmission::REFERENCE_ALL_TRAJECTORY_BREAKPOINTS) {
+      select_previous_breakpoint(event_breakpoints);
+    } else {
+      for (Index station = 0; station < supports.size(); ++station) {
+        const int support = supports[station];
+        if (support < 0) {
+          continue;
+        }
+        select_previous_breakpoint(
+            precomputed
+                ->trajectories[static_cast<Index>(support)]
+                .t_breaks);
+      }
     }
+    const auto event_detection_start =
+        diagnostics == nullptr ? std::chrono::steady_clock::time_point{}
+                               : std::chrono::steady_clock::now();
     for (int station_id = 0; station_id < instance.m; ++station_id) {
       const int support = supports[static_cast<Index>(station_id)];
       if (support < 0) {
@@ -438,13 +559,16 @@ KineticSolution KineticSolution::extend(
       }
       const auto events = KineticCore::find_support_changes(
           instance, station_id, support, current_time, t_end, forward,
-          budget);
+          budget, event_engine, diagnostics);
       for (const auto& event : events) {
         if (budget != nullptr) {
           budget->checkpoint();
         }
         if (owners[static_cast<Index>(event.new_supporting_point)] !=
             station_id) {
+          if (diagnostics != nullptr) {
+            ++diagnostics->candidate_roots_rejected;
+          }
           continue;
         }
         const Value derivative_change =
@@ -454,6 +578,9 @@ KineticSolution KineticSolution::extend(
             distance_derivative(instance, *precomputed, station_id, support,
                                 event.time, forward);
         if (direction * derivative_change <= 1e-12) {
+          if (diagnostics != nullptr) {
+            ++diagnostics->candidate_roots_rejected;
+          }
           continue;
         }
         if (direction * (event.time - current_time) > 0.0 &&
@@ -464,25 +591,77 @@ KineticSolution KineticSolution::extend(
       }
     }
     HandoverEvent handover_event;
+    const Index handover_trace_start =
+        diagnostics == nullptr ? 0U : diagnostics->trace.size();
     if (use_handovers) {
       handover_event = KineticCore::find_next_handover(
-          instance, supports, owners, current_time, t_end, forward, budget);
+          instance, supports, owners, current_time, t_end, forward, budget,
+          event_engine, diagnostics);
       if (handover_event.valid &&
           direction * (handover_event.time - current_time) > 0.0 &&
           direction * (handover_event.time - next_time) < 0.0) {
         next_time = handover_event.time;
       }
     }
+    const bool handover_selected =
+        handover_event.valid &&
+        std::abs(handover_event.time - next_time) <= kIntervalTolerance &&
+        handover_event.point_id >= 0 &&
+        handover_event.point_id < instance.n &&
+        owners[static_cast<Index>(handover_event.point_id)] ==
+            handover_event.from_station;
+    if (diagnostics != nullptr && handover_event.valid &&
+        !handover_selected) {
+      diagnostics->trace.erase(
+          diagnostics->trace.begin() +
+              static_cast<std::vector<KineticEventTraceEntry>::difference_type>(
+                  handover_trace_start),
+          diagnostics->trace.end());
+    }
+    if (diagnostics != nullptr) {
+      diagnostics->event_detection_nanoseconds +=
+          static_cast<std::uint64_t>(
+              std::chrono::duration_cast<std::chrono::nanoseconds>(
+                  std::chrono::steady_clock::now() - event_detection_start)
+                  .count());
+    }
 
     const Value interval_start = std::min(current_time, next_time);
     const Value interval_end = std::max(current_time, next_time);
+    IntervalConstructionTimer interval_timer(diagnostics);
     SolutionInterval interval;
     interval.t_start = interval_start;
     interval.t_end = interval_end;
     interval.assigned_points = owners;
     compute_quadratic_coeffs_precomputed(instance, *precomputed, supports,
                                          interval, budget);
+    assert(interval.t_start < interval.t_end);
+    assert(std::isfinite(interval.a) && std::isfinite(interval.b) &&
+           std::isfinite(interval.c));
     solution.intervals.push_back(std::move(interval));
+    interval_timer.stop();
+    if (diagnostics != nullptr) {
+      ++diagnostics->solution_intervals_generated;
+      if (direction * (next_time - t_end) < -kIntervalTolerance) {
+        for (Index station = 0; station < supports.size(); ++station) {
+          const int support = supports[station];
+          if (support < 0) {
+            continue;
+          }
+          const auto& trajectory =
+              precomputed->trajectories[static_cast<Index>(support)];
+          if (std::find(trajectory.t_breaks.begin(),
+                        trajectory.t_breaks.end(), next_time) !=
+              trajectory.t_breaks.end()) {
+            diagnostics->trace.push_back(
+                {next_time,
+                 KineticEventType::ACTIVE_SUPPORT_MOTION_BREAKPOINT,
+                 static_cast<int>(station), support, support, -1, -1, support,
+                 "active support trajectory changes linear segment"});
+          }
+        }
+      }
+    }
 
     if (handover_event.valid &&
         std::abs(handover_event.time - next_time) <= kIntervalTolerance &&
@@ -502,18 +681,49 @@ KineticSolution KineticSolution::extend(
     }
   }
   if (solution.intervals.empty() && t_start != t_end) {
+    IntervalConstructionTimer interval_timer(diagnostics);
     SolutionInterval interval;
     interval.t_start = std::min(t_start, t_end);
     interval.t_end = std::max(t_start, t_end);
     interval.assigned_points = owners;
     compute_quadratic_coeffs_precomputed(instance, *precomputed, supports,
                                          interval, budget);
+    assert(interval.t_start < interval.t_end);
+    assert(std::isfinite(interval.a) && std::isfinite(interval.b) &&
+           std::isfinite(interval.c));
     solution.intervals.push_back(std::move(interval));
+    interval_timer.stop();
+    if (diagnostics != nullptr) {
+      ++diagnostics->solution_intervals_generated;
+    }
   }
   std::sort(solution.intervals.begin(), solution.intervals.end(),
             [](const SolutionInterval& lhs, const SolutionInterval& rhs) {
               return lhs.t_start < rhs.t_start;
             });
+  if (diagnostics != nullptr) {
+    std::stable_sort(
+        diagnostics->trace.begin(), diagnostics->trace.end(),
+        [](const KineticEventTraceEntry& lhs,
+           const KineticEventTraceEntry& rhs) {
+          if (lhs.time != rhs.time) {
+            return lhs.time < rhs.time;
+          }
+          if (lhs.type != rhs.type) {
+            return lhs.type < rhs.type;
+          }
+          if (lhs.station_id != rhs.station_id) {
+            return lhs.station_id < rhs.station_id;
+          }
+          if (lhs.from_station != rhs.from_station) {
+            return lhs.from_station < rhs.from_station;
+          }
+          if (lhs.to_station != rhs.to_station) {
+            return lhs.to_station < rhs.to_station;
+          }
+          return lhs.affected_point < rhs.affected_point;
+        });
+  }
   LOG_INFO("extend: {} intervals over [{}, {}]", solution.intervals.size(),
            std::min(t_start, t_end), std::max(t_start, t_end));
   return solution;

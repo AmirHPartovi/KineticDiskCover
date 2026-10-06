@@ -6,8 +6,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <cmath>
+#include <random>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace {
@@ -59,6 +62,99 @@ kdc::KineticSolution make_piecewise_constant_solution(
     solution.intervals.push_back(interval);
   }
   return solution;
+}
+
+void require_extension_invariants(const kdc::Instance& instance,
+                                  const kdc::KineticSolution& solution) {
+  REQUIRE(solution.is_well_formed());
+  for (kdc::Index index = 0; index < solution.intervals.size(); ++index) {
+    const auto& interval = solution.intervals[index];
+    REQUIRE(interval.t_start < interval.t_end);
+    REQUIRE(std::isfinite(interval.a));
+    REQUIRE(std::isfinite(interval.b));
+    REQUIRE(std::isfinite(interval.c));
+    REQUIRE(interval.supporting_point.size() ==
+            static_cast<kdc::Index>(instance.m));
+    REQUIRE(interval.assigned_points.size() ==
+            static_cast<kdc::Index>(instance.n));
+    for (int station = 0; station < instance.m; ++station) {
+      const int support =
+          interval.supporting_point[static_cast<kdc::Index>(station)];
+      if (support >= 0) {
+        REQUIRE(support < instance.n);
+        REQUIRE(interval.assigned_points[static_cast<kdc::Index>(support)] ==
+                station);
+      }
+    }
+    if (index == 0U) {
+      continue;
+    }
+    const auto& previous = solution.intervals[index - 1U];
+    REQUIRE(previous.t_end == interval.t_start);
+    if (previous.assigned_points == interval.assigned_points) {
+      const double time = interval.t_start;
+      const double previous_cost =
+          (previous.a * time + previous.b) * time + previous.c;
+      const double next_cost =
+          (interval.a * time + interval.b) * time + interval.c;
+      REQUIRE(kdc::test::near(previous_cost, next_cost, 1e-8, 1e-8));
+    }
+  }
+}
+
+const kdc::SolutionInterval& solution_interval_at(
+    const kdc::KineticSolution& solution, double time) {
+  const auto interval = std::find_if(
+      solution.intervals.begin(), solution.intervals.end(),
+      [time](const auto& candidate) {
+        return time >= candidate.t_start && time <= candidate.t_end;
+      });
+  if (interval == solution.intervals.end()) {
+    throw std::out_of_range("time is not covered by the kinetic solution");
+  }
+  return *interval;
+}
+
+kdc::Instance randomized_piecewise_instance(std::uint32_t seed) {
+  std::mt19937 generator(seed);
+  std::uniform_real_distribution<double> coordinate(-3.0, 3.0);
+  constexpr int point_count = 8;
+  constexpr int station_count = 3;
+  const std::vector<double> times{0.0, 0.17, 0.43, 0.76, 1.0};
+
+  kdc::Instance instance;
+  instance.id = static_cast<int>(seed);
+  instance.name = "randomized-kinetic-emission";
+  instance.n = point_count;
+  instance.m = station_count;
+  instance.T_end = 1.0;
+  for (int station = 0; station < station_count; ++station) {
+    instance.stations.push_back(
+        {station, {static_cast<double>(station) * 5.0, 0.0}});
+  }
+  for (int point = 0; point < point_count; ++point) {
+    std::vector<kdc::Point> waypoints;
+    waypoints.reserve(times.size());
+    for (kdc::Index index = 0; index < times.size(); ++index) {
+      const double center = static_cast<double>(point % station_count) * 5.0;
+      waypoints.emplace_back(center + coordinate(generator),
+                             coordinate(generator));
+    }
+    instance.trajectories.emplace_back(times, std::move(waypoints));
+  }
+  return instance;
+}
+
+std::vector<kdc::KineticEventTraceEntry> selected_events(
+    const kdc::KineticEventDiagnostics& diagnostics,
+    kdc::KineticEventType type) {
+  std::vector<kdc::KineticEventTraceEntry> events;
+  for (const auto& event : diagnostics.trace) {
+    if (event.type == type) {
+      events.push_back(event);
+    }
+  }
+  return events;
 }
 }
 
@@ -173,11 +269,20 @@ TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
          kdc::Point(0.0, 0.0)});
     const auto assignment =
         kdc::StationarySolver::solve_nn(piecewise, 0.0);
+    kdc::KineticEventDiagnostics diagnostics;
     const auto extended = kdc::KineticSolution::extend(
         piecewise, assignment, 0.0, 1.0, true, false,
-        kdc::ObjectiveType::MIN_MAX);
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
     REQUIRE(extended.is_well_formed());
     REQUIRE(extended.intervals.size() == 2U);
+    REQUIRE(diagnostics.solution_intervals_generated == 2U);
+    REQUIRE(std::any_of(diagnostics.trace.begin(), diagnostics.trace.end(),
+                        [](const auto& event) {
+                          return event.type == kdc::KineticEventType::
+                                                   ACTIVE_SUPPORT_MOTION_BREAKPOINT &&
+                                 kdc::test::near(event.time, 0.5);
+                        }));
     REQUIRE(kdc::test::near(extended.cost_at(0.75),
                             std::acos(-1.0) * 0.5 * 0.5));
   }
@@ -423,5 +528,437 @@ TEST_CASE("KineticSolution computes and evaluates quadratic costs") {
     REQUIRE(combined.is_well_formed());
     REQUIRE(kdc::test::near(combined.peak_cost(), 10.0));
     REQUIRE(combined.peak_cost() < current.peak_cost());
+  }
+}
+
+TEST_CASE("Kinetic extension represents only relevant support events") {
+  SECTION("inactive trajectory waypoints do not split emitted intervals") {
+    auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(10.0, 0.0), kdc::Point(10.0, 0.0)},
+         {kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)}},
+        {{0.0, 0.0}});
+    instance.trajectories[1] = kdc::Trajectory(
+        {0.0, 0.25, 0.5, 0.75, 1.0},
+        {kdc::Point(1.0, 0.0), kdc::Point(1.2, 0.2),
+         kdc::Point(0.8, -0.1), kdc::Point(1.1, 0.1),
+         kdc::Point(1.0, 0.0)});
+    const kdc::StaticAssignment assignment{
+        {0}, {10.0}, 100.0 * std::acos(-1.0), true, {0, 0}};
+
+    const auto reference = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+        kdc::KineticIntervalEmission::REFERENCE_ALL_TRAJECTORY_BREAKPOINTS);
+    const auto optimized = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+        kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES);
+
+    require_extension_invariants(instance, reference);
+    require_extension_invariants(instance, optimized);
+    REQUIRE(reference.intervals.size() == 4U);
+    REQUIRE(optimized.intervals.size() == 1U);
+    REQUIRE(kdc::Verifier::verify_continuous(instance, optimized).all_ok());
+    REQUIRE(kdc::test::near(reference.total_integral(),
+                            optimized.total_integral()));
+    REQUIRE(kdc::test::near(reference.peak_cost(), optimized.peak_cost()));
+    for (int sample = 0; sample <= 100; ++sample) {
+      const double time = static_cast<double>(sample) / 100.0;
+      REQUIRE(kdc::test::near(reference.cost_at(time),
+                              optimized.cost_at(time)));
+    }
+  }
+
+  SECTION("one station and one support has no event") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(2.0, 0.0), kdc::Point(3.0, 1.0)}},
+        {{0.0, 0.0}});
+    const kdc::StaticAssignment assignment{
+        {0}, {2.0}, 4.0 * std::acos(-1.0), true, {0}};
+    kdc::KineticEventDiagnostics diagnostics;
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 1U);
+    REQUIRE(diagnostics.point_vs_support_comparisons == 0U);
+    REQUIRE(diagnostics.selected_support_events == 0U);
+    REQUIRE(diagnostics.trace.empty());
+  }
+
+  SECTION("support changes exactly at a trajectory breakpoint") {
+    auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)}},
+        {{0.0, 0.0}});
+    instance.trajectories[1] = kdc::Trajectory(
+        {0.0, 0.5, 1.0},
+        {kdc::Point(0.0, 0.0), kdc::Point(1.0, 0.0),
+         kdc::Point(2.0, 0.0)});
+    const kdc::StaticAssignment assignment{
+        {0}, {1.0}, std::acos(-1.0), true, {0, 0}};
+    kdc::KineticEventDiagnostics diagnostics;
+
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 2U);
+    REQUIRE(kdc::test::near(solution.intervals[0].t_end, 0.5));
+    REQUIRE(solution.intervals[0].supporting_point ==
+            std::vector<int>{0});
+    REQUIRE(solution.intervals[1].supporting_point ==
+            std::vector<int>{1});
+    REQUIRE(diagnostics.solution_intervals_generated == 2U);
+    REQUIRE(diagnostics.selected_support_events == 1U);
+    REQUIRE(std::any_of(diagnostics.trace.begin(), diagnostics.trace.end(),
+                        [](const auto& event) {
+                          return event.type ==
+                                     kdc::KineticEventType::SUPPORT_CHANGE &&
+                                 kdc::test::near(event.time, 0.5) &&
+                                 event.old_support == 0 &&
+                                 event.new_support == 1;
+                        }));
+  }
+
+  SECTION("support change strictly inside a trajectory segment") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)}},
+        {{0.0, 0.0}});
+    const kdc::StaticAssignment assignment{
+        {0}, {1.0}, std::acos(-1.0), true, {0, 0}};
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 2U);
+    REQUIRE(kdc::test::near(solution.intervals.front().t_end, 0.5));
+    REQUIRE(solution.intervals.front().supporting_point ==
+            std::vector<int>{0});
+    REQUIRE(solution.intervals.back().supporting_point ==
+            std::vector<int>{1});
+  }
+
+  SECTION("a tangent equality does not change the support") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(1.0, -1.0), kdc::Point(1.0, 1.0)}},
+        {{0.0, 0.0}});
+    const kdc::StaticAssignment assignment{
+        {1}, {std::sqrt(2.0)}, 2.0 * std::acos(-1.0), true, {0, 0}};
+    kdc::KineticEventDiagnostics diagnostics;
+
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 1U);
+    REQUIRE(solution.intervals.front().supporting_point ==
+            std::vector<int>{1});
+    REQUIRE(diagnostics.candidate_roots_rejected >= 1U);
+    REQUIRE(diagnostics.selected_support_events == 0U);
+  }
+
+  SECTION("irrelevant trajectory waypoints are only internal scan breaks") {
+    auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(99.0, 0.0), kdc::Point(99.0, 0.0)},
+         {kdc::Point(90.0, 0.0), kdc::Point(90.0, 0.0)}},
+        {{0.0, 0.0}, {100.0, 0.0}});
+    instance.trajectories[1] = kdc::Trajectory(
+        {0.0, 0.3, 0.7, 1.0},
+        {kdc::Point(99.0, 0.0), kdc::Point(99.0, 0.0),
+         kdc::Point(99.0, 0.0), kdc::Point(99.0, 0.0)});
+    const kdc::StaticAssignment assignment{
+        {0, 2}, {1.0, 10.0}, 101.0 * std::acos(-1.0), true, {0, 1, 1}};
+    kdc::KineticEventDiagnostics diagnostics;
+
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 1U);
+    REQUIRE(solution.intervals.front().assigned_points ==
+            std::vector<int>{0, 1, 1});
+    REQUIRE(diagnostics.trajectory_segment_pair_examinations >= 6U);
+    REQUIRE(diagnostics.solution_intervals_generated == 1U);
+  }
+
+  SECTION("simultaneous support changes are deterministic in both directions") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(2.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(1.0, 0.0), kdc::Point(2.0, 0.0)},
+         {kdc::Point(8.0, 0.0), kdc::Point(9.0, 0.0)},
+         {kdc::Point(9.0, 0.0), kdc::Point(8.0, 0.0)}},
+        {{0.0, 0.0}, {10.0, 0.0}});
+    const kdc::StaticAssignment forward_assignment{
+        {0, 2}, {2.0, 2.0}, 8.0 * std::acos(-1.0), true, {0, 0, 1, 1}};
+    kdc::KineticEventDiagnostics forward_diagnostics;
+    const auto forward = kdc::KineticSolution::extend(
+        instance, forward_assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE,
+        &forward_diagnostics);
+
+    require_extension_invariants(instance, forward);
+    REQUIRE(forward.intervals.size() == 2U);
+    REQUIRE(forward.intervals[0].supporting_point ==
+            std::vector<int>{0, 2});
+    REQUIRE(forward.intervals[1].supporting_point ==
+            std::vector<int>{1, 3});
+    REQUIRE(forward_diagnostics.selected_support_events == 2U);
+    REQUIRE(forward_diagnostics.solution_intervals_generated == 2U);
+    const double left_cost =
+        (forward.intervals[0].a * 0.5 + forward.intervals[0].b) * 0.5 +
+        forward.intervals[0].c;
+    const double right_cost =
+        (forward.intervals[1].a * 0.5 + forward.intervals[1].b) * 0.5 +
+        forward.intervals[1].c;
+    REQUIRE(kdc::test::near(left_cost, right_cost));
+
+    const kdc::StaticAssignment backward_assignment{
+        {1, 3}, {2.0, 2.0}, 8.0 * std::acos(-1.0), true, {0, 0, 1, 1}};
+    kdc::KineticEventDiagnostics backward_diagnostics;
+    const auto backward = kdc::KineticSolution::extend(
+        instance, backward_assignment, 1.0, 0.0, false, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE,
+        &backward_diagnostics);
+
+    require_extension_invariants(instance, backward);
+    REQUIRE(backward.intervals.size() == 2U);
+    REQUIRE(backward.intervals[0].supporting_point ==
+            std::vector<int>{0, 2});
+    REQUIRE(backward.intervals[1].supporting_point ==
+            std::vector<int>{1, 3});
+    REQUIRE(backward_diagnostics.selected_support_events == 2U);
+  }
+
+  SECTION("multiple equal candidates choose the lowest point id") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+         {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)},
+         {kdc::Point(0.0, 0.0), kdc::Point(2.0, 0.0)}},
+        {{0.0, 0.0}});
+    const kdc::StaticAssignment assignment{
+        {0}, {1.0}, std::acos(-1.0), true, {0, 0, 0}};
+    kdc::KineticEventDiagnostics diagnostics;
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.0, 1.0, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    require_extension_invariants(instance, solution);
+    REQUIRE(solution.intervals.size() == 2U);
+    REQUIRE(solution.intervals.back().supporting_point ==
+            std::vector<int>{1});
+    REQUIRE(diagnostics.selected_support_events == 1U);
+    const auto transition = std::find_if(
+        diagnostics.trace.begin(), diagnostics.trace.end(),
+        [](const auto& event) {
+          return event.type == kdc::KineticEventType::SUPPORT_CHANGE &&
+                 kdc::test::near(event.time, 0.5);
+        });
+    REQUIRE(transition != diagnostics.trace.end());
+    REQUIRE(transition->new_support == 1);
+    REQUIRE(transition->tie_breaking_outcome.find("lowest point id") !=
+            std::string::npos);
+  }
+
+  SECTION("zero-duration extension emits no degenerate interval") {
+    const auto instance = kdc::test::make_instance_linear(
+        {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)}},
+        {{0.0, 0.0}});
+    const kdc::StaticAssignment assignment{
+        {0}, {1.0}, std::acos(-1.0), true, {0}};
+    kdc::KineticEventDiagnostics diagnostics;
+    const auto solution = kdc::KineticSolution::extend(
+        instance, assignment, 0.5, 0.5, true, false,
+        kdc::ObjectiveType::MIN_MAX, nullptr,
+        kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+
+    REQUIRE(solution.intervals.empty());
+    REQUIRE_FALSE(solution.is_well_formed());
+    REQUIRE(diagnostics.solution_intervals_generated == 0U);
+  }
+}
+
+TEST_CASE("Handover and support change can coincide in the event trace") {
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(2.0, 0.0), kdc::Point(2.0, 0.0)},
+       {kdc::Point(1.0, 0.0), kdc::Point(2.2, 0.0)},
+       {kdc::Point(7.0, 0.0), kdc::Point(1.0, 0.0)}},
+      {{0.0, 0.0}, {10.0, 0.0}});
+  const kdc::StaticAssignment assignment{
+      {0, 2}, {2.0, 3.0}, 13.0 * std::acos(-1.0), true, {0, 0, 1}};
+  kdc::KineticEventDiagnostics diagnostics;
+  const auto solution = kdc::KineticSolution::extend(
+      instance, assignment, 0.0, 1.0, true, true,
+      kdc::ObjectiveType::MIN_SUM, nullptr,
+      kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, &diagnostics);
+  const double event_time = 5.0 / 6.0;
+
+  require_extension_invariants(instance, solution);
+  REQUIRE(solution.intervals.size() == 2U);
+  REQUIRE(kdc::test::near(solution.intervals.front().t_end, event_time));
+  REQUIRE(solution.intervals.front().assigned_points ==
+          std::vector<int>{0, 0, 1});
+  REQUIRE(solution.intervals.back().assigned_points ==
+          std::vector<int>{1, 0, 1});
+  const auto handover_trace =
+      std::find_if(diagnostics.trace.begin(), diagnostics.trace.end(),
+                   [event_time](const auto& event) {
+                     return event.type == kdc::KineticEventType::HANDOVER &&
+                            event.affected_point == 0 &&
+                            kdc::test::near(event.time, event_time);
+                   });
+  REQUIRE(handover_trace != diagnostics.trace.end());
+  REQUIRE(handover_trace->from_station == 0);
+  REQUIRE(handover_trace->to_station == 1);
+  REQUIRE(handover_trace->from_station_support_after == 1);
+  REQUIRE(handover_trace->to_station_support_after == 2);
+  REQUIRE(std::any_of(diagnostics.trace.begin(), diagnostics.trace.end(),
+                      [event_time](const auto& event) {
+                        return event.type ==
+                                   kdc::KineticEventType::SUPPORT_CHANGE &&
+                               event.station_id == 0 &&
+                               event.old_support == 0 &&
+                               event.new_support == 1 &&
+                               kdc::test::near(event.time, event_time);
+                      }));
+  REQUIRE(diagnostics.handover_event_checks > 0U);
+  REQUIRE(diagnostics.handover_detection_nanoseconds > 0U);
+  REQUIRE(diagnostics.support_event_detection_nanoseconds > 0U);
+  REQUIRE(diagnostics.total_extension_nanoseconds > 0U);
+}
+
+TEST_CASE("Exact interval emission differentially matches global-breakpoint reference") {
+  constexpr double tolerance = 1e-8;
+  constexpr int random_cases = 12;
+  constexpr int dense_samples = 128;
+
+  for (int case_index = 0; case_index < random_cases; ++case_index) {
+    const auto instance =
+        randomized_piecewise_instance(7301U + static_cast<std::uint32_t>(
+                                                  case_index));
+    const auto assignment = kdc::StationarySolver::solve_nn(instance, 0.0);
+    REQUIRE(assignment.feasible);
+
+    for (const auto objective : {kdc::ObjectiveType::MIN_MAX,
+                                 kdc::ObjectiveType::MIN_SUM}) {
+      kdc::KineticEventDiagnostics reference_diagnostics;
+      const auto reference = kdc::KineticSolution::extend(
+          instance, assignment, 0.0, instance.T_end, true, true, objective,
+          nullptr, kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE,
+          &reference_diagnostics,
+          kdc::KineticIntervalEmission::REFERENCE_ALL_TRAJECTORY_BREAKPOINTS);
+      kdc::KineticEventDiagnostics optimized_diagnostics;
+      const auto optimized = kdc::KineticSolution::extend(
+          instance, assignment, 0.0, instance.T_end, true, true, objective,
+          nullptr, kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE,
+          &optimized_diagnostics,
+          kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES);
+
+      require_extension_invariants(instance, reference);
+      require_extension_invariants(instance, optimized);
+      REQUIRE(kdc::Verifier::verify_continuous(instance, reference).all_ok());
+      REQUIRE(kdc::Verifier::verify_continuous(instance, optimized).all_ok());
+      REQUIRE(optimized.intervals.size() <= reference.intervals.size());
+      REQUIRE(reference_diagnostics.raw_trajectory_breakpoints ==
+              optimized_diagnostics.raw_trajectory_breakpoints);
+      REQUIRE(optimized_diagnostics.solution_intervals_generated ==
+              optimized.intervals.size());
+
+      const auto reference_support_events =
+          selected_events(reference_diagnostics,
+                          kdc::KineticEventType::SUPPORT_CHANGE);
+      const auto optimized_support_events =
+          selected_events(optimized_diagnostics,
+                          kdc::KineticEventType::SUPPORT_CHANGE);
+      REQUIRE(reference_support_events.size() ==
+              optimized_support_events.size());
+      for (kdc::Index event = 0; event < reference_support_events.size();
+           ++event) {
+        REQUIRE(kdc::test::near(reference_support_events[event].time,
+                                optimized_support_events[event].time,
+                                tolerance, tolerance));
+        REQUIRE(reference_support_events[event].station_id ==
+                optimized_support_events[event].station_id);
+        REQUIRE(reference_support_events[event].old_support ==
+                optimized_support_events[event].old_support);
+        REQUIRE(reference_support_events[event].new_support ==
+                optimized_support_events[event].new_support);
+      }
+
+      const auto reference_handovers =
+          selected_events(reference_diagnostics,
+                          kdc::KineticEventType::HANDOVER);
+      const auto optimized_handovers =
+          selected_events(optimized_diagnostics,
+                          kdc::KineticEventType::HANDOVER);
+      REQUIRE(reference_handovers.size() == optimized_handovers.size());
+      for (kdc::Index event = 0; event < reference_handovers.size(); ++event) {
+        REQUIRE(kdc::test::near(reference_handovers[event].time,
+                                optimized_handovers[event].time,
+                                tolerance, tolerance));
+        REQUIRE(reference_handovers[event].from_station ==
+                optimized_handovers[event].from_station);
+        REQUIRE(reference_handovers[event].to_station ==
+                optimized_handovers[event].to_station);
+        REQUIRE(reference_handovers[event].affected_point ==
+                optimized_handovers[event].affected_point);
+      }
+
+      std::vector<double> sample_times;
+      sample_times.reserve(static_cast<kdc::Index>(dense_samples + 1) +
+                           4U * reference_diagnostics.trace.size());
+      for (int sample = 0; sample <= dense_samples; ++sample) {
+        sample_times.push_back(static_cast<double>(sample) / dense_samples);
+      }
+      for (const auto& event : reference_diagnostics.trace) {
+        sample_times.push_back(event.time);
+        sample_times.push_back(std::max(0.0, event.time - 1e-8));
+        sample_times.push_back(std::min(1.0, event.time + 1e-8));
+      }
+      for (const auto& event : optimized_diagnostics.trace) {
+        sample_times.push_back(event.time);
+        sample_times.push_back(std::max(0.0, event.time - 1e-8));
+        sample_times.push_back(std::min(1.0, event.time + 1e-8));
+      }
+      std::sort(sample_times.begin(), sample_times.end());
+      sample_times.erase(
+          std::unique(sample_times.begin(), sample_times.end()),
+          sample_times.end());
+      for (const double time : sample_times) {
+        const auto& reference_interval = solution_interval_at(reference, time);
+        const auto& optimized_interval = solution_interval_at(optimized, time);
+        REQUIRE(reference_interval.supporting_point ==
+                optimized_interval.supporting_point);
+        REQUIRE(reference_interval.assigned_points ==
+                optimized_interval.assigned_points);
+        REQUIRE(kdc::test::near(reference.cost_at(time),
+                                optimized.cost_at(time), tolerance,
+                                tolerance));
+      }
+      REQUIRE(kdc::test::near(reference.total_integral(),
+                              optimized.total_integral(), tolerance,
+                              tolerance));
+      REQUIRE(kdc::test::near(reference.peak_cost(), optimized.peak_cost(),
+                              tolerance, tolerance));
+      REQUIRE(kdc::test::near(reference.peak_time(), optimized.peak_time(),
+                              tolerance, tolerance));
+    }
   }
 }

@@ -335,6 +335,12 @@ if(TARGET kdc-kont-native)
   add_dependencies(kdc-solver kdc-kont-native)
 endif()
 
+if(BUILD_BENCHMARK)
+  add_executable(kdc-kinetic-interval-benchmark
+    benchmarks/kinetic_interval_emission.cpp)
+  target_link_libraries(kdc-kinetic-interval-benchmark PRIVATE kdc-core)
+endif()
+
 if(BUILD_TESTS)
   enable_testing()
   file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
