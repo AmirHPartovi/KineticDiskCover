@@ -34,6 +34,8 @@ class MinMaxSolver {
   struct Result {
     KineticSolution solution;
     double peak_cost{0.0};
+    double peak_time{0.0};
+    double initial_peak_cost{0.0};
     double lower_bound{0.0};
     BoundStatus bound_status{BoundStatus::NONE};
     double upper_bound{std::numeric_limits<double>::infinity()};
@@ -42,6 +44,7 @@ class MinMaxSolver {
     bool exact_solver{false};
     double certified_lower_bound{0.0};
     double heuristic_lower_bound{0.0};
+    double heuristic_gap{0.0};
     double gap{0.0};
     double total_time_sec{0.0};
     int num_ip_solves{0};
@@ -50,6 +53,7 @@ class MinMaxSolver {
     VerificationKind verification_kind{VerificationKind::NONE};
     double verification_time_sec{0.0};
     bool feasible{false};
+    bool peak_consistent{false};
     bool time_limited{false};
     std::vector<double> gap_trace;
     std::vector<IterTrace> trace;
@@ -65,6 +69,6 @@ class MinMaxSolver {
                       const Config& config, SolverBudget& budget);
 
  private:
-  static double find_max_area_time(const KineticSolution& solution);
+  static double find_peak_time(const KineticSolution& solution);
 };
 }

@@ -116,6 +116,10 @@ Json record_json(const BatchRunRecord& record) {
               {"wall_time_sec", record.wall_time_sec},
               {"solve_time_sec", record.solve_time_sec},
               {"peak_cost", record.peak_cost},
+              {"peak_time", record.peak_time},
+              {"initial_peak_cost", record.initial_peak_cost},
+              {"heuristic_gap", record.heuristic_gap},
+              {"peak_consistent", record.peak_consistent},
               {"integral_cost", record.integral_cost},
               {"empirical_ratio_to_exact",
                record.empirical_ratio_to_exact
@@ -301,6 +305,10 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           std::to_string(record.peak_memory_mb),
           std::to_string(record.time_limit_per_ip_sec),
           std::to_string(record.peak_cost),
+          std::to_string(record.peak_time),
+          std::to_string(record.initial_peak_cost),
+          std::to_string(record.heuristic_gap),
+          record.peak_consistent ? "true" : "false",
           std::to_string(record.integral_cost),
           record.empirical_ratio_to_exact
               ? std::to_string(*record.empirical_ratio_to_exact)
@@ -925,6 +933,10 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       record.exact_solver = result.exact_solver;
       record.certified_lower_bound = result.certified_lower_bound;
       record.heuristic_lower_bound = result.heuristic_lower_bound;
+      record.initial_peak_cost = result.initial_peak_cost;
+      record.peak_time = result.peak_time;
+      record.heuristic_gap = result.heuristic_gap;
+      record.peak_consistent = result.peak_consistent;
       record.gap = result.gap;
       record.num_iterations = result.num_iterations;
       record.num_ip_solves = result.num_ip_solves;
@@ -991,6 +1003,9 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       TraceWriter::write_csv(trace_rows, record.trace_csv_path);
     }
     record.peak_cost = solution.peak_cost();
+    if (objective == ObjectiveType::MIN_MAX) {
+      record.peak_time = solution.peak_time();
+    }
     record.integral_cost = solution.total_integral();
     record.candidate_count =
         CandidateSet::precompute(instance)->candidates.size();
@@ -1112,7 +1127,8 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
          "fallback_used,native_solve_count,fallback_solve_count,"
          "failed_native_solve_count,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
          "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
-         "peak_cost,integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
+         "peak_cost,peak_time,initial_peak_cost,heuristic_gap,peak_consistent,"
+         "integral_cost,empirical_ratio_to_exact,ratio_to_incumbent,"
          "objective_value,lower_bound,bound_status,upper_bound,certified_gap,"
          "optimality_status,minsum_refinement_policy,exact_solver,gap,"
          "num_iterations,num_ip_solves,verified,verification_kind,"

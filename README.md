@@ -301,11 +301,17 @@ resulting ownership map alongside its supporting points.
 costs, integrals, peak values/times, and structural consistency. It can extend
 a stationary assignment across kinetic support and handover events, combine
 two interval solutions using their pointwise lower envelope, and truncate
-non-MinSum extensions at a cumulative-integral crossing.
+MinSum extensions at a cumulative-integral crossing. MinMax refinement instead
+keeps candidates on their common time domain and lets the pointwise lower
+envelope decide whether they reduce the global peak; it never uses integral
+ordering to accept or reject a MinMax candidate.
 
 `kdc::MinMaxSolver` iteratively solves stationary IPs at the current peak time,
-extends and combines the resulting kinetic assignments, tracks a monotone
-relative-gap trace, and can verify point coverage and interval costs.
+extends and continuously verifies the resulting kinetic candidates, then
+combines them with the incumbent by pointwise minimum. Its trace records the
+static-solver status, candidate/combined peaks, acceptance, and stop reason.
+Continuous verification checks the returned kinetic representation and
+feasibility; it does not establish global MinMax optimality.
 
 `kdc::MinSumSolver` defaults to incumbent-driven adaptive refinement: it
 starts with one feasible stationary solve and selects the current solution

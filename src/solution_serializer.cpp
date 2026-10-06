@@ -3,6 +3,7 @@
 #include "kdc/logging.hpp"
 #include "kdc/objective.hpp"
 #include "kdc/profiling.hpp"
+#include "kdc/verify.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -86,6 +87,14 @@ void SolutionSerializer::save_json(const Instance& instance,
   if (!validate(instance, solution, &error)) {
     invalid_solution(error);
   }
+  const double peak_cost = solution.peak_cost();
+  const double peak_time = solution.peak_time();
+  const bool peak_consistent =
+      solution.objective != ObjectiveType::MIN_MAX ||
+      Verifier::check_peak_consistency(solution, peak_cost, peak_time);
+  if (!peak_consistent) {
+    invalid_solution("MinMax peak is inconsistent with the solution");
+  }
 
   Json intervals = Json::array();
   for (const auto& interval : solution.intervals) {
@@ -105,8 +114,9 @@ void SolutionSerializer::save_json(const Instance& instance,
         {"T_end", instance.T_end}}},
       {"objective", to_string(solution.objective)},
       {"summary",
-       {{"peak_cost", solution.peak_cost()},
-        {"peak_time", solution.peak_time()},
+       {{"peak_cost", peak_cost},
+        {"peak_time", peak_time},
+        {"peak_consistent", peak_consistent},
         {"total_integral", solution.total_integral()},
         {"num_intervals", solution.intervals.size()}}},
       {"intervals", std::move(intervals)}};
@@ -195,7 +205,14 @@ KineticSolution SolutionSerializer::load_json(const Instance& instance,
              std::abs(stored - computed) <
                  1e-6 * std::max(1.0, std::abs(computed));
     };
+    const bool peak_consistent =
+        solution.objective != ObjectiveType::MIN_MAX ||
+        Verifier::check_peak_consistency(solution, stored_peak,
+                                         stored_peak_time);
     if (stored_intervals != solution.intervals.size() ||
+        (summary.contains("peak_consistent") &&
+         !summary.at("peak_consistent").get<bool>()) ||
+        !peak_consistent ||
         !summary_matches(stored_peak, solution.peak_cost()) ||
         !summary_matches(stored_peak_time, solution.peak_time()) ||
         !summary_matches(stored_integral, solution.total_integral())) {

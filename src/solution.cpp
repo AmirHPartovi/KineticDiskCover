@@ -102,15 +102,6 @@ std::vector<Value> common_breakpoints(const KineticSolution& first,
   return unique_breakpoints;
 }
 
-void append_clipped_solution(KineticSolution& destination,
-                             const KineticSolution& source, Value start,
-                             Value end) {
-  for (const auto& interval : source.intervals) {
-    append_interval(destination, interval, std::max(start, interval.t_start),
-                    std::min(end, interval.t_end));
-  }
-}
-
 Value distance_derivative(const Instance& instance,
                           const InstancePrecompute& precompute,
                           int station_id, int point_id, Value time,
@@ -630,119 +621,40 @@ KineticSolution KineticSolution::partial_extend(
                              current.intervals.back().t_end);
   KineticSolution result;
   result.objective = objective_type;
+  if (objective_type == ObjectiveType::MIN_MAX) {
+    // MinMax refinement is peak-based: the actual decision is made later by
+    // `combine(..., MIN_MAX)`, which constructs the pointwise lower envelope.
+    // Carrying the whole candidate through the common domain preserves the
+    // correct MinMax semantics and avoids rejecting a candidate solely because
+    // its cumulative integral is larger than the incumbent's.
+    result = new_solution;
+    result.objective = objective_type;
+    if (start > result.intervals.front().t_start ||
+        end < result.intervals.back().t_end) {
+      KineticSolution clipped;
+      clipped.objective = objective_type;
+      for (const auto& interval : result.intervals) {
+        if (budget != nullptr) {
+          budget->checkpoint();
+        }
+        const Value interval_start = std::max(start, interval.t_start);
+        const Value interval_end = std::min(end, interval.t_end);
+        if (interval_end <= interval_start) {
+          continue;
+        }
+        append_interval(clipped, interval, interval_start, interval_end);
+      }
+      clipped.remove_duplicates();
+      return clipped;
+    }
+    return result;
+  }
   if (objective_type == ObjectiveType::MIN_SUM) {
     result = new_solution;
     result.objective = objective_type;
     return result;
   }
-  if (end <= start) {
-    return result;
-  }
-
-  const auto cumulative_difference = [&new_solution, &current, start](
-                                         Value time) {
-    return new_solution.integral_on(start, time) -
-           current.integral_on(start, time);
-  };
-  std::vector<Value> breakpoints;
-  for (const auto& interval : new_solution.intervals) {
-    if (interval.t_start > start && interval.t_start < end) {
-      breakpoints.push_back(interval.t_start);
-    }
-    if (interval.t_end > start && interval.t_end < end) {
-      breakpoints.push_back(interval.t_end);
-    }
-  }
-  for (const auto& interval : current.intervals) {
-    if (interval.t_start > start && interval.t_start < end) {
-      breakpoints.push_back(interval.t_start);
-    }
-    if (interval.t_end > start && interval.t_end < end) {
-      breakpoints.push_back(interval.t_end);
-    }
-  }
-  breakpoints.push_back(start);
-  breakpoints.push_back(end);
-  std::sort(breakpoints.begin(), breakpoints.end());
-  breakpoints.erase(
-      std::unique(breakpoints.begin(), breakpoints.end(),
-                  [](Value lhs, Value rhs) {
-                    return std::abs(lhs - rhs) <= kIntervalTolerance;
-                  }),
-      breakpoints.end());
-
-  Value intersection = end;
-  bool found_intersection = false;
-  for (Index index = 0; index + 1U < breakpoints.size() &&
-                         !found_intersection;
-       ++index) {
-    if (budget != nullptr) {
-      budget->checkpoint();
-    }
-    const Value segment_start = breakpoints[index];
-    const Value segment_end = breakpoints[index + 1U];
-    const Value midpoint =
-        segment_start + (segment_end - segment_start) / 2.0;
-    const auto& new_interval = interval_at(new_solution, midpoint);
-    const auto& current_interval = interval_at(current, midpoint);
-    std::vector<Value> monotonic_points{segment_start, segment_end};
-    const auto critical_points = KineticCore::solve_quadratic(
-        new_interval.a - current_interval.a,
-        new_interval.b - current_interval.b,
-        new_interval.c - current_interval.c);
-    for (const Value critical : critical_points) {
-      if (critical > segment_start + kIntervalTolerance &&
-          critical < segment_end - kIntervalTolerance) {
-        monotonic_points.push_back(critical);
-      }
-    }
-    std::sort(monotonic_points.begin(), monotonic_points.end());
-    for (Index point = 0; point + 1U < monotonic_points.size();
-         ++point) {
-      Value low = monotonic_points[point];
-      Value high = monotonic_points[point + 1U];
-      Value low_difference = cumulative_difference(low);
-      Value high_difference = cumulative_difference(high);
-      if (high > start + kIntervalTolerance &&
-          std::abs(high_difference) <= 1e-12) {
-        intersection = high;
-        found_intersection = true;
-        break;
-      }
-      if (low <= start + kIntervalTolerance ||
-          low_difference == 0.0 ||
-          (low_difference < 0.0) == (high_difference < 0.0)) {
-        continue;
-      }
-      const bool low_negative = low_difference < 0.0;
-      for (int iteration = 0; iteration < 80; ++iteration) {
-        if (budget != nullptr) {
-          budget->checkpoint();
-        }
-        const Value middle = low + (high - low) / 2.0;
-        const Value difference = cumulative_difference(middle);
-        if ((difference < 0.0) == low_negative) {
-          low = middle;
-          low_difference = difference;
-        } else {
-          high = middle;
-          high_difference = difference;
-        }
-      }
-      (void)low_difference;
-      (void)high_difference;
-      intersection = low + (high - low) / 2.0;
-      found_intersection = true;
-      break;
-    }
-  }
-
-  if (!found_intersection && cumulative_difference(end) > 0.0) {
-    return result;
-  }
-  append_clipped_solution(result, new_solution, start, intersection);
-  result.remove_duplicates();
-  return result;
+  throw std::invalid_argument("partial_extend received an unknown objective");
 }
 
 double KineticSolution::cost_at(double time) const {
