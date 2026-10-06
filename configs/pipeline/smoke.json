@@ -8,7 +8,7 @@
   "smoke_max_m": 25,
   "algorithms": "all",
   "exact_backend": "auto",
-  "objectives": "both",
+  "objectives": "all",
   "repeats": 1,
   "seed": 42,
   "threads": 2,
@@ -24,6 +24,7 @@
   "figures": true,
   "animation": {
     "enabled": true,
+    "mode": "all",
     "policy": "all-algorithms",
     "top_n": 0,
     "fps": 12,

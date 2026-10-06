@@ -66,6 +66,12 @@ PIVOT_METRICS = [
     "gap_pct",
     "peak_memory_mb",
 ]
+JOINT_COLUMNS = [
+    "instance_name", "n", "m", "algorithm_name", "peak_cost", "integral_cost",
+    "minmax_component_peak", "minmax_component_integral",
+    "minsum_component_peak", "minsum_component_integral",
+    "dominates_minmax", "dominates_minsum", "optimality_status", "verified",
+]
 
 
 def _to_bool(value: object) -> bool:
@@ -326,6 +332,56 @@ def _family_table(df: pd.DataFrame) -> pd.DataFrame:
     return result.reset_index(drop=True)
 
 
+def _joint_table(df: pd.DataFrame) -> pd.DataFrame:
+    joint = df[df["objective"].astype(str).str.lower() == "minmaxsum"].copy()
+    rows: list[dict[str, object]] = []
+    for _, source in joint.iterrows():
+        vector = source.get("objective_vector")
+        metadata = source.get("joint")
+        vector = vector if isinstance(vector, dict) else {}
+        metadata = metadata if isinstance(metadata, dict) else {}
+        rows.append({
+            "instance_name": source["instance_name"],
+            "n": source["n"],
+            "m": source["m"],
+            "algorithm_name": source["algorithm_name"],
+            "peak_cost": vector.get("peak_cost", source.get("peak_cost")),
+            "integral_cost": vector.get("integral_cost", source.get("integral_cost")),
+            "minmax_component_peak": metadata.get(
+                "minmax_component_peak", source.get("minmax_component_peak")
+            ),
+            "minmax_component_integral": metadata.get(
+                "minmax_component_integral",
+                source.get("minmax_component_integral"),
+            ),
+            "minsum_component_peak": metadata.get(
+                "minsum_component_peak", source.get("minsum_component_peak")
+            ),
+            "minsum_component_integral": metadata.get(
+                "minsum_component_integral",
+                source.get("minsum_component_integral"),
+            ),
+            "dominates_minmax": metadata.get(
+                "dominates_minmax", source.get("dominates_minmax")
+            ),
+            "dominates_minsum": metadata.get(
+                "dominates_minsum", source.get("dominates_minsum")
+            ),
+            "optimality_status": metadata.get(
+                "joint_optimality_status", source.get("optimality_status")
+            ),
+            "verified": source.get("verified"),
+        })
+    result = pd.DataFrame(rows, columns=JOINT_COLUMNS)
+    if result.empty:
+        return result
+    for column in JOINT_COLUMNS[1:3] + JOINT_COLUMNS[4:10]:
+        result[column] = pd.to_numeric(result[column], errors="coerce")
+    return result.sort_values(
+        ["instance_name", "algorithm_name"], kind="stable"
+    ).reset_index(drop=True)
+
+
 def _safe_filename(value: object) -> str:
     filename = re.sub(r"[^A-Za-z0-9._-]+", "_", str(value)).strip("._")
     return filename or "unnamed"
@@ -359,6 +415,17 @@ def write_tables(df: pd.DataFrame, successful: pd.DataFrame,
     written.extend(_write_formats(
         master, output / "master", formats,
         markdown=render_master(successful),
+    ))
+
+    joint_table = _joint_table(successful)
+    written.extend(_write_formats(
+        joint_table, output / "minmaxsum", formats,
+        markdown=(
+            "# MinMaxSum Objective Vectors\n\n"
+            "MinMaxSum is reported as `(peak_cost, integral_cost)`; no "
+            "scalar objective value is assigned.\n\n"
+            + _markdown_table(joint_table)
+        ),
     ))
 
     algorithm_files: list[Path] = []
@@ -428,6 +495,10 @@ def write_tables(df: pd.DataFrame, successful: pd.DataFrame,
         ("Master table", Path("master.md") if "markdown" in formats
          else Path("master.csv")),
     ]
+    links.append((
+        "MinMaxSum vector results",
+        Path("minmaxsum.md") if "markdown" in formats else Path("minmaxsum.csv"),
+    ))
     if "markdown" in formats and "csv" in formats:
         links.append(("Master CSV", Path("master.csv")))
     for label, files in [
@@ -454,6 +525,11 @@ def write_tables(df: pd.DataFrame, successful: pd.DataFrame,
             "",
         ])
     index_lines.extend([summary, ""])
+    index_lines.extend([
+        "MinMaxSum results are reported as separate peak and integral "
+        "components; they are not ranked by a scalar objective.",
+        "",
+    ])
     for label, relative in links:
         if relative.exists() or (output / relative).exists():
             index_lines.append(f"- [{label}: {relative.as_posix()}]({relative.as_posix()})")

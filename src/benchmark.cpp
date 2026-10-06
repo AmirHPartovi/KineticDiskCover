@@ -153,6 +153,54 @@ Json result_to_json(const BenchmarkResult& result) {
               {"dominates_minsum", result.dominates_minsum},
               {"dominance_invariants_ok",
                result.dominance_invariants_ok},
+              {"objective_vector",
+               result.objective == ObjectiveType::MIN_MAX_SUM
+                   ? Json{{"peak_cost", std::isfinite(result.peak_cost)
+                                            ? Json(result.peak_cost)
+                                            : Json(nullptr)},
+                          {"integral_cost",
+                           std::isfinite(result.integral_cost)
+                               ? Json(result.integral_cost)
+                               : Json(nullptr)}}
+                   : Json(nullptr)},
+              {"joint",
+               result.objective == ObjectiveType::MIN_MAX_SUM
+                   ? Json{{"minmax_component_status",
+                           to_string(result.minmaxsum_minmax_status)},
+                          {"minsum_component_status",
+                           to_string(result.minmaxsum_minsum_status)},
+                          {"minmax_component_optimality",
+                           optimality_status_to_string(
+                               result.minmaxsum_minmax_optimality)},
+                          {"minsum_component_optimality",
+                           optimality_status_to_string(
+                               result.minmaxsum_minsum_optimality)},
+                          {"joint_optimality_status",
+                           optimality_status_to_string(
+                               result.optimality_status)},
+                          {"dominates_minmax", result.dominates_minmax},
+                          {"dominates_minsum", result.dominates_minsum},
+                          {"dominance_invariants_ok",
+                           result.dominance_invariants_ok},
+                          {"minmax_component_peak",
+                           result.minmax_component_peak
+                               ? Json(*result.minmax_component_peak)
+                               : Json(nullptr)},
+                          {"minmax_component_integral",
+                           result.minmax_component_integral
+                               ? Json(*result.minmax_component_integral)
+                               : Json(nullptr)},
+                          {"minsum_component_peak",
+                           result.minsum_component_peak
+                               ? Json(*result.minsum_component_peak)
+                               : Json(nullptr)},
+                          {"minsum_component_integral",
+                           result.minsum_component_integral
+                               ? Json(*result.minsum_component_integral)
+                               : Json(nullptr)},
+                          {"minmax_source_run", result.minmax_source_run},
+                          {"minsum_source_run", result.minsum_source_run}}
+                   : Json(nullptr)},
               {"minmax_component_peak",
                result.minmax_component_peak
                    ? Json(*result.minmax_component_peak)
@@ -672,6 +720,9 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
     benchmark.solve_time_sec = result.total_time_sec;
     benchmark.verification_time_sec = result.verification_time_sec;
     benchmark.verified = result.verified;
+    benchmark.verification_kind =
+        result.verified ? VerificationKind::CERTIFIED_CONTINUOUS
+                        : VerificationKind::NONE;
     benchmark.feasible = result.feasible;
     benchmark.time_limited = result.time_limited;
     benchmark.exact_solver =
@@ -1095,7 +1146,8 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
             "requested_backend,selected_backend,actual_backend,solver_name,"
             "kont_version,native_kont,fallback_used,solver_runtime_sec,"
             "objective,repeat,objective_value,"
-            "peak_cost,integral_cost,lower_bound,upper_bound,bound_status,"
+            "peak_cost,integral_cost,objective_vector_peak_cost,"
+            "objective_vector_integral_cost,lower_bound,upper_bound,bound_status,"
             "minmaxsum_minmax_status,minmaxsum_minsum_status,"
             "minmaxsum_minmax_optimality,minmaxsum_minsum_optimality,"
             "dominates_minmax,dominates_minsum,dominance_invariants_ok,"
@@ -1130,11 +1182,22 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
     if (std::isfinite(result.objective_value)) {
       output << result.objective_value;
     }
+    output << ',';
     if (std::isfinite(result.peak_cost)) {
       output << result.peak_cost;
     }
     output << ',';
     if (std::isfinite(result.integral_cost)) {
+      output << result.integral_cost;
+    }
+    output << ',';
+    if (result.objective == ObjectiveType::MIN_MAX_SUM &&
+        std::isfinite(result.peak_cost)) {
+      output << result.peak_cost;
+    }
+    output << ',';
+    if (result.objective == ObjectiveType::MIN_MAX_SUM &&
+        std::isfinite(result.integral_cost)) {
       output << result.integral_cost;
     }
     output << ',';

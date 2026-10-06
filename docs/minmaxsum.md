@@ -42,6 +42,25 @@ Benchmark and batch outputs retain the vector costs, component execution and
 optimality statuses, component objective diagnostics and certified gaps when
 available, dominance flags, and source-run identifiers. For this mode,
 scalar `objective_value` is null/blank rather than a misleading proxy.
+Structured JSON stores the pair in `objective_vector` and the component
+diagnostics in `joint`; CSV exports expose `objective_vector_peak_cost` and
+`objective_vector_integral_cost`. These are additive schema-version-1 fields,
+so historical MinMax and MinSum records remain valid and unchanged.
+
+Managed-result validation requires finite peak and integral costs on feasible
+joint results, continuous verification, consistent component-dominance flags,
+and matching joint/run optimality statuses. The result pipeline checks the
+component inequalities within the solver's configured numerical tolerance.
+The smoke profile exercises all three modes on its selected small dataset;
+the reference and full profiles retain their existing MinMax/MinSum defaults
+and accept `--modes minmaxsum` or `--modes all`.
+
+The reporting tools keep the two components separate: tables include a
+dedicated `minmaxsum` vector table, comparison plots include peak-versus-
+integral points, and animations show both peak cost and integral-per-horizon.
+Because the vector has no scalar ordering, MinMaxSum animation selection uses
+the fastest verified feasible run as a visualization tie-break, not as an
+objective ranking.
 
 The envelope formulation relies on cost-free switching between feasible
 interval-local assignments. If switching costs, switching limits, or

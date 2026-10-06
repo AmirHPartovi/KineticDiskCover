@@ -25,8 +25,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from kdc_tools.storage import validate_results_input
 
 
-PALETTE = {"minmax": "#1f77b4", "minsum": "#d62728", "baseline": "#7f7f7f"}
-OBJECTIVE_MARKERS = {"minmax": "o", "minsum": "s"}
+PALETTE = {
+    "minmax": "#1f77b4", "minsum": "#d62728",
+    "minmaxsum": "#2ca02c", "baseline": "#7f7f7f",
+}
+OBJECTIVE_MARKERS = {"minmax": "o", "minsum": "s", "minmaxsum": "D"}
 ALGORITHM_PALETTE = sns.color_palette("husl", 16)
 FIGURE_DESCRIPTIONS: dict[str, tuple[str, str]] = {}
 OUTPUT_DIR = Path("results/figures")
@@ -52,8 +55,7 @@ def prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     if "verified" in df:
         df = df[df["verified"].map(_bool_value)]
     df = df.replace([np.inf, -np.inf], np.nan)
-    df = df.dropna(subset=["wall_time_sec", "peak_memory_mb",
-                           "objective_value", "gap_pct"])
+    df = df.dropna(subset=["wall_time_sec", "peak_memory_mb"])
     return df.reset_index(drop=True)
 
 
@@ -172,9 +174,9 @@ def _legend(ax: plt.Axes, title: str = "Objective") -> None:
         handles = [
             plt.Line2D([], [], marker=OBJECTIVE_MARKERS[key], linestyle="",
                        color=PALETTE[key], label=key)
-            for key in ("minmax", "minsum")
+            for key in ("minmax", "minsum", "minmaxsum")
         ]
-        labels = ["minmax", "minsum"]
+        labels = ["minmax", "minsum", "minmaxsum"]
     ax.legend(handles, labels, title=title, loc="best")
 
 
@@ -203,11 +205,10 @@ def _bar_per_instance(df: pd.DataFrame, metric: str, prefix: str,
                       label: str, unit: str) -> list[str]:
     names = []
     for instance, group in df.groupby("instance_name", sort=True):
-        order = (group[group.objective == "minmax"]
-                 .groupby("algorithm_name")[metric].median().sort_values().index)
+        order = group.groupby("algorithm_name")[metric].median().sort_values().index
         fig, ax = plt.subplots(figsize=(max(8, len(order) * 0.75), 5))
         sns.barplot(data=group, x="algorithm_name", y=metric, hue="objective",
-                    hue_order=["minmax", "minsum"], order=list(order),
+                    hue_order=["minmax", "minsum", "minmaxsum"], order=list(order),
                     palette=PALETTE, errorbar=None, ax=ax)
         ax.tick_params(axis="x", rotation=35)
         if metric == "wall_time_sec" and group[metric].min() > 0:
@@ -242,15 +243,16 @@ def memory_bar_per_instance(df: pd.DataFrame,
 def _box_plot(df: pd.DataFrame, metric: str, name: str,
               title: str, ylabel: str, log_axis: bool = False,
               annotate_counts: bool = False) -> str:
+    plot_df = df.dropna(subset=[metric]) if metric in df else df.iloc[0:0]
     fig, ax = plt.subplots(figsize=(max(9, df.algorithm_name.nunique() * 0.8), 5.5))
-    if df.empty:
-        ax.text(0.5, 0.5, "No successful verified records",
+    if plot_df.empty:
+        ax.text(0.5, 0.5, "No finite values for this metric",
                 ha="center", transform=ax.transAxes)
     else:
-        sns.boxplot(data=df, x="algorithm_name", y=metric, hue="objective",
-                    hue_order=["minmax", "minsum"], palette=PALETTE,
+        sns.boxplot(data=plot_df, x="algorithm_name", y=metric, hue="objective",
+                    hue_order=["minmax", "minsum", "minmaxsum"], palette=PALETTE,
                     notch=True, ax=ax)
-        sns.stripplot(data=df, x="algorithm_name", y=metric, hue="objective",
+        sns.stripplot(data=plot_df, x="algorithm_name", y=metric, hue="objective",
                       dodge=True, jitter=0.18, alpha=0.4, size=4,
                       palette=PALETTE, ax=ax, legend=False)
         if log_axis and (df[metric] > 0).any():
@@ -393,7 +395,7 @@ def _heatmap(df: pd.DataFrame, metric: str, name: str, title: str,
         ax.legend(handles=[
             plt.Line2D([], [], marker="s", linestyle="", color=PALETTE[key],
                        label=key)
-            for key in ("minmax", "minsum")
+            for key in ("minmax", "minsum", "minmaxsum")
         ], title="Objective", loc="upper left", bbox_to_anchor=(1.18, 1.0))
     ax.set_title(title)
     save_fig(fig, name)
@@ -890,6 +892,7 @@ def write_report(df: pd.DataFrame, output: str | Path,
         FIGURE_DESCRIPTIONS
     )
     families = df["instance_name"].map(_family).nunique() if not df.empty else 0
+    scalar_df = df[df.objective.isin(["minmax", "minsum"])]
     summary_stats = df.groupby("algorithm_name").agg(
         median_time=("wall_time_sec", "median"),
         q25_time=("wall_time_sec", lambda values: values.quantile(0.25)),
@@ -956,6 +959,41 @@ def write_report(df: pd.DataFrame, output: str | Path,
     else:
         lines.append("No successful verified records are available.")
 
+    vector_rows = []
+    for _, row in df[df.objective == "minmaxsum"].iterrows():
+        vector = row.get("objective_vector")
+        if not isinstance(vector, dict):
+            vector = {}
+        try:
+            peak, integral = float(vector.get("peak_cost")), float(
+                vector.get("integral_cost")
+            )
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(peak) and math.isfinite(integral):
+            vector_rows.append((row.get("algorithm_name", ""), peak, integral))
+    lines.extend([
+        "",
+        "## MinMaxSum objective vectors",
+        "",
+        "No scalar ranking is applied; each row reports peak and integral separately.",
+        "",
+        "| Algorithm | Runs | Median peak cost | Median integral cost |",
+        "|---|---:|---:|---:|",
+    ])
+    vector_frame = pd.DataFrame(
+        vector_rows, columns=["algorithm_name", "peak_cost", "integral_cost"]
+    )
+    if vector_frame.empty:
+        lines.append("| — | 0 | N/A | N/A |")
+    else:
+        for algorithm, group in vector_frame.groupby("algorithm_name", sort=True):
+            lines.append(
+                f"| {algorithm} | {len(group)} | "
+                f"{group.peak_cost.median():.6g} | "
+                f"{group.integral_cost.median():.6g} |"
+            )
+
     lines.extend(["", "## Figures", ""])
     for name in names:
         png = f"{name}.png"
@@ -977,10 +1015,10 @@ def write_report(df: pd.DataFrame, output: str | Path,
     lines.extend(["## Key findings", ""])
     if df.empty:
         lines.append("No successful verified runs are available for comparison.")
-    else:
+    elif not scalar_df.empty:
         fastest = df.groupby("algorithm_name").wall_time_sec.median().idxmin()
-        most_accurate = df.groupby("algorithm_name").gap_pct.median().idxmin()
-        normalized = _pareto_summary(df)
+        most_accurate = scalar_df.groupby("algorithm_name").gap_pct.median().idxmin()
+        normalized = _pareto_summary(scalar_df)
         efficient_counts = {algorithm: 0 for algorithm in df.algorithm_name.unique()}
         for _, group in normalized.groupby("objective"):
             for algorithm in pareto_front(
@@ -994,14 +1032,24 @@ def write_report(df: pd.DataFrame, output: str | Path,
         )
         lines.append(
             f"- Lowest median optimality gap: **{most_accurate}** "
-            f"({df.groupby('algorithm_name').gap_pct.median()[most_accurate]:.6g}%)."
+            f"({scalar_df.groupby('algorithm_name').gap_pct.median()[most_accurate]:.6g}%)."
         )
         lines.append(
             f"- Most represented on aggregated Pareto fronts: **{best_pareto}**."
         )
-        dominated = _dominated_algorithms(df)
+        dominated = _dominated_algorithms(scalar_df)
         lines.append("- Algorithms dominated on every comparable instance/objective: "
                      + (", ".join(dominated) if dominated else "none detected") + ".")
+    else:
+        fastest = df.groupby("algorithm_name").wall_time_sec.median().idxmin()
+        lines.append(
+            f"- Fastest by median runtime: **{fastest}** "
+            f"({df.groupby('algorithm_name').wall_time_sec.median()[fastest]:.6g} s)."
+        )
+        lines.append(
+            "- No MinMax/MinSum scalar-objective runs are present; MinMaxSum "
+            "is only compared by its separate peak/integral vector."
+        )
     report = directory / "REPORT.md"
     report.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return report
@@ -1063,7 +1111,8 @@ def _make_empty_figure(name: str, title: str, ylabel: str) -> None:
 def _produce_extra_figures(df: pd.DataFrame, fixed_m: int,
                            fixed_n: int) -> list[str]:
     names = [runtime_ecdf(df), memory_vs_m(df, fixed_n=fixed_n),
-             gap_vs_runtime(df), objective_box_by_algorithm(df)]
+             gap_vs_runtime(df), objective_box_by_algorithm(df),
+             objective_vector_scatter(df)]
     names.append(_heatmap(df[df.objective == "minmax"], "objective_value",
                           "E2_minmax_quality_heatmap",
                           "MinMax quality heatmap (rank per instance)",
@@ -1097,6 +1146,57 @@ def _produce_extra_figures(df: pd.DataFrame, fixed_m: int,
     return list(dict.fromkeys(names))
 
 
+def objective_vector_scatter(df: pd.DataFrame) -> str:
+    columns = []
+    for _, row in df.iterrows():
+        objective = str(row.get("objective", "")).lower()
+        vector = row.get("objective_vector")
+        if objective == "minmaxsum" and isinstance(vector, dict):
+            peak, integral = vector.get("peak_cost"), vector.get("integral_cost")
+        else:
+            peak, integral = row.get("peak_cost"), row.get("integral_cost")
+        try:
+            peak, integral = float(peak), float(integral)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(peak) and math.isfinite(integral):
+            columns.append({
+                "objective": objective,
+                "algorithm_name": row.get("algorithm_name", ""),
+                "peak_cost": peak,
+                "integral_cost": integral,
+            })
+    points = pd.DataFrame(columns)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    if points.empty:
+        ax.text(0.5, 0.5, "No finite peak/integral vectors",
+                ha="center", va="center", transform=ax.transAxes)
+    else:
+        for objective in ("minmax", "minsum", "minmaxsum"):
+            group = points[points.objective == objective]
+            if group.empty:
+                continue
+            ax.scatter(
+                group.peak_cost, group.integral_cost,
+                color=PALETTE[objective], marker=OBJECTIVE_MARKERS[objective],
+                label=objective, alpha=0.8,
+            )
+    _finish(
+        ax, "Peak cost vs integral cost", "Peak cost", "Integral cost",
+        legend_title="Solution source",
+    )
+    name = "D4_objective_vector_peak_vs_integral"
+    save_fig(fig, name)
+    _remember(
+        name,
+        "Every point uses the same solution's peak and integral; MinMaxSum "
+        "is shown as a vector and is not reduced to a scalar.",
+        "The joint envelope should weakly improve both components relative "
+        "to each available component solution.",
+    )
+    return name
+
+
 def generate_figures(df: pd.DataFrame, output: str | Path,
                      fixed_m: int = 25, fixed_n: int = 500,
                      sections: set[str] | None = None) -> list[str]:
@@ -1110,7 +1210,7 @@ def generate_figures(df: pd.DataFrame, output: str | Path,
         "B1", "B2", "B3", "B4", "B5",
         "C1", "C2", "C3", "C4", "C5", "C6",
         "D1", "D2", "D3", "E1", "E2", "E3",
-        "F1", "F2", "G1",
+        "D4", "F1", "F2", "G1",
     }
     names: list[str] = []
     actions: dict[str, Callable[[], object]] = {
@@ -1151,6 +1251,7 @@ def generate_figures(df: pd.DataFrame, output: str | Path,
         "D3": lambda: names.extend(_produce_extra_figures(
             df, fixed_m, fixed_n
         )),
+        "D4": lambda: names.append(objective_vector_scatter(df)),
     }
     for section in sorted(selected):
         if section not in actions:

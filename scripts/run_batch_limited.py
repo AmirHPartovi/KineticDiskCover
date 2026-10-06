@@ -56,6 +56,7 @@ ALGORITHM_PHASES = (
 )
 ALGORITHMS = tuple(name for phase in ALGORITHM_PHASES for name in phase)
 OBJECTIVES = ("minmax", "minsum")
+ALL_OBJECTIVES = ("minmax", "minsum", "minmaxsum")
 TERMINAL_STATES = {
     "COMPLETED", "FAILED", "TIME_LIMIT", "TIMED_OUT", "INVALID",
     "CANCELLED", "ABANDONED", "SKIPPED",
@@ -673,7 +674,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--safety-timeout", type=float, default=None)
     parser.add_argument("--modes",
-                        choices=("minmax", "minsum", "minmaxsum", "both"),
+                        choices=("minmax", "minsum", "minmaxsum", "both", "all"),
                         default="both")
     parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
                         default="auto")
@@ -694,7 +695,7 @@ def main(argv: list[str] | None = None) -> int:
             or args.minmax_budget_fraction <= 0
             or args.minsum_budget_fraction <= 0):
         parser.error("MinMaxSum budget fractions must be positive finite numbers")
-    if (args.modes == "minmaxsum"
+    if (args.modes in {"minmaxsum", "all"}
             and not math.isclose(args.minmax_budget_fraction
                                  + args.minsum_budget_fraction,
                                  1.0, rel_tol=0.0, abs_tol=1e-9)):
@@ -872,7 +873,11 @@ def main(argv: list[str] | None = None) -> int:
     if unknown:
         parser.error("unknown algorithms: " + ", ".join(sorted(unknown)))
     algorithms = order_algorithms(selected)
-    objectives = OBJECTIVES if args.modes == "both" else (args.modes,)
+    objectives = (
+        OBJECTIVES if args.modes == "both"
+        else ALL_OBJECTIVES if args.modes == "all"
+        else (args.modes,)
+    )
 
     plan, task_data = _build_plan(
         experiment, instance_paths, algorithms, objectives, exact_backend,

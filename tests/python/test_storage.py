@@ -21,6 +21,7 @@ from kdc_tools.storage import (  # noqa: E402
     validate_run_directory,
     validate_complete_aggregate,
     validate_results_input,
+    validate_joint_result,
     write_bytes_create_only,
     write_json_create_only,
     write_run_plan,
@@ -218,6 +219,61 @@ def test_run_finalization_validates_checksums_and_rejects_terminal_writes(tmp_pa
     solution.write_text('{"changed":true}')
     with pytest.raises(ValueError, match="checksum mismatch"):
         validate_run_directory(run)
+
+
+def _joint_result_record():
+    return {
+        "objective": "minmaxsum",
+        "objective_value": None,
+        "objective_vector": {"peak_cost": 2.0, "integral_cost": 1.25},
+        "joint": {
+            "minmax_component_status": "COMPLETED",
+            "minsum_component_status": "COMPLETED",
+            "minmax_component_optimality": "FEASIBLE",
+            "minsum_component_optimality": "FEASIBLE",
+            "joint_optimality_status": "FEASIBLE",
+            "dominates_minmax": True,
+            "dominates_minsum": True,
+            "dominance_invariants_ok": True,
+            "minmax_component_peak": 3.0,
+            "minmax_component_integral": 2.0,
+            "minsum_component_peak": 4.0,
+            "minsum_component_integral": 1.5,
+            "minmax_source_run": "run-mm",
+            "minsum_source_run": "run-ms",
+        },
+        "feasible": True,
+        "verified": True,
+        "verification_kind": "CERTIFIED_CONTINUOUS",
+        "optimality_status": "FEASIBLE",
+    }
+
+
+def test_joint_result_vector_and_dominance_are_validated():
+    validate_joint_result(_joint_result_record())
+
+    bad_dominance = _joint_result_record()
+    bad_dominance["objective_vector"]["integral_cost"] = 2.1
+    with pytest.raises(ValueError, match="dominance"):
+        validate_joint_result(bad_dominance)
+
+    scalarized = _joint_result_record()
+    scalarized["objective_value"] = 1.0
+    with pytest.raises(ValueError, match="scalar objective"):
+        validate_joint_result(scalarized)
+
+    unverified = _joint_result_record()
+    unverified["verified"] = False
+    with pytest.raises(ValueError, match="not marked verified"):
+        validate_joint_result(unverified)
+
+
+def test_minmaxsum_optimal_requires_both_optimal_components():
+    record = _joint_result_record()
+    record["optimality_status"] = "OPTIMAL"
+    record["joint"]["joint_optimality_status"] = "OPTIMAL"
+    with pytest.raises(ValueError, match="two optimal components"):
+        validate_joint_result(record)
 
 
 def test_aggregate_is_derived_from_run_packages_and_reports_plan_gaps(tmp_path):

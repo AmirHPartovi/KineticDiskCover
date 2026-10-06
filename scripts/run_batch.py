@@ -51,7 +51,7 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--modes",
-                        choices=("minmax", "minsum", "minmaxsum", "both"),
+                        choices=("minmax", "minsum", "minmaxsum", "both", "all"),
                         default="both")
     parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
                         default="auto",
@@ -105,7 +105,7 @@ def main() -> int:
             or args.minmax_budget_fraction <= 0
             or args.minsum_budget_fraction <= 0):
         parser.error("threads, time limits, and repeats must be positive; seed must be nonnegative")
-    if (args.modes == "minmaxsum"
+    if (args.modes in {"minmaxsum", "all"}
             and abs(args.minmax_budget_fraction
                     + args.minsum_budget_fraction - 1.0) > 1e-9):
         parser.error("MinMaxSum budget fractions must sum to one")

@@ -42,6 +42,7 @@ while IFS=$'\t' read -r key value; do
     TABLES_ENABLED) TABLES_ENABLED="$value" ;;
     FIGURES_ENABLED) FIGURES_ENABLED="$value" ;;
     ANIMATION_ENABLED) ANIMATION_ENABLED="$value" ;;
+    ANIMATION_MODE_DEFAULT) ANIMATION_MODE_DEFAULT="$value" ;;
     ANIMATION_POLICY) ANIMATION_POLICY="$value" ;;
     ANIMATION_TOP_N) ANIMATION_TOP_N="$value" ;;
     ANIMATION_FPS) ANIMATION_FPS="$value" ;;
@@ -59,7 +60,7 @@ DATASET_EXPLICIT=0
 DATASET_PROFILE_EXPLICIT=0
 OUTPUT=""
 ALGORITHMS_EXPLICIT=0
-ANIMATION_MODE="both"
+ANIMATION_MODE="${ANIMATION_MODE_DEFAULT:-both}"
 ANIMATION_INSTANCES=""
 SKIP_PREFLIGHT=0
 SKIP_FIGURES=0
@@ -88,7 +89,7 @@ Options:
   --dataset-profile full|smoke10   Built-in dataset profile (default: full)
   --output PATH                    Experiment directory (default: unique results/experiments/<ID>)
   --algorithms all-fast|all-comparison|LIST
-  --modes minmax|minsum|minmaxsum|both
+  --modes minmax|minsum|minmaxsum|both|all
   --seed N
   --repeats N
   --threads N
@@ -97,7 +98,7 @@ Options:
   --time-limit SEC                 Per-static-solve limit
   --exact-reference auto|ip-kont|branch-and-bound
   --animation-top-n N
-  --animation-mode minmax|minsum|both
+  --animation-mode minmax|minsum|minmaxsum|both|all
   --animation-instances LIST       Comma-separated instance names or JSON basenames
   --animation-policy best|all-algorithms
   --all-algorithms                 Animate every algorithm for selected instances
@@ -198,8 +199,8 @@ if [[ "$PIPELINE_PROFILE" == reference ]]; then
     *) fail_usage "reference pipeline requires exactly one heuristic algorithm" ;;
   esac
 fi
-case "$MODES" in minmax|minsum|minmaxsum|both) ;; *) fail_usage "invalid --modes value" ;; esac
-case "$ANIMATION_MODE" in minmax|minsum|both) ;; *) fail_usage "invalid --animation-mode value" ;; esac
+case "$MODES" in minmax|minsum|minmaxsum|both|all) ;; *) fail_usage "invalid --modes value" ;; esac
+case "$ANIMATION_MODE" in minmax|minsum|minmaxsum|both|all) ;; *) fail_usage "invalid --animation-mode value" ;; esac
 case "$ANIMATION_POLICY" in best|all-algorithms) ;; *) fail_usage "invalid --animation-policy value" ;; esac
 case "$EXACT_REFERENCE" in auto|ip-kont|branch-and-bound) ;; *) fail_usage "invalid --exact-reference value" ;; esac
 [[ "$SEED" =~ ^[0-9]+$ ]] || fail_usage "--seed must be a nonnegative integer"

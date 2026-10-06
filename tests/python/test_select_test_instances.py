@@ -226,7 +226,9 @@ def test_named_pipeline_profiles_have_stable_required_stages():
         profile = json.loads(completed.stdout)
         assert profile["pipeline"] == name
         assert profile["required_stages"] == stages
-        assert profile["objectives"] == "both"
+        assert profile["objectives"] == (
+            "all" if name == "smoke" else "both"
+        )
         assert profile["exact_backend"] == "auto"
         assert profile["tables"] and profile["figures"]
         if name == "smoke":

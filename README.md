@@ -37,7 +37,7 @@ the requested count; this is recorded rather than hidden. For development:
 bash scripts/run_experiment.sh --pipeline smoke
 ```
 
-Smoke uses all registered algorithms, both objectives, one repeat, two
+Smoke uses all registered algorithms, all three objectives, one repeat, two
 workers, per-static-solve / heuristic / exact deadlines of 2 / 5 / 10 seconds,
 and the debug verification profile. It generates verified animations for all
 eligible algorithms and selected instances. Override the size bounds with
@@ -48,14 +48,16 @@ validation, not as the full scientific benchmark.
 
 The reference profile runs one heuristic (`greedy` by default) and exactly one
 resolved exact backend on every instance in `data/instances/public_instance_set/`,
-for both objectives. AUTO selects either runtime-ready KONT/COPT or
+for both original objectives by default; MinMaxSum is available via
+`--modes minmaxsum` or `--modes all`. AUTO selects either runtime-ready KONT/COPT or
 branch-and-bound and records the choice and calibration evidence. Use
 `--algorithms` to choose another approximation/heuristic.
 
 ### Full scientific benchmark
 
 The full profile runs all registered algorithms across the complete dataset,
-both objectives, and three repeats for stochastic algorithms by default.
+both original objectives, and three repeats for stochastic algorithms by
+default. `--modes minmaxsum` or `--modes all` adds the joint vector objective.
 Exact-reference results are produced by one resolved backend, never by
 silently substituting an unreported solver. The CLI and workflow inputs allow
 repeat, worker-count, and time-limit overrides.
@@ -220,7 +222,7 @@ passes its selected backend into each isolated per-run process.
 To run each individual
 instance/algorithm/objective combination in a separate process, use
 `python3 scripts/run_batch_limited.py --instances DIR --output results/batch
---algorithms all --modes both`. It defaults to
+--algorithms all --modes both`. Use `--modes all` to include MinMaxSum. It defaults to
 using all available CPU cores and forwards the cooperative global and
 per-static-solve limits to the solver. An optional `--safety-timeout SEC`
 provides an external hard subprocess timeout; any such interruption is recorded
@@ -276,6 +278,8 @@ using the pointwise lower envelope. It reports `peak_cost` and `integral_cost`
 as a vector, not as a scalar objective; batch and benchmark records preserve
 the component statuses, dominance checks, and source identifiers. See
 [`docs/minmaxsum.md`](docs/minmaxsum.md) for result and certification semantics.
+The development smoke pipeline runs all three modes and produces a dedicated
+peak-versus-integral vector report and plot for MinMaxSum.
 
 ## Dataset I/O
 

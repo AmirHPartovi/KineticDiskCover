@@ -51,6 +51,52 @@ def test_prepare_frame_filters_failed_runs_and_computes_gap_pct():
     assert (frame.gap_pct == frame.gap * 100).all()
 
 
+def test_prepare_frame_keeps_joint_vectors_without_scalar_metrics(tmp_path):
+    frame = sample_frame()
+    joint_row = {
+        **frame.iloc[0].to_dict(),
+        "objective": "minmaxsum",
+        "objective_value": None,
+        "gap": None,
+        "peak_cost": 4.0,
+        "integral_cost": 2.5,
+        "objective_vector": {"peak_cost": 4.0, "integral_cost": 2.5},
+    }
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+    prepared = plot_comparisons.prepare_frame(frame)
+    joint = prepared[prepared.objective == "minmaxsum"]
+    assert len(joint) == 1
+    assert pd.isna(joint.iloc[0].objective_value)
+
+    plot_comparisons.configure_style(50)
+    plot_comparisons.OUTPUT_DIR = tmp_path
+    name = plot_comparisons.objective_vector_scatter(prepared)
+    assert name == "D4_objective_vector_peak_vs_integral"
+    assert (tmp_path / f"{name}.png").is_file()
+    assert (tmp_path / f"{name}.pdf").is_file()
+
+
+def test_joint_only_reporting_does_not_require_scalar_objective(tmp_path):
+    row = sample_frame().iloc[0].to_dict()
+    row.update({
+        "objective": "minmaxsum",
+        "objective_value": None,
+        "gap": None,
+        "peak_cost": 4.0,
+        "integral_cost": 2.5,
+        "objective_vector": {"peak_cost": 4.0, "integral_cost": 2.5},
+    })
+    frame = plot_comparisons.prepare_frame(pd.DataFrame([row]))
+    plot_comparisons.configure_style(40)
+    names = plot_comparisons.generate_figures(
+        frame, tmp_path,
+        sections={"A1", "B1", "C1", "D1", "D2", "D4"},
+    )
+    report = plot_comparisons.write_report(frame, tmp_path, names)
+    assert "MinMaxSum objective vectors" in report.read_text()
+    assert "D4_objective_vector_peak_vs_integral" in names
+
+
 def test_ecdf_and_power_law_helpers():
     x, y = plot_comparisons.ecdf([3, 1, 2])
     assert list(x) == [1, 1, 2, 3]
@@ -87,6 +133,7 @@ def test_full_figure_set_report_and_file_pairs(tmp_path):
         assert report.count(f"![{name}]({name}.png)") == 1
     assert len(list(tmp_path.glob("*.png"))) == len(names)
     assert "D2_pareto_aggregated" in names
+    assert "D4_objective_vector_peak_vs_integral" in names
 
 
 def test_png_generation_is_reproducible(tmp_path):

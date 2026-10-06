@@ -102,6 +102,11 @@ TEST_CASE("BatchRunner persists MinMaxSum objective vectors") {
   for (const auto& record : records) {
     REQUIRE(record.at("objective") == "minmaxsum");
     REQUIRE(record.at("objective_value").is_null());
+    REQUIRE(record.at("objective_vector").at("peak_cost").is_number());
+    REQUIRE(record.at("objective_vector").at("integral_cost").is_number());
+    REQUIRE(record.at("joint").at("joint_optimality_status") ==
+            record.at("optimality_status"));
+    REQUIRE(record.at("verification_kind") == "certified_continuous");
     REQUIRE(record.at("lower_bound").is_null());
     REQUIRE(record.at("dominance_invariants_ok").get<bool>());
     REQUIRE(record.at("peak_cost").is_number());

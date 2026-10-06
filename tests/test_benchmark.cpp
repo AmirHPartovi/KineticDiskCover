@@ -137,6 +137,7 @@ TEST_CASE("Benchmark runner measures and persists results") {
     joint.minsum_source_run = "joint:minsum";
     joint.feasible = true;
     joint.verified = true;
+    joint.verification_kind = kdc::VerificationKind::CERTIFIED_CONTINUOUS;
     joint.optimality_status = kdc::OptimalityStatus::OPTIMAL;
     joint.timestamp = "test";
 
@@ -148,6 +149,10 @@ TEST_CASE("Benchmark runner measures and persists results") {
     const auto json = nlohmann::json::parse(json_input);
     REQUIRE(json.front().at("objective_value").is_null());
     REQUIRE(json.front().at("lower_bound").is_null());
+    REQUIRE(json.front().at("objective_vector").at("peak_cost") == 2.0);
+    REQUIRE(json.front().at("objective_vector").at("integral_cost") == 1.25);
+    REQUIRE(json.front().at("joint").at("dominance_invariants_ok").get<bool>());
+    REQUIRE(json.front().at("verification_kind") == "certified_continuous");
     const auto loaded = kdc::BenchmarkRunner::load_json(json_path);
     REQUIRE(loaded.size() == 1U);
     REQUIRE(loaded.front().objective == kdc::ObjectiveType::MIN_MAX_SUM);

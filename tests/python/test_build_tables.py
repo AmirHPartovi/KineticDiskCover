@@ -133,6 +133,41 @@ def test_smoke_tables_are_labeled_as_development_validation(tmp_path):
     ).read_text()
 
 
+def test_minmaxsum_has_separate_peak_integral_table(tmp_path):
+    frame = sample_frame()
+    joint_row = {
+        **frame.iloc[0].to_dict(),
+        "objective": "minmaxsum",
+        "objective_value": None,
+        "peak_cost": 90.0,
+        "integral_cost": 55.0,
+        "objective_vector": {"peak_cost": 90.0, "integral_cost": 55.0},
+        "joint": {
+            "minmax_component_peak": 100.0,
+            "minmax_component_integral": 70.0,
+            "minsum_component_peak": 120.0,
+            "minsum_component_integral": 60.0,
+            "dominates_minmax": True,
+            "dominates_minsum": True,
+            "joint_optimality_status": "FEASIBLE",
+        },
+    }
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+    raw, good, failed = _prepare(frame)
+    build_tables.write_tables(raw, good, failed, tmp_path, {"markdown", "csv"})
+
+    vector_table = pd.read_csv(tmp_path / "minmaxsum.csv")
+    assert len(vector_table) == 1
+    assert vector_table.iloc[0].peak_cost == 90.0
+    assert vector_table.iloc[0].integral_cost == 55.0
+    assert "no scalar objective value" in (
+        tmp_path / "minmaxsum.md"
+    ).read_text().lower()
+    assert "[MinMaxSum vector results: minmaxsum.md](minmaxsum.md)" in (
+        tmp_path / "00_index.md"
+    ).read_text()
+
+
 def test_numeric_formatting():
     assert build_tables._format_value("objective_value", 123.4567) == "123.457"
     assert build_tables._format_value("gap_pct", 12.345) == "12.35%"

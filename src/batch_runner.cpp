@@ -136,6 +136,54 @@ Json record_json(const BatchRunRecord& record) {
               {"dominates_minsum", record.dominates_minsum},
               {"dominance_invariants_ok",
                record.dominance_invariants_ok},
+              {"objective_vector",
+               record.objective == "minmaxsum"
+                   ? Json{{"peak_cost", std::isfinite(record.peak_cost)
+                                            ? Json(record.peak_cost)
+                                            : Json(nullptr)},
+                          {"integral_cost",
+                           std::isfinite(record.integral_cost)
+                               ? Json(record.integral_cost)
+                               : Json(nullptr)}}
+                   : Json(nullptr)},
+              {"joint",
+               record.objective == "minmaxsum"
+                   ? Json{{"minmax_component_status",
+                           to_string(record.minmaxsum_minmax_status)},
+                          {"minsum_component_status",
+                           to_string(record.minmaxsum_minsum_status)},
+                          {"minmax_component_optimality",
+                           optimality_status_to_string(
+                               record.minmaxsum_minmax_optimality)},
+                          {"minsum_component_optimality",
+                           optimality_status_to_string(
+                               record.minmaxsum_minsum_optimality)},
+                          {"joint_optimality_status",
+                           optimality_status_to_string(
+                               record.optimality_status)},
+                          {"dominates_minmax", record.dominates_minmax},
+                          {"dominates_minsum", record.dominates_minsum},
+                          {"dominance_invariants_ok",
+                           record.dominance_invariants_ok},
+                          {"minmax_component_peak",
+                           record.minmax_component_peak
+                               ? Json(*record.minmax_component_peak)
+                               : Json(nullptr)},
+                          {"minmax_component_integral",
+                           record.minmax_component_integral
+                               ? Json(*record.minmax_component_integral)
+                               : Json(nullptr)},
+                          {"minsum_component_peak",
+                           record.minsum_component_peak
+                               ? Json(*record.minsum_component_peak)
+                               : Json(nullptr)},
+                          {"minsum_component_integral",
+                           record.minsum_component_integral
+                               ? Json(*record.minsum_component_integral)
+                               : Json(nullptr)},
+                          {"minmax_source_run", record.minmax_source_run},
+                          {"minsum_source_run", record.minsum_source_run}}
+                   : Json(nullptr)},
               {"minmax_component_peak",
                record.minmax_component_peak
                    ? Json(*record.minmax_component_peak)
@@ -367,6 +415,10 @@ std::vector<std::string> csv_fields(const BatchRunRecord& record) {
           finite_string(record.heuristic_gap),
           record.peak_consistent ? "true" : "false",
           finite_string(record.integral_cost),
+          record.objective == "minmaxsum" ? finite_string(record.peak_cost) : "",
+          record.objective == "minmaxsum"
+              ? finite_string(record.integral_cost)
+              : "",
           to_string(record.minmaxsum_minmax_status),
           to_string(record.minmaxsum_minsum_status),
           optimality_status_to_string(
@@ -1161,6 +1213,9 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       record.solve_time_sec = result.total_time_sec;
       record.verification_time_sec = result.verification_time_sec;
       record.verified = result.verified;
+      record.verification_kind =
+          result.verified ? VerificationKind::CERTIFIED_CONTINUOUS
+                          : VerificationKind::NONE;
       record.feasible = result.feasible;
       record.time_limited = result.time_limited;
       if (!result.minmax_error.empty() || !result.minsum_error.empty()) {
@@ -1322,7 +1377,9 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
          "failed_native_solve_count,solver_runtime_sec,objective,repeat,n,m,wall_time_sec,"
          "solve_time_sec,cpu_time_sec,peak_memory_mb,time_limit_per_ip_sec,"
          "peak_cost,peak_time,initial_peak_cost,heuristic_gap,peak_consistent,"
-         "integral_cost,minmaxsum_minmax_status,minmaxsum_minsum_status,"
+         "integral_cost,objective_vector_peak_cost,"
+         "objective_vector_integral_cost,minmaxsum_minmax_status,"
+         "minmaxsum_minsum_status,"
          "minmaxsum_minmax_optimality,minmaxsum_minsum_optimality,"
          "dominates_minmax,dominates_minsum,dominance_invariants_ok,"
          "minmax_component_peak,minmax_component_integral,"

@@ -107,6 +107,20 @@ def test_tie_break_time():
     assert animate_best.select_best(frame, "x", "minsum").algorithm_name == "b"
 
 
+def test_minmaxsum_selection_uses_runtime_not_a_scalar_objective():
+    frame = pd.DataFrame([
+        {"instance_name": "x", "objective": "minmaxsum", "algorithm_name": "slow",
+         "objective_value": None, "objective_vector": {"peak_cost": 1, "integral_cost": 2},
+         "wall_time_sec": 2, "verified": True, "feasible": True},
+        {"instance_name": "x", "objective": "minmaxsum", "algorithm_name": "fast",
+         "objective_value": None, "objective_vector": {"peak_cost": 9, "integral_cost": 7},
+         "wall_time_sec": 1, "verified": True, "feasible": True},
+    ])
+    assert animate_best.select_best(
+        frame, "x", "minmaxsum"
+    ).algorithm_name == "fast"
+
+
 def test_radius_at_time():
     instance = sample_instance()
     solution = sample_solution(instance)
@@ -173,6 +187,51 @@ def test_animation_generation_smoke(tmp_path):
     assert len(created) == 1
     assert created[0].is_file()
     assert created[0].stat().st_size > 10_000
+
+
+def test_minmaxsum_animation_preserves_both_objectives(tmp_path):
+    batch, instances = make_animation_inputs(tmp_path)
+    records = json.loads((batch / "master_results.json").read_text())
+    records[0].update({
+        "objective": "minmaxsum",
+        "objective_value": None,
+        "objective_vector": {
+            "peak_cost": 4 * np.pi,
+            "integral_cost": 4 * np.pi / 3,
+        },
+        "optimality_status": "FEASIBLE",
+        "verification_kind": "CERTIFIED_CONTINUOUS",
+        "joint": {
+            "minmax_component_status": "COMPLETED",
+            "minsum_component_status": "COMPLETED",
+            "minmax_component_optimality": "FEASIBLE",
+            "minsum_component_optimality": "FEASIBLE",
+            "joint_optimality_status": "FEASIBLE",
+            "dominates_minmax": True,
+            "dominates_minsum": True,
+            "dominance_invariants_ok": True,
+            "minmax_component_peak": 5 * np.pi,
+            "minmax_component_integral": 2 * np.pi,
+            "minsum_component_peak": 6 * np.pi,
+            "minsum_component_integral": 5 * np.pi / 3,
+            "minmax_source_run": "run-minmax",
+            "minsum_source_run": "run-minsum",
+        },
+    })
+    (batch / "master_results.json").write_text(json.dumps(records))
+
+    created = animate_best.run(
+        batch, instances, tmp_path / "joint-animations", "minmaxsum",
+        fps=2, frames=5, dpi=70,
+    )
+
+    assert len(created) == 1
+    metadata = json.loads(
+        created[0].with_suffix(created[0].suffix + ".metadata.json").read_text()
+    )
+    assert metadata["objective"] == "minmaxsum"
+    assert metadata["objective_vector"]["peak_cost"] == 4 * np.pi
+    assert "no scalar objective ranking" in metadata["selection_rule"]
 
 
 def test_generates_one_animation_per_verified_algorithm(tmp_path):
