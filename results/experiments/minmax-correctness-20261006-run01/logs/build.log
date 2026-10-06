@@ -1,0 +1,121 @@
+[2026-10-06T06:05:13+0330] COMMAND: bash -c cmake\ -S\ \"\$1\"\ -B\ \"\$1/build\"\ -DCMAKE_BUILD_TYPE=Release\ \&\&\ cmake\ --build\ \"\$1/build\"\ --parallel\ \"\$2\" _ /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon 2 
+-- KONT/COPT root: /Applications/kont72 (COPT_HOME environment variable)
+-- COPT copt.h: COPT_INCLUDE_DIR-NOTFOUND
+-- COPT library: COPT_LIBRARY-NOTFOUND
+-- KONT C++ header: /Applications/kont72/include; /Applications/kont72/include/kontcpp_inc
+-- KONT C++ library: /Applications/kont72/lib/libkont_cpp.dylib
+-- Detected architecture: arm64
+-- Native API compile/link check: PASS
+-- Native backend enabled: KONT (version 7.2.4)
+CMake Warning (author) at /opt/homebrew/share/cmake/Modules/FetchContent.cmake:1386 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:259 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+CMake Warning (author) at /opt/homebrew/share/cmake/Modules/FetchContent.cmake:1386 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:260 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+CMake Warning (author) at /opt/homebrew/share/cmake/Modules/FetchContent.cmake:1386 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:261 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+CMake Warning (author) at /opt/homebrew/share/cmake/Modules/FetchContent.cmake:1386 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:262 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+CMake Warning (deprecated) at build/_deps/eigen-src/CMakeLists.txt:2 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test COMPILER_SUPPORT_std=cpp03
+-- Performing Test COMPILER_SUPPORT_std=cpp03 - Success
+-- Standard libraries to link to explicitly: none
+-- Found unsuitable Qt version "" from NOTFOUND
+-- Found unsuitable Qt version "" from NOTFOUND
+-- Qt4 not found, so disabling the mandelbrot and opengl demos
+-- Could NOT find CHOLMOD (missing: CHOLMOD_INCLUDES CHOLMOD_LIBRARIES) 
+-- Could NOT find UMFPACK (missing: UMFPACK_INCLUDES UMFPACK_LIBRARIES) 
+-- Could NOT find KLU (missing: KLU_INCLUDES KLU_LIBRARIES) 
+-- Could NOT find SuperLU (missing: SUPERLU_INCLUDES SUPERLU_LIBRARIES SUPERLU_VERSION_OK) (Required is at least version "4.0")
+-- Checking for one of the modules 'hwloc'
+-- A version of Pastix has been found but pastix_nompi.h does not exist in the include directory. Because Eigen tests require a version without MPI, we disable the Pastix backend.
+-- 
+-- Configured Eigen 3.4.0
+-- 
+-- Available targets (use: make TARGET):
+-- ---------+--------------------------------------------------------------
+-- Target   |   Description
+-- ---------+--------------------------------------------------------------
+-- install  | Install Eigen. Headers will be installed to:
+--          |     <CMAKE_INSTALL_PREFIX>/<INCLUDE_INSTALL_DIR>
+--          |   Using the following values:
+--          |     CMAKE_INSTALL_PREFIX: /usr/local
+--          |     INCLUDE_INSTALL_DIR:  include/eigen3
+--          |   Change the install location of Eigen headers using:
+--          |     cmake . -DCMAKE_INSTALL_PREFIX=yourprefix
+--          |   Or:
+--          |     cmake . -DINCLUDE_INSTALL_DIR=yourdir
+-- doc      | Generate the API documentation, requires Doxygen & LaTeX
+-- blas     | Build BLAS library (not the same thing as Eigen)
+-- uninstall| Remove files installed by the install target
+-- ---------+--------------------------------------------------------------
+-- 
+-- Using the multi-header code from /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build/_deps/json-src/include/
+-- Build spdlog: 1.15.0
+-- Build type: Release
+-- Configuring done (2.0s)
+-- Generating done (1.4s)
+-- Build files have been written to: /Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/build
+[  0%] Built target kdc-kont-native
+[  5%] Built target spdlog
+[ 26%] Built target kdc-core
+[ 26%] Built target kdc-solver
+[ 78%] Built target Catch2
+[ 78%] Built target Catch2WithMain
+[100%] Built target kdc-tests

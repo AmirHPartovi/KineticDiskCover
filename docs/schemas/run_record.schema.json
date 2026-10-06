@@ -37,7 +37,7 @@
     "experiment_id": { "type": "string", "minLength": 1 },
     "instance_id": { "type": "string", "minLength": 1 },
     "algorithm": { "type": "string", "minLength": 1 },
-    "objective": { "enum": ["minmax", "minsum"] },
+    "objective": { "enum": ["minmax", "minsum", "minmaxsum"] },
     "family": { "type": "string", "minLength": 1 },
     "n": { "type": "integer", "minimum": 0 },
     "m": { "type": "integer", "minimum": 0 },
@@ -199,6 +199,18 @@
         "objective_value": { "$ref": "#/$defs/finiteNumber" },
         "lower_bound": { "$ref": "#/$defs/finiteNumber" },
         "upper_bound": { "$ref": "#/$defs/finiteNumber" },
+        "objective_vector": {
+          "anyOf": [
+            { "$ref": "#/$defs/objectiveVector" },
+            { "type": "null" }
+          ]
+        },
+        "joint": {
+          "anyOf": [
+            { "$ref": "#/$defs/jointResult" },
+            { "type": "null" }
+          ]
+        },
         "optimality_status": {
           "enum": ["OPTIMAL", "FEASIBLE", "TIME_LIMIT", "FAILED"]
         },
@@ -208,6 +220,80 @@
           "additionalProperties": true
         }
       }
+    },
+    "objectiveVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["peak_cost", "integral_cost"],
+      "properties": {
+        "peak_cost": { "$ref": "#/$defs/finiteNumber" },
+        "integral_cost": { "$ref": "#/$defs/finiteNumber" }
+      }
+    },
+    "jointResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minmax_component_status",
+        "minsum_component_status",
+        "minmax_component_optimality",
+        "minsum_component_optimality",
+        "joint_optimality_status",
+        "dominates_minmax",
+        "dominates_minsum",
+        "dominance_invariants_ok",
+        "minmax_component_peak",
+        "minmax_component_integral",
+        "minsum_component_peak",
+        "minsum_component_integral",
+        "minmax_source_run",
+        "minsum_source_run"
+      ],
+      "properties": {
+        "minmax_component_status": {
+          "enum": ["NOT_RUN", "COMPLETED", "TIME_LIMIT", "FAILED"]
+        },
+        "minsum_component_status": {
+          "enum": ["NOT_RUN", "COMPLETED", "TIME_LIMIT", "FAILED"]
+        },
+        "minmax_component_optimality": {
+          "enum": ["OPTIMAL", "FEASIBLE", "TIME_LIMIT", "FAILED"]
+        },
+        "minsum_component_optimality": {
+          "enum": ["OPTIMAL", "FEASIBLE", "TIME_LIMIT", "FAILED"]
+        },
+        "joint_optimality_status": {
+          "enum": ["OPTIMAL", "FEASIBLE", "TIME_LIMIT", "FAILED"]
+        },
+        "dominates_minmax": { "type": "boolean" },
+        "dominates_minsum": { "type": "boolean" },
+        "dominance_invariants_ok": { "type": "boolean" },
+        "minmax_component_peak": { "$ref": "#/$defs/finiteNumber" },
+        "minmax_component_integral": { "$ref": "#/$defs/finiteNumber" },
+        "minsum_component_peak": { "$ref": "#/$defs/finiteNumber" },
+        "minsum_component_integral": { "$ref": "#/$defs/finiteNumber" },
+        "minmax_source_run": { "type": "string" },
+        "minsum_source_run": { "type": "string" }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "objective": { "const": "minmaxsum" } },
+        "required": ["objective"]
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "type": "object",
+            "required": ["objective_vector", "joint"],
+            "properties": {
+              "objective_value": { "type": "null" }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

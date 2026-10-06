@@ -35,7 +35,7 @@ STATION_COLORS = plt.get_cmap("tab10")
 
 
 def select_best(frame: pd.DataFrame, instance: str, mode: str) -> pd.Series | None:
-    """Choose a verified feasible record using the specified deterministic tiebreaks."""
+    """Choose a verified feasible result without scalarizing joint objectives."""
     rows = frame[
         (frame["instance_name"].astype(str) == str(instance))
         & (frame["objective"].astype(str).str.lower() == mode.lower())
@@ -62,6 +62,16 @@ def select_best(frame: pd.DataFrame, instance: str, mode: str) -> pd.Series | No
         ]).sort_index()
     if rows.empty:
         return None
+    rows["wall_time_sec"] = pd.to_numeric(
+        rows.get("wall_time_sec", 0.0), errors="coerce"
+    )
+    if mode.lower() == "minmaxsum":
+        rows = rows.dropna(subset=["wall_time_sec"])
+        if rows.empty:
+            return None
+        return rows.sort_values(
+            ["wall_time_sec", "algorithm_name"], kind="stable"
+        ).iloc[0]
     rows["objective_value"] = pd.to_numeric(rows["objective_value"], errors="coerce")
     rows["gap"] = pd.to_numeric(rows.get("gap", 0.0), errors="coerce")
     rows["wall_time_sec"] = pd.to_numeric(
@@ -368,11 +378,21 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     summary = solution.get("summary", {})
     peak_value = max(costs) if costs.size else 0.0
     final_integral = float(integrals[-1]) if integrals.size else 0.0
-    reference = peak_value if mode == "minmax" else (
-        final_integral / float(instance["T_end"])
-    )
-    curve.axhline(reference, color="#d62728", linestyle="--",
-                  label="Peak" if mode == "minmax" else "Mean cost")
+    if mode == "minmaxsum":
+        joint_peak = float(summary.get("peak_cost", peak_value))
+        joint_integral = float(summary.get("total_integral", final_integral))
+        curve.axhline(joint_peak, color="#d62728", linestyle="--",
+                      label="Peak cost")
+        curve.axhline(
+            joint_integral / float(instance["T_end"]), color="#2ca02c",
+            linestyle="-.", label="Integral / T (mean cost)",
+        )
+    else:
+        reference = peak_value if mode == "minmax" else (
+            final_integral / float(instance["T_end"])
+        )
+        curve.axhline(reference, color="#d62728", linestyle="--",
+                      label="Peak" if mode == "minmax" else "Mean cost")
     lower_bound = float(record.get("lower_bound", 0.0) or 0.0)
     curve.axhline(lower_bound, color="#2ca02c", linestyle=":",
                   label="Lower bound")
@@ -387,13 +407,21 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         0.02, 0.97, "", transform=scene.transAxes, va="top", ha="left",
         bbox={"facecolor": "white", "alpha": 0.78, "edgecolor": "none"},
     )
-    gap_pct = float(record.get("gap", 0.0) or 0.0) * 100.0
     runtime = float(record.get("wall_time_sec", 0.0) or 0.0)
+    objective_text = (
+        f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
+        f"integral = {float(summary.get('total_integral', final_integral)):.3f}"
+        if mode == "minmaxsum"
+        else (
+            f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
+            f"final_integral = "
+            f"{float(summary.get('total_integral', final_integral)):.3f}\n"
+            f"gap = {float(record.get('gap', 0.0) or 0.0) * 100.0:.2f}%"
+        )
+    )
     figure.text(
         0.98, 0.91,
-        f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
-        f"final_integral = {float(summary.get('total_integral', final_integral)):.3f}\n"
-        f"gap = {gap_pct:.2f}%\nruntime = {runtime:.3f} s",
+        f"{objective_text}\nruntime = {runtime:.3f} s",
         transform=figure.transFigure, va="top", ha="right", fontsize=8,
         bbox={"facecolor": "white", "alpha": 0.78, "edgecolor": "none"},
     )
@@ -496,6 +524,12 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         "instance_name": instance_name,
         "algorithm": algorithm,
         "objective": mode,
+        "objective_vector": record.get("objective_vector") if mode == "minmaxsum" else None,
+        "joint": record.get("joint") if mode == "minmaxsum" else None,
+        "selection_rule": (
+            "fastest verified feasible run; no scalar objective ranking"
+            if mode == "minmaxsum" else "objective value, gap, runtime"
+        ),
         "actual_backend": record.get("actual_backend"),
         "verification_status": (
             "PASSED" if bool(record.get("verified")) else "NOT_PASSED"
@@ -538,7 +572,11 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
         ]
         if dataframe.empty:
             raise ValueError(f"No results found for algorithm {algorithm!r}")
-    modes = ("minmax", "minsum") if mode == "both" else (mode,)
+    modes = (
+        ("minmax", "minsum") if mode == "both"
+        else ("minmax", "minsum", "minmaxsum") if mode == "all"
+        else (mode,)
+    )
     instances = sorted(dataframe["instance_name"].astype(str).unique())
     if selected_instances:
         missing = sorted(set(selected_instances) - set(instances))
@@ -616,7 +654,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--batch", default="results/batch")
     parser.add_argument("--instances", default="data/instances")
     parser.add_argument("--output", default="results/animations")
-    parser.add_argument("--mode", choices=("minmax", "minsum", "both"),
+    parser.add_argument("--mode", choices=("minmax", "minsum", "minmaxsum", "both", "all"),
                         default="minmax")
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--frames", type=int, default=200)

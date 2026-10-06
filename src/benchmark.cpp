@@ -139,6 +139,94 @@ Json result_to_json(const BenchmarkResult& result) {
               {"heuristic_gap", result.heuristic_gap},
               {"peak_consistent", result.peak_consistent},
               {"integral_cost", result.integral_cost},
+              {"minmaxsum_minmax_status",
+               to_string(result.minmaxsum_minmax_status)},
+              {"minmaxsum_minsum_status",
+               to_string(result.minmaxsum_minsum_status)},
+              {"minmaxsum_minmax_optimality",
+               optimality_status_to_string(
+                   result.minmaxsum_minmax_optimality)},
+              {"minmaxsum_minsum_optimality",
+               optimality_status_to_string(
+                   result.minmaxsum_minsum_optimality)},
+              {"dominates_minmax", result.dominates_minmax},
+              {"dominates_minsum", result.dominates_minsum},
+              {"dominance_invariants_ok",
+               result.dominance_invariants_ok},
+              {"objective_vector",
+               result.objective == ObjectiveType::MIN_MAX_SUM
+                   ? Json{{"peak_cost", std::isfinite(result.peak_cost)
+                                            ? Json(result.peak_cost)
+                                            : Json(nullptr)},
+                          {"integral_cost",
+                           std::isfinite(result.integral_cost)
+                               ? Json(result.integral_cost)
+                               : Json(nullptr)}}
+                   : Json(nullptr)},
+              {"joint",
+               result.objective == ObjectiveType::MIN_MAX_SUM
+                   ? Json{{"minmax_component_status",
+                           to_string(result.minmaxsum_minmax_status)},
+                          {"minsum_component_status",
+                           to_string(result.minmaxsum_minsum_status)},
+                          {"minmax_component_optimality",
+                           optimality_status_to_string(
+                               result.minmaxsum_minmax_optimality)},
+                          {"minsum_component_optimality",
+                           optimality_status_to_string(
+                               result.minmaxsum_minsum_optimality)},
+                          {"joint_optimality_status",
+                           optimality_status_to_string(
+                               result.optimality_status)},
+                          {"dominates_minmax", result.dominates_minmax},
+                          {"dominates_minsum", result.dominates_minsum},
+                          {"dominance_invariants_ok",
+                           result.dominance_invariants_ok},
+                          {"minmax_component_peak",
+                           result.minmax_component_peak
+                               ? Json(*result.minmax_component_peak)
+                               : Json(nullptr)},
+                          {"minmax_component_integral",
+                           result.minmax_component_integral
+                               ? Json(*result.minmax_component_integral)
+                               : Json(nullptr)},
+                          {"minsum_component_peak",
+                           result.minsum_component_peak
+                               ? Json(*result.minsum_component_peak)
+                               : Json(nullptr)},
+                          {"minsum_component_integral",
+                           result.minsum_component_integral
+                               ? Json(*result.minsum_component_integral)
+                               : Json(nullptr)},
+                          {"minmax_source_run", result.minmax_source_run},
+                          {"minsum_source_run", result.minsum_source_run}}
+                   : Json(nullptr)},
+              {"minmax_component_peak",
+               result.minmax_component_peak
+                   ? Json(*result.minmax_component_peak)
+                   : Json(nullptr)},
+              {"minmax_component_integral",
+               result.minmax_component_integral
+                   ? Json(*result.minmax_component_integral)
+                   : Json(nullptr)},
+              {"minsum_component_peak",
+               result.minsum_component_peak
+                   ? Json(*result.minsum_component_peak)
+                   : Json(nullptr)},
+              {"minsum_component_integral",
+               result.minsum_component_integral
+                   ? Json(*result.minsum_component_integral)
+                   : Json(nullptr)},
+              {"minmax_component_certified_gap",
+               result.minmax_component_certified_gap
+                   ? Json(*result.minmax_component_certified_gap)
+                   : Json(nullptr)},
+              {"minsum_component_certified_gap",
+               result.minsum_component_certified_gap
+                   ? Json(*result.minsum_component_certified_gap)
+                   : Json(nullptr)},
+              {"minmax_source_run", result.minmax_source_run},
+              {"minsum_source_run", result.minsum_source_run},
               {"empirical_ratio_to_exact",
                result.empirical_ratio_to_exact
                    ? Json(*result.empirical_ratio_to_exact)
@@ -149,8 +237,13 @@ Json result_to_json(const BenchmarkResult& result) {
               {"cpu_time_sec", result.cpu_time_sec},
               {"ip_time_sec", result.ip_time_sec},
               {"peak_memory_mb", result.peak_memory_mb},
-              {"objective_value", result.objective_value},
-              {"lower_bound", result.lower_bound},
+              {"objective_value",
+               std::isfinite(result.objective_value)
+                   ? Json(result.objective_value)
+                   : Json(nullptr)},
+              {"lower_bound",
+               std::isfinite(result.lower_bound) ? Json(result.lower_bound)
+                                                 : Json(nullptr)},
               {"bound_status", bound_status_to_string(result.bound_status)},
               {"upper_bound", std::isfinite(result.upper_bound)
                                   ? Json(result.upper_bound)
@@ -164,7 +257,8 @@ Json result_to_json(const BenchmarkResult& result) {
               {"optimality_status",
                optimality_status_to_string(
                    result.time_limited ? OptimalityStatus::TIME_LIMIT
-                   : (!result.exact_solver &&
+                   : (result.objective != ObjectiveType::MIN_MAX_SUM &&
+                              !result.exact_solver &&
                               result.optimality_status ==
                                   OptimalityStatus::OPTIMAL
                           ? OptimalityStatus::FEASIBLE
@@ -174,8 +268,14 @@ Json result_to_json(const BenchmarkResult& result) {
                    result.minsum_refinement_policy)},
               {"exact_solver", result.exact_solver},
               {"feasible", result.feasible},
-              {"certified_lower_bound", result.certified_lower_bound},
-              {"heuristic_lower_bound", result.heuristic_lower_bound},
+              {"certified_lower_bound",
+               std::isfinite(result.certified_lower_bound)
+                   ? Json(result.certified_lower_bound)
+                   : Json(nullptr)},
+              {"heuristic_lower_bound",
+               std::isfinite(result.heuristic_lower_bound)
+                   ? Json(result.heuristic_lower_bound)
+                   : Json(nullptr)},
               {"gap", result.gap},
               {"num_ip_solves", result.num_ip_solves},
               {"num_iterations", result.num_iterations},
@@ -237,14 +337,90 @@ BenchmarkResult result_from_json(const Json& json) {
   result.cpu_time_sec = json.at("cpu_time_sec").get<double>();
   result.ip_time_sec = json.at("ip_time_sec").get<double>();
   result.peak_memory_mb = json.at("peak_memory_mb").get<double>();
-  result.objective_value = json.at("objective_value").get<double>();
-  result.peak_cost = json.value("peak_cost", result.objective_value);
-  result.peak_time = json.value("peak_time", 0.0);
-  result.initial_peak_cost = json.value("initial_peak_cost", 0.0);
-  result.heuristic_gap = json.value("heuristic_gap", 0.0);
+  result.objective_value =
+      json.contains("objective_value") &&
+              json.at("objective_value").is_number()
+          ? json.at("objective_value").get<double>()
+          : std::numeric_limits<double>::quiet_NaN();
+  const auto component_status = [](const Json& value) {
+    const std::string status = value.get<std::string>();
+    if (status == "COMPLETED") {
+      return MinMaxSumComponentStatus::COMPLETED;
+    }
+    if (status == "TIME_LIMIT") {
+      return MinMaxSumComponentStatus::TIME_LIMIT;
+    }
+    if (status == "FAILED") {
+      return MinMaxSumComponentStatus::FAILED;
+    }
+    return MinMaxSumComponentStatus::NOT_RUN;
+  };
+  result.minmaxsum_minmax_status =
+      json.contains("minmaxsum_minmax_status")
+          ? component_status(json.at("minmaxsum_minmax_status"))
+          : MinMaxSumComponentStatus::NOT_RUN;
+  result.minmaxsum_minsum_status =
+      json.contains("minmaxsum_minsum_status")
+          ? component_status(json.at("minmaxsum_minsum_status"))
+          : MinMaxSumComponentStatus::NOT_RUN;
+  result.minmaxsum_minmax_optimality =
+      json.contains("minmaxsum_minmax_optimality")
+          ? optimality_status_from_string(
+                json.at("minmaxsum_minmax_optimality").get<std::string>())
+          : OptimalityStatus::FAILED;
+  result.minmaxsum_minsum_optimality =
+      json.contains("minmaxsum_minsum_optimality")
+          ? optimality_status_from_string(
+                json.at("minmaxsum_minsum_optimality").get<std::string>())
+          : OptimalityStatus::FAILED;
+  result.dominates_minmax = json.value("dominates_minmax", false);
+  result.dominates_minsum = json.value("dominates_minsum", false);
+  result.dominance_invariants_ok =
+      json.value("dominance_invariants_ok", false);
+  const auto optional_number = [&json](const char* key)
+      -> std::optional<double> {
+    return json.contains(key) && json.at(key).is_number()
+               ? std::optional<double>(json.at(key).get<double>())
+               : std::nullopt;
+  };
+  result.minmax_component_peak = optional_number("minmax_component_peak");
+  result.minmax_component_integral =
+      optional_number("minmax_component_integral");
+  result.minsum_component_peak = optional_number("minsum_component_peak");
+  result.minsum_component_integral =
+      optional_number("minsum_component_integral");
+  result.minmax_component_certified_gap =
+      optional_number("minmax_component_certified_gap");
+  result.minsum_component_certified_gap =
+      optional_number("minsum_component_certified_gap");
+  result.minmax_source_run = json.value("minmax_source_run", std::string{});
+  result.minsum_source_run = json.value("minsum_source_run", std::string{});
+  result.peak_cost =
+      json.contains("peak_cost") && json.at("peak_cost").is_number()
+          ? json.at("peak_cost").get<double>()
+          : result.objective_value;
+  result.peak_time =
+      json.contains("peak_time") && json.at("peak_time").is_number()
+          ? json.at("peak_time").get<double>()
+          : std::numeric_limits<double>::quiet_NaN();
+  result.initial_peak_cost =
+      json.contains("initial_peak_cost") &&
+              json.at("initial_peak_cost").is_number()
+          ? json.at("initial_peak_cost").get<double>()
+          : std::numeric_limits<double>::quiet_NaN();
+  result.heuristic_gap =
+      json.contains("heuristic_gap") && json.at("heuristic_gap").is_number()
+          ? json.at("heuristic_gap").get<double>()
+          : std::numeric_limits<double>::quiet_NaN();
   result.peak_consistent = json.value("peak_consistent", false);
-  result.integral_cost = json.value("integral_cost", result.objective_value);
-  result.lower_bound = json.at("lower_bound").get<double>();
+  result.integral_cost =
+      json.contains("integral_cost") && json.at("integral_cost").is_number()
+          ? json.at("integral_cost").get<double>()
+          : result.objective_value;
+  result.lower_bound =
+      json.contains("lower_bound") && json.at("lower_bound").is_number()
+          ? json.at("lower_bound").get<double>()
+          : std::numeric_limits<double>::quiet_NaN();
   result.bound_status =
       json.contains("bound_status")
           ? bound_status_from_string(json.at("bound_status").get<std::string>())
@@ -277,14 +453,18 @@ BenchmarkResult result_from_json(const Json& json) {
     }
   }
   result.certified_lower_bound =
-      json.contains("certified_lower_bound")
+      json.contains("certified_lower_bound") &&
+              json.at("certified_lower_bound").is_number()
           ? json.at("certified_lower_bound").get<double>()
           : result.lower_bound;
   result.heuristic_lower_bound =
-      json.contains("heuristic_lower_bound")
+      json.contains("heuristic_lower_bound") &&
+              json.at("heuristic_lower_bound").is_number()
           ? json.at("heuristic_lower_bound").get<double>()
           : result.lower_bound;
-  result.gap = json.at("gap").get<double>();
+  result.gap = json.contains("gap") && json.at("gap").is_number()
+                   ? json.at("gap").get<double>()
+                   : std::numeric_limits<double>::quiet_NaN();
   result.num_ip_solves = json.at("num_ip_solves").get<int>();
   result.num_iterations = json.at("num_iterations").get<int>();
   result.verified = json.at("verified").get<bool>();
@@ -332,7 +512,7 @@ BenchmarkResult result_from_json(const Json& json) {
   if (result.time_limited) {
     result.optimality_status = OptimalityStatus::TIME_LIMIT;
   }
-  if (!result.exact_solver &&
+  if (result.objective != ObjectiveType::MIN_MAX_SUM && !result.exact_solver &&
       result.optimality_status == OptimalityStatus::OPTIMAL) {
     result.optimality_status = OptimalityStatus::FEASIBLE;
   }
@@ -480,6 +660,78 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
         static_cast<std::size_t>(result.num_ip_solves);
     benchmark.minsum_refinement_policy =
         MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+  } else if (objective == ObjectiveType::MIN_MAX_SUM) {
+    auto solver_config = config.minmaxsum_cfg;
+    solver_config.global_time_limit_sec = global_limit;
+    solver_config.minmax_config.time_limit_per_ip =
+        config.per_static_time_limit_sec;
+    solver_config.minsum_config.time_limit_per_ip =
+        config.per_static_time_limit_sec;
+    solver_config.minmax_config.gap_target = config.minmax_cfg.gap_target;
+    solver_config.minsum_config.gap_target = config.minsum_cfg.gap_target;
+    solver_config.minmax_config.verify_each_iteration =
+        config.verify_each_iteration;
+    solver_config.minsum_config.verify_each_iteration =
+        config.verify_each_iteration;
+    solver_config.minsum_config.refinement_policy =
+        config.profile == BenchmarkProfile::FAST
+            ? MinSumRefinementPolicy::HEURISTIC_ADAPTIVE
+            : MinSumRefinementPolicy::CERTIFIED_BOUND;
+    solver_config.seed = benchmark.seed;
+    const auto result = MinMaxSumSolver::solve(
+        instance, *static_solver, solver_config, budget);
+    benchmark.objective_value =
+        std::numeric_limits<double>::quiet_NaN();
+    benchmark.lower_bound = std::numeric_limits<double>::quiet_NaN();
+    benchmark.certified_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    benchmark.heuristic_lower_bound =
+        std::numeric_limits<double>::quiet_NaN();
+    benchmark.gap = std::numeric_limits<double>::quiet_NaN();
+    benchmark.initial_peak_cost =
+        std::numeric_limits<double>::quiet_NaN();
+    benchmark.heuristic_gap = std::numeric_limits<double>::quiet_NaN();
+    benchmark.peak_cost = result.peak_cost;
+    benchmark.integral_cost = result.integral_cost;
+    benchmark.peak_time =
+        result.feasible ? result.solution.peak_time()
+                        : std::numeric_limits<double>::quiet_NaN();
+    benchmark.peak_consistent = result.peak_consistent;
+    benchmark.minmaxsum_minmax_status = result.minmax_component_status;
+    benchmark.minmaxsum_minsum_status = result.minsum_component_status;
+    benchmark.minmaxsum_minmax_optimality =
+        result.minmax_component_optimality;
+    benchmark.minmaxsum_minsum_optimality =
+        result.minsum_component_optimality;
+    benchmark.dominates_minmax = result.dominates_minmax;
+    benchmark.dominates_minsum = result.dominates_minsum;
+    benchmark.dominance_invariants_ok = result.dominance_invariants_ok;
+    benchmark.minmax_component_peak = result.minmax_component_peak;
+    benchmark.minmax_component_integral = result.minmax_component_integral;
+    benchmark.minsum_component_peak = result.minsum_component_peak;
+    benchmark.minsum_component_integral = result.minsum_component_integral;
+    benchmark.minmax_component_certified_gap =
+        result.minmax_component_certified_gap;
+    benchmark.minsum_component_certified_gap =
+        result.minsum_component_certified_gap;
+    benchmark.minmax_source_run = result.minmax_source_run;
+    benchmark.minsum_source_run = result.minsum_source_run;
+    benchmark.optimality_status = result.joint_optimality_status;
+    benchmark.solve_time_sec = result.total_time_sec;
+    benchmark.verification_time_sec = result.verification_time_sec;
+    benchmark.verified = result.verified;
+    benchmark.verification_kind =
+        result.verified ? VerificationKind::CERTIFIED_CONTINUOUS
+                        : VerificationKind::NONE;
+    benchmark.feasible = result.feasible;
+    benchmark.time_limited = result.time_limited;
+    benchmark.exact_solver =
+        result.joint_optimality_status == OptimalityStatus::OPTIMAL;
+    benchmark.certified_gap.reset();
+    benchmark.bound_status = BoundStatus::NONE;
+    benchmark.upper_bound = std::numeric_limits<double>::infinity();
+    benchmark.seed = result.seed;
+    computed_solution = result.solution;
   } else {
     auto solver_config = config.minsum_cfg;
     solver_config.time_limit_per_ip = config.per_static_time_limit_sec;
@@ -555,8 +807,13 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
   benchmark.total_wall_time_sec = benchmark.wall_time_sec;
   benchmark.timeout = benchmark.time_limited;
   benchmark.failed = !benchmark.feasible && !benchmark.time_limited;
-  benchmark.peak_cost = computed_solution.peak_cost();
-  benchmark.integral_cost = computed_solution.total_integral();
+  if (benchmark.feasible && computed_solution.is_well_formed()) {
+    benchmark.peak_cost = computed_solution.peak_cost();
+    benchmark.integral_cost = computed_solution.total_integral();
+  } else if (!std::isfinite(benchmark.peak_cost)) {
+    benchmark.peak_cost = std::numeric_limits<double>::quiet_NaN();
+    benchmark.integral_cost = std::numeric_limits<double>::quiet_NaN();
+  }
   benchmark.peak_memory_mb =
       config.measure_memory ? std::max(memory_before, get_peak_memory_mb())
                             : 0.0;
@@ -889,7 +1146,16 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
             "requested_backend,selected_backend,actual_backend,solver_name,"
             "kont_version,native_kont,fallback_used,solver_runtime_sec,"
             "objective,repeat,objective_value,"
-            "peak_cost,integral_cost,lower_bound,upper_bound,bound_status,"
+            "peak_cost,integral_cost,objective_vector_peak_cost,"
+            "objective_vector_integral_cost,lower_bound,upper_bound,bound_status,"
+            "minmaxsum_minmax_status,minmaxsum_minsum_status,"
+            "minmaxsum_minmax_optimality,minmaxsum_minsum_optimality,"
+            "dominates_minmax,dominates_minsum,dominance_invariants_ok,"
+            "minmax_component_peak,minmax_component_integral,"
+            "minsum_component_peak,minsum_component_integral,"
+            "minmax_component_certified_gap,minsum_component_certified_gap,"
+            "minmax_source_run,"
+            "minsum_source_run,"
             "optimality_status,certified_gap,empirical_ratio_to_exact,"
             "ratio_to_incumbent,feasible,verified,solve_time_sec,"
             "verification_time_sec,serialization_time_sec,total_wall_time_sec,"
@@ -912,12 +1178,61 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
            << (result.fallback_used ? "true" : "false") << ','
            << result.solve_time_sec << ','
            << to_string(result.objective) << ',' << result.repeat << ','
-           << result.objective_value << ',' << result.peak_cost << ','
-           << result.integral_cost << ',' << result.lower_bound << ',';
+           ;
+    if (std::isfinite(result.objective_value)) {
+      output << result.objective_value;
+    }
+    output << ',';
+    if (std::isfinite(result.peak_cost)) {
+      output << result.peak_cost;
+    }
+    output << ',';
+    if (std::isfinite(result.integral_cost)) {
+      output << result.integral_cost;
+    }
+    output << ',';
+    if (result.objective == ObjectiveType::MIN_MAX_SUM &&
+        std::isfinite(result.peak_cost)) {
+      output << result.peak_cost;
+    }
+    output << ',';
+    if (result.objective == ObjectiveType::MIN_MAX_SUM &&
+        std::isfinite(result.integral_cost)) {
+      output << result.integral_cost;
+    }
+    output << ',';
+    if (std::isfinite(result.lower_bound)) {
+      output << result.lower_bound;
+    }
+    output << ',';
     if (std::isfinite(result.upper_bound)) {
       output << result.upper_bound;
     }
     output << ',' << bound_status_to_string(result.bound_status) << ','
+           << to_string(result.minmaxsum_minmax_status) << ','
+           << to_string(result.minmaxsum_minsum_status) << ','
+           << optimality_status_to_string(
+                  result.minmaxsum_minmax_optimality)
+           << ','
+           << optimality_status_to_string(
+                  result.minmaxsum_minsum_optimality)
+           << ',' << (result.dominates_minmax ? "true" : "false") << ','
+           << (result.dominates_minsum ? "true" : "false") << ','
+           << (result.dominance_invariants_ok ? "true" : "false") << ',';
+    const auto write_optional = [&output](const std::optional<double>& value) {
+      if (value.has_value()) {
+        output << *value;
+      }
+      output << ',';
+    };
+    write_optional(result.minmax_component_peak);
+    write_optional(result.minmax_component_integral);
+    write_optional(result.minsum_component_peak);
+    write_optional(result.minsum_component_integral);
+    write_optional(result.minmax_component_certified_gap);
+    write_optional(result.minsum_component_certified_gap);
+    output << csv_escape(result.minmax_source_run) << ','
+           << csv_escape(result.minsum_source_run) << ','
            << optimality_status_to_string(result.optimality_status) << ',';
     if (result.certified_gap.has_value() && result.exact_solver &&
         result.feasible && result.bound_status == BoundStatus::CERTIFIED) {

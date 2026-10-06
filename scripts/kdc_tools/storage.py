@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import csv
 import datetime as dt
+import math
 import os
 from pathlib import Path
 import re
@@ -499,6 +500,9 @@ def finalize_run(
         "error_message": result_document.get("error_message"),
         "solver_result": solver_result,
     }
+    if str(request["objective"]).lower() == "minmaxsum":
+        summary["objective_vector"] = _joint_objective_vector(solver_result)
+        summary["joint"] = _joint_result_summary(solver_result)
     record = {
         "schema_version": 1,
         "run_id": request["run_id"],
@@ -576,10 +580,160 @@ def _canonical_optimality(result: dict[str, Any]) -> str:
     return status if status in {"OPTIMAL", "FEASIBLE", "TIME_LIMIT", "FAILED"} else "FAILED"
 
 
+def _joint_objective_vector(result: dict[str, Any]) -> dict[str, float | None]:
+    source = result.get("objective_vector")
+    if not isinstance(source, dict):
+        source = result
+    return {
+        "peak_cost": _finite_or_none(source.get("peak_cost")),
+        "integral_cost": _finite_or_none(source.get("integral_cost")),
+    }
+
+
+def _joint_result_summary(result: dict[str, Any]) -> dict[str, Any]:
+    source = result.get("joint")
+    if not isinstance(source, dict):
+        source = result
+    aliases = {
+        "minmax_component_status": "minmaxsum_minmax_status",
+        "minsum_component_status": "minmaxsum_minsum_status",
+    }
+
+    def value(name: str) -> Any:
+        if name in source:
+            return source[name]
+        return result.get(aliases.get(name, name))
+
+    return {
+        "minmax_component_status": value("minmax_component_status") or "NOT_RUN",
+        "minsum_component_status": value("minsum_component_status") or "NOT_RUN",
+        "minmax_component_optimality": (
+            value("minmax_component_optimality") or "FAILED"
+        ),
+        "minsum_component_optimality": (
+            value("minsum_component_optimality") or "FAILED"
+        ),
+        "joint_optimality_status": (
+            value("joint_optimality_status")
+            or result.get("optimality_status")
+            or "FAILED"
+        ),
+        "dominates_minmax": bool(value("dominates_minmax")),
+        "dominates_minsum": bool(value("dominates_minsum")),
+        "dominance_invariants_ok": bool(value("dominance_invariants_ok")),
+        "minmax_component_peak": _finite_or_none(
+            value("minmax_component_peak")
+        ),
+        "minmax_component_integral": _finite_or_none(
+            value("minmax_component_integral")
+        ),
+        "minsum_component_peak": _finite_or_none(
+            value("minsum_component_peak")
+        ),
+        "minsum_component_integral": _finite_or_none(
+            value("minsum_component_integral")
+        ),
+        "minmax_source_run": str(value("minmax_source_run") or ""),
+        "minsum_source_run": str(value("minsum_source_run") or ""),
+    }
+
+
+def validate_joint_result(record: dict[str, Any]) -> None:
+    """Validate MinMaxSum vector semantics in flat or canonical run records."""
+    if str(record.get("objective", "")).lower() != "minmaxsum":
+        return
+    result = record.get("result")
+    result = result if isinstance(result, dict) else record
+    solver_result = result.get("solver_result")
+    solver_result = solver_result if isinstance(solver_result, dict) else record
+    vector = result.get("objective_vector")
+    if not isinstance(vector, dict):
+        vector = solver_result.get("objective_vector")
+    joint = result.get("joint")
+    if not isinstance(joint, dict):
+        joint = solver_result.get("joint")
+    if not isinstance(vector, dict) or not isinstance(joint, dict):
+        raise ValueError("MinMaxSum result is missing its objective vector or joint metadata")
+    if result.get("objective_value", record.get("objective_value")) is not None:
+        raise ValueError("MinMaxSum result must not expose a scalar objective_value")
+    if not isinstance(vector.get("peak_cost"), (int, float)) or isinstance(
+        vector.get("peak_cost"), bool
+    ) or not math.isfinite(float(vector["peak_cost"])):
+        if result.get("feasible", record.get("feasible", False)):
+            raise ValueError("feasible MinMaxSum result has a non-finite peak_cost")
+    if not isinstance(vector.get("integral_cost"), (int, float)) or isinstance(
+        vector.get("integral_cost"), bool
+    ) or not math.isfinite(float(vector["integral_cost"])):
+        if result.get("feasible", record.get("feasible", False)):
+            raise ValueError("feasible MinMaxSum result has a non-finite integral_cost")
+
+    feasible = bool(result.get("feasible", record.get("feasible", False)))
+    if not feasible:
+        return
+    verified = record.get("verified")
+    verification = record.get("verification")
+    if isinstance(verification, dict):
+        verified = verification.get("passed", verified)
+        verification_kind = verification.get("kind")
+    else:
+        verification_kind = record.get("verification_kind")
+    if verified is not True:
+        raise ValueError("feasible MinMaxSum result is not marked verified")
+    if str(verification_kind or "").upper() not in {
+        "CERTIFIED_CONTINUOUS", "CONTINUOUS_UNCERTIFIED"
+    }:
+        raise ValueError("feasible MinMaxSum result lacks continuous verification")
+    if joint.get("dominance_invariants_ok") is not True:
+        raise ValueError("MinMaxSum dominance invariants are not satisfied")
+
+    peak = float(vector["peak_cost"])
+    integral = float(vector["integral_cost"])
+    tolerance = lambda a, b: max(2e-8, 2e-9 * max(abs(a), abs(b)))
+    for label in ("minmax", "minsum"):
+        component_peak = joint.get(f"{label}_component_peak")
+        component_integral = joint.get(f"{label}_component_integral")
+        has_peak = isinstance(component_peak, (int, float)) and not isinstance(
+            component_peak, bool
+        ) and math.isfinite(float(component_peak))
+        has_integral = isinstance(component_integral, (int, float)) and not isinstance(
+            component_integral, bool
+        ) and math.isfinite(float(component_integral))
+        dominated = joint.get(f"dominates_{label}")
+        if has_peak != has_integral:
+            raise ValueError(f"MinMaxSum {label} component has an incomplete objective vector")
+        if has_peak:
+            component_peak = float(component_peak)
+            component_integral = float(component_integral)
+            actual = (
+                peak <= component_peak + tolerance(peak, component_peak)
+                and integral <= component_integral + tolerance(integral, component_integral)
+            )
+            if not actual:
+                raise ValueError(f"MinMaxSum result violates {label} component dominance")
+            if dominated is not True:
+                raise ValueError(f"MinMaxSum {label} dominance flag is inconsistent")
+        elif dominated is not False:
+            raise ValueError(f"MinMaxSum {label} dominance flag lacks component metrics")
+
+    joint_status = str(joint.get("joint_optimality_status", "")).upper()
+    result_status = str(
+        result.get("optimality_status", record.get("optimality_status", ""))
+    ).upper()
+    if joint_status != result_status:
+        raise ValueError("MinMaxSum joint and run optimality statuses disagree")
+    if joint_status == "OPTIMAL" and not all(
+        str(joint.get(f"{label}_component_optimality", "")).upper() == "OPTIMAL"
+        and str(joint.get(f"{label}_component_status", "")).upper() == "COMPLETED"
+        for label in ("minmax", "minsum")
+    ):
+        raise ValueError("MinMaxSum OPTIMAL status lacks two optimal components")
+
+
 def validate_run_directory(run_dir: str | Path, *, experiment_id: str | None = None) -> dict[str, Any]:
     """Validate canonical run metadata, result/verification and checksums."""
     root = Path(run_dir).resolve()
     record = read_json(root / "run.json", schema_name="run_record")
+    validate_joint_result(record)
     status = read_json(root / "execution" / "status.json", schema_name="run_status")
     if record["run_id"] != root.name:
         raise ValueError(f"run ID does not match directory: {root}")
@@ -812,6 +966,19 @@ def validate_results_input(path: str | Path) -> None:
     )
     if (experiment / "experiment.json").is_file():
         validate_complete_aggregate(experiment)
+    if source.is_file():
+        with source.open(encoding="utf-8") as input_file:
+            records = loads_json(input_file.read())
+        if not isinstance(records, list):
+            raise ValueError(f"results input must contain an array: {source}")
+        for index, record in enumerate(records):
+            if isinstance(record, dict):
+                try:
+                    validate_joint_result(record)
+                except ValueError as error:
+                    raise ValueError(
+                        f"invalid MinMaxSum result at row {index}: {error}"
+                    ) from error
 
 
 def recover_experiment(experiment_dir: str | Path) -> list[str]:

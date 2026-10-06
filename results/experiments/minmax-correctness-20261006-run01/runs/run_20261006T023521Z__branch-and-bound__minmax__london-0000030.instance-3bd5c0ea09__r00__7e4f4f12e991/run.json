@@ -1,0 +1,296 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm": "branch-and-bound",
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "b1f141362c03e13a8c791c6e99daf7fcce4e7411596d56942e1ebd9e185009de",
+      "size_bytes": 925
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "e7491c52d6a065c9ae4ca00df2eaba29c6f26a581a5180f8e3835f5fc50056c8",
+      "size_bytes": 465
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "f8cbe47f4890526565eb58f11fb0c55b44d081c33cc766a8ec1200912f30cb32",
+      "size_bytes": 3249
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "bd558037ee7f3839cfc3aa64d2940e10de992dff5f1bb053f8605a1bb54a8f8d",
+      "size_bytes": 1962
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "9bee06d5450df198963fd6081818fb767c55c163ef6e0ec16142dd4eb612b1d6",
+      "size_bytes": 3949
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/branch-and-bound/minmax/result.json",
+      "sha256": "d82c9c87753bb9e1e446a388f7135707d0a72480f640d68c7615bc1fe346b266",
+      "size_bytes": 3767
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/branch-and-bound/minmax/solution.json",
+      "sha256": "bf203c76d075c0349a454f1e7ba4719391939ffeba36184f64d8d661911a4e2f",
+      "size_bytes": 3726
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/london-0000030.instance/branch-and-bound/minmax/trace.csv",
+      "sha256": "760654d839ed1d5b1f76cdb89c57758ee89ac2be2a780bb4ffd799cf306257db",
+      "size_bytes": 984
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "909ad0a629962e790aa643d399eced885973d303281aea23754374791407cf00",
+      "size_bytes": 6431
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "0072c7f3cb80b6b3cc8d2dce9ea3db4f0d5043a3838c0bdeda772748cc365978",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "size_bytes": 2854
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "26ad7241dbf1bfd52832c77756c100e5af0744592cdf905584928d1ac48cfc44",
+      "size_bytes": 427
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "a86a4c12267f303626cdb340e3d6e2f362616a24dda86783c84055b495be864e",
+      "size_bytes": 1245
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "733b3c453b8bc0c58b5091450b1188ec1eba5e6501943a90aee6ace2c388b48e",
+      "size_bytes": 3831
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "bf203c76d075c0349a454f1e7ba4719391939ffeba36184f64d8d661911a4e2f",
+      "size_bytes": 3726
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "760654d839ed1d5b1f76cdb89c57758ee89ac2be2a780bb4ffd799cf306257db",
+      "size_bytes": 984
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "d93ba2f32195c79af8cb629a7d846bd24c22e49229e4566c8071355a63e1363c",
+      "size_bytes": 2302
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "2e48cf5f6f4730d0679808ee9f1a2d0706db772414460027fdced2ac6b486da7",
+      "size_bytes": 485
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "not-applicable",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "d5c7994c3d88b461eebae6c7c20324b73c3a38ed0b4e7a50e4afe3fa341900c0",
+  "experiment_id": "minmax-correctness-20261006-run01",
+  "family": "london",
+  "finished_at": "2026-10-06T02:35:21.909081Z",
+  "input_sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+  "instance_id": "london-0000030.instance-3bd5c0ea09",
+  "m": 25,
+  "n": 2,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "not-applicable",
+    "source_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426"
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": null,
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 10.0,
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "dataset_profile": "smoke10",
+    "exact_time_limit_sec": 10.0,
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "requested_algorithm": "branch-and-bound",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 10.0,
+    "resolved_algorithm": "branch-and-bound",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": null,
+    "feasible": true,
+    "lower_bound": 945.5870702780646,
+    "objective_value": 945.587070278064,
+    "optimality_status": "OPTIMAL",
+    "solver_result": {
+      "actual_backend": "branch-and-bound",
+      "actual_threads": 1,
+      "algorithm_category": "exact_reference",
+      "algorithm_name": "branch-and-bound",
+      "bound_status": "CERTIFIED",
+      "build_type": "Release",
+      "candidate_count": 50,
+      "certified_gap": 0.0,
+      "certified_lower_bound": 945.5870702780646,
+      "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
+      "configuration": {
+        "algorithm": "branch-and-bound",
+        "cache_policy": "auto",
+        "global_time_limit_sec": 10.0,
+        "handovers_enabled": true,
+        "minsum_refinement_policy": "CERTIFIED_BOUND",
+        "objective": "minmax",
+        "per_static_time_limit_sec": 2.0,
+        "profile": "DEBUG",
+        "repeat": 0,
+        "seed": 2925654449,
+        "verify_after": true,
+        "verify_each_iteration": true
+      },
+      "coverage_nnz": null,
+      "cpu_time_sec": 0.001137,
+      "dataset_profile": "smoke10",
+      "empirical_ratio_to_exact": 1.0,
+      "error_message": "",
+      "exact_solver": true,
+      "experiment_id": "minmax-correctness-20261006-run01",
+      "experiment_label": "smoke / development validation",
+      "external_timeout": false,
+      "failed": false,
+      "failed_native_solve_count": 0,
+      "fallback_solve_count": 0,
+      "fallback_used": false,
+      "feasible": true,
+      "gap": 0.0,
+      "git_commit": "26c953ee6e7b7d1183a7881de70ee2cc331e6426",
+      "global_time_limit_sec": 10.0,
+      "handovers_enabled": true,
+      "heuristic_gap": 945.587070278064,
+      "heuristic_lower_bound": 0.0,
+      "initial_peak_cost": 6552.285597659102,
+      "instance_id": "london-0000030.instance-3bd5c0ea09",
+      "instance_name": "london-0000030.instance",
+      "integral_cost": 498.7168895624334,
+      "kont_version": "not-applicable",
+      "lower_bound": 945.5870702780646,
+      "m": 25,
+      "minsum_refinement_policy": "HEURISTIC_ADAPTIVE",
+      "n": 2,
+      "native_kont": false,
+      "native_solve_count": 0,
+      "num_ip_solves": 3,
+      "num_iterations": 3,
+      "num_static_solves": 3,
+      "objective": "minmax",
+      "objective_value": 945.587070278064,
+      "optimality_status": "OPTIMAL",
+      "peak_consistent": true,
+      "peak_cost": 945.587070278064,
+      "peak_memory_mb": 17.078125,
+      "peak_time": 1.0,
+      "per_static_time_limit_sec": 2.0,
+      "ratio_to_incumbent": 1.0,
+      "refinement_policy": "HEURISTIC_ADAPTIVE",
+      "repeat": 0,
+      "requested_backend": "branch-and-bound",
+      "result_json_path": "result/result.json",
+      "run_id": "run_20261006T023521Z__branch-and-bound__minmax__london-0000030.instance-3bd5c0ea09__r00__7e4f4f12e991",
+      "run_key": "62474a238020f5868e185d839c417b079a679845b8d713489c06b2367ff50a41",
+      "schema_version": 3,
+      "seed": 42,
+      "selected_backend": "branch-and-bound",
+      "serialization_time_sec": 0.000327334,
+      "solution_json_path": "result/solution.json",
+      "solve_time_sec": 0.00014533500000000002,
+      "solver_name": "branch-and-bound",
+      "solver_runtime_sec": 0.00014533500000000002,
+      "thread_count": 1,
+      "time_limit_per_ip_sec": 2.0,
+      "time_limited": false,
+      "timeout": false,
+      "total_wall_time_sec": 0.0006864589999999999,
+      "trace_csv_path": "result/trace.csv",
+      "trace_jsonl_path": "result/trace.jsonl",
+      "upper_bound": 945.587070278064,
+      "verification_kind": "certified_continuous",
+      "verification_time_sec": 0.00019779,
+      "verified": true,
+      "verify_after": true,
+      "verify_each_iteration": true,
+      "wall_time_sec": 0.0006864589999999999,
+      "wrapper_wall_time_sec": 0.016553332999999948
+    },
+    "upper_bound": 945.587070278064
+  },
+  "run_id": "run_20261006T023521Z__branch-and-bound__minmax__london-0000030.instance-3bd5c0ea09__r00__7e4f4f12e991",
+  "run_key": "62474a238020f5868e185d839c417b079a679845b8d713489c06b2367ff50a41",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "branch-and-bound",
+  "started_at": "2026-10-06T02:35:21.876099Z",
+  "status": "COMPLETED",
+  "verification": {
+    "checked_at": "2026-10-06T02:35:21.903836Z",
+    "continuous": true,
+    "experiment_id": "minmax-correctness-20261006-run01",
+    "kind": "CERTIFIED_CONTINUOUS",
+    "message": null,
+    "passed": true,
+    "result_sha256": "733b3c453b8bc0c58b5091450b1188ec1eba5e6501943a90aee6ace2c388b48e",
+    "run_id": "run_20261006T023521Z__branch-and-bound__minmax__london-0000030.instance-3bd5c0ea09__r00__7e4f4f12e991",
+    "schema_version": 1,
+    "status": "PASSED",
+    "verification_mode": "continuous"
+  }
+}

@@ -36,13 +36,21 @@ def test_exact_animation_gate_requires_all_proof_metadata():
         assert not pipeline.exact_proven({**proven, **update})
 
 
+def test_smoke_pipeline_includes_joint_objective():
+    config = pipeline.load_pipeline_config("smoke")
+    assert config["objectives"] == "all"
+    assert config["animation"]["mode"] == "all"
+    assert pipeline.load_pipeline_config("reference")["objectives"] == "both"
+    assert pipeline.load_pipeline_config("full")["objectives"] == "both"
+
+
 def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
     experiment = tmp_path / "experiment"
     (experiment / "batch").mkdir(parents=True)
     (experiment / "reports").mkdir()
     (experiment / "experiment_manifest.json").write_text(json.dumps({
         "instance_count": 1,
-        "objectives": ["minmax", "minsum"],
+        "objectives": ["minmax", "minsum", "minmaxsum"],
     }))
     (experiment / "batch" / "experiment_manifest.json").write_text(json.dumps({
         "dataset": {"instance_count": 0},
@@ -50,7 +58,7 @@ def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
         "seed_policy": {"repeats": 3},
     }))
     rows = []
-    for objective in ("minmax", "minsum"):
+    for objective in ("minmax", "minsum", "minmaxsum"):
         rows.extend([
             {
                 "instance_name": "tiny",
@@ -62,10 +70,46 @@ def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
                 "failed": False,
                 "feasible": True,
                 "verified": True,
+                **({
+                    "objective_value": None,
+                    "peak_cost": 2.0,
+                    "integral_cost": 1.25,
+                    "objective_vector": {
+                        "peak_cost": 2.0,
+                        "integral_cost": 1.25,
+                    },
+                    "joint": {
+                        "minmax_component_status": (
+                            "TIME_LIMIT" if repeat == 2 else "COMPLETED"
+                        ),
+                        "minsum_component_status": (
+                            "TIME_LIMIT" if repeat == 2 else "COMPLETED"
+                        ),
+                        "minmax_component_optimality": (
+                            "TIME_LIMIT" if repeat == 2 else "FEASIBLE"
+                        ),
+                        "minsum_component_optimality": (
+                            "TIME_LIMIT" if repeat == 2 else "FEASIBLE"
+                        ),
+                        "joint_optimality_status": (
+                            "TIME_LIMIT" if repeat == 2 else "FEASIBLE"
+                        ),
+                        "dominates_minmax": True,
+                        "dominates_minsum": True,
+                        "dominance_invariants_ok": True,
+                        "minmax_component_peak": 3.0,
+                        "minmax_component_integral": 2.0,
+                        "minsum_component_peak": 4.0,
+                        "minsum_component_integral": 1.5,
+                        "minmax_source_run": "run-mm",
+                        "minsum_source_run": "run-ms",
+                    },
+                    "verification_kind": "CERTIFIED_CONTINUOUS",
+                } if objective == "minmaxsum" else {}),
             }
             for repeat in range(1, 4)
         ])
-        rows.append({
+        exact_row = {
             "instance_name": "tiny",
             "algorithm_name": "branch-and-bound",
             "algorithm_category": "exact_reference",
@@ -76,7 +120,35 @@ def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
             "failed": False,
             "feasible": True,
             "verified": True,
-        })
+        }
+        if objective == "minmaxsum":
+            exact_row.update({
+                "objective_value": None,
+                "peak_cost": 2.0,
+                "integral_cost": 1.25,
+                "objective_vector": {
+                    "peak_cost": 2.0,
+                    "integral_cost": 1.25,
+                },
+                "joint": {
+                    "minmax_component_status": "COMPLETED",
+                    "minsum_component_status": "COMPLETED",
+                    "minmax_component_optimality": "FEASIBLE",
+                    "minsum_component_optimality": "FEASIBLE",
+                    "joint_optimality_status": "FEASIBLE",
+                    "dominates_minmax": True,
+                    "dominates_minsum": True,
+                    "dominance_invariants_ok": True,
+                    "minmax_component_peak": 3.0,
+                    "minmax_component_integral": 2.0,
+                    "minsum_component_peak": 4.0,
+                    "minsum_component_integral": 1.5,
+                    "minmax_source_run": "run-mm",
+                    "minsum_source_run": "run-ms",
+                },
+                "verification_kind": "CERTIFIED_CONTINUOUS",
+            })
+        rows.append(exact_row)
     results = experiment / "batch" / "master_results.json"
     results.write_text(json.dumps(rows))
 
@@ -86,8 +158,8 @@ def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
     ))
 
     report = (experiment / "reports" / "result_integrity_report.md").read_text()
-    assert "Runs: 8 (expected 8)" in report
-    assert "Timeouts: 2" in report
+    assert "Runs: 12 (expected 12)" in report
+    assert "Timeouts: 3" in report
     assert "TIME_LIMIT" in report
 
 

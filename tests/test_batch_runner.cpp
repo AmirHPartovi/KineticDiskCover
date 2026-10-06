@@ -86,6 +86,39 @@ TEST_CASE("BatchRunConfig: defaults to a 60-second IP limit") {
   REQUIRE(config.num_threads >= 1);
 }
 
+TEST_CASE("BatchRunner persists MinMaxSum objective vectors") {
+  const auto root = temporary_directory("kdc-batch-minmaxsum-");
+  write_instance(root / "instances");
+  auto config = one_run_config(root, "output");
+  config.objectives = {kdc::ObjectiveType::MIN_MAX_SUM};
+  config.fast_time_limit_sec = 10.0;
+  config.exact_time_limit_sec = 10.0;
+  kdc::MockILPSolver mock;
+  kdc::BatchRunner::run(config, &mock);
+
+  std::ifstream result_input(config.output_dir + "/master_results.json");
+  const auto records = nlohmann::json::parse(result_input);
+  REQUIRE(records.size() == 2U);
+  for (const auto& record : records) {
+    REQUIRE(record.at("objective") == "minmaxsum");
+    REQUIRE(record.at("objective_value").is_null());
+    REQUIRE(record.at("objective_vector").at("peak_cost").is_number());
+    REQUIRE(record.at("objective_vector").at("integral_cost").is_number());
+    REQUIRE(record.at("joint").at("joint_optimality_status") ==
+            record.at("optimality_status"));
+    REQUIRE(record.at("verification_kind") == "certified_continuous");
+    REQUIRE(record.at("lower_bound").is_null());
+    REQUIRE(record.at("dominance_invariants_ok").get<bool>());
+    REQUIRE(record.at("peak_cost").is_number());
+    REQUIRE(record.at("integral_cost").is_number());
+    REQUIRE(record.at("minmax_component_peak").is_number());
+    REQUIRE(record.at("minsum_component_integral").is_number());
+    REQUIRE_FALSE(record.at("minmax_source_run").get<std::string>().empty());
+    REQUIRE_FALSE(record.at("minsum_source_run").get<std::string>().empty());
+  }
+  std::filesystem::remove_all(root);
+}
+
 TEST_CASE("BatchRunner: refuses to overwrite existing batch artifacts") {
   const auto root = temporary_directory("kdc-batch-clean-");
   write_instance(root / "instances");

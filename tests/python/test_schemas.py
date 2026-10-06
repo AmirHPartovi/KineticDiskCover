@@ -92,6 +92,62 @@ def test_valid_run_record_passes_schema():
     validate_document(valid_run_record(), "run_record")
 
 
+def _joint_metadata():
+    return {
+        "minmax_component_status": "COMPLETED",
+        "minsum_component_status": "COMPLETED",
+        "minmax_component_optimality": "FEASIBLE",
+        "minsum_component_optimality": "FEASIBLE",
+        "joint_optimality_status": "FEASIBLE",
+        "dominates_minmax": True,
+        "dominates_minsum": True,
+        "dominance_invariants_ok": True,
+        "minmax_component_peak": 3.0,
+        "minmax_component_integral": 2.0,
+        "minsum_component_peak": 4.0,
+        "minsum_component_integral": 1.5,
+        "minmax_source_run": "run-mm",
+        "minsum_source_run": "run-ms",
+    }
+
+
+def test_minmaxsum_record_requires_vector_and_joint_details():
+    record = valid_run_record()
+    record["objective"] = "minmaxsum"
+    record["result"]["objective_value"] = None
+    record["result"]["objective_vector"] = {
+        "peak_cost": 2.0,
+        "integral_cost": 1.25,
+    }
+    record["result"]["joint"] = _joint_metadata()
+    validate_document(record, "run_record")
+
+    missing_vector = {**record, "result": dict(record["result"])}
+    del missing_vector["result"]["objective_vector"]
+    with pytest.raises(SchemaValidationError):
+        validate_document(missing_vector, "run_record")
+
+
+def test_canonical_result_schema_accepts_minmaxsum_vector():
+    validate_document({
+        "schema_version": 1,
+        "run_id": "run-001",
+        "experiment_id": "exp-001",
+        "run_key": "key-001",
+        "execution_status": "COMPLETED",
+        "solver_result": {
+            "objective": "minmaxsum",
+            "objective_value": None,
+            "objective_vector": {
+                "peak_cost": 2.0,
+                "integral_cost": 1.25,
+            },
+            "joint": _joint_metadata(),
+        },
+        "error_message": None,
+    }, "result")
+
+
 @pytest.mark.parametrize(
     ("update", "message"),
     [

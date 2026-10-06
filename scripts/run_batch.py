@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -49,7 +50,8 @@ def main() -> int:
                         default="fast")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--repeats", type=int, default=1)
-    parser.add_argument("--modes", choices=("minmax", "minsum", "both"),
+    parser.add_argument("--modes",
+                        choices=("minmax", "minsum", "minmaxsum", "both", "all"),
                         default="both")
     parser.add_argument("--exact-reference", choices=("ip-kont", "branch-and-bound", "auto"),
                         default="auto",
@@ -71,6 +73,8 @@ def main() -> int:
         default="adaptive",
         help="MinSum refinement policy (default: adaptive)",
     )
+    parser.add_argument("--minmax-budget-fraction", type=float, default=0.5)
+    parser.add_argument("--minsum-budget-fraction", type=float, default=0.5)
     parser.add_argument("--force", action="store_true",
                         help="run even if the preflight report is missing or failed")
     parser.add_argument("--save-solutions", action="store_true")
@@ -95,8 +99,16 @@ def main() -> int:
     apply_execution_defaults(args)
     if (args.threads <= 0 or args.time_limit <= 0
             or args.fast_time_limit <= 0 or args.exact_time_limit <= 0
-            or args.repeats <= 0 or args.seed < 0):
+            or args.repeats <= 0 or args.seed < 0
+            or not math.isfinite(args.minmax_budget_fraction)
+            or not math.isfinite(args.minsum_budget_fraction)
+            or args.minmax_budget_fraction <= 0
+            or args.minsum_budget_fraction <= 0):
         parser.error("threads, time limits, and repeats must be positive; seed must be nonnegative")
+    if (args.modes in {"minmaxsum", "all"}
+            and abs(args.minmax_budget_fraction
+                    + args.minsum_budget_fraction - 1.0) > 1e-9):
+        parser.error("MinMaxSum budget fractions must sum to one")
 
     if not preflight_passed():
         print(f"warning: preflight is missing or did not pass: "
@@ -124,6 +136,8 @@ def main() -> int:
         "--fast-time-limit", str(args.fast_time_limit),
         "--exact-time-limit", str(args.exact_time_limit),
         "--minsum-refinement-policy", args.minsum_refinement_policy,
+        "--minmax-budget-fraction", str(args.minmax_budget_fraction),
+        "--minsum-budget-fraction", str(args.minsum_budget_fraction),
     ]
     if args.output:
         batch_args.extend(["--output", args.output])

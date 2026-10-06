@@ -20,6 +20,9 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from kdc_tools.storage import validate_joint_result  # noqa: E402
+
 EXACT_STATUSES = {"OPTIMAL"}
 PIPELINE_NAMES = {"smoke", "reference", "full"}
 REQUIRED_PIPELINE_STAGES = [
@@ -55,8 +58,8 @@ def load_pipeline_config(name: str) -> dict[str, Any]:
         name == "full" and config["algorithms"] != "all"
     ):
         raise ValueError(f"pipeline {name} algorithm policy is invalid")
-    if config["objectives"] != "both" or config["exact_backend"] != "auto":
-        raise ValueError(f"pipeline {name} must use both objectives and AUTO")
+    if config["objectives"] not in {"both", "all"} or config["exact_backend"] != "auto":
+        raise ValueError(f"pipeline {name} must use a supported objective set and AUTO")
     return config
 
 
@@ -87,6 +90,7 @@ def command_config(args: argparse.Namespace) -> None:
         "TABLES_ENABLED": int(config["tables"]),
         "FIGURES_ENABLED": int(config["figures"]),
         "ANIMATION_ENABLED": int(config["animation"]["enabled"]),
+        "ANIMATION_MODE_DEFAULT": config["animation"].get("mode", "both"),
         "ANIMATION_POLICY": config["animation"]["policy"],
         "ANIMATION_TOP_N": config["animation"]["top_n"],
         "ANIMATION_FPS": config["animation"]["fps"],
@@ -177,8 +181,11 @@ def command_init(args: argparse.Namespace) -> None:
         expected = {
             "pipeline": args.pipeline,
             "algorithm_list": args.algorithms,
-            "objectives": ["minmax", "minsum"] if args.modes == "both"
-            else [args.modes],
+            "objectives": (
+                ["minmax", "minsum"] if args.modes == "both"
+                else ["minmax", "minsum", "minmaxsum"] if args.modes == "all"
+                else [args.modes]
+            ),
             "seed": args.seed,
             "repeats": args.repeats,
             "thread_count": args.threads,
@@ -240,8 +247,11 @@ def command_init(args: argparse.Namespace) -> None:
         "instance_count": None,
         "algorithm_list": args.algorithms,
         "algorithm_set": [],
-        "objectives": ["minmax", "minsum"] if args.modes == "both"
-        else [args.modes],
+        "objectives": (
+            ["minmax", "minsum"] if args.modes == "both"
+            else ["minmax", "minsum", "minmaxsum"] if args.modes == "all"
+            else [args.modes]
+        ),
         "profile": args.benchmark_profile,
         "benchmark_profile": args.benchmark_profile,
         "seed": args.seed,
@@ -588,7 +598,13 @@ def command_validate(args: argparse.Namespace) -> None:
         for key in ("OPTIMAL", "FEASIBLE", "TIME_LIMIT", "INFEASIBLE", "FAILED")
     }
     by_objective: dict[str, dict[str, Any]] = {}
-    for objective in ("minmax", "minsum"):
+    joint_errors: list[str] = []
+    for index, row in enumerate(records):
+        try:
+            validate_joint_result(row)
+        except ValueError as error:
+            joint_errors.append(f"row {index}: {error}")
+    for objective in ("minmax", "minsum", "minmaxsum"):
         subset = [row for row in records
                   if str(row.get("objective", "")).lower() == objective]
         by_objective[objective] = {
@@ -669,6 +685,9 @@ def command_validate(args: argparse.Namespace) -> None:
             f"{data['timeouts']} | {data['OPTIMAL']} | {data['FEASIBLE']} | "
             f"{data['TIME_LIMIT']} | {data['INFEASIBLE']} | {data['FAILED']} |"
         )
+    if joint_errors:
+        report.extend(["", "## Invalid MinMaxSum records", ""])
+        report.extend(f"- {error}" for error in joint_errors)
     report.extend(["", "## Exact backend provenance", ""])
     report.extend([f"- {line}" for line in provenance] or ["- No exact-reference records"])
     report.extend(["", "## Missing declared paths", "", "### Solutions", ""])
@@ -698,6 +717,11 @@ def command_validate(args: argparse.Namespace) -> None:
         raise ValueError(
             "canonical aggregate is incomplete; see aggregate_manifest.json "
             "and result_integrity_report.md"
+        )
+    if joint_errors:
+        raise ValueError(
+            "MinMaxSum vector or dominance validation failed; see "
+            "result_integrity_report.md"
         )
 
 
@@ -743,8 +767,8 @@ def command_summary(args: argparse.Namespace) -> None:
     report.extend(["", "## Runtime and quality statistics", "",
                    "Runtime uses `solve_time_sec` when present, otherwise `wall_time_sec`; "
                    "quality metrics are not filtered to successful rows.", "",
-                   "| Algorithm | Objective | Runs | Runtime median | Q1 | Q3 | Min | Max | P95 | Objective median | Lower-bound median | Upper-bound median | Bound status | Certified-gap median | Heuristic-gap median | Empirical ratio median | Feasibility | Verification | Timeout | Failure | Iterations median | Static solves median |",
-                   "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"])
+                   "| Algorithm | Objective | Runs | Runtime median | Q1 | Q3 | Min | Max | P95 | Objective median | Lower-bound median | Upper-bound median | Bound status | Certified-gap median | Heuristic-gap median | Empirical ratio median | Peak cost median | Integral cost median | Feasibility | Verification | Timeout | Failure | Iterations median | Static solves median |",
+                   "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"])
     groups = sorted({
         (str(row.get("algorithm_name", "")), str(row.get("objective", "")).lower())
         for row in records if isinstance(row, dict)
@@ -767,6 +791,15 @@ def command_summary(args: argparse.Namespace) -> None:
         heuristic = [float(r["heuristic_gap"]) for r in rows if r.get("heuristic_gap") is not None]
         ratios = [float(r["empirical_ratio_to_exact"]) for r in rows
                   if r.get("empirical_ratio_to_exact") is not None]
+        peak_values = []
+        integral_values = []
+        for row in rows:
+            vector = row.get("objective_vector")
+            vector = vector if isinstance(vector, dict) else row
+            if vector.get("peak_cost") is not None:
+                peak_values.append(float(vector["peak_cost"]))
+            if vector.get("integral_cost") is not None:
+                integral_values.append(float(vector["integral_cost"]))
         median = lambda xs: statistics.median(xs) if xs else math.nan
         feasible = sum(bool_value(r.get("feasible")) for r in rows) / max(1, len(rows))
         verified = sum(bool_value(r.get("verified")) for r in rows) / max(1, len(rows))
@@ -789,6 +822,8 @@ def command_summary(args: argparse.Namespace) -> None:
             f"{median(certified):.6g}" if certified else "N/A",
             f"{median(heuristic):.6g}" if heuristic else "N/A",
             f"{median(ratios):.6g}" if ratios else "N/A",
+            f"{median(peak_values):.6g}" if peak_values else "N/A",
+            f"{median(integral_values):.6g}" if integral_values else "N/A",
             f"{feasible:.1%}", f"{verified:.1%}", f"{timeouts:.1%}", f"{failed:.1%}",
             f"{median(iterations):.6g}" if iterations else "N/A",
             f"{median(static):.6g}" if static else "N/A",

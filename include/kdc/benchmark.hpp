@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kdc/minmax.hpp"
+#include "kdc/minmaxsum.hpp"
 #include "kdc/minsum.hpp"
 #include "kdc/benchmark_protocol.hpp"
 #include "kdc/objective.hpp"
@@ -40,6 +41,7 @@ struct BenchmarkConfig {
   int num_threads{1};
   MinMaxSolver::Config minmax_cfg;
   MinSumSolver::Config minsum_cfg;
+  MinMaxSumSolver::Config minmaxsum_cfg;
   std::string solver_name{"KONT"};
   std::string algorithm_name;
   std::string actual_backend;
@@ -62,6 +64,23 @@ struct BenchmarkResult {
   int n{0};
   int m{0};
   ObjectiveType objective{ObjectiveType::MIN_MAX};
+  MinMaxSumComponentStatus minmaxsum_minmax_status{
+      MinMaxSumComponentStatus::NOT_RUN};
+  MinMaxSumComponentStatus minmaxsum_minsum_status{
+      MinMaxSumComponentStatus::NOT_RUN};
+  OptimalityStatus minmaxsum_minmax_optimality{OptimalityStatus::FAILED};
+  OptimalityStatus minmaxsum_minsum_optimality{OptimalityStatus::FAILED};
+  bool dominates_minmax{false};
+  bool dominates_minsum{false};
+  bool dominance_invariants_ok{false};
+  std::optional<double> minmax_component_peak;
+  std::optional<double> minmax_component_integral;
+  std::optional<double> minsum_component_peak;
+  std::optional<double> minsum_component_integral;
+  std::optional<double> minmax_component_certified_gap;
+  std::optional<double> minsum_component_certified_gap;
+  std::string minmax_source_run;
+  std::string minsum_source_run;
   double wall_time_sec{0.0};
   double solve_time_sec{0.0};
   double cpu_time_sec{0.0};

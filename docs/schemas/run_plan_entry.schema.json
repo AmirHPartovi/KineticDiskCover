@@ -21,7 +21,7 @@
     "run_key": { "type": "string", "minLength": 1 },
     "instance_id": { "type": "string", "minLength": 1 },
     "algorithm": { "type": "string", "minLength": 1 },
-    "objective": { "enum": ["minmax", "minsum"] },
+    "objective": { "enum": ["minmax", "minsum", "minmaxsum"] },
     "repeat": { "type": "integer", "minimum": 0 },
     "seed": { "type": "integer", "minimum": 0 },
     "configuration_sha256": { "$ref": "#/$defs/sha256" },
