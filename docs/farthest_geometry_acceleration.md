@@ -1,225 +1,222 @@
-# Farthest-Point Geometric Acceleration: Investigation and Decision
+# Farthest-Point Geometric Acceleration: Research Gate
 
-## Decision summary
+## Decision
 
-Do not implement or promote a geometric accelerator in the current change.
-The exact convex-hull theorem below does justify excluding non-extreme sites
-from a farthest-point query at a fixed time. It does not, by itself, justify
-excluding them throughout continuous motion, nor does it provide a correct
-dynamic kinetic hull with ownership changes, degeneracies, and deterministic
-support ties.
+**ABANDON_GEOMETRIC_ACCELERATION** for the current implementation cycle.
 
-There is also an implementation-state issue that must be resolved before
-benchmarking the proposed second-level accelerator: the checked-out changes
-do not currently provide an integrated kinetic tournament engine. The class
-named `KineticFarthestTournament` stores a vector and computes its winner by
-scanning that vector. Its `next_event_time` examines every point pair. The
-support-event query accepts `KINETIC_TOURNAMENT` but runs the same exhaustive
-scan, while `KineticSolution::extend` rejects that engine. Therefore the
-repository cannot yet supply the three comparable production paths assumed
-by the proposed benchmark (exhaustive, kinetic tournament, geometric).
+Do not implement or promote a kinetic hull or farthest-point Voronoi structure.
+This is a scope decision based on the absence of a certified tournament event
+engine, no measured support-event benefit from the current engine option, and
+the substantially larger correctness surface a kinetic hull would add. It is
+not a claim that kinetic hulls are never useful.
 
-The correct sequence is to complete and validate the first-level tournament
-engine, establish representative workloads and a reproducible benchmark,
-then prototype a kinetic hull behind a non-default engine. A full dynamic
-farthest-point Voronoi diagram is not recommended for this model.
+The fixed-time convex-hull theorem is valid and could eventually make a
+station-local hull a candidate filter. It does not justify temporal pruning,
+and the current benchmark does not establish that there is a correct,
+integrated tournament against which a hull could be compared. In particular,
+the passing Prompt 4 differential rows certify equivalence of the current
+public execution paths; they do **not** certify a certificate-driven
+tournament KDS. This gate therefore does not satisfy Prompt 5's prerequisite
+for a hull experiment. The appropriate action is to fix and certify the
+first-level event engine before reopening geometric acceleration.
 
-## 1. Problem and exact fixed-time theorem
+## Fixed-time theorem and assumptions
 
-For a station \(q\) and its currently owned finite site set \(A\), the
-required support maximizes squared Euclidean distance:
-
+For one station at fixed position \(q\) and its current finite assigned set
+\(A\), a farthest point maximizing
 \[
-  \max_{p\in A} \lVert p-q\rVert^2.
+  \max_{p\in A}\|p-q\|^2
 \]
-
-Let \(P=\operatorname{conv}(A)\). A maximizer can be found among the extreme
-points of \(P\). Every point \(p\in A\) is a convex combination of vertices
-\(v_k\) of \(P\). If \(p\) is not itself an extreme coordinate, this
-combination contains at least two distinct vertices with positive weights.
-Strict convexity of squared distance gives
-
+can be chosen among the extreme points of \(\operatorname{conv}(A)\).
+Squared Euclidean distance is strictly convex: if \(p\) is not an extreme
+coordinate and is a convex combination of at least two distinct hull
+vertices \(v_k\), then
 \[
-  \lVert p-q\rVert^2
-  < \sum_k \lambda_k\lVert v_k-q\rVert^2
-  \le \max_k \lVert v_k-q\rVert^2.
+  \|p-q\|^2
+  < \sum_k \lambda_k\|v_k-q\|^2
+  \le \max_k\|v_k-q\|^2.
 \]
+Thus a non-extreme coordinate cannot be strictly farthest. Coincident point
+ids have the same distance, so a hull representation must retain the lowest
+point id for every represented extreme coordinate to preserve the solver's
+tie rule. Collinear sets have only their endpoint coordinates as extremes
+(with the same duplicate-coordinate rule).
 
-Thus no non-extreme site can be a farthest site; the maximum over \(A\) is
-attained by a site whose coordinate is a vertex of \(P\). This argument uses
-convexity of squared distance, not a linear-objective support query. The
-strict inequality also shows that a distinct, non-extreme site cannot tie the
-maximum. Coincident sites are an exception in the representation, not in the
-geometry: identical coordinates have identical distances, so the hull
-representation must retain the lowest point id at each represented extreme
-coordinate (or otherwise preserve the repository's lowest-id tie rule).
-
-This is a per-time theorem only. It says nothing about how to maintain the
-extreme set as the sites move or ownership changes. In particular, a site
-that is interior now may become extreme later, and may become the farthest
-site. An implementation may omit it only while a maintained kinetic
-certificate proves the relevant hull classification remains valid.
-
-The repository's support tie rule is lowest point id on equal distance.
-Any geometric candidate structure must preserve that rule, including
-coincident sites, collinear sites, simultaneous certificate failures, and
-ties at trajectory waypoints.
-
-## 2. Alternatives
-
-| Alternative | Correctness assumptions | Dynamic insertion/deletion | Motion breakpoints and event locality | Certificates and numerical risk | KDC workload assessment |
-|---|---|---|---|---|---|
-| **A. Exhaustive reference scan** | None beyond the existing piecewise-quadratic root solver; compare every currently owned candidate to the support. | Assignment changes are reflected directly in the owner vector; no persistent structure to update. | Each support query segments every candidate/support pair at both trajectories' waypoints. Events are global scans, not local. | \(O(n)\) comparisons per support query, with potentially many segment-pair equations. Uses existing solver and tolerances; simplest oracle. | Highest predictable work, but lowest correctness and integration risk. Keep as oracle. |
-| **B. Kinetic tournament** | Every internal winner certificate must remain valid through the next root or trajectory breakpoint; simultaneous failures and ties must be repaired deterministically. | A real tree can update a leaf and its root path in \(O(\log n)\) comparisons; the current class is not such a tree and currently rescans. | Pair comparisons are between tournament sub-winners. Motion breakpoints invalidate certificates on affected paths; an event queue should localize repairs. | \(O(n)\) internal comparison certificates for a balanced tree, with quadratic roots per fixed motion-segment pair. The current solver conventions can be reused. | A natural first acceleration. It may still have many certificate events, but is simpler to validate than a kinetic hull and supports dynamic ownership locally. |
-| **C. Kinetic convex hull** | Fixed-time farthest support lies among hull vertices. A kinetic hull must prove every maintained hull edge/vertex remains correct until its next orientation or motion event. Non-extreme sites cannot be permanently discarded. | Fully dynamic hull update bounds depend on data structure and degeneracy model. A point handover requires deletion in one station's set and insertion in another; each must repair the local hull and certificates. | With fixed linear motion per site segment, a triple orientation determinant is degree at most two. Root events and every participating motion breakpoint must be handled; an affected site can invalidate multiple certificates. | Orientation roots use the existing robust quadratic solver in exact arithmetic semantics, but floating tolerances, zero polynomials, collinearity intervals, duplicate positions, and simultaneous roots complicate topology. | The theorem provides a safe candidate reduction when the kinetic hull is correct. Hull maintenance is a substantial new correctness surface; hull size may still be \(n\), eliminating the benefit. |
-| **D. Farthest-point Voronoi maintenance** | Must maintain the full farthest-site subdivision for the current moving site set and answer queries at the fixed station. A static diagram cannot be reused while sites move. | Dynamic site insertion/deletion changes the subdivision; handovers require updates in two different station-specific sets. | Diagram combinatorics can change on kinetic events, and event locality is not automatically small for moving sites. | More combinatorial predicates and topology changes than the hull candidate theorem alone requires. Degenerate co-circular/collinear configurations need explicit support. | Excessive complexity for one fixed query per station. No evidence here that maintaining the entire subdivision pays for itself. |
-| **E. Tournament plus geometric filtering** | A filter may reject a point only if a certificate proves it cannot beat the tournament winner through the interval. A current hull vertex list is safe only while the kinetic hull certificates remain valid. | Tournament leaf updates and hull updates both have to be made atomically on a handover. | Could reduce candidates to hull vertices while retaining tournament comparisons, but motion and ownership events must update both structures in the same deterministic event transaction. | Combines certificate systems and their simultaneous-failure handling. Fewer distance comparisons are possible only if the hull is smaller and maintenance does not dominate. | Potentially useful after each component is independently exact and benchmarked. It is not the appropriate first geometric implementation. |
-
-Complexity statements in this table are structural counts, not a claim of
-wall-clock performance. In particular, no logarithmic farthest-query bound is
-claimed for the repository's moving, dynamically owned point sets.
-
-## 3. Why a static hull or neighbor filter is not sufficient
-
-The station is fixed, but its eligible set is station-specific:
-
+This theorem assumes Euclidean distance and a fixed station and time. It
+applies separately to each station's currently owned set
 \[
   A_j(t)=\{i:\operatorname{owner}(i,t)=j\}.
 \]
+It is not a temporal pruning theorem. A currently interior point can later
+become extreme, and ownership can move a point between station sets. No
+current-time hull, global hull, nearest-neighbor set, radius cutoff, ordinary
+Voronoi adjacency, or Delaunay adjacency can safely exclude a point over a
+future interval without kinetic certificates.
 
-The points move continuously and may change owner at a handover. Thus a
-static hull computed from all points, or from one station's initial
-assignment, is not a valid filter for later support searches.
+## What a correct kinetic hull would require
 
-Using only hull vertices at the current time is also insufficient. The
-excluded interior sites must remain represented as potential entrants into
-the hull. As trajectories change, orientation certificates can fail and an
-excluded point can become extreme before any current farthest-support
-comparison involving that point is scheduled. A correct kinetic hull must
-schedule and process those hull-combinatorics events, including trajectory
-breakpoints.
+No hull structure or hull-based farthest query is implemented in this
+repository. The following are requirements for a possible future prototype,
+not implemented guarantees.
 
-Neither Delaunay edges nor ordinary nearest-neighbor adjacency provides a
-completeness proof for a farthest query. The exact geometric statement
-available here is about current convex-hull extreme sites; using that
-statement over time requires a valid kinetic hull.
+### Certificate definitions
 
-## 4. Proposed exact kinetic-hull invariants
+On a common interval where three trajectories are each linear, an orientation
+predicate for points \(a,b,c\) is
+\[
+  \operatorname{orient}_{abc}(t)=
+  (p_b(t)-p_a(t))_x(p_c(t)-p_a(t))_y
+  -(p_b(t)-p_a(t))_y(p_c(t)-p_a(t))_x.
+\]
+Each coordinate difference is affine in time, so this determinant is a
+polynomial of degree at most two. Its roots can signal a change in the
+orientation relation used by a hull certificate. Every such certificate
+would have to be scheduled only up to the earliest participating trajectory
+breakpoint or certificate failure, then rebuilt using the adjacent motion
+segments. The root itself does not necessarily change the hull topology.
 
-If a hull prototype is pursued, it should be station-local, dynamic, and
-optional. At each event time, for every station:
+Triple-orientation tests for current hull neighbors alone are insufficient to
+prove all excluded points remain interior. A correct kinetic hull needs a
+complete certificate scheme for its hull representation and for points that
+may become hull vertices, including the relevant bridge/visibility or
+replacement conditions. Such a scheme and its proof are not present here.
 
-1. Its maintained site ids equal exactly the ids whose owner is that station.
-2. Its hull contains every current extreme coordinate and preserves the
-   lowest-id representative for coincident extreme coordinates.
-3. Its ordered hull satisfies the documented orientation convention,
-   including an explicit representation for empty, singleton, collinear,
-   and duplicate-coordinate sets.
-4. Every kinetic certificate is valid on its scheduled open time interval.
-5. Every certificate's polynomial is formed only over an interval where all
-   participating trajectories use fixed linear segments.
-6. At a simultaneous event, all affected certificates are invalidated and
-   the hull is repaired to a deterministic valid state before the next
-   positive-duration interval.
-7. Its station support equals the brute-force argmax by squared distance,
-   with lowest point id on ties.
-8. A handover removes the point from the source structure and inserts it
-   into the receiver structure as one ownership transition; both resulting
-   structures satisfy the invariants before support selection continues.
+### Required state transitions and degeneracies
 
-For three point trajectories that are linear on one common segment, the
-orientation determinant is a polynomial of degree at most two. Its real
-roots must be computed with the repository's quadratic solver, restricted to
-that common segment, and re-created after any participating point changes
-trajectory segment. Degree zero/identically zero predicates, tangencies,
-near-zero discriminants, collinear intervals, and roots shared by multiple
-certificates need explicit deterministic policies. A zero of an orientation
-predicate is not by itself proof of a persistent hull-topology change.
+A future station-local implementation must support atomic ownership
+transitions (erase from source hull, insert into receiver hull), and must
+restore valid certificates before advancing beyond a simultaneous event
+batch. It also needs explicit deterministic behavior for:
 
-These are requirements for a future implementation, not guarantees supplied
-by the current code.
+- empty, singleton, two-point, and collinear sets;
+- coincident coordinates and repeated positions, retaining the lowest-id
+  representative where coordinates coincide;
+- identically-zero orientation polynomials and intervals of collinearity;
+- tangent/repeated roots, simultaneous certificate failures, and a
+  trajectory breakpoint coinciding with an orientation root.
 
-## 5. Current implementation and benchmark status
+The current numerical policy uses floating-point coefficients, centralized
+scale-aware comparison tolerances, and deterministic point-id ties; it is not
+exact arithmetic. Any hull predicate would need a documented tolerance policy
+compatible with support comparisons, root isolation, and simultaneous-event
+grouping. The hull's farthest-support query would have to equal the
+brute-force support at every critical time and directional state.
 
-The working tree has an uncommitted `KineticFarthestTournament` API, but its
-implementation is currently a vector-backed scan:
+## Current implementation and complexity
 
-- `initialize`, `insert`, `erase`, `update_motion`, `process_until`, and
-  `validate` recompute the winner across the full stored point vector.
-- `next_event_time` examines all point pairs and their piecewise trajectory
-  segments; it does not maintain internal tournament nodes or an event queue.
-- `KineticCore` support-event queries that accept
-  `KINETIC_TOURNAMENT` still execute `support_changes_impl`, the exhaustive
-  all-points scan.
-- `KineticSolution::extend` currently accepts only
-  `REFERENCE_EXHAUSTIVE`.
+`KineticFarthestTournament` currently builds a balanced binary winner tree
+over sorted point ids and stores the best and runner-up at each node. This
+helps answer cached winner/runner-up queries between rebuilds. It is not yet a
+certificate-driven kinetic tournament scheduler:
 
-Consequently, the current `KINETIC_TOURNAMENT` label is not evidence of a
-kinetic tournament engine and cannot serve as a separate benchmark baseline.
-It would be misleading to report it as one.
+- `initialize`, `insert`, `erase`, `update_motion`, and `process_until`
+  rebuild the tree. Rebuild sorts the stored ids and recomputes nodes, so
+  updates are \(O(n\log n)\) in the number of assigned points, rather than a
+  local \(O(\log n)\) tree update.
+- `next_event_time` examines pairs of assigned points and their piecewise
+  trajectory segments; its work is pairwise, not a maintained local
+  certificate queue.
+- `KineticSolution::extend` resolves owner supports by scanning assigned
+  points and uses `support_changes_impl` for support-event prediction.
+  That detector enumerates every challenger and solves pairwise polynomial
+  equations. The `KINETIC_TOURNAMENT` selection does not replace this
+  exhaustive support-event scan with maintained tournament certificates.
 
-No geometric accelerator exists in this tree, so no valid measurements are
-available for geometric updates, certificate failures, queue operations,
-or geometric-engine equivalence. The repository's
-`kinetic_interval_emission` benchmark measures interval-emission variants,
-not the exhaustive/tournament/geometric comparison requested here. Its
-results must not be presented as geometric-acceleration results. No runtime
-or speedup is claimed in this report.
+Consequently, the current structure is a winner tree with rebuild-based
+maintenance, but it is not an integrated kinetic tournament KDS. The current
+support-event work remains exhaustive in the number of challengers and
+trajectory segment pairs. The reference detector remains the correctness
+oracle.
 
-### Measured benchmark results
+A kinetic hull could reduce the number of sites participating in a
+fixed-time farthest query from \(n\) to hull size \(h\) **only after** complete
+kinetic hull maintenance proves the candidate set is valid. Hull maintenance,
+certificate count, event queue costs, dynamic ownership update costs, and
+memory have no implemented complexity bound or measured value here. In
+particular, no logarithmic kinetic-query or update claim is made.
 
-| Engine | Comparable production implementation in this tree? | Runtime / verification / event metrics |
-|---|---|---|
-| Exhaustive reference | Yes | Not measured in this investigation; no paired three-engine benchmark was run. |
-| Kinetic tournament | No; the named helper rescans and is not integrated into `KineticSolution::extend`. | Not measurable as a distinct engine. |
-| Geometric accelerator | No implementation. | Not measurable. |
+## Differential and benchmark evidence
 
-This is an explicit no-result, not an estimate: collecting numbers from
-different call paths or comparing a vector rescan with an integrated
-extension would not be an apples-to-apples benchmark.
+Prompt 4 recorded 200 deterministic seeds across ten synthetic families,
+three repetitions, and three public configurations (600 rows). All saved
+rows were `PASS`, including continuous verification and comparisons of
+ordered event traces, interval boundaries/state/coefficient data, event-time
+and adjacent-representable-time costs, peak, and integral. The run was
+compiled directly with Apple clang 17 using `-O2 -DNDEBUG` from a dirty
+worktree at base revision `31fa4196bd478f6e94c033cc0fd7afe73e9528b5`.
+These results are exploratory synthetic measurements, not clean-runner
+release benchmarks.
 
-### Reproducible benchmark protocol for a future prototype
+| Configuration | What was actually exercised | Median speedup vs reference | p25–p75 | Interpretation |
+|---|---|---:|---:|---|
+| `REFERENCE_EXHAUSTIVE` + global handover | Exhaustive support-event search and reference handover evaluation | 1.000x baseline | — | Correctness oracle |
+| `KINETIC_TOURNAMENT` + global handover | Public option with same exhaustive support-event candidate search; tournament winner structure also used | 1.001x | 0.990–1.017x | Not evidence for a certificate-driven tournament |
+| `KINETIC_TOURNAMENT` + local exact handover | Same support-event path, local handover evaluation with reference fallback | 1.005x | 0.995–1.025x | Handover-local path only; no hull comparison |
+| Kinetic hull | Not implemented | Not measured | Not measured | No correctness, runtime, or memory result |
+| Tournament + hull | Not implemented | Not measured | Not measured | No correctness, runtime, or memory result |
 
-Once a real tournament engine is integrated, compare all three engines on
-identical serialized instances, initial assignments, direction, handover
-settings, solver budgets, build mode, hardware, and continuous-verification
-settings. Record one raw row per instance and engine, including:
+Across the 200 per-instance ratios, tournament/global's geometric mean
+speedup was 1.006x, and tournament/local's was 1.010x; the quartile ranges
+cross 1x. Median extension times were 0.290 ms (reference/global), 0.286 ms
+(tournament/global), and 0.291 ms (tournament/local). Point-vs-support
+comparison and quadratic-solve counts were unchanged between the reference
+and tournament-selected engine options. No support-event break-even was
+demonstrated. In the deliberately handover-heavy family, local handover
+evaluation reduced recorded global-fallback point scans from 4,400 to 1,600
+across 20 seeds, but this does not imply a geometric benefit.
 
-- instance id, dimensions, trajectory segment count, and deterministic seed;
-- extension total runtime and continuous verification runtime;
-- support-event time, point comparisons, segment-pair examinations, and
-  polynomial solves;
-- tournament certificate failures, geometric orientation-certificate
-  failures, hull updates, and priority-queue pushes/pops/stale events;
-- emitted interval count, peak value/time, total integral, and deterministic
-  support/ownership event trace.
+There is no measured hull memory consumption, orientation-certificate count,
+hull update/query cost, or hull differential result because the structure was
+not implemented. Tournament-node memory was also not measured in the
+campaign. These unknowns are not estimates and must not be described as
+measured performance.
 
-Warm-up policy, compiler/version/flags, repetitions, and whether timing is
-median or distribution must be recorded. Validate event traces and interval
-representations against the exhaustive oracle before comparing performance.
-For every run, compare all support and handover events (including simultaneous
-events and deterministic tie outcomes), ownership/support vectors at event
-times and open-interval representatives, interval coefficients, continuous
-verification, peak, and integral. Report per-instance measurements and
-aggregates; do not infer a general speedup from synthetic instances alone.
+## When geometry may help or hurt
 
-## 6. Recommendation
+Geometry may help only if real workloads have small station-local hulls for
+most intervals and the cost of discovering, maintaining, and repairing hull
+certificates is smaller than the support work they remove. The strongest
+candidate workloads would have many assigned points, few hull vertices, and
+relatively few hull/ownership events. This is a hypothesis, not an observed
+result in this repository.
 
-1. Retain exhaustive scanning as the correctness oracle.
-2. Complete the actual kinetic tournament and integrate it into extension
-   before treating it as an established baseline.
-3. Benchmark that implementation on representative KDC workloads.
-4. If exhaustive pair scans remain dominant and the assigned-set hull is
-   materially smaller than the set on those workloads, prototype a
-   station-local kinetic convex hull behind an optional engine. Preserve
-   non-extreme sites and all orientation/motion certificates.
-5. Differential-test that prototype—including event traces, degeneracies,
-   ownership handovers, and backward extension—against exhaustive behavior.
-6. Consider a hull-plus-tournament hybrid only if measured hull maintenance
-   cost and support comparison savings justify its extra state.
+Geometry may hurt when many points are extreme, trajectories frequently
+change segments, orientation certificates fail often, or handovers force
+frequent delete/insert repairs. Collinearity, duplicates, and simultaneous
+orientation events increase both implementation complexity and repair work.
+If hull size approaches \(n\), a hull may add certificate and storage
+overhead without reducing support candidates. A tournament-plus-hull hybrid
+would maintain two interacting structures and is unjustified before either
+the tournament scheduler or a standalone hull is certified.
 
-Do not build a full farthest-point Voronoi diagram for the current fixed
-station queries absent workload evidence that the simpler exact hull
-candidate filter is inadequate. Do not claim an asymptotic query improvement
-until the complete dynamic/kinetic maintenance and degeneracy analysis
-supports it.
+A full farthest-point Voronoi diagram is even less justified: the station is
+a fixed query point and the required result is only the maximum-distance
+site. Maintaining the entire moving-site subdivision adds topology and
+dynamic update complexity without evidence of a benefit over a correct
+station-local hull.
+
+## Research decision and reopening criteria
+
+Selected option: **ABANDON_GEOMETRIC_ACCELERATION** for now. Retain the
+exhaustive reference as oracle and do not add a hull or FVD engine in this
+change. This is the evidence-based choice because the prerequisite
+certificate-driven tournament has not been demonstrated, the tested engine
+options retain the same exhaustive support-event work, and there are no
+representative hull-size, runtime, or memory measurements.
+
+Reopen this decision only after:
+
+1. tournament support certificates actually drive support-event scheduling;
+2. that engine passes deterministic, randomized, adversarial, forward,
+   backward, simultaneous-event, and continuous-verifier comparisons against
+   the exhaustive reference;
+3. representative workloads report per-station hull-size distributions and
+   support-event work, with clean/reproducible timing and memory;
+4. evidence shows a meaningful remaining support-query bottleneck that a
+   hull could reduce.
+
+If reopened, first prototype a station-local kinetic hull behind an optional
+engine. Compare exhaustive, the certified tournament, hull, and a combined
+path only if each individual structure is independently correct. Do not
+promote a hull based only on the fixed-time theorem, static hull measurements,
+or sampled future positions.

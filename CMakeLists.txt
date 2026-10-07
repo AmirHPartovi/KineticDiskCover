@@ -336,6 +336,14 @@ if(TARGET kdc-kont-native)
 endif()
 
 if(BUILD_BENCHMARK)
+  add_executable(kdc-kinetic-certification
+    benchmarks/kinetic_certification.cpp)
+  target_link_libraries(kdc-kinetic-certification PRIVATE kdc-core)
+  target_compile_definitions(kdc-kinetic-certification PRIVATE
+    KDC_BENCH_GIT_COMMIT="${KDC_GIT_COMMIT}"
+    KDC_BENCH_GIT_DIRTY="${KDC_GIT_DIRTY}"
+    KDC_BENCH_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+  )
   add_executable(kdc-kinetic-interval-benchmark
     benchmarks/kinetic_interval_emission.cpp)
   target_link_libraries(kdc-kinetic-interval-benchmark PRIVATE kdc-core)

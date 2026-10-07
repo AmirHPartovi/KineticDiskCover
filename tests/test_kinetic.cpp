@@ -359,6 +359,24 @@ TEST_CASE("KineticFarthestTournament matches exhaustive support winners") {
     tournament.process_until(time);
     REQUIRE(tournament.validate(time));
     REQUIRE(tournament.current_winner() == expected);
+    std::vector<int> ordered = assigned;
+    std::stable_sort(ordered.begin(), ordered.end(), [&](int lhs, int rhs) {
+      const double lhs_distance =
+          (instance.trajectories[static_cast<kdc::Index>(lhs)].position(time) -
+           instance.stations[0].pos)
+              .norm2();
+      const double rhs_distance =
+          (instance.trajectories[static_cast<kdc::Index>(rhs)].position(time) -
+           instance.stations[0].pos)
+              .norm2();
+      return lhs_distance != rhs_distance ? lhs_distance > rhs_distance
+                                          : lhs < rhs;
+    });
+    REQUIRE(tournament.second_winner() ==
+            (ordered.size() > 1U ? ordered[1] : -1));
+    REQUIRE(tournament.best_except(expected) ==
+            (ordered.size() > 1U ? ordered[1] : -1));
+    REQUIRE(tournament.best_except(ordered[1]) == expected);
   }
 
   tournament.insert(2, 0.5);
@@ -482,6 +500,55 @@ TEST_CASE("Precomputed handover sets match the reference derivation") {
   }
 }
 
+TEST_CASE("External handover challenges match exhaustive pair roots") {
+  for (std::uint32_t seed = 1; seed <= 12; ++seed) {
+    const auto instance = make_handover_differential_instance(seed + 100U);
+    std::vector<int> owners(static_cast<kdc::Index>(instance.n), 0);
+    for (int point = 0; point < instance.n; ++point) {
+      owners[static_cast<kdc::Index>(point)] = point % instance.m;
+    }
+    for (int from = 0; from < instance.m; ++from) {
+      for (int to = 0; to < instance.m; ++to) {
+        if (from == to) {
+          continue;
+        }
+        for (const bool forward : {true, false}) {
+          const double start = forward ? 0.0 : instance.T_end;
+          const double end = forward ? instance.T_end : 0.0;
+          const auto supports = farthest_supports(instance, owners, start);
+          const int source = supports[static_cast<kdc::Index>(from)];
+          const int receiver = supports[static_cast<kdc::Index>(to)];
+          if (source < 0 || receiver < 0) {
+            continue;
+          }
+          kdc::SupportChangeEvent expected;
+          for (const auto& event : reference_support_changes(
+                   instance, to, receiver, start, end, forward)) {
+            if (event.new_supporting_point == source &&
+                kdc::KineticCore::compare_support_directional_limit(
+                    instance, to, source, receiver, event.time, forward) < 0) {
+              expected = event;
+              break;
+            }
+          }
+          kdc::KineticEventDiagnostics diagnostics;
+          const auto actual = kdc::KineticCore::find_external_challenge(
+              instance, to, receiver, source, start, end, forward, nullptr,
+              kdc::KineticEventEngine::KINETIC_TOURNAMENT, &diagnostics);
+          REQUIRE(actual.valid == expected.valid);
+          if (expected.valid) {
+            REQUIRE(actual.new_supporting_point ==
+                    expected.new_supporting_point);
+            REQUIRE(kdc::test::near(actual.time, expected.time, 1e-9, 1e-12));
+          }
+          REQUIRE(diagnostics.external_challenge_certificates == 1U);
+          REQUIRE(diagnostics.point_vs_support_comparisons <= 1U);
+        }
+      }
+    }
+  }
+}
+
 TEST_CASE("Local handover evaluation is differentially equivalent to global reference") {
   const auto fixture = kdc::test::make_instance_linear(
       {{kdc::Point(2, 0), kdc::Point(2, 0)},
@@ -602,26 +669,105 @@ TEST_CASE("Local and global handover evaluation preserve extended solution state
       kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
       kdc::HandoverEvaluation::REFERENCE_GLOBAL);
 
+  kdc::KineticEventDiagnostics tournament_diagnostics;
+  const auto tournament = kdc::KineticSolution::extend(
+      instance, assignment, 0.0, 1.0, true, true,
+      kdc::ObjectiveType::MIN_SUM, nullptr,
+      kdc::KineticEventEngine::KINETIC_TOURNAMENT,
+      &tournament_diagnostics,
+      kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+      kdc::HandoverEvaluation::LOCAL_EXACT);
+
   REQUIRE(local.is_well_formed());
   REQUIRE(reference.is_well_formed());
+  REQUIRE(tournament.is_well_formed());
   REQUIRE(local.intervals.size() == reference.intervals.size());
+  REQUIRE(local.intervals.size() == tournament.intervals.size());
   for (kdc::Index index = 0; index < local.intervals.size(); ++index) {
     const auto& actual = local.intervals[index];
     const auto& expected = reference.intervals[index];
+    const auto& tournament_interval = tournament.intervals[index];
     REQUIRE(actual.t_start == expected.t_start);
     REQUIRE(actual.t_end == expected.t_end);
+    REQUIRE(actual.t_start == tournament_interval.t_start);
+    REQUIRE(actual.t_end == tournament_interval.t_end);
     REQUIRE(actual.supporting_point == expected.supporting_point);
     REQUIRE(actual.assigned_points == expected.assigned_points);
+    REQUIRE(actual.supporting_point == tournament_interval.supporting_point);
+    REQUIRE(actual.assigned_points == tournament_interval.assigned_points);
     REQUIRE(kdc::test::near(actual.a, expected.a));
     REQUIRE(kdc::test::near(actual.b, expected.b));
     REQUIRE(kdc::test::near(actual.c, expected.c));
+    REQUIRE(kdc::test::near(actual.a, tournament_interval.a));
+    REQUIRE(kdc::test::near(actual.b, tournament_interval.b));
+    REQUIRE(kdc::test::near(actual.c, tournament_interval.c));
   }
   REQUIRE(kdc::test::near(local.peak_cost(), reference.peak_cost()));
+  REQUIRE(kdc::test::near(local.peak_cost(), tournament.peak_cost()));
   REQUIRE(kdc::test::near(local.peak_time(), reference.peak_time()));
+  REQUIRE(kdc::test::near(local.peak_time(), tournament.peak_time()));
   REQUIRE(kdc::test::near(local.total_integral(), reference.total_integral()));
+  REQUIRE(kdc::test::near(local.total_integral(), tournament.total_integral()));
   require_same_trace(local_diagnostics.trace, reference_diagnostics.trace);
+  REQUIRE(tournament_diagnostics.source_receiver_pair_count > 0U);
+  REQUIRE(tournament_diagnostics.external_challenge_certificates > 0U);
+  REQUIRE(tournament_diagnostics.handover_queue_pushes <=
+          tournament_diagnostics.external_challenge_certificates);
   REQUIRE(kdc::Verifier::verify_continuous(instance, local).all_ok());
   REQUIRE(kdc::Verifier::verify_continuous(instance, reference).all_ok());
+  REQUIRE(kdc::Verifier::verify_continuous(instance, tournament).all_ok());
+}
+
+TEST_CASE("Tournament handover extensions match global reference in both directions") {
+  for (std::uint32_t seed = 31; seed < 35; ++seed) {
+    const auto instance = make_handover_differential_instance(seed);
+    for (const bool forward : {true, false}) {
+      const double start = forward ? 0.0 : instance.T_end;
+      const double end = forward ? instance.T_end : 0.0;
+      const auto assignment = kdc::StationarySolver::solve_nn(instance, start);
+      REQUIRE(assignment.feasible);
+
+      kdc::KineticEventDiagnostics tournament_diagnostics;
+      const auto actual = kdc::KineticSolution::extend(
+          instance, assignment, start, end, forward, true,
+          kdc::ObjectiveType::MIN_SUM, nullptr,
+          kdc::KineticEventEngine::KINETIC_TOURNAMENT,
+          &tournament_diagnostics,
+          kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+          kdc::HandoverEvaluation::LOCAL_EXACT);
+      const auto expected = kdc::KineticSolution::extend(
+          instance, assignment, start, end, forward, true,
+          kdc::ObjectiveType::MIN_SUM, nullptr,
+          kdc::KineticEventEngine::REFERENCE_EXHAUSTIVE, nullptr,
+          kdc::KineticIntervalEmission::EXACT_RELEVANT_BOUNDARIES,
+          kdc::HandoverEvaluation::REFERENCE_GLOBAL);
+
+      REQUIRE(actual.is_well_formed());
+      REQUIRE(expected.is_well_formed());
+      REQUIRE(actual.intervals.size() == expected.intervals.size());
+      for (kdc::Index index = 0; index < actual.intervals.size(); ++index) {
+        const auto& actual_interval = actual.intervals[index];
+        const auto& expected_interval = expected.intervals[index];
+        REQUIRE(kdc::test::near(actual_interval.t_start,
+                                expected_interval.t_start, 1e-9, 1e-12));
+        REQUIRE(kdc::test::near(actual_interval.t_end,
+                                expected_interval.t_end, 1e-9, 1e-12));
+        REQUIRE(actual_interval.supporting_point ==
+                expected_interval.supporting_point);
+        REQUIRE(actual_interval.assigned_points ==
+                expected_interval.assigned_points);
+        REQUIRE(kdc::test::near(actual_interval.a, expected_interval.a));
+        REQUIRE(kdc::test::near(actual_interval.b, expected_interval.b));
+        REQUIRE(kdc::test::near(actual_interval.c, expected_interval.c));
+      }
+      REQUIRE(kdc::test::near(actual.peak_cost(), expected.peak_cost()));
+      REQUIRE(kdc::test::near(actual.total_integral(),
+                              expected.total_integral()));
+      REQUIRE(kdc::Verifier::verify_continuous(instance, actual).all_ok());
+      REQUIRE(kdc::Verifier::verify_continuous(instance, expected).all_ok());
+      REQUIRE(tournament_diagnostics.source_receiver_pair_count > 0U);
+    }
+  }
 }
 
 TEST_CASE("KineticCore finds support changes and resolves ties") {
