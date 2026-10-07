@@ -20,15 +20,13 @@ d_{ij}^2(t)=\lVert p_i(t)-q_j\rVert^2
 \]
 
 At any time, an assignment gives each point exactly one owner station.
-For a fixed assignment, the support of station \(j\) is the farthest
+For a fixed assignment, the exact-time support of station \(j\) is the farthest
 currently assigned point,
 \[
 s_j(t)=\arg\max_{i:\operatorname{owner}(i)=j}d_{ij}^2(t),
 \]
-with ties resolved by the current deterministic point ordering: extension
-scans point ids in ascending order and replaces the support only on a strict
-distance increase, so the lowest id wins an exact distance tie. An empty
-station has support \(-1\) and contributes zero radius. Its radius is
+with ties resolved by the lowest point id. An empty station has support \(-1\)
+and contributes zero radius. Its radius is
 \[
 r_j^2(t)=d_{s_j(t),j}^2(t),
 \]
@@ -58,21 +56,61 @@ change.
 ### Kinetic extension
 
 `KineticSolution::extend` validates the supplied feasible assignment and its
-ownership/coverage at the requested start. It then advances in the requested
-direction. A short directional probe selects the farthest assigned point for
-each station; equal distances retain the first point id in ascending order.
-At a boundary it searches for:
+ownership/coverage at the requested start. At every event time it resolves
+both the exact-time support and the support valid on the immediately adjacent
+open interval \((t,t+\delta)\) forward or \((t-\delta,t)\) backward, for
+sufficiently small positive \(\delta\). It does not choose a support by
+evaluating trajectories at a time offset. At a boundary it searches for:
+
+The removed probe used an offset as large as \(10^{-8}\). If a support root
+lies strictly between the current time and that probe time, the probe observes
+the post-event support before the exhaustive detector searches forward from
+the current time. The detector then treats that root as no longer future and
+cannot report the transition, skipping a real interval boundary. A smaller
+fixed offset would only move the same failure to a closer root.
 
 - the next waypoint of any currently active support trajectory;
-- the earliest owned candidate/support equality whose directional derivative
-  says the candidate is becoming farther; and
+- the earliest owned candidate/support equality whose directional polynomial
+  comparison says the candidate becomes farther; and
 - when enabled, the earliest valid non-increasing handover.
 
-The next boundary is the earliest of these and the requested end. A handover
-may also be applied immediately at the extension start when the existing
+The next boundary is the earliest of these and the requested end. Event roots
+strictly after the current time are not filtered by the simultaneous-event
+tolerance, so a genuine transition arbitrarily close to the current time is
+still scheduled. Events simultaneous under `event_times_simultaneous` are
+handled at one boundary; support states are recomputed from post-transition
+ownership before the next positive-duration interval. A handover may also be
+applied immediately at the extension start when the existing
 source-second-furthest and receiver-containment tests allow it. A source point
 is only transferred when the complete before/after sum of squared station
 radii does not increase, within the existing numeric tolerance.
+
+### Exact and directional support states
+
+On fixed trajectory segments, let
+\(g(t)=d_{uj}^2(t)-d_{vj}^2(t)\). At \(t_0\), the local expansion is
+\[
+g(t_0+\sigma\delta)=A_0+A_1\delta+A_2\delta^2,\qquad\delta>0,
+\]
+where \(\sigma=+1\) forward and \(\sigma=-1\) backward. \(A_0\) is the
+exact squared-distance difference; \(A_1\) is \(\sigma\) times the
+difference of squared-distance derivatives on the directionally active
+segments; \(A_2\) is the difference of squared speeds on those segments.
+Comparison uses the first distinguishable coefficient in \(A_0,A_1,A_2\).
+Each coefficient treats values within
+\(64\,\epsilon_{\mathrm{machine}}\max(1,|x|,|y|)\) as numerically equal.
+The same distance tolerance is used for exact-time support. If all three
+coefficients tie, the lower point id wins. Thus first-order equality proceeds
+to second-order comparison; second-order equality proceeds to the point-id
+tie rule. At a trajectory breakpoint, forward comparisons use the segment
+beginning at the breakpoint and backward comparisons use the segment ending
+there. Tangencies and persistent equality are resolved without temporal
+sampling or artificial repeated events.
+
+The event-time batching tolerance is separate from support comparison:
+`event_times_simultaneous` uses an absolute \(10^{-9}\) term plus a
+scale-dependent floating-point term. It groups detected events; it does not
+move the current-time boundary or suppress a strictly future root.
 
 The support-event search itself can span future trajectory waypoints; it
 segments its equations internally. The emitted interval partition in the
@@ -101,9 +139,9 @@ apply the same transition tests as extension.
 
 ### Handovers and second-furthest points
 
-`second_furthest_assigned` sorts an explicit station assignment by descending
-squared distance, then ascending point id; it returns the second entry, or
-\(-1\) if fewer than two points are assigned. Handover searches require valid
+`second_furthest_assigned` returns the runner-up under descending squared
+distance, then ascending point id, or \(-1\) if fewer than two points are
+assigned. Handover searches require valid
 source/receiver supports and at least two source-owned points. The candidate
 point must be the source support, become contained in the receiver disk in the
 requested direction, and pass a whole-assignment before/after radius check.
@@ -111,6 +149,30 @@ requested direction, and pass a whole-assignment before/after radius check.
 `find_handovers_from` checks each active receiving station in ascending order.
 `find_next_handover` scans source and receiver station ids in ascending order
 and keeps the first event at an equal event time.
+
+The extension path keeps at most one external challenge certificate for each
+ordered source/receiver station pair and current source support. For source
+support \(p\) and receiver support \(s\), it solves
+\[
+\lVert p_p(t)-q_B\rVert^2-\lVert p_s(t)-q_B\rVert^2=0
+\]
+piecewise over the pair's active trajectory segments. It does not compare the
+receiver support against all receiver-owned points. A certificate is replaced
+when its source or receiver support changes, either active trajectory changes
+segment, or its challenge is processed. Other cached pair certificates remain
+available. The next solution boundary is selected across support events,
+active-support breakpoints, cached challenges, and the requested endpoint.
+
+The tournament stores the best and second-best assigned point at each node;
+its second-support query reads the root's runner-up without sorting the source
+assignment. At a candidate transfer, the local evaluation uses only the
+source and receiver supports before and after the hypothetical ownership
+change. It does not mutate permanent ownership or tournament state during
+evaluation. If the local objective comparison is unfavorable, the
+`REFERENCE_GLOBAL` whole-assignment check remains the numerical-tolerance
+fallback and its point scans are counted. Simultaneous challenges are
+revalidated against the directional support state at their shared event time
+before ownership changes.
 
 ### Combination and partial extension
 
@@ -170,11 +232,13 @@ piece it obtains each trajectory's linear segment, constructs
 \[
 d_{ij}^2(t)-d_{sj}^2(t),
 \]
-and solves the resulting quadratic exactly using the repository's quadratic
-root routine. It retains roots in the relevant piece and directional query
-interval, clamps tolerated endpoint roots to the piece, and orders results by
-directional time and then candidate id. The existing time tolerance and
-root-solving tolerances remain part of this reference behavior.
+and solves the resulting quadratic using the repository's quadratic root
+routine. It retains roots in the relevant piece and directional query
+interval, clamps machine-precision-near endpoint roots to the piece, and
+orders results by directional time and then candidate id. Root solving keeps
+its coefficient/discriminant tolerances. Query inclusion is strictly
+directional at the current time; the separate simultaneous-event policy
+batches nearby detected roots.
 `find_next_event` scans station ids in ascending order, so equal-time station
 events retain the lowest station id.
 
@@ -223,6 +287,10 @@ collect:
 - quadratic equations solved and real roots found;
 - candidate roots rejected by time, ownership, or transition tests;
 - selected support events and handover-event checks;
+- ordered source/receiver pairs, external challenge certificates and updates,
+  queue insertions, and stale challenge events;
+- local support and second-support queries, global fallbacks, and global
+  points scanned;
 - generated solution intervals; and
 - total extension, support-event detection, and handover detection
   nanoseconds.

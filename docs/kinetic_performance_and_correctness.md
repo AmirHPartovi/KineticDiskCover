@@ -1,222 +1,217 @@
-# Kinetic Handover Performance and Correctness
+# Kinetic performance and correctness certification
 
-## 1. Scope and implementation status
+## Executive result
 
-This change optimizes the area-admissibility work performed after an exact
-handover candidate has been detected. It does not replace support-event root
-prediction, alter receiver acceptance or derivative tie-breaking, change
-MinMax/MinSum/MinMaxSum semantics, or establish global optimality.
+The deterministic 200-seed campaign found no observable differences among
+`REFERENCE_EXHAUSTIVE` with global handover evaluation,
+`KINETIC_TOURNAMENT` with global handover evaluation, and
+`KINETIC_TOURNAMENT` with local exact handover evaluation. All 600 emitted
+engine rows passed differential checks and certified continuous verification.
 
-The checked-out `KineticFarthestTournament` class is not a maintained
-certificate tournament: it rescans a point vector, and its event-query
-surface is not integrated into `KineticSolution::extend`. Accordingly, this
-report compares the existing exhaustive kinetic extension with the same
-extension using global-reference versus local-exact handover evaluation. It
-does not report tournament or geometric-engine measurements.
+There is no meaningful support-event speedup or measured break-even point.
+Median extension speedups were close to 1x, interquartile ranges crossed 1x,
+and support comparison/pairwise polynomial-solve counts were identical. Local
+handover evaluation reduced whole-assignment fallback scans in the
+handover-heavy family, but the aggregate runtime gain remained small and mixed.
+No automatic engine selection is justified; the API default remains
+`REFERENCE_EXHAUSTIVE`.
 
-## 2. Reference algorithm
+The measurements are exploratory, not representative release benchmarks:
+they were recorded from a dirty worktree and a direct optimized compile rather
+than a clean CMake build.
 
-For a possible transfer of point \(p\) from station \(A\) to \(B\), the
-original `make_nonincreasing_handover` scanned every owned point and built
-before/after radii and support ids for every station. It then compared the
-whole objective:
+## Mathematical invariants
 
-\[
-  C_{\mathrm{after}} \le C_{\mathrm{before}} +
-  10^{-9}\max(1, |C_{\mathrm{before}}|, |C_{\mathrm{after}}|).
-\]
+For each station, support is the assigned point maximizing squared distance.
+At exact ties, the centralized tolerance policy and deterministic point-id
+rule apply. Directional support resolves the first nonzero coefficient in the
+local quadratic distance difference; a trajectory breakpoint uses its
+adjacent motion segment in the requested direction. This is a directional
+limit, not temporal sampling.
 
-The point's owner is the only assignment changed by this hypothetical
-transfer. Therefore every other station \(C\notin\{A,B\}\) has the same
-assigned set and the same exact radius before and after. The global reference
-path is retained as `HandoverEvaluation::REFERENCE_GLOBAL` for differential
-tests and benchmarks.
+A support transition occurs at a root of a pairwise squared-distance
+difference over a fixed pair of linear-motion segments. External handover
+challenge roots compare the current source support with the current receiver
+support. The existing handover rules remain in force: source support
+strictness, directional receiver acceptance, the minimum source ownership
+condition, and non-increasing objective. Ownership changes only after the
+preceding interval is emitted. Simultaneous events use the repository's
+central event-time policy.
 
-## 3. Local exact algorithm
+All roots, comparisons, and event grouping use floating-point arithmetic and
+the repository's tolerances; “exact” in this report means exact under those
+existing numerical semantics, not exact arithmetic. Continuous verification
+is an independent implementation-level check. Kinetic event correctness does
+not prove global optimality of the static MinMax, MinSum, or MinMaxSum problem.
 
-The optimized path groups points by owner once per handover query. For a
-candidate \(p:A\to B\), it computes only:
+## Engines and implementation boundary
 
-- before-support/radius for \(A\) and \(B\);
-- after-support/radius for \(A\setminus\{p\}\) and \(B\cup\{p\}\).
+| Configuration | Event-engine option | Handover evaluation |
+|---|---|---|
+| `reference_global` | `REFERENCE_EXHAUSTIVE` | `REFERENCE_GLOBAL` |
+| `tournament_global` | `KINETIC_TOURNAMENT` | `REFERENCE_GLOBAL` |
+| `tournament_local` | `KINETIC_TOURNAMENT` | `LOCAL_EXACT` |
 
-The affected station supports are selected using the same directional
-velocity tie-breakers and floating tolerance as the reference routine. The
-receiver's inserted candidate is considered in ascending point-id order,
-matching the original all-points scan. This is a side-effect-free
-hypothetical evaluation: owner vectors and any persistent support state are
-not mutated.
+These rows invoke the public engine options; the benchmark does not label a
+vector implementation or placeholder as a tournament baseline. Inspection of
+the checked-out implementation shows that `support_changes_impl` still
+enumerates every challenger and solves its pairwise segment equations for
+both engine values. The engine argument is validated there, but does not
+select a maintained tournament certificate queue. The tournament structure
+is used for support queries, but its event-query surface is not integrated
+into a certificate-driven support scheduler. Consequently, this campaign
+certifies equivalence of these execution paths and handover policies; it does
+not certify or measure a fully maintained tournament KDS.
 
-Let \(L_{\mathrm{before}}\) and \(L_{\mathrm{after}}\) be the sum of the two
-affected squared radii. If \(L_{\mathrm{after}}\le L_{\mathrm{before}}\), the
-global objective cannot increase: all other stations contribute the same
-nonnegative term to both sides. The original non-increase predicate
-therefore necessarily accepts, including its nonnegative tolerance. If the
-local affected sum increases, the optimized implementation falls back to the
-retained global routine. This preserves the original global scale-dependent
-tolerance decision exactly in the only case where that shared unchanged
-objective could affect acceptance. The fallback is counted in diagnostics.
+For handovers evaluated immediately after a support-state change, local
+evaluation falls back to the global reference check. Source eligibility at a
+transition must retain the reference approach-side semantics; the differential
+campaign exposed a spurious reverse transfer without this fallback. These
+fallbacks are counted in `global_fallbacks`.
 
-The local common case inspects points owned by \(A\) and \(B\); it does not
-scan unrelated owners or allocate before/after arrays for all stations.
-Point grouping costs one linear pass per top-level handover query. Support
-event searches that produce candidate events remain the exhaustive reference
-search and are not pruned.
+## Correctness methodology
 
-## 4. Invariants and event ordering
+`benchmarks/kinetic_certification.cpp` generates ten deterministic instance
+families: support-event-heavy small cases, large \(n\)/small \(m\), moderate
+\(n\)/larger \(m\), irrelevant waypoints, handover stress, near-zero time
+scales, simultaneous motion, tangent/degenerate motion, long piecewise
+trajectories, and sparse events.
 
-- Ownership changes only for the candidate point; all other owner groups
-  remain unchanged during hypothetical evaluation.
-- Each station's radius is the maximum squared distance in its current
-  owner group, with the implementation's direction-sensitive tie handling.
-- The source candidate must still be the before-support of \(A\), and both
-  affected after-stations must have a support, as in the reference routine.
-- The existing receiver-disk derivative condition and whole-objective
-  non-increase condition remain in force.
-- A rejected candidate leaves permanent ownership/support state untouched.
-- The extension loop selects the earliest computed boundary and applies a
-  handover only at that boundary. Support selection is recomputed after the
-  ownership change; a simultaneous support root/active-support waypoint is
-  therefore handled on the next iteration using the post-handover owner
-  state.
-- `event_times_simultaneous` centralizes test/diagnostic time comparison:
-  \[
-    |t_1-t_2|\le 10^{-9}
-      +64\epsilon_{\mathrm{machine}}\max(1,|t_1|,|t_2|).
-  \]
-  Root prediction and the repository's existing event-selection semantics
-  are otherwise unchanged. Existing extension boundary tolerances continue
-  to govern interval construction.
+The simultaneous family varies the crossing across deterministic seeds: roots
+are placed exactly at the shared midpoint breakpoint, \(2\times10^{-9}\)
+before or after it, or nearly simultaneously across station groups. The
+tangent/degenerate family alternates an exact tangent equality with a
+\(10^{-10}\) spatial perturbation. These are generated adversarial variants,
+not a transform applied to every root discovered in every random instance.
 
-Kinetic events are still predicted by piecewise-quadratic root solving across
-the union of relevant trajectory breakpoints. The local handover path does
-not replace event prediction with sampling.
+Each case uses the same initial assignment, objective, bounds, and interval
+emission policy for all three configurations. The comparison checks:
 
-## 5. Differential certification
+- ordered event traces, event times under the centralized simultaneity
+  policy, event types, station/support ids, handover ids, and tie outcomes;
+- interval boundaries, support vectors, ownership vectors, and quadratic
+  coefficients;
+- costs at each event and the adjacent representable floating-point times,
+  peak and peak time, and total integral;
+- certified continuous verification for every engine output.
 
-`HandoverEvaluation::REFERENCE_GLOBAL` executes the original global
-before/after recomputation; `LOCAL_EXACT` uses the station-local path with
-the positive-delta global fallback. Tests compare validity and complete
-handover event fields in both time directions across fixed and deterministic
-random instances, including differing point/station sizes and piecewise
-motion.
+The benchmark does not replace continuous verification with dense sampling.
+Extension timing excludes verification; rows report `extension_ns`,
+`verification_ns`, and `end_to_end_ns` separately. The speedup field is zero
+unless the differential checks and verifier pass. On failure, the process
+returns nonzero and reports the seed and family for reproduction.
 
-Extension-level differential tests run the same reference exhaustive event
-engine and initial assignment with each handover evaluation mode. They compare
-interval boundaries, support vectors, ownership vectors, quadratic
-coefficients, peak, peak time, integral, and require continuous verification
-for both solutions. The benchmark additionally compares deterministic event
-traces, including event type, station/support ids, handover ids, and tie
-outcomes. Objective agreement alone is not considered sufficient.
+The existing C++ tests additionally cover near-zero roots, exact and adjacent
+trajectory-breakpoint directional states, tangent roots, second-order ties,
+simultaneous support/handover events, forward and backward traversal, and
+randomized handover comparisons.
 
-The test corpus also exercises breakpoint support events, tangent/equal
-distance cases, simultaneous support changes, support-id ties, forward and
-backward extension, handover-at-start behavior, and continuous coverage.
-No kinetic hull/geometric engine is claimed or compared.
+## Randomized campaign and reproducibility
 
-## 6. Degeneracies
+The raw per-engine, per-instance results are stored in
+[`benchmarks/kinetic_certification_results.csv`](../benchmarks/kinetic_certification_results.csv).
+The harness takes seed count, repetition count, and optional starting seed
+index. The CI command runs `kdc-kinetic-certification 200 1`; the saved local
+campaign uses 200 consecutive seeds starting at `20261007`, three repetitions
+per engine and instance, and reports the median extension-time run for each
+engine. There was no outlier removal.
 
-The local support selector retains the prior per-station comparison tolerance
-and directional derivative tie-breaker. Equal distance and equal
-tie-breaker retains the first point in ascending id order. An accepted local
-non-increase requires no global resummation; a positive local increase uses
-the original full scan, preserving its aggregate tolerance behavior.
+Every row includes Git revision/dirty status, compiler, build type, reported
+logical CPU count, seed, family, \(n\), \(m\), trajectory-segment total,
+engine/handover configuration, timing breakdown, available work counters,
+interval count, support/handover event counts, peak, integral, speedup, and
+correctness status. It also stores an event-grouped trace with event times,
+types, stations, support ids, and transferred points. Missing counters and
+memory are recorded as `NA`, not estimated.
 
-Trajectory waypoints remain the responsibility of the existing piecewise
-event detector. A handover exactly coincident with another predicted event
-is processed at the common extension boundary; ownership is updated only
-after constructing the preceding interval, and subsequent supports are
-recomputed from the new ownership.
+Local measurement environment:
 
-## 7. Benchmark methodology
+- Base revision `31fa4196bd478f6e94c033cc0fd7afe73e9528b5`, dirty worktree
+  (`git_dirty=true`).
+- Apple clang 17.0.0, arm64 macOS 27.2, 8 reported logical CPUs.
+- Direct optimized compile: `-O2 -DNDEBUG`; row build type `Release`. This is
+  not the repository's full CMake Release build.
+- Seeds `20261007` through `20261206`; three repeats per engine and seed.
+- Synthetic benchmark only; a clean-runner and stored real-instance campaign
+  remain necessary for representative performance claims.
 
-The CMake `BUILD_BENCHMARK` suite now includes
-`kdc-kinetic-handover-benchmark`, using the repository's existing benchmark
-target pattern and build metadata. It emits CSV to standard output and takes
-instance-count and repetition-count arguments. For each deterministic seed,
-both handover evaluators receive the same initial assignment, event engine,
-solver setup, and verification. Rows include seed/configuration, build
-revision/dirty state, platform and logical CPU count, runtime, event and
-handover diagnostics, interval counts, verification runtime, peak, integral,
-speedups, and a required correctness status. Unsupported tournament,
-geometric, and certificate-queue metrics are explicitly emitted as `NA`.
+## Raw and aggregate results
 
-Five deterministic workload families are covered: small, general,
-large-\(n\) small-\(m\), moderate-\(n\) large-\(m\), and handover-heavy.
-Repetitions are sorted by
-extension wall time and the middle observation is reported. Correctness is
-required for every repetition; a mismatch returns failure rather than
-emitting a successful row. The generated suite is a reproducible synthetic
-microbenchmark, not a substitute for the repository's stored real-instance
-experiment runs.
+All 200 seeds (600 rows) reported `correctness_status=PASS`. Aggregate
+per-instance speedups compare each tournament row with its corresponding
+reference extension time:
 
-Run with:
+| Configuration | Median extension speedup | p25 | p75 | Geometric mean | Faster than reference |
+|---|---:|---:|---:|---:|---:|
+| Tournament + global handover | 1.001x | 0.990x | 1.017x | 1.006x | 105 / 200 |
+| Tournament + local handover | 1.005x | 0.995x | 1.025x | 1.010x | 122 / 200 |
 
-```sh
-cmake -S . -B build -DBUILD_BENCHMARK=ON
-cmake --build build --target kdc-kinetic-handover-benchmark
-./build/kdc-kinetic-handover-benchmark 10 3 > handover-results.csv
-```
+These small differences are within workload/process variability and should not
+be treated as proof of improvement. Median extension times across all rows
+were 0.290 ms for reference/global, 0.286 ms for tournament/global, and
+0.291 ms for tournament/local. Median verification times were 0.183, 0.183,
+and 0.183 ms; verification is reported separately.
 
-The reported extension speedup is the ratio of reference-global to
-local-exact extension runtime. Event-detection and interval-construction
-ratios are reported separately. Verification overhead is reported as
-optimized verification runtime divided by reference verification runtime.
-No global solver optimality claim follows from a faster or verified kinetic
-extension; MinMax lower-bound/optimality semantics are unchanged.
+Per-family median speedups and interquartile ranges are below. Each family has
+20 seeds; these are extension-time ratios to the matching reference instance.
 
-## 8. Measured results
+| Family | Tournament/global median (p25–p75) | Tournament/local median (p25–p75) |
+|---|---:|---:|
+| Support-event-heavy | 1.003x (0.995–1.026) | 1.006x (0.998–1.009) |
+| Large \(n\), small \(m\) | 1.001x (0.989–1.016) | 0.996x (0.989–1.015) |
+| Moderate \(n\), larger \(m\) | 0.997x (0.983–1.014) | 1.004x (0.978–1.026) |
+| Irrelevant waypoints | 1.010x (0.996–1.033) | 1.003x (0.995–1.023) |
+| Handover stress | 1.002x (0.988–1.030) | 1.048x (1.040–1.067) |
+| Near-zero scale | 1.006x (0.995–1.034) | 1.006x (0.997–1.055) |
+| Simultaneous motion | 0.999x (0.989–1.017) | 1.002x (0.997–1.021) |
+| Tangent/degenerate | 0.997x (0.991–1.027) | 1.002x (0.990–1.013) |
+| Long piecewise paths | 1.005x (0.996–1.015) | 1.009x (0.997–1.017) |
+| Sparse events | 0.991x (0.975–1.003) | 1.000x (0.984–1.007) |
 
-The persisted CSV `benchmarks/kinetic_handover_results.csv` records five
-deterministic families (three repetitions each; median extension runtime),
-measured on Release/macOS with 8 logical CPUs. Every repetition passed
-solution/event-trace comparison and continuous verification. The recorded
-revision was `78cd913` with a dirty worktree. The benchmark executable was
-manually linked against the available Release project libraries because
-CMake regeneration/build subprocesses were blocked by host process-resource
-exhaustion; the resulting executable ran successfully and produced the CSV.
-This is a reproducible measurement from the recorded binary and inputs, but
-not a clean CMake rebuild of the current dirty worktree.
+In the handover-heavy family (20 seeds), median handovers were six per
+solution. The local path's aggregate global-fallback point scans were 1,600,
+versus 4,400 for the global evaluator. Its 1.048x median speedup is a
+measurable benefit on this deliberately handover-heavy fixture, but does not
+establish a broad speedup for typical workloads.
 
-| Workload | \(n,m\) | Reference → local extension (ms) | Speedup | Handover checks | Handover-phase speedup | Intervals ref → local | Correct |
-|---|---:|---:|---:|---:|---:|---:|:---:|
-| Small | 8, 2 | 0.0630 → 0.0618 | 1.0195x | 0 | 1.2049x* | 9 → 9 | PASS |
-| General | 60, 6 | 73.945 → 72.709 | 1.0170x | 0 | 1.0163x* | 109 → 109 | PASS |
-| Large \(n\), small \(m\) | 120, 2 | 7.800 → 7.674 | 1.0165x | 0 | 1.0232x* | 48 → 48 | PASS |
-| Moderate \(n\), large \(m\) | 36, 12 | 58.366 → 58.454 | 0.9985x | 0 | 0.9981x* | 64 → 64 | PASS |
-| Handover-heavy | 20, 2 | 0.1010 → 0.0958 | 1.0553x | 19 | 1.1270x | 7 → 7 | PASS |
+Pairwise point-vs-support comparisons and quadratic solve counts matched
+between reference and tournament-selected engines. This confirms that the
+tournament option did not reduce the dominant support-event candidate work
+in this implementation. Some individual instances improved and some
+regressed; no family exhibits evidence for a dependable size-based selection
+threshold.
 
-`*` No handover was evaluated in these families; these phase ratios are
-microsecond-scale timing observations, not evidence of a handover benefit.
-The local implementation inspects 440 station-local support points across
-19 handover checks in the handover-heavy workload, accepts 11 locally, and
-uses no global fallbacks. Support-comparison and certificate counts matched
-between evaluators on every row. Peak cost and integral agreed exactly in the
-recorded output; verification overhead ratios ranged from 0.9256x to 1.0500x.
-The measured gains are modest, one workload has a small regression, and
-interval counts are unchanged. These results do not demonstrate a universal
-runtime improvement; they support retaining the reference mode and revisiting
-default selection with broader real-instance measurements.
+## Break-even, regressions, and memory
 
-## 9. Known limitations and default recommendation
+No empirical support-event break-even was found over the tested sweep:
+\(n\) reached 160, \(m\) reached 8 in the scaled station-count family, and
+trajectories reached 40 segments per point. Since point-vs-support and
+pairwise polynomial work were unchanged, these results cannot support an
+automatic-selection threshold. No `auto` mode is added.
 
-- The support-event search remains exhaustive and can dominate total runtime,
-  limiting the end-to-end gain from a handover-only optimization.
-- Positive affected-radius deltas deliberately fall back to the global
-  reference evaluator to preserve its global tolerance semantics.
-- A diagnostic grouped-point construction is linear in point count. Very
-  small or no-handover instances may not benefit; benchmark results should
-  guide whether the default should be local or reference for those workloads.
-- `KINETIC_TOURNAMENT` is not a maintained, integrated kinetic certificate
-  engine in the checked-out implementation. It is not a valid tournament
-  benchmark baseline.
-- No orientation certificates, kinetic hull, or farthest-point Voronoi
-  structure are implemented here.
+Individual timings show regressions as well as wins. The mixed results and
+very small overall median speedups do not meet the promotion criterion.
+Tournament-node storage exists, but memory was not measured; all memory
+fields are `NA`. Certificate creation/failure, support queue operations,
+stale support events, tree updates, and handover queue pops are also not yet
+instrumented and are reported as `NA`.
 
-Keep exhaustive support-event detection and global handover evaluation
-available as references. The local path is exact by the two-station locality
-argument and is differentially checked. Current synthetic measurements show
-small extension gains on four families, one slight regression, and a larger
-gain on the handover-heavy family; they do not establish representative
-real-world performance. This work does not change solver optimality
-certification.
+## CI and promotion decision
+
+`.github/workflows/kinetic-certification.yml` runs on pushes, pull requests,
+and manual dispatch. It builds the complete C++ test executable and
+certification harness, runs the full C++ suite, then runs a seeded 200-case
+three-engine differential campaign and uploads the CSV.
+
+Locally, all 228 C++ test cases (37,229 assertions) passed after a direct
+Clang build against the installed dependencies. The normal CMake-generated
+build could not be regenerated in this checkout because its cached
+FetchContent state did not provide the Eigen and Catch2 targets; CI exercises
+the repository's standard clean CMake path.
+
+The promotion gate is **not met**. Differential correctness and continuous
+verification passed in the recorded campaign, but a fully certificate-driven
+tournament event scheduler, clean repeatable runtime benefit, and memory
+evidence are absent. Keep `REFERENCE_EXHAUSTIVE` as the default and keep
+tournament selection explicit. Nothing in this report claims global
+optimization optimality.

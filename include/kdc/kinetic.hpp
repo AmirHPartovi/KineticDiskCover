@@ -4,6 +4,7 @@
 #include "kdc/types.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -32,16 +33,32 @@ class KineticFarthestTournament {
   void update_motion(int point_id, double time,
                     SolverBudget* budget = nullptr);
   int current_winner() const;
+  int second_winner() const;
+  int best_except(int point_id) const;
   double next_event_time(double time, bool forward = true,
                          SolverBudget* budget = nullptr) const;
   bool process_until(double time, SolverBudget* budget = nullptr);
   bool validate(double time, SolverBudget* budget = nullptr) const;
 
  private:
+  struct Node {
+    explicit Node(int point_id);
+    int point_id{-1};
+    int winner{-1};
+    int second_winner{-1};
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
+  };
+
+  void rebuild_tree(double time, SolverBudget* budget = nullptr);
+  void recompute_node(Node* node, double time, SolverBudget* budget = nullptr);
+
   const Instance* instance_{nullptr};
   int station_id_{-1};
   std::vector<int> points_;
+  std::unique_ptr<Node> root_;
   int winner_{-1};
+  int second_winner_{-1};
 };
 
 enum class KineticEventType {
@@ -77,6 +94,13 @@ struct KineticEventDiagnostics {
   std::uint64_t handover_local_acceptances{0};
   std::uint64_t handover_global_fallbacks{0};
   std::uint64_t handover_global_point_scans{0};
+  std::uint64_t source_receiver_pair_count{0};
+  std::uint64_t external_challenge_certificates{0};
+  std::uint64_t external_challenge_updates{0};
+  std::uint64_t handover_queue_pushes{0};
+  std::uint64_t stale_handover_events{0};
+  std::uint64_t local_support_queries{0};
+  std::uint64_t second_support_queries{0};
   std::uint64_t solution_intervals_generated{0};
   std::uint64_t total_extension_nanoseconds{0};
   std::uint64_t support_event_detection_nanoseconds{0};
@@ -106,6 +130,32 @@ struct HandoverEvent {
 
 class KineticCore {
  public:
+  // Support comparison returns positive when first is farther, negative when
+  // second is farther, and zero only when the point ids are identical.
+  // Exact-time distances use a scale-aware 64*machine-epsilon tolerance and
+  // then the lower point id. Directional comparison examines, in order, the
+  // constant, linear, and quadratic coefficients of the local squared-
+  // distance difference; the first coefficient distinguishable under that
+  // same tolerance determines the winner. The linear coefficient is
+  // multiplied by +1 forward or -1 backward. If linear terms tie, quadratic
+  // terms decide; if all terms tie, the lower point id wins.
+  static int compare_support_at_time(const Instance& instance, int station_id,
+                                    int first_point, int second_point,
+                                    double time,
+                                    SolverBudget* budget = nullptr);
+  static int compare_support_directional_limit(
+      const Instance& instance, int station_id, int first_point,
+      int second_point, double time, bool forward,
+      SolverBudget* budget = nullptr);
+  static int resolve_support_at_time(const Instance& instance, int station_id,
+                                     const std::vector<int>& candidates,
+                                     double time,
+                                     SolverBudget* budget = nullptr);
+  static int resolve_support_directional_limit(
+      const Instance& instance, int station_id,
+      const std::vector<int>& candidates, double time, bool forward,
+      SolverBudget* budget = nullptr);
+
   static std::vector<double> solve_quadratic(
       double a, double b, double c, double eps_a = 1e-12,
       double eps_b = 1e-12, double eps_disc = 1e-12);
@@ -146,6 +196,23 @@ class KineticCore {
       bool forward, SolverBudget* budget = nullptr,
       KineticEventEngine engine =
           KineticEventEngine::REFERENCE_EXHAUSTIVE,
+      KineticEventDiagnostics* diagnostics = nullptr,
+      HandoverEvaluation evaluation = HandoverEvaluation::LOCAL_EXACT);
+
+  static SupportChangeEvent find_external_challenge(
+      const Instance& instance, int receiver_station, int receiver_support,
+      int challenger, double t_start, double t_end, bool forward,
+      SolverBudget* budget = nullptr,
+      KineticEventEngine engine =
+          KineticEventEngine::KINETIC_TOURNAMENT,
+      KineticEventDiagnostics* diagnostics = nullptr);
+
+  static HandoverEvent evaluate_handover_candidate(
+      const Instance& instance, int station_from, int station_to,
+      int point_id, int source_support_before, int receiver_support_before,
+      int source_support_after_removal, int receiver_support_without_point,
+      const std::vector<int>& assigned_points, double time, bool forward,
+      SolverBudget* budget = nullptr,
       KineticEventDiagnostics* diagnostics = nullptr,
       HandoverEvaluation evaluation = HandoverEvaluation::LOCAL_EXACT);
 
