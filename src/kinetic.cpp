@@ -68,7 +68,7 @@ Value comparison_tolerance(Value first, Value second) {
          std::max({1.0, std::abs(first), std::abs(second)});
 }
 
-int compare_numeric(Value first, Value second) {
+int compare_support_scalar(Value first, Value second) {
   const Value tolerance = comparison_tolerance(first, second);
   if (first > second + tolerance) {
     return 1;
@@ -77,6 +77,10 @@ int compare_numeric(Value first, Value second) {
     return -1;
   }
   return 0;
+}
+
+int compare_support_point_id_tie(int first_point, int second_point) {
+  return first_point < second_point ? 1 : -1;
 }
 
 class DiagnosticsTimer {
@@ -579,12 +583,12 @@ int compare_support_at_time_impl(
   const Point second_position =
       precompute.position(static_cast<Index>(second_point), time);
   const int distance_order =
-      compare_numeric((first_position - station).norm2(),
-                      (second_position - station).norm2());
+      compare_support_scalar((first_position - station).norm2(),
+                             (second_position - station).norm2());
   if (distance_order != 0) {
     return distance_order;
   }
-  return first_point < second_point ? 1 : -1;
+  return compare_support_point_id_tie(first_point, second_point);
 }
 
 int compare_support_directional_limit_impl(
@@ -600,8 +604,8 @@ int compare_support_directional_limit_impl(
   const Point second_position =
       precompute.position(static_cast<Index>(second_point), time);
   const int distance_order =
-      compare_numeric((first_position - station).norm2(),
-                      (second_position - station).norm2());
+      compare_support_scalar((first_position - station).norm2(),
+                             (second_position - station).norm2());
   if (distance_order != 0) {
     return distance_order;
   }
@@ -615,18 +619,18 @@ int compare_support_directional_limit_impl(
       direction * 2.0 * (first_position - station).dot(first_velocity);
   const Value second_rate =
       direction * 2.0 * (second_position - station).dot(second_velocity);
-  const int rate_order = compare_numeric(first_rate, second_rate);
+  const int rate_order = compare_support_scalar(first_rate, second_rate);
   if (rate_order != 0) {
     return rate_order;
   }
 
   const int acceleration_order =
-      compare_numeric(first_velocity.dot(first_velocity),
-                      second_velocity.dot(second_velocity));
+      compare_support_scalar(first_velocity.dot(first_velocity),
+                             second_velocity.dot(second_velocity));
   if (acceleration_order != 0) {
     return acceleration_order;
   }
-  return first_point < second_point ? 1 : -1;
+  return compare_support_point_id_tie(first_point, second_point);
 }
 
 }  // namespace
@@ -646,6 +650,7 @@ KineticFarthestTournament::Node::Node(int point_id)
 
 void KineticFarthestTournament::rebuild_tree(double time,
                                              SolverBudget* budget) {
+  time_ = time;
   if (instance_ == nullptr) {
     root_.reset();
     winner_ = -1;
@@ -669,8 +674,19 @@ void KineticFarthestTournament::rebuild_tree(double time,
     return node;
   };
   root_ = build(build, 0U, ordered.size());
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
+  if (root_ == nullptr) {
+    winner_ = -1;
+    second_winner_ = -1;
+    return;
+  }
+  // Pairwise tolerance comparisons are non-transitive, so grouped node
+  // winners cannot define the authoritative support state.
+  winner_ = KineticCore::resolve_support_at_time(
+      *instance_, station_id_, ordered, time, budget);
+  ordered.erase(std::remove(ordered.begin(), ordered.end(), winner_),
+                ordered.end());
+  second_winner_ = KineticCore::resolve_support_at_time(
+      *instance_, station_id_, ordered, time, budget);
 }
 
 void KineticFarthestTournament::recompute_node(Node* node, double time,
@@ -737,8 +753,6 @@ void KineticFarthestTournament::initialize(
     }
   }
   rebuild_tree(time, budget);
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
 }
 
 void KineticFarthestTournament::insert(int point_id, double time,
@@ -753,8 +767,6 @@ void KineticFarthestTournament::insert(int point_id, double time,
     points_.push_back(point_id);
   }
   rebuild_tree(time, budget);
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
 }
 
 void KineticFarthestTournament::erase(int point_id, double time,
@@ -767,8 +779,6 @@ void KineticFarthestTournament::erase(int point_id, double time,
     points_.erase(found);
   }
   rebuild_tree(time, budget);
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
 }
 
 void KineticFarthestTournament::update_motion(int point_id, double time,
@@ -783,8 +793,6 @@ void KineticFarthestTournament::update_motion(int point_id, double time,
     return;
   }
   rebuild_tree(time, budget);
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
 }
 
 int KineticFarthestTournament::current_winner() const { return winner_; }
@@ -794,10 +802,18 @@ int KineticFarthestTournament::second_winner() const {
 }
 
 int KineticFarthestTournament::best_except(int point_id) const {
-  if (winner_ != point_id) {
-    return winner_;
+  if (instance_ == nullptr) {
+    return -1;
   }
-  return second_winner_;
+  std::vector<int> candidates;
+  candidates.reserve(points_.size());
+  for (const int candidate : points_) {
+    if (candidate != point_id) {
+      candidates.push_back(candidate);
+    }
+  }
+  return KineticCore::resolve_support_at_time(
+      *instance_, station_id_, candidates, time_);
 }
 
 double KineticFarthestTournament::next_event_time(double time, bool forward,
@@ -871,8 +887,6 @@ bool KineticFarthestTournament::process_until(double time, SolverBudget* budget)
   }
   const int previous = winner_;
   rebuild_tree(time, budget);
-  winner_ = root_ ? root_->winner : -1;
-  second_winner_ = root_ ? root_->second_winner : -1;
   return winner_ != previous;
 }
 
@@ -931,7 +945,10 @@ int KineticCore::resolve_support_at_time(
   }
   const auto precomputed = CandidateSet::precompute(instance, budget);
   int winner = -1;
-  for (const int candidate : candidates) {
+  std::vector<int> ordered = candidates;
+  std::sort(ordered.begin(), ordered.end());
+  ordered.erase(std::unique(ordered.begin(), ordered.end()), ordered.end());
+  for (const int candidate : ordered) {
     if (budget != nullptr) {
       budget->checkpoint();
     }
@@ -957,7 +974,10 @@ int KineticCore::resolve_support_directional_limit(
   }
   const auto precomputed = CandidateSet::precompute(instance, budget);
   int winner = -1;
-  for (const int candidate : candidates) {
+  std::vector<int> ordered = candidates;
+  std::sort(ordered.begin(), ordered.end());
+  ordered.erase(std::unique(ordered.begin(), ordered.end()), ordered.end());
+  for (const int candidate : ordered) {
     if (budget != nullptr) {
       budget->checkpoint();
     }
@@ -1119,8 +1139,7 @@ HandoverEvent KineticCore::evaluate_handover_candidate(
         point_id, time, forward, diagnostics);
   }
 
-  const int receiver_support_after =
-      receiver_order > 0 ? point_id : receiver_support_without_point;
+  const int receiver_support_after = receiver_support_without_point;
   const Point station_from_position =
       instance.stations[static_cast<Index>(station_from)].pos;
   const Point station_to_position =

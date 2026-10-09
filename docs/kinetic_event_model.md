@@ -57,10 +57,11 @@ change.
 
 `KineticSolution::extend` validates the supplied feasible assignment and its
 ownership/coverage at the requested start. At every event time it resolves
-both the exact-time support and the support valid on the immediately adjacent
-open interval \((t,t+\delta)\) forward or \((t-\delta,t)\) backward, for
-sufficiently small positive \(\delta\). It does not choose a support by
-evaluating trajectories at a time offset. At a boundary it searches for:
+the exact-time support and the support valid on the adjacent open interval in
+the traversal direction. It determines the
+directional support symbolically from the local polynomial coefficients; it
+does not evaluate trajectories at a finite time offset. At a boundary it
+searches for:
 
 The removed probe used an offset as large as \(10^{-8}\). If a support root
 lies strictly between the current time and that probe time, the probe observes
@@ -96,13 +97,18 @@ where \(\sigma=+1\) forward and \(\sigma=-1\) backward. \(A_0\) is the
 exact squared-distance difference; \(A_1\) is \(\sigma\) times the
 difference of squared-distance derivatives on the directionally active
 segments; \(A_2\) is the difference of squared speeds on those segments.
-Comparison uses the first distinguishable coefficient in \(A_0,A_1,A_2\).
-Each coefficient treats values within
+Pairwise scalar comparisons treat values within
 \(64\,\epsilon_{\mathrm{machine}}\max(1,|x|,|y|)\) as numerically equal.
-The same distance tolerance is used for exact-time support. If all three
-coefficients tie, the lower point id wins. Thus first-order equality proceeds
-to second-order comparison; second-order equality proceeds to the point-id
-tie rule. At a trajectory breakpoint, forward comparisons use the segment
+This is intentionally not described as a total order: tolerance equality can
+be non-transitive for triples. The authoritative support resolvers sort
+candidates by point id and apply the pairwise policy in that fixed sequence,
+so reference scans do not depend on caller-provided vector order. A tree
+reduction is not equivalent in general and must not be used as the
+authoritative winner until it maintains a state machine proven to reproduce
+the same canonical fold. If all three directional coefficients compare equal,
+the lower point id wins. Thus first-order equality proceeds to second-order
+comparison; second-order equality proceeds to the point-id tie rule. At a
+trajectory breakpoint, forward comparisons use the segment
 beginning at the breakpoint and backward comparisons use the segment ending
 there. Tangencies and persistent equality are resolved without temporal
 sampling or artificial repeated events.
@@ -163,9 +169,12 @@ segment, or its challenge is processed. Other cached pair certificates remain
 available. The next solution boundary is selected across support events,
 active-support breakpoints, cached challenges, and the requested endpoint.
 
-The tournament stores the best and second-best assigned point at each node;
-its second-support query reads the root's runner-up without sorting the source
-assignment. At a candidate transfer, the local evaluation uses only the
+The current `KineticFarthestTournament` is a rebuild-based winner tree, not a
+certificate-driven kinetic tournament. Since pairwise support tolerance is
+not transitive, the public winner and runner-up are resolved by the canonical
+ascending-id fold rather than by grouped internal-node comparisons. The tree
+does not currently provide an exhaustive-scan performance reduction. At a
+candidate transfer, the local evaluation uses only the
 source and receiver supports before and after the hypothetical ownership
 change. It does not mutate permanent ownership or tournament state during
 evaluation. If the local objective comparison is unfavorable, the
@@ -247,6 +256,14 @@ filtering. Every point is compared against the current support, including
 points that are later rejected by ownership/transition checks. Its cost is
 therefore suitable as a transparent baseline, not as the eventual
 performance-oriented data structure.
+
+`KineticEventEngine::KINETIC_TOURNAMENT` is currently experimental and does
+not dispatch support-event generation to a certificate queue:
+`find_support_changes` still uses this same exhaustive candidate scan. The
+winner tree's canonical support resolution also scans assigned candidates to
+avoid making a non-transitive pairwise tolerance relation depend on tree
+grouping. Consequently, selecting the tournament enum does not establish a
+support-event work reduction.
 
 ## 5. Correctness invariants
 
