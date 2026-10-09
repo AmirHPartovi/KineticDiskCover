@@ -59,6 +59,7 @@ class KineticFarthestTournament {
   std::unique_ptr<Node> root_;
   int winner_{-1};
   int second_winner_{-1};
+  double time_{0.0};
 };
 
 enum class KineticEventType {
@@ -130,15 +131,14 @@ struct HandoverEvent {
 
 class KineticCore {
  public:
-  // Support comparison returns positive when first is farther, negative when
-  // second is farther, and zero only when the point ids are identical.
-  // Exact-time distances use a scale-aware 64*machine-epsilon tolerance and
-  // then the lower point id. Directional comparison examines, in order, the
-  // constant, linear, and quadratic coefficients of the local squared-
-  // distance difference; the first coefficient distinguishable under that
-  // same tolerance determines the winner. The linear coefficient is
-  // multiplied by +1 forward or -1 backward. If linear terms tie, quadratic
-  // terms decide; if all terms tie, the lower point id wins.
+  // Pairwise support comparison returns positive when first wins and negative
+  // when second wins. Scalar comparisons use the existing scale-aware
+  // 64*machine-epsilon tolerance and point-id tie-breaking. This pairwise
+  // relation is not transitive for arbitrary triples. resolve_support_*()
+  // therefore defines the authoritative deterministic result as a fold over
+  // candidates in ascending point-id order. A tournament tree must not use
+  // grouped pairwise comparisons as an authoritative winner unless it proves
+  // equivalence to that fold.
   static int compare_support_at_time(const Instance& instance, int station_id,
                                     int first_point, int second_point,
                                     double time,

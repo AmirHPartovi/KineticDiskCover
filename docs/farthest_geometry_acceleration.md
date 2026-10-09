@@ -105,9 +105,12 @@ brute-force support at every critical time and directional state.
 ## Current implementation and complexity
 
 `KineticFarthestTournament` currently builds a balanced binary winner tree
-over sorted point ids and stores the best and runner-up at each node. This
-helps answer cached winner/runner-up queries between rebuilds. It is not yet a
-certificate-driven kinetic tournament scheduler:
+over sorted point ids and stores locally reduced winner/runner-up values at
+each node. Because the pairwise tolerance comparison is not transitive, those
+grouped values cannot define the authoritative support. The public winner and
+runner-up are obtained with a canonical ascending-id fold over the assignment;
+the cached nodes do not provide a production query-work reduction. It is not
+yet a certificate-driven kinetic tournament scheduler:
 
 - `initialize`, `insert`, `erase`, `update_motion`, and `process_until`
   rebuild the tree. Rebuild sorts the stored ids and recomputes nodes, so

@@ -391,6 +391,80 @@ TEST_CASE("KineticFarthestTournament matches exhaustive support winners") {
   require_same_events(support_events, reference);
 }
 
+TEST_CASE(
+    "Non-transitive support tolerance cannot change tournament resolution") {
+  const double epsilon = std::numeric_limits<double>::epsilon();
+  const auto instance = kdc::test::make_instance_linear(
+      {{kdc::Point(1.0, 0.0), kdc::Point(1.0, 0.0)},
+       {kdc::Point(1.0 + 20.0 * epsilon, 0.0),
+        kdc::Point(1.0 + 20.0 * epsilon, 0.0)},
+       {kdc::Point(1.0 + 40.0 * epsilon, 0.0),
+        kdc::Point(1.0 + 40.0 * epsilon, 0.0)}},
+      {{0.0, 0.0}});
+
+  const int ab =
+      kdc::KineticCore::compare_support_at_time(instance, 0, 0, 1, 0.0);
+  const int bc =
+      kdc::KineticCore::compare_support_at_time(instance, 0, 1, 2, 0.0);
+  const int ca =
+      kdc::KineticCore::compare_support_at_time(instance, 0, 2, 0, 0.0);
+  REQUIRE(ab > 0);
+  REQUIRE(bc > 0);
+  REQUIRE(ca > 0);
+
+  const std::vector<std::vector<int>> permutations{
+      {0, 1, 2}, {0, 2, 1}, {1, 0, 2},
+      {1, 2, 0}, {2, 0, 1}, {2, 1, 0}};
+  int expected = -1;
+  for (const auto& points : permutations) {
+    const int scanned =
+        kdc::KineticCore::resolve_support_at_time(instance, 0, points, 0.0);
+    if (expected < 0) {
+      expected = scanned;
+    }
+    REQUIRE(scanned == expected);
+    REQUIRE(kdc::KineticCore::resolve_support_directional_limit(
+                instance, 0, points, 0.0, true) == expected);
+    REQUIRE(kdc::KineticCore::resolve_support_directional_limit(
+                instance, 0, points, 0.0, false) == expected);
+
+    kdc::KineticFarthestTournament tournament;
+    tournament.initialize(instance, 0, points, 0.0);
+    REQUIRE(tournament.current_winner() == expected);
+    for (const int point : points) {
+      std::vector<int> remaining;
+      for (const int candidate : points) {
+        if (candidate != point) {
+          remaining.push_back(candidate);
+        }
+      }
+      REQUIRE(tournament.best_except(point) ==
+              kdc::KineticCore::resolve_support_at_time(
+                  instance, 0, remaining, 0.0));
+    }
+    REQUIRE(tournament.validate(0.0));
+
+    kdc::KineticFarthestTournament inserted;
+    inserted.initialize(instance, 0, {}, 0.0);
+    for (const int point : points) {
+      inserted.insert(point, 0.0);
+    }
+    REQUIRE(inserted.current_winner() == expected);
+    for (const int point : points) {
+      std::vector<int> remaining;
+      for (const int candidate : points) {
+        if (candidate != point) {
+          remaining.push_back(candidate);
+        }
+      }
+      REQUIRE(inserted.best_except(point) ==
+              kdc::KineticCore::resolve_support_at_time(
+                  instance, 0, remaining, 0.0));
+    }
+    REQUIRE(inserted.validate(0.0));
+  }
+}
+
 TEST_CASE("Precomputed event geometry preserves breakpoint semantics") {
   const auto instance = make_piecewise_instance();
   for (const auto& query :

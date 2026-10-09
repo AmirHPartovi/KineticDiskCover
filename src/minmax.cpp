@@ -108,7 +108,7 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
   }
   LOG_INFO("MinMax: start n={}, m={}, T={}", instance.n, instance.m,
            instance.T_end);
-  const auto start = std::chrono::high_resolution_clock::now();
+  const auto start = std::chrono::steady_clock::now();
   const auto solve_start = std::chrono::steady_clock::now();
 
   Result result;
@@ -400,7 +400,7 @@ MinMaxSolver::Result MinMaxSolver::solve(const Instance& instance,
     result.trace.back().stop_reason = "iteration_limit";
   }
 
-  const auto finish = std::chrono::high_resolution_clock::now();
+  const auto finish = std::chrono::steady_clock::now();
   result.solution = std::move(solution);
   result.feasible = result.solution.is_well_formed();
   result.exact_solver = static_solver.is_exact();

@@ -510,7 +510,7 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
     throw std::invalid_argument("MinSum received an invalid instance");
   }
   LOG_INFO("MinSum: start n={}, m={}", instance.n, instance.m);
-  const auto start = std::chrono::high_resolution_clock::now();
+  const auto start = std::chrono::steady_clock::now();
   Result result;
   result.refinement_policy = config.refinement_policy;
 
@@ -604,7 +604,7 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
     row.gap = relative_gap(current_integral, lower_bound_integral);
     row.wall_time_sec =
         std::chrono::duration<double>(
-            std::chrono::high_resolution_clock::now() - start)
+            std::chrono::steady_clock::now() - start)
             .count();
     row.num_ip_solves = result.num_ip_solves;
     result.trace.push_back(row);
@@ -823,7 +823,7 @@ MinSumSolver::Result MinSumSolver::solve(const Instance& instance,
     LOG_WARN("MinSum: global solver budget expired");
   }
 
-  const auto finish = std::chrono::high_resolution_clock::now();
+  const auto finish = std::chrono::steady_clock::now();
   result.solution = std::move(solution);
   result.feasible = result.solution.is_well_formed();
   result.exact_solver = static_solver.is_exact();
