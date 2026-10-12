@@ -1,0 +1,107 @@
+[2026-10-12 07:49:35.331] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71/input for instances
+2026-10-12 07:49:35 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:35 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:35 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:35.337] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:35.337] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:35.337] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:35.338] [info] [io.cpp:137] read_json: loaded 26 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71/input/instance.json
+[2026-10-12 07:49:35.339] [info] [minmax.cpp:110] MinMax: start n=26, m=25, T=1
+[2026-10-12 07:49:35.339] [info] [candidate.cpp:199] InstancePrecompute: built 650 candidates
+[2026-10-12 07:49:35.339] [info] [stationary.cpp:264] NN: cost=789.341959, feasible=true, active_stations=8
+[2026-10-12 07:49:35.344] [info] [simulated_annealing_solver.cpp:260] SA: cost=716.360212816 LB=251.820138415 final_T=6.653969e-02
+[2026-10-12 07:49:35.366] [info] [solution.cpp:1026] extend: 42 intervals over [0, 1]
+[2026-10-12 07:49:35.366] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.457409, peak=5468.455542, LB=251.820138, gap=20.7157
+[2026-10-12 07:49:35.366] [info] [stationary.cpp:264] NN: cost=507.293787, feasible=true, active_stations=6
+[2026-10-12 07:49:35.371] [info] [simulated_annealing_solver.cpp:260] SA: cost=503.448420758 LB=169.236146255 final_T=6.653969e-02
+[2026-10-12 07:49:35.378] [info] [solution.cpp:1026] extend: 17 intervals over [0.45740926316131014, 1]
+[2026-10-12 07:49:35.380] [info] [solution.cpp:1026] extend: 6 intervals over [0, 0.45740926316131014]
+[2026-10-12 07:49:35.380] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 22 intervals
+[2026-10-12 07:49:35.383] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.383] [info] [solution.cpp:1097] combine: 30 intervals
+[2026-10-12 07:49:35.383] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 30 intervals
+[2026-10-12 07:49:35.387] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.387] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.943397, peak=3929.378904, LB=251.820138, gap=14.6039
+[2026-10-12 07:49:35.387] [info] [stationary.cpp:264] NN: cost=496.107645, feasible=true, active_stations=11
+[2026-10-12 07:49:35.392] [info] [simulated_annealing_solver.cpp:260] SA: cost=442.782070717 LB=100.705740335 final_T=6.653969e-02
+[2026-10-12 07:49:35.394] [info] [solution.cpp:1026] extend: 6 intervals over [0.9433967616839148, 1]
+[2026-10-12 07:49:35.419] [info] [solution.cpp:1026] extend: 55 intervals over [0, 0.9433967616839148]
+[2026-10-12 07:49:35.419] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 60 intervals
+[2026-10-12 07:49:35.428] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=false, supporting_points_ok=false, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=false
+[2026-10-12 07:49:35.428] [info] [minsum.cpp:512] MinSum: start n=26, m=25
+[2026-10-12 07:49:35.428] [info] [stationary.cpp:264] NN: cost=789.341959, feasible=true, active_stations=8
+[2026-10-12 07:49:35.433] [info] [simulated_annealing_solver.cpp:260] SA: cost=716.121796947 LB=251.820138415 final_T=6.653969e-02
+[2026-10-12 07:49:35.454] [info] [solution.cpp:1026] extend: 40 intervals over [0, 1]
+[2026-10-12 07:49:35.454] [info] [stationary.cpp:264] NN: cost=789.341959, feasible=true, active_stations=8
+[2026-10-12 07:49:35.459] [info] [simulated_annealing_solver.cpp:260] SA: cost=716.121796947 LB=251.820138415 final_T=6.653969e-02
+[2026-10-12 07:49:35.459] [info] [stationary.cpp:264] NN: cost=526.372568, feasible=true, active_stations=8
+[2026-10-12 07:49:35.464] [info] [simulated_annealing_solver.cpp:260] SA: cost=462.591355809 LB=179.980801379 final_T=6.653969e-02
+[2026-10-12 07:49:35.464] [info] [stationary.cpp:264] NN: cost=606.854480, feasible=true, active_stations=8
+[2026-10-12 07:49:35.469] [info] [simulated_annealing_solver.cpp:260] SA: cost=520.349255613 LB=155.036541140 final_T=6.653969e-02
+[2026-10-12 07:49:35.469] [info] [stationary.cpp:264] NN: cost=549.442614, feasible=true, active_stations=10
+[2026-10-12 07:49:35.475] [info] [simulated_annealing_solver.cpp:260] SA: cost=478.498992367 LB=195.358624896 final_T=6.653969e-02
+[2026-10-12 07:49:35.475] [info] [stationary.cpp:264] NN: cost=592.940265, feasible=true, active_stations=12
+[2026-10-12 07:49:35.480] [info] [simulated_annealing_solver.cpp:260] SA: cost=557.363319194 LB=108.505710809 final_T=6.653969e-02
+[2026-10-12 07:49:35.480] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.7436,0.8287], t_mid=0.7862, int=3477.285465, LB=177.634723, gap=18.5755
+[2026-10-12 07:49:35.480] [info] [stationary.cpp:264] NN: cost=487.332034, feasible=true, active_stations=9
+[2026-10-12 07:49:35.485] [info] [simulated_annealing_solver.cpp:260] SA: cost=484.772835589 LB=200.809871933 final_T=6.653969e-02
+[2026-10-12 07:49:35.493] [info] [solution.cpp:1026] extend: 22 intervals over [0.7861654539269564, 1]
+[2026-10-12 07:49:35.505] [info] [solution.cpp:1026] extend: 21 intervals over [0, 0.7861654539269564]
+[2026-10-12 07:49:35.505] [info] [solution.cpp:1097] combine: 51 intervals
+[2026-10-12 07:49:35.531] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 51 intervals
+[2026-10-12 07:49:35.539] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.539] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.0969,0.2002], t_mid=0.1485, int=1430.753271, LB=179.886666, gap=6.9536
+[2026-10-12 07:49:35.539] [info] [stationary.cpp:264] NN: cost=521.978138, feasible=true, active_stations=8
+[2026-10-12 07:49:35.544] [info] [simulated_annealing_solver.cpp:260] SA: cost=521.978138108 LB=173.249962162 final_T=6.653969e-02
+[2026-10-12 07:49:35.564] [info] [solution.cpp:1026] extend: 42 intervals over [0.1485365898343758, 1]
+[2026-10-12 07:49:35.566] [info] [solution.cpp:1026] extend: 5 intervals over [0, 0.1485365898343758]
+[2026-10-12 07:49:35.566] [info] [solution.cpp:1097] combine: 57 intervals
+[2026-10-12 07:49:35.592] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 57 intervals
+[2026-10-12 07:49:35.600] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.600] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.5659,0.6593], t_mid=0.6126, int=1097.684639, LB=179.886666, gap=5.1021
+[2026-10-12 07:49:35.600] [info] [stationary.cpp:264] NN: cost=644.603635, feasible=true, active_stations=8
+[2026-10-12 07:49:35.605] [info] [simulated_annealing_solver.cpp:260] SA: cost=545.015624947 LB=197.658495756 final_T=6.653969e-02
+[2026-10-12 07:49:35.612] [info] [solution.cpp:1026] extend: 21 intervals over [0.6126132574917493, 1]
+[2026-10-12 07:49:35.619] [info] [solution.cpp:1026] extend: 22 intervals over [0, 0.6126132574917493]
+[2026-10-12 07:49:35.620] [info] [solution.cpp:1097] combine: 72 intervals
+[2026-10-12 07:49:35.655] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 72 intervals
+[2026-10-12 07:49:35.665] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.665] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.2808,0.3347], t_mid=0.3078, int=751.661707, LB=179.886666, gap=3.1785
+[2026-10-12 07:49:35.665] [info] [stationary.cpp:264] NN: cost=491.475311, feasible=true, active_stations=10
+[2026-10-12 07:49:35.670] [info] [simulated_annealing_solver.cpp:260] SA: cost=431.081929761 LB=202.814860987 final_T=6.653969e-02
+[2026-10-12 07:49:35.693] [info] [solution.cpp:1026] extend: 43 intervals over [0.3077815651828494, 1]
+[2026-10-12 07:49:35.696] [info] [solution.cpp:1026] extend: 7 intervals over [0, 0.3077815651828494]
+[2026-10-12 07:49:35.696] [info] [solution.cpp:1097] combine: 80 intervals
+[2026-10-12 07:49:35.736] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 80 intervals
+[2026-10-12 07:49:35.747] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.747] [info] [minsum.cpp:633] MinSum iter 5: [t_a,t_b]=[0.8864,0.9400], t_mid=0.9132, int=679.033554, LB=182.033040, gap=2.7303
+[2026-10-12 07:49:35.747] [info] [stationary.cpp:264] NN: cost=418.121503, feasible=true, active_stations=12
+[2026-10-12 07:49:35.752] [info] [simulated_annealing_solver.cpp:260] SA: cost=413.879192010 LB=88.630536977 final_T=6.653969e-02
+[2026-10-12 07:49:35.755] [info] [solution.cpp:1026] extend: 9 intervals over [0.9131581981351851, 1]
+[2026-10-12 07:49:35.778] [info] [solution.cpp:1026] extend: 52 intervals over [0, 0.9131581981351851]
+[2026-10-12 07:49:35.778] [info] [solution.cpp:1097] combine: 80 intervals
+[2026-10-12 07:49:35.824] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 5 (1/3)
+[2026-10-12 07:49:35.824] [info] [minsum.cpp:633] MinSum iter 6: [t_a,t_b]=[0.8864,0.9400], t_mid=0.9132, int=679.033554, LB=182.033040, gap=2.7303
+[2026-10-12 07:49:35.824] [info] [stationary.cpp:264] NN: cost=418.121503, feasible=true, active_stations=12
+[2026-10-12 07:49:35.829] [info] [simulated_annealing_solver.cpp:260] SA: cost=413.879192010 LB=88.630536977 final_T=6.653969e-02
+[2026-10-12 07:49:35.832] [info] [solution.cpp:1026] extend: 9 intervals over [0.9131581981351851, 1]
+[2026-10-12 07:49:35.856] [info] [solution.cpp:1026] extend: 52 intervals over [0, 0.9131581981351851]
+[2026-10-12 07:49:35.856] [info] [solution.cpp:1097] combine: 80 intervals
+[2026-10-12 07:49:35.903] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 6 (2/3)
+[2026-10-12 07:49:35.903] [info] [minsum.cpp:633] MinSum iter 7: [t_a,t_b]=[0.8864,0.9400], t_mid=0.9132, int=679.033554, LB=182.033040, gap=2.7303
+[2026-10-12 07:49:35.903] [info] [stationary.cpp:264] NN: cost=418.121503, feasible=true, active_stations=12
+[2026-10-12 07:49:35.908] [info] [simulated_annealing_solver.cpp:260] SA: cost=413.879192010 LB=88.630536977 final_T=6.653969e-02
+[2026-10-12 07:49:35.911] [info] [solution.cpp:1026] extend: 9 intervals over [0.9131581981351851, 1]
+[2026-10-12 07:49:35.935] [info] [solution.cpp:1026] extend: 52 intervals over [0, 0.9131581981351851]
+[2026-10-12 07:49:35.935] [info] [solution.cpp:1097] combine: 80 intervals
+[2026-10-12 07:49:35.981] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 7 (3/3)
+[2026-10-12 07:49:35.981] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 80 intervals
+[2026-10-12 07:49:35.991] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:35.991] [info] [minsum.cpp:881] MinSum: done. int=679.033554, LB=182.033040, gap=2.7303, iters=7, t=0.378s
+[2026-10-12 07:49:35.991] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 80 intervals
+[2026-10-12 07:49:36.002] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:36.002] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71/execution/solver/runs/C-right/sa/minmaxsum/trace.csv
+[2026-10-12 07:49:36.003] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 104976 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71/execution/solver/runs/C-right/sa/minmaxsum/solution.json
+[2026-10-12 07:49:36.003] [info] [batch_runner.cpp:1352] BatchRunner: C-right / sa / minmaxsum cost=1299.604899 t=0.664s verified=true
+[2026-10-12 07:49:36.004] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

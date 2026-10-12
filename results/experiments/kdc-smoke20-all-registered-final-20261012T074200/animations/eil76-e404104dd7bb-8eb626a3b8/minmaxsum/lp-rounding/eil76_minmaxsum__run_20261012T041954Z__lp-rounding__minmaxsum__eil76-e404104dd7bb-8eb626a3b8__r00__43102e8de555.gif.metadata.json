@@ -1,0 +1,42 @@
+{
+  "actual_backend": "lp-rounding",
+  "algorithm": "lp-rounding",
+  "animation_path": "eil76_minmaxsum__run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555.gif",
+  "animation_sha256": "461a076fd8f1c3016bb939b4246c863ce8c257a30c1dc34991d4cd2516edcae6",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "eil76-e404104dd7bb-8eb626a3b8",
+  "instance_name": "eil76",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": false,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3610.284202207638,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4959.724211460535,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555/execution/solver/runs/eil76/lp-rounding/minmaxsum/component-minmax",
+    "minsum_component_integral": null,
+    "minsum_component_optimality": "FAILED",
+    "minsum_component_peak": null,
+    "minsum_component_status": "FAILED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555/execution/solver/runs/eil76/lp-rounding/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3610.284202207638,
+    "peak_cost": 4959.724211460535
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555/result/result.json",
+  "source_solution_path": "runs/run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555/result/solution.json",
+  "source_solution_sha256": "cde2955d2683dd2f54dd3635da907f1d7995cd1658adfeca867ed08085eb9414",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

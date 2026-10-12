@@ -1,0 +1,15 @@
+[2026-10-12 07:58:39.976] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042839Z__brute-force__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__e416f4ed1ba2/input for instances
+2026-10-12 07:58:39 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:58:39 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:58:39 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:58:39.982] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:58:39.982] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:58:39.982] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042839Z__brute-force__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__e416f4ed1ba2/execution/solver/experiment_manifest.json)
+[2026-10-12 07:58:39.983] [info] [io.cpp:137] read_json: loaded 26 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042839Z__brute-force__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__e416f4ed1ba2/input/instance.json
+[2026-10-12 07:58:39.983] [info] [minmax.cpp:110] MinMax: start n=26, m=25, T=1
+[2026-10-12 07:58:39.983] [warning] [brute_force_solver.cpp:107] BruteForce: assignment count exceeds configured cap 100000
+[2026-10-12 07:58:39.983] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042839Z__brute-force__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__e416f4ed1ba2/execution/solver/runs/C-right/brute-force/minmax/trace.csv
+[2026-10-12 07:58:39.984] [info] [candidate.cpp:199] InstancePrecompute: built 650 candidates
+[2026-10-12 07:58:39.984] [info] [batch_runner.cpp:1352] BatchRunner: C-right / brute-force / minmax cost=0.000000 t=0.000s verified=false
+[2026-10-12 07:58:39.985] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

@@ -1,0 +1,59 @@
+[2026-10-12 07:50:20.089] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042020Z__primal-dual__minmax__kroD100-100b54b48d61-5062f763b8__r00__8aa7d49ea61d/input for instances
+2026-10-12 07:50:20 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:50:20 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:50:20 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:50:20.095] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:50:20.095] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:50:20.095] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042020Z__primal-dual__minmax__kroD100-100b54b48d61-5062f763b8__r00__8aa7d49ea61d/execution/solver/experiment_manifest.json)
+[2026-10-12 07:50:20.096] [info] [io.cpp:137] read_json: loaded 37 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042020Z__primal-dual__minmax__kroD100-100b54b48d61-5062f763b8__r00__8aa7d49ea61d/input/instance.json
+[2026-10-12 07:50:20.096] [info] [minmax.cpp:110] MinMax: start n=37, m=25, T=1
+[2026-10-12 07:50:20.096] [info] [candidate.cpp:199] InstancePrecompute: built 925 candidates
+[2026-10-12 07:50:20.097] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:50:20.097] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=5401.682758247 LB=161.967505211 ratio=33.3504 |D|=5
+[2026-10-12 07:50:20.113] [info] [solution.cpp:1026] extend: 17 intervals over [0, 1]
+[2026-10-12 07:50:20.113] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.824784, peak=11302.761935, LB=0.000000, gap=11302.7619
+[2026-10-12 07:50:20.114] [info] [candidate.cpp:345] build_coverage: nnz=17576
+[2026-10-12 07:50:20.115] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=3583.679570151 LB=122.421369933 ratio=29.2733 |D|=8
+[2026-10-12 07:50:20.118] [info] [solution.cpp:1026] extend: 5 intervals over [0.8247842141856148, 1]
+[2026-10-12 07:50:20.137] [info] [solution.cpp:1026] extend: 26 intervals over [0, 0.8247842141856148]
+[2026-10-12 07:50:20.137] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 30 intervals
+[2026-10-12 07:50:20.144] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.144] [info] [solution.cpp:1097] combine: 32 intervals
+[2026-10-12 07:50:20.144] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 32 intervals
+[2026-10-12 07:50:20.150] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.150] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.552392, peak=6272.732087, LB=0.000000, gap=6272.7321
+[2026-10-12 07:50:20.151] [info] [candidate.cpp:345] build_coverage: nnz=17576
+[2026-10-12 07:50:20.152] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=3875.192262687 LB=123.918693215 ratio=31.2721 |D|=8
+[2026-10-12 07:50:20.161] [info] [solution.cpp:1026] extend: 15 intervals over [0.5523918390553778, 1]
+[2026-10-12 07:50:20.175] [info] [solution.cpp:1026] extend: 20 intervals over [0, 0.5523918390553778]
+[2026-10-12 07:50:20.175] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 34 intervals
+[2026-10-12 07:50:20.182] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.182] [info] [solution.cpp:1097] combine: 35 intervals
+[2026-10-12 07:50:20.182] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 35 intervals
+[2026-10-12 07:50:20.189] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.189] [info] [minmax.cpp:202] MinMax iter 3: t_max=0.985226, peak=5409.350848, LB=0.000000, gap=5409.3508
+[2026-10-12 07:50:20.190] [info] [candidate.cpp:345] build_coverage: nnz=17576
+[2026-10-12 07:50:20.191] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=5789.109022144 LB=155.144157171 ratio=37.3144 |D|=9
+[2026-10-12 07:50:20.191] [info] [solution.cpp:1026] extend: 1 intervals over [0.9852262499475558, 1]
+[2026-10-12 07:50:20.216] [info] [solution.cpp:1026] extend: 35 intervals over [0, 0.9852262499475558]
+[2026-10-12 07:50:20.216] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 35 intervals
+[2026-10-12 07:50:20.225] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.225] [info] [solution.cpp:1097] combine: 39 intervals
+[2026-10-12 07:50:20.225] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 39 intervals
+[2026-10-12 07:50:20.240] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.240] [info] [minmax.cpp:202] MinMax iter 4: t_max=0.985226, peak=5337.745382, LB=0.000000, gap=5337.7454
+[2026-10-12 07:50:20.269] [info] [candidate.cpp:345] build_coverage: nnz=17576
+[2026-10-12 07:50:20.270] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=5789.109022144 LB=155.144157171 ratio=37.3144 |D|=9
+[2026-10-12 07:50:20.272] [info] [solution.cpp:1026] extend: 1 intervals over [0.9852262499475558, 1]
+[2026-10-12 07:50:20.303] [info] [solution.cpp:1026] extend: 35 intervals over [0, 0.9852262499475558]
+[2026-10-12 07:50:20.303] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 35 intervals
+[2026-10-12 07:50:20.311] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.311] [info] [solution.cpp:1097] combine: 39 intervals
+[2026-10-12 07:50:20.311] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 39 intervals
+[2026-10-12 07:50:20.319] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:20.319] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-10-12 07:50:20.320] [error] [batch_runner.cpp:1305] BatchRunner: kroD100 / primal-dual / minmax failed: MinMax reported peak is inconsistent with the solution
+[2026-10-12 07:50:20.320] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042020Z__primal-dual__minmax__kroD100-100b54b48d61-5062f763b8__r00__8aa7d49ea61d/execution/solver/runs/kroD100/primal-dual/minmax/trace.csv
+[2026-10-12 07:50:20.320] [info] [batch_runner.cpp:1352] BatchRunner: kroD100 / primal-dual / minmax cost=0.000000 t=0.224s verified=false
+[2026-10-12 07:50:20.321] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

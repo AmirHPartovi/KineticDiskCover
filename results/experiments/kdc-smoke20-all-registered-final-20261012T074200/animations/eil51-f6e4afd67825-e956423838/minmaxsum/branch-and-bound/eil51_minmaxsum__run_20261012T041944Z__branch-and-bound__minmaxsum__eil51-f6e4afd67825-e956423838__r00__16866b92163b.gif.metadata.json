@@ -1,0 +1,42 @@
+{
+  "actual_backend": "branch-and-bound",
+  "algorithm": "branch-and-bound",
+  "animation_path": "eil51_minmaxsum__run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b.gif",
+  "animation_sha256": "e22fbbba8220ceb95d81b54829cab091f4a361a3f17f0d2610452b8620224302",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "eil51-f6e4afd67825-e956423838",
+  "instance_name": "eil51",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 1870.4718559663759,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 3204.818619470701,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b/execution/solver/runs/eil51/branch-and-bound/minmaxsum/component-minmax",
+    "minsum_component_integral": 1809.7605663641361,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 3354.516634066291,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b/execution/solver/runs/eil51/branch-and-bound/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 1761.6154381613262,
+    "peak_cost": 3204.570168942002
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b/result/result.json",
+  "source_solution_path": "runs/run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b/result/solution.json",
+  "source_solution_sha256": "c503642129138224bf40b742c6532acb408e948c1b6f7ecd3abf622518374cef",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

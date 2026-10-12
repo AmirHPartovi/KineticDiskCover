@@ -1,0 +1,52 @@
+[2026-10-12 07:49:25.579] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529/input for instances
+2026-10-12 07:49:25 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:25 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:25 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:25.587] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:25.587] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:25.587] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:25.588] [info] [io.cpp:137] read_json: loaded 34 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529/input/instance.json
+[2026-10-12 07:49:25.589] [info] [minsum.cpp:512] MinSum: start n=34, m=25
+[2026-10-12 07:49:25.589] [info] [candidate.cpp:199] InstancePrecompute: built 850 candidates
+[2026-10-12 07:49:25.589] [info] [stationary.cpp:264] NN: cost=1268.566300, feasible=true, active_stations=12
+[2026-10-12 07:49:25.614] [info] [genetic_solver.cpp:274] GA: cost=1268.566299652 gens=500
+[2026-10-12 07:49:25.684] [info] [solution.cpp:1026] extend: 113 intervals over [0, 1]
+[2026-10-12 07:49:25.684] [info] [stationary.cpp:264] NN: cost=1268.566300, feasible=true, active_stations=12
+[2026-10-12 07:49:25.715] [info] [genetic_solver.cpp:274] GA: cost=1268.566299652 gens=500
+[2026-10-12 07:49:25.715] [info] [stationary.cpp:264] NN: cost=871.121258, feasible=true, active_stations=10
+[2026-10-12 07:49:25.746] [info] [genetic_solver.cpp:274] GA: cost=848.819698760 gens=500
+[2026-10-12 07:49:25.746] [info] [stationary.cpp:264] NN: cost=932.857606, feasible=true, active_stations=9
+[2026-10-12 07:49:25.773] [info] [genetic_solver.cpp:274] GA: cost=909.535713847 gens=500
+[2026-10-12 07:49:25.773] [info] [stationary.cpp:264] NN: cost=1230.360882, feasible=true, active_stations=8
+[2026-10-12 07:49:25.801] [info] [genetic_solver.cpp:274] GA: cost=1228.334905802 gens=500
+[2026-10-12 07:49:25.801] [info] [stationary.cpp:264] NN: cost=1285.000098, feasible=true, active_stations=14
+[2026-10-12 07:49:25.826] [info] [genetic_solver.cpp:274] GA: cost=1272.290570798 gens=500
+[2026-10-12 07:49:25.826] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.6446,0.6872], t_mid=0.6659, int=3135.001337, LB=466.439255, gap=5.7211
+[2026-10-12 07:49:25.826] [info] [stationary.cpp:264] NN: cost=1309.689276, feasible=true, active_stations=8
+[2026-10-12 07:49:25.851] [info] [genetic_solver.cpp:274] GA: cost=1306.283536443 gens=500
+[2026-10-12 07:49:25.868] [info] [solution.cpp:1026] extend: 39 intervals over [0.6658927041351961, 1]
+[2026-10-12 07:49:25.913] [info] [solution.cpp:1026] extend: 90 intervals over [0, 0.6658927041351961]
+[2026-10-12 07:49:25.913] [info] [solution.cpp:1097] combine: 130 intervals
+[2026-10-12 07:49:25.941] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 1 (1/3)
+[2026-10-12 07:49:25.941] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.6446,0.6872], t_mid=0.6659, int=3135.001337, LB=472.301050, gap=5.6377
+[2026-10-12 07:49:25.941] [info] [stationary.cpp:264] NN: cost=1309.689276, feasible=true, active_stations=8
+[2026-10-12 07:49:25.965] [info] [genetic_solver.cpp:274] GA: cost=1306.283536443 gens=500
+[2026-10-12 07:49:25.982] [info] [solution.cpp:1026] extend: 39 intervals over [0.6658927041351961, 1]
+[2026-10-12 07:49:26.025] [info] [solution.cpp:1026] extend: 90 intervals over [0, 0.6658927041351961]
+[2026-10-12 07:49:26.025] [info] [solution.cpp:1097] combine: 130 intervals
+[2026-10-12 07:49:26.053] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 2 (2/3)
+[2026-10-12 07:49:26.053] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.6446,0.6872], t_mid=0.6659, int=3135.001337, LB=472.301050, gap=5.6377
+[2026-10-12 07:49:26.053] [info] [stationary.cpp:264] NN: cost=1309.689276, feasible=true, active_stations=8
+[2026-10-12 07:49:26.076] [info] [genetic_solver.cpp:274] GA: cost=1306.283536443 gens=500
+[2026-10-12 07:49:26.093] [info] [solution.cpp:1026] extend: 39 intervals over [0.6658927041351961, 1]
+[2026-10-12 07:49:26.139] [info] [solution.cpp:1026] extend: 90 intervals over [0, 0.6658927041351961]
+[2026-10-12 07:49:26.139] [info] [solution.cpp:1097] combine: 130 intervals
+[2026-10-12 07:49:26.167] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 3 (3/3)
+[2026-10-12 07:49:26.167] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 113 intervals
+[2026-10-12 07:49:26.195] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:26.195] [info] [minsum.cpp:881] MinSum: done. int=3135.001337, LB=472.301050, gap=5.6377, iters=3, t=0.510s
+[2026-10-12 07:49:26.195] [info] [trace.cpp:93] TraceWriter: wrote 1 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529/execution/solver/runs/C-lower/genetic/minsum/trace.csv
+[2026-10-12 07:49:26.195] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 166776 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529/execution/solver/runs/C-lower/genetic/minsum/solution.json
+[2026-10-12 07:49:26.196] [info] [batch_runner.cpp:1352] BatchRunner: C-lower / genetic / minsum cost=3135.001337 t=0.607s verified=true
+[2026-10-12 07:49:26.196] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

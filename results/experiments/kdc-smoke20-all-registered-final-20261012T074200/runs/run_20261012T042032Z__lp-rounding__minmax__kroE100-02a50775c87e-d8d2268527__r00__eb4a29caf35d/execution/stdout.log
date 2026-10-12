@@ -1,0 +1,52 @@
+[2026-10-12 07:50:32.883] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d/input for instances
+2026-10-12 07:50:32 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:50:32 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:50:32 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:50:32.889] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:50:32.889] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:50:32.889] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d/execution/solver/experiment_manifest.json)
+[2026-10-12 07:50:32.890] [info] [io.cpp:137] read_json: loaded 37 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d/input/instance.json
+[2026-10-12 07:50:32.890] [info] [minmax.cpp:110] MinMax: start n=37, m=25, T=1
+[2026-10-12 07:50:32.890] [info] [candidate.cpp:199] InstancePrecompute: built 925 candidates
+[2026-10-12 07:50:32.892] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:50:32.956] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=4600.315418884 LB=4600.315418884 ratio=1.0000
+[2026-10-12 07:50:32.982] [info] [solution.cpp:1026] extend: 36 intervals over [0, 1]
+[2026-10-12 07:50:32.982] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=13751.204488, LB=4600.315419, gap=1.9892
+[2026-10-12 07:50:32.983] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:50:33.014] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=3784.174283150 LB=3784.174283150 ratio=1.0000
+[2026-10-12 07:50:33.014] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:50:33.044] [info] [solution.cpp:1026] extend: 45 intervals over [0, 1]
+[2026-10-12 07:50:33.044] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 45 intervals
+[2026-10-12 07:50:33.055] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.055] [info] [solution.cpp:1097] combine: 51 intervals
+[2026-10-12 07:50:33.055] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 51 intervals
+[2026-10-12 07:50:33.068] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.068] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.479838, peak=8942.531127, LB=4600.315419, gap=0.9439
+[2026-10-12 07:50:33.069] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:50:33.108] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=2387.665669015 LB=2387.665669015 ratio=1.0000
+[2026-10-12 07:50:33.122] [info] [solution.cpp:1026] extend: 22 intervals over [0.4798382341979194, 1]
+[2026-10-12 07:50:33.132] [info] [solution.cpp:1026] extend: 19 intervals over [0, 0.4798382341979194]
+[2026-10-12 07:50:33.132] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 40 intervals
+[2026-10-12 07:50:33.142] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.142] [info] [solution.cpp:1097] combine: 58 intervals
+[2026-10-12 07:50:33.142] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 58 intervals
+[2026-10-12 07:50:33.156] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.156] [info] [minmax.cpp:202] MinMax iter 3: t_max=0.189773, peak=5455.211717, LB=4600.315419, gap=0.1858
+[2026-10-12 07:50:33.157] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:50:33.278] [info] [lp_rounding_solver.cpp:291] LPRounding: cost=3319.888067678 LB=3319.888067678 ratio=1.0000
+[2026-10-12 07:50:33.297] [info] [solution.cpp:1026] extend: 24 intervals over [0.18977328450007286, 1]
+[2026-10-12 07:50:33.302] [info] [solution.cpp:1026] extend: 11 intervals over [0, 0.18977328450007286]
+[2026-10-12 07:50:33.302] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 34 intervals
+[2026-10-12 07:50:33.308] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.308] [info] [solution.cpp:1097] combine: 60 intervals
+[2026-10-12 07:50:33.308] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 60 intervals
+[2026-10-12 07:50:33.322] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.322] [info] [minmax.cpp:202] MinMax iter 4: t_max=0.000000, peak=4600.315419, LB=4600.315419, gap=0.0000
+[2026-10-12 07:50:33.322] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 60 intervals
+[2026-10-12 07:50:33.335] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:33.335] [info] [minmax.cpp:467] MinMax: done. peak=4600.315419, certified_LB=4600.315419, gap=0.0000, iters=4, t=0.364s
+[2026-10-12 07:50:33.336] [info] [trace.cpp:93] TraceWriter: wrote 4 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d/execution/solver/runs/kroE100/lp-rounding/minmax/trace.csv
+[2026-10-12 07:50:33.336] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 91723 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d/execution/solver/runs/kroE100/lp-rounding/minmax/solution.json
+[2026-10-12 07:50:33.337] [info] [batch_runner.cpp:1352] BatchRunner: kroE100 / lp-rounding / minmax cost=4600.315419 t=0.446s verified=true
+[2026-10-12 07:50:33.337] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

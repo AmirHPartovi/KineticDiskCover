@@ -1,0 +1,8 @@
+[2026-10-12T08:02:10+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --stage figures --dpi 300 
+/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax.boxplot(samples, labels=algorithms, showfliers=True)
+/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax.boxplot(values, labels=algorithms)
+/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax.boxplot(values, labels=algorithms)
+Wrote figures report for kdc-smoke20-all-registered-final-20261012T074200.

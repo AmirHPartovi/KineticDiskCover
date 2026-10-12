@@ -1,0 +1,23 @@
+[2026-10-12 07:49:41.753] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__greedy__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__ca1b9ab112db/input for instances
+2026-10-12 07:49:41 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:41 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:41 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:41.759] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:41.759] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:41.759] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__greedy__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__ca1b9ab112db/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:41.760] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__greedy__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__ca1b9ab112db/input/instance.json
+[2026-10-12 07:49:41.760] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-12 07:49:41.760] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-12 07:49:41.760] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-12 07:49:41.763] [info] [solution.cpp:1026] extend: 15 intervals over [0, 1]
+[2026-10-12 07:49:41.763] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=16693.036444, LB=1598.360240, gap=9.4439
+[2026-10-12 07:49:41.763] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5243.144327500 LB=1934.141241316 ratio=2.7108
+[2026-10-12 07:49:41.763] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:41.766] [info] [solution.cpp:1026] extend: 15 intervals over [0, 1]
+[2026-10-12 07:49:41.766] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:41.768] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=false, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=false
+[2026-10-12 07:49:41.768] [error] [batch_runner.cpp:1305] BatchRunner: berlin52 / greedy / minmax failed: MinMax candidate verification failed: supporting-points continuous verification failed
+[2026-10-12 07:49:41.768] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__greedy__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__ca1b9ab112db/execution/solver/runs/berlin52/greedy/minmax/trace.csv
+[2026-10-12 07:49:41.768] [info] [batch_runner.cpp:1352] BatchRunner: berlin52 / greedy / minmax cost=0.000000 t=0.008s verified=false
+[2026-10-12 07:49:41.769] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

@@ -1,0 +1,119 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "3a3bfa65b68df530065182b831328c6f5f124a76f23c4bd44a95c49f79f06804",
+      "size_bytes": 886
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "599dbfeeb2b1446a90aa99694b78e20502ad473e4901a18242342583d60d3f71",
+      "size_bytes": 445
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "06ac0eb4f433807c1e937eafa7933d7801c409c69eaf16cd100950efd2ebab84",
+      "size_bytes": 3119
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "b08d74844371b4c8c34b96824d97caadddca23996fe6382087e7a9c03c9520e2",
+      "size_bytes": 3037
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "6c1f4097921b62ce93970e58ae55f4011d6ea35a03ce45836bffd06c09651d64",
+      "size_bytes": 6256
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/rd100/lp-rounding/minmaxsum/result.json",
+      "sha256": "6258e4b1fc6261440db05c9dbea780e29e9fcbf086314605ceb6b806313b076f",
+      "size_bytes": 6000
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/rd100/lp-rounding/minmaxsum/solution.json",
+      "sha256": "aaea31220e360e29ac305e5e52b874df8fa505d6efa1cd6703493429b7a4fb31",
+      "size_bytes": 135713
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/rd100/lp-rounding/minmaxsum/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "e1fb855c67c665a8a063e1b3dc13594ceb618fc5a21f4432421b0ed9794c7926",
+      "size_bytes": 23862
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "767888baf524c62a44fe5b9797828f81718dc076d201c6dc5b252ee882a2021b",
+      "size_bytes": 233
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "b9917bc5f53094215a92532eef1dbf69a6a4f8b06305afbc1f380d545aec9c24",
+      "size_bytes": 12371
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "568f0c0409322010ec98a7d88f7c549180d27f5bc86089a7e32067413285386a",
+      "size_bytes": 526
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "0f2547dc3915e87c58892aad935e7dabe351d8c75d73506ecb29bb479cd9f68f",
+      "size_bytes": 1500
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "97c421ac0b7165ba6d4001519608bf5eca8f07fa8de5ec45b1e3653192806b09",
+      "size_bytes": 6320
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "aaea31220e360e29ac305e5e52b874df8fa505d6efa1cd6703493429b7a4fb31",
+      "size_bytes": 135713
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "03fc6c107ab43fc90e657dd3239cb599c0edc65ad0c5c41d14adbdfb2a9e627d",
+      "size_bytes": 14363
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "ce03e85cca8cdeb8481ca1f42df7eca1517fedef5d5cd3a13986ce904389fa65",
+      "size_bytes": 493
+    }
+  ],
+  "schema_version": 1
+}

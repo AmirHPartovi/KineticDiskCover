@@ -1,0 +1,103 @@
+{
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "figures": [
+    {
+      "figure": "runtime_by_algorithm_objective",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_runtime_by_algorithm_objective.pdf",
+      "path_png": "report_runtime_by_algorithm_objective.png",
+      "reason": ""
+    },
+    {
+      "figure": "runtime_distribution_by_algorithm",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_runtime_distribution_by_algorithm.pdf",
+      "path_png": "report_runtime_distribution_by_algorithm.png",
+      "reason": ""
+    },
+    {
+      "figure": "objective_quality_minmax_minsum",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_objective_quality_minmax_minsum.pdf",
+      "path_png": "report_objective_quality_minmax_minsum.png",
+      "reason": ""
+    },
+    {
+      "figure": "runtime_versus_quality",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_runtime_versus_quality.pdf",
+      "path_png": "report_runtime_versus_quality.png",
+      "reason": ""
+    },
+    {
+      "figure": "per_instance_normalized_quality",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_per_instance_normalized_quality.pdf",
+      "path_png": "report_per_instance_normalized_quality.png",
+      "reason": ""
+    },
+    {
+      "figure": "performance_vs_n_m",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_performance_vs_n_m.pdf",
+      "path_png": "report_performance_vs_n_m.png",
+      "reason": ""
+    },
+    {
+      "figure": "reliability_comparison",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_reliability_comparison.pdf",
+      "path_png": "report_reliability_comparison.png",
+      "reason": ""
+    },
+    {
+      "figure": "family_level_comparison",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_family_level_comparison.pdf",
+      "path_png": "report_family_level_comparison.png",
+      "reason": ""
+    },
+    {
+      "figure": "convergence_curves",
+      "generation_status": "NOT_GENERATED",
+      "path_pdf": null,
+      "path_png": null,
+      "reason": "No valid run-associated trace CSV files with finite supported x/y columns are present. 600 declared trace file(s) were missing or invalid."
+    },
+    {
+      "figure": "minmaxsum_peak_integral",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_minmaxsum_peak_integral.pdf",
+      "path_png": "report_minmaxsum_peak_integral.png",
+      "reason": ""
+    },
+    {
+      "figure": "minmaxsum_pareto",
+      "generation_status": "GENERATED",
+      "path_pdf": "report_minmaxsum_pareto.pdf",
+      "path_png": "report_minmaxsum_pareto.png",
+      "reason": ""
+    },
+    {
+      "figure": "three_time_solution_figures",
+      "generation_status": "NOT_GENERATED",
+      "path_pdf": null,
+      "path_png": null,
+      "reason": "No actual renderable run solution snapshots; plan-only slots are not visualized as solver results."
+    }
+  ],
+  "requested": [
+    "runtime_by_algorithm_objective",
+    "runtime_distribution_by_algorithm",
+    "objective_quality_minmax_minsum",
+    "runtime_versus_quality",
+    "per_instance_normalized_quality",
+    "performance_vs_n_m",
+    "reliability_comparison",
+    "family_level_comparison",
+    "convergence_curves",
+    "minmaxsum_peak_integral",
+    "minmaxsum_pareto",
+    "three_time_solution_figures"
+  ]
+}

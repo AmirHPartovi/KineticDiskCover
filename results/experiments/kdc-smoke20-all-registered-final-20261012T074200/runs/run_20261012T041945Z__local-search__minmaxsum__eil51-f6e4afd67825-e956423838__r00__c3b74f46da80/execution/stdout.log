@@ -1,0 +1,194 @@
+[2026-10-12 07:49:45.143] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80/input for instances
+2026-10-12 07:49:45 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:45 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:45 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:45.149] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:45.149] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:45.149] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:45.150] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80/input/instance.json
+[2026-10-12 07:49:45.150] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-12 07:49:45.150] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-12 07:49:45.150] [info] [stationary.cpp:264] NN: cost=2643.341971, feasible=true, active_stations=11
+[2026-10-12 07:49:45.150] [info] [local_search_solver.cpp:283] LocalSearch: cost=2501.963875217 LB=381.292439887 iters=10 restarts=9
+[2026-10-12 07:49:45.153] [info] [solution.cpp:1026] extend: 13 intervals over [0, 1]
+[2026-10-12 07:49:45.153] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=26956.090245, LB=381.292440, gap=69.6966
+[2026-10-12 07:49:45.153] [info] [stationary.cpp:264] NN: cost=3375.937558, feasible=true, active_stations=10
+[2026-10-12 07:49:45.153] [info] [local_search_solver.cpp:283] LocalSearch: cost=3363.085003502 LB=728.311402032 iters=10 restarts=9
+[2026-10-12 07:49:45.153] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:45.156] [info] [solution.cpp:1026] extend: 11 intervals over [0, 1]
+[2026-10-12 07:49:45.156] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 11 intervals
+[2026-10-12 07:49:45.157] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.157] [info] [solution.cpp:1097] combine: 15 intervals
+[2026-10-12 07:49:45.157] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:45.159] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.159] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.398888, peak=10544.659804, LB=728.311402, gap=13.4782
+[2026-10-12 07:49:45.159] [info] [stationary.cpp:264] NN: cost=1086.631408, feasible=true, active_stations=11
+[2026-10-12 07:49:45.159] [info] [local_search_solver.cpp:283] LocalSearch: cost=934.300197506 LB=258.235179501 iters=11 restarts=9
+[2026-10-12 07:49:45.160] [info] [solution.cpp:1026] extend: 7 intervals over [0.3988884901847816, 1]
+[2026-10-12 07:49:45.161] [info] [solution.cpp:1026] extend: 3 intervals over [0, 0.3988884901847816]
+[2026-10-12 07:49:45.161] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 9 intervals
+[2026-10-12 07:49:45.162] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.162] [info] [solution.cpp:1097] combine: 13 intervals
+[2026-10-12 07:49:45.162] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 13 intervals
+[2026-10-12 07:49:45.164] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.164] [info] [minmax.cpp:202] MinMax iter 3: t_max=0.710013, peak=4715.643990, LB=728.311402, gap=5.4748
+[2026-10-12 07:49:45.164] [info] [stationary.cpp:264] NN: cost=1439.537850, feasible=true, active_stations=9
+[2026-10-12 07:49:45.164] [info] [local_search_solver.cpp:283] LocalSearch: cost=1281.988263770 LB=597.950681002 iters=11 restarts=9
+[2026-10-12 07:49:45.165] [info] [solution.cpp:1026] extend: 5 intervals over [0.7100132717548007, 1]
+[2026-10-12 07:49:45.167] [info] [solution.cpp:1026] extend: 10 intervals over [0, 0.7100132717548007]
+[2026-10-12 07:49:45.167] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 14 intervals
+[2026-10-12 07:49:45.168] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.168] [info] [solution.cpp:1097] combine: 16 intervals
+[2026-10-12 07:49:45.168] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 16 intervals
+[2026-10-12 07:49:45.170] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.170] [info] [minmax.cpp:202] MinMax iter 4: t_max=0.130913, peak=4129.239407, LB=728.311402, gap=4.6696
+[2026-10-12 07:49:45.170] [info] [stationary.cpp:264] NN: cost=2360.543520, feasible=true, active_stations=10
+[2026-10-12 07:49:45.170] [info] [local_search_solver.cpp:283] LocalSearch: cost=2163.295858494 LB=421.274009345 iters=10 restarts=9
+[2026-10-12 07:49:45.172] [info] [solution.cpp:1026] extend: 8 intervals over [0.13091305142209328, 1]
+[2026-10-12 07:49:45.172] [info] [solution.cpp:1026] extend: 3 intervals over [0, 0.13091305142209328]
+[2026-10-12 07:49:45.172] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 10 intervals
+[2026-10-12 07:49:45.173] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.174] [info] [solution.cpp:1097] combine: 21 intervals
+[2026-10-12 07:49:45.174] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 21 intervals
+[2026-10-12 07:49:45.175] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.175] [info] [minmax.cpp:202] MinMax iter 5: t_max=0.937433, peak=3704.209926, LB=728.311402, gap=4.0860
+[2026-10-12 07:49:45.175] [info] [stationary.cpp:264] NN: cost=3069.186636, feasible=true, active_stations=12
+[2026-10-12 07:49:45.176] [info] [local_search_solver.cpp:283] LocalSearch: cost=2815.859895782 LB=607.465027270 iters=9 restarts=9
+[2026-10-12 07:49:45.176] [info] [solution.cpp:1026] extend: 2 intervals over [0.9374326509402746, 1]
+[2026-10-12 07:49:45.177] [info] [solution.cpp:1026] extend: 7 intervals over [0, 0.9374326509402746]
+[2026-10-12 07:49:45.177] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 8 intervals
+[2026-10-12 07:49:45.178] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.178] [info] [solution.cpp:1097] combine: 20 intervals
+[2026-10-12 07:49:45.178] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 20 intervals
+[2026-10-12 07:49:45.180] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.180] [info] [minmax.cpp:202] MinMax iter 6: t_max=1.000000, peak=3354.516634, LB=728.311402, gap=3.6059
+[2026-10-12 07:49:45.180] [info] [stationary.cpp:264] NN: cost=3375.937558, feasible=true, active_stations=10
+[2026-10-12 07:49:45.180] [info] [local_search_solver.cpp:283] LocalSearch: cost=3363.085003502 LB=728.311402032 iters=10 restarts=9
+[2026-10-12 07:49:45.180] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:45.183] [info] [solution.cpp:1026] extend: 11 intervals over [0, 1]
+[2026-10-12 07:49:45.183] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 11 intervals
+[2026-10-12 07:49:45.184] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.184] [info] [solution.cpp:1097] combine: 20 intervals
+[2026-10-12 07:49:45.184] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 20 intervals
+[2026-10-12 07:49:45.185] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.185] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-10-12 07:49:45.185] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 20 intervals
+[2026-10-12 07:49:45.188] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.188] [info] [minmax.cpp:467] MinMax: done. peak=3354.516634, certified_LB=728.311402, gap=3.6059, iters=6, t=0.018s
+[2026-10-12 07:49:45.188] [info] [minsum.cpp:512] MinSum: start n=13, m=25
+[2026-10-12 07:49:45.188] [info] [stationary.cpp:264] NN: cost=2643.341971, feasible=true, active_stations=11
+[2026-10-12 07:49:45.188] [info] [local_search_solver.cpp:283] LocalSearch: cost=2501.963875217 LB=381.292439887 iters=10 restarts=9
+[2026-10-12 07:49:45.190] [info] [solution.cpp:1026] extend: 13 intervals over [0, 1]
+[2026-10-12 07:49:45.190] [info] [stationary.cpp:264] NN: cost=2643.341971, feasible=true, active_stations=11
+[2026-10-12 07:49:45.190] [info] [local_search_solver.cpp:283] LocalSearch: cost=2501.963875217 LB=381.292439887 iters=10 restarts=9
+[2026-10-12 07:49:45.190] [info] [stationary.cpp:264] NN: cost=1752.231550, feasible=true, active_stations=11
+[2026-10-12 07:49:45.190] [info] [local_search_solver.cpp:283] LocalSearch: cost=1676.187270854 LB=408.336355919 iters=10 restarts=9
+[2026-10-12 07:49:45.190] [info] [stationary.cpp:264] NN: cost=1338.807724, feasible=true, active_stations=10
+[2026-10-12 07:49:45.190] [info] [local_search_solver.cpp:283] LocalSearch: cost=1338.807724324 LB=432.702656502 iters=9 restarts=9
+[2026-10-12 07:49:45.191] [info] [stationary.cpp:264] NN: cost=1357.551032, feasible=true, active_stations=9
+[2026-10-12 07:49:45.191] [info] [local_search_solver.cpp:283] LocalSearch: cost=1357.551032465 LB=550.785497787 iters=9 restarts=9
+[2026-10-12 07:49:45.191] [info] [stationary.cpp:264] NN: cost=3375.937558, feasible=true, active_stations=10
+[2026-10-12 07:49:45.191] [info] [local_search_solver.cpp:283] LocalSearch: cost=3363.085003502 LB=728.311402032 iters=9 restarts=9
+[2026-10-12 07:49:45.191] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.5996,0.8525], t_mid=0.7260, int=13036.728836, LB=486.656608, gap=25.7884
+[2026-10-12 07:49:45.191] [info] [stationary.cpp:264] NN: cost=1288.120686, feasible=true, active_stations=9
+[2026-10-12 07:49:45.191] [info] [local_search_solver.cpp:283] LocalSearch: cost=1288.120686064 LB=576.561558545 iters=9 restarts=9
+[2026-10-12 07:49:45.191] [info] [solution.cpp:1026] extend: 4 intervals over [0.7260262099220816, 1]
+[2026-10-12 07:49:45.194] [info] [solution.cpp:1026] extend: 11 intervals over [0, 0.7260262099220816]
+[2026-10-12 07:49:45.194] [info] [solution.cpp:1097] combine: 14 intervals
+[2026-10-12 07:49:45.200] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 14 intervals
+[2026-10-12 07:49:45.201] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.201] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.1532,0.2739], t_mid=0.2136, int=3349.252263, LB=491.294062, gap=5.8172
+[2026-10-12 07:49:45.201] [info] [stationary.cpp:264] NN: cost=1896.593528, feasible=true, active_stations=10
+[2026-10-12 07:49:45.201] [info] [local_search_solver.cpp:283] LocalSearch: cost=1855.449656067 LB=316.006201754 iters=11 restarts=9
+[2026-10-12 07:49:45.202] [info] [solution.cpp:1026] extend: 6 intervals over [0.21357154162477193, 1]
+[2026-10-12 07:49:45.203] [info] [solution.cpp:1026] extend: 4 intervals over [0, 0.21357154162477193]
+[2026-10-12 07:49:45.203] [info] [solution.cpp:1097] combine: 15 intervals
+[2026-10-12 07:49:45.210] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:45.211] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.211] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.2290,0.4569], t_mid=0.3430, int=2416.591879, LB=491.294062, gap=3.9188
+[2026-10-12 07:49:45.211] [info] [stationary.cpp:264] NN: cost=1231.006824, feasible=true, active_stations=11
+[2026-10-12 07:49:45.211] [info] [local_search_solver.cpp:283] LocalSearch: cost=1128.168853897 LB=242.349773753 iters=10 restarts=9
+[2026-10-12 07:49:45.212] [info] [solution.cpp:1026] extend: 5 intervals over [0.34295894156472245, 1]
+[2026-10-12 07:49:45.212] [info] [solution.cpp:1026] extend: 1 intervals over [0, 0.34295894156472245]
+[2026-10-12 07:49:45.212] [info] [solution.cpp:1097] combine: 15 intervals
+[2026-10-12 07:49:45.221] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:45.223] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.223] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.7667,0.9681], t_mid=0.8674, int=2045.981767, LB=491.294062, gap=3.1645
+[2026-10-12 07:49:45.223] [info] [stationary.cpp:264] NN: cost=2301.153513, feasible=true, active_stations=11
+[2026-10-12 07:49:45.223] [info] [local_search_solver.cpp:283] LocalSearch: cost=2301.153513050 LB=532.695384936 iters=9 restarts=9
+[2026-10-12 07:49:45.223] [info] [solution.cpp:1026] extend: 2 intervals over [0.8673732708702677, 1]
+[2026-10-12 07:49:45.224] [info] [solution.cpp:1026] extend: 8 intervals over [0, 0.8673732708702677]
+[2026-10-12 07:49:45.224] [info] [solution.cpp:1097] combine: 15 intervals
+[2026-10-12 07:49:45.234] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:45.235] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.235] [info] [minsum.cpp:633] MinSum iter 5: [t_a,t_b]=[0.8353,0.9895], t_mid=0.9124, int=1977.592001, LB=491.294062, gap=3.0253
+[2026-10-12 07:49:45.236] [info] [stationary.cpp:264] NN: cost=2867.938644, feasible=true, active_stations=12
+[2026-10-12 07:49:45.236] [info] [local_search_solver.cpp:283] LocalSearch: cost=2653.176923270 LB=573.378261227 iters=10 restarts=9
+[2026-10-12 07:49:45.236] [info] [solution.cpp:1026] extend: 2 intervals over [0.9123779523409412, 1]
+[2026-10-12 07:49:45.238] [info] [solution.cpp:1026] extend: 7 intervals over [0, 0.9123779523409412]
+[2026-10-12 07:49:45.238] [info] [solution.cpp:1097] combine: 16 intervals
+[2026-10-12 07:49:45.250] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 16 intervals
+[2026-10-12 07:49:45.252] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.252] [info] [minsum.cpp:633] MinSum iter 6: [t_a,t_b]=[0.8813,0.9895], t_mid=0.9354, int=1951.143518, LB=491.294062, gap=2.9714
+[2026-10-12 07:49:45.252] [info] [stationary.cpp:264] NN: cost=3052.057153, feasible=true, active_stations=12
+[2026-10-12 07:49:45.252] [info] [local_search_solver.cpp:283] LocalSearch: cost=2807.214376165 LB=604.345426508 iters=10 restarts=9
+[2026-10-12 07:49:45.252] [info] [solution.cpp:1026] extend: 2 intervals over [0.9353670962370231, 1]
+[2026-10-12 07:49:45.254] [info] [solution.cpp:1026] extend: 7 intervals over [0, 0.9353670962370231]
+[2026-10-12 07:49:45.254] [info] [solution.cpp:1097] combine: 17 intervals
+[2026-10-12 07:49:45.267] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 17 intervals
+[2026-10-12 07:49:45.268] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.268] [info] [minsum.cpp:633] MinSum iter 7: [t_a,t_b]=[0.1279,0.2290], t_mid=0.1785, int=1935.418481, LB=491.294062, gap=2.9394
+[2026-10-12 07:49:45.268] [info] [stationary.cpp:264] NN: cost=1985.240021, feasible=true, active_stations=10
+[2026-10-12 07:49:45.268] [info] [local_search_solver.cpp:283] LocalSearch: cost=1925.594777524 LB=326.062096106 iters=10 restarts=9
+[2026-10-12 07:49:45.270] [info] [solution.cpp:1026] extend: 7 intervals over [0.17846565824206748, 1]
+[2026-10-12 07:49:45.270] [info] [solution.cpp:1026] extend: 4 intervals over [0, 0.17846565824206748]
+[2026-10-12 07:49:45.270] [info] [solution.cpp:1097] combine: 19 intervals
+[2026-10-12 07:49:45.288] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 19 intervals
+[2026-10-12 07:49:45.290] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.290] [info] [minsum.cpp:633] MinSum iter 8: [t_a,t_b]=[0.0557,0.1663], t_mid=0.1110, int=1919.704480, LB=491.294062, gap=2.9074
+[2026-10-12 07:49:45.290] [info] [stationary.cpp:264] NN: cost=2525.110155, feasible=true, active_stations=10
+[2026-10-12 07:49:45.290] [info] [local_search_solver.cpp:283] LocalSearch: cost=2286.191091743 LB=419.250188570 iters=11 restarts=9
+[2026-10-12 07:49:45.291] [info] [solution.cpp:1026] extend: 8 intervals over [0.11099250656198778, 1]
+[2026-10-12 07:49:45.292] [info] [solution.cpp:1026] extend: 3 intervals over [0, 0.11099250656198778]
+[2026-10-12 07:49:45.292] [info] [solution.cpp:1097] combine: 21 intervals
+[2026-10-12 07:49:45.310] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 21 intervals
+[2026-10-12 07:49:45.313] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.313] [info] [minsum.cpp:633] MinSum iter 9: [t_a,t_b]=[0.0557,0.1400], t_mid=0.0978, int=1908.741302, LB=491.294062, gap=2.8851
+[2026-10-12 07:49:45.313] [info] [stationary.cpp:264] NN: cost=2564.955664, feasible=true, active_stations=10
+[2026-10-12 07:49:45.313] [info] [local_search_solver.cpp:283] LocalSearch: cost=2223.486400991 LB=406.603491581 iters=11 restarts=9
+[2026-10-12 07:49:45.315] [info] [solution.cpp:1026] extend: 11 intervals over [0.09782694463551114, 1]
+[2026-10-12 07:49:45.316] [info] [solution.cpp:1026] extend: 3 intervals over [0, 0.09782694463551114]
+[2026-10-12 07:49:45.316] [info] [solution.cpp:1097] combine: 22 intervals
+[2026-10-12 07:49:45.346] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 22 intervals
+[2026-10-12 07:49:45.348] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.348] [info] [minsum.cpp:633] MinSum iter 10: [t_a,t_b]=[0.4412,0.5555], t_mid=0.4984, int=1890.102755, LB=491.294062, gap=2.8472
+[2026-10-12 07:49:45.348] [info] [stationary.cpp:264] NN: cost=1329.264364, feasible=true, active_stations=10
+[2026-10-12 07:49:45.348] [info] [local_search_solver.cpp:283] LocalSearch: cost=1329.264364078 LB=428.822453519 iters=9 restarts=9
+[2026-10-12 07:49:45.351] [info] [solution.cpp:1026] extend: 6 intervals over [0.49835196963216266, 1]
+[2026-10-12 07:49:45.352] [info] [solution.cpp:1026] extend: 5 intervals over [0, 0.49835196963216266]
+[2026-10-12 07:49:45.352] [info] [solution.cpp:1097] combine: 23 intervals
+[2026-10-12 07:49:45.371] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 23 intervals
+[2026-10-12 07:49:45.373] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:633] MinSum iter 11: [t_a,t_b]=[0.4412,0.5855], t_mid=0.5133, int=1833.628925, LB=491.294062, gap=2.7322
+[2026-10-12 07:49:45.373] [info] [stationary.cpp:264] NN: cost=1424.539698, feasible=true, active_stations=10
+[2026-10-12 07:49:45.373] [info] [local_search_solver.cpp:283] LocalSearch: cost=1424.539698328 LB=465.372053269 iters=9 restarts=9
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:681] MinSum: no improvement at selected time (1/3)
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:633] MinSum iter 12: [t_a,t_b]=[0.4412,0.5855], t_mid=0.5133, int=1833.628925, LB=491.294062, gap=2.7322
+[2026-10-12 07:49:45.373] [info] [stationary.cpp:264] NN: cost=1424.539698, feasible=true, active_stations=10
+[2026-10-12 07:49:45.373] [info] [local_search_solver.cpp:283] LocalSearch: cost=1424.539698328 LB=465.372053269 iters=9 restarts=9
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:681] MinSum: no improvement at selected time (2/3)
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:633] MinSum iter 13: [t_a,t_b]=[0.4412,0.5855], t_mid=0.5133, int=1833.628925, LB=491.294062, gap=2.7322
+[2026-10-12 07:49:45.373] [info] [stationary.cpp:264] NN: cost=1424.539698, feasible=true, active_stations=10
+[2026-10-12 07:49:45.373] [info] [local_search_solver.cpp:283] LocalSearch: cost=1424.539698328 LB=465.372053269 iters=9 restarts=9
+[2026-10-12 07:49:45.373] [info] [minsum.cpp:681] MinSum: no improvement at selected time (3/3)
+[2026-10-12 07:49:45.373] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 23 intervals
+[2026-10-12 07:49:45.375] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.375] [info] [minsum.cpp:881] MinSum: done. int=1833.628925, LB=491.294062, gap=2.7322, iters=13, t=0.129s
+[2026-10-12 07:49:45.375] [info] [solution.cpp:1097] combine: 28 intervals
+[2026-10-12 07:49:45.375] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 28 intervals
+[2026-10-12 07:49:45.378] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:45.378] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80/execution/solver/runs/eil51/local-search/minmaxsum/trace.csv
+[2026-10-12 07:49:45.378] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 29947 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80/execution/solver/runs/eil51/local-search/minmaxsum/solution.json
+[2026-10-12 07:49:45.378] [info] [batch_runner.cpp:1352] BatchRunner: eil51 / local-search / minmaxsum cost=3354.516634 t=0.228s verified=true
+[2026-10-12 07:49:45.379] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

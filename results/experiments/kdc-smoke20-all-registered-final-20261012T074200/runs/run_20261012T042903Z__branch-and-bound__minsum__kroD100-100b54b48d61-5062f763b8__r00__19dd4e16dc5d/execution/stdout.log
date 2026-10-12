@@ -1,0 +1,22 @@
+[2026-10-12 07:59:03.276] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d/input for instances
+2026-10-12 07:59:03 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:59:03 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:59:03 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:59:03.282] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:59:03.282] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:59:03.282] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d/execution/solver/experiment_manifest.json)
+[2026-10-12 07:59:03.283] [info] [io.cpp:137] read_json: loaded 37 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d/input/instance.json
+[2026-10-12 07:59:03.284] [info] [minsum.cpp:512] MinSum: start n=37, m=25
+[2026-10-12 07:59:03.284] [info] [candidate.cpp:199] InstancePrecompute: built 925 candidates
+[2026-10-12 07:59:03.284] [info] [stationary.cpp:264] NN: cost=4973.444326, feasible=true, active_stations=8
+[2026-10-12 07:59:05.284] [warning] [branch_and_bound_solver.cpp:289] BnB: time limit 2.0000s reached
+[2026-10-12 07:59:05.284] [info] [branch_and_bound_solver.cpp:416] BnB: cost=4973.444325946 LB=3578.852521391 nodes=175469 t=2.0000s
+[2026-10-12 07:59:05.470] [info] [solution.cpp:1026] extend: 33 intervals over [0, 1]
+[2026-10-12 07:59:05.470] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 33 intervals
+[2026-10-12 07:59:05.479] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:59:05.479] [info] [minsum.cpp:881] MinSum: done. int=8294.016842, LB=0.000000, gap=8294.0168, iters=0, t=2.187s
+[2026-10-12 07:59:05.479] [info] [trace.cpp:93] TraceWriter: wrote 1 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d/execution/solver/runs/kroD100/branch-and-bound/minsum/trace.csv
+[2026-10-12 07:59:05.479] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 51190 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d/execution/solver/runs/kroD100/branch-and-bound/minsum/solution.json
+[2026-10-12 07:59:05.480] [info] [batch_runner.cpp:1352] BatchRunner: kroD100 / branch-and-bound / minsum cost=8294.016842 t=2.196s verified=true
+[2026-10-12 07:59:05.480] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

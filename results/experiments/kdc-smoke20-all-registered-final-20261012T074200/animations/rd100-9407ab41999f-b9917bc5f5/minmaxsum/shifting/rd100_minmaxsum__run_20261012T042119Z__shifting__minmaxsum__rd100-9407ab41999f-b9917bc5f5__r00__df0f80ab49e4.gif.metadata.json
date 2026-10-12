@@ -1,0 +1,42 @@
+{
+  "actual_backend": "shifting",
+  "algorithm": "shifting",
+  "animation_path": "rd100_minmaxsum__run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4.gif",
+  "animation_sha256": "63794209a70d5414ce968087faa859c40821e60a918d80c06b75572b3c05d608",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "rd100-9407ab41999f-b9917bc5f5",
+  "instance_name": "rd100",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 4414.743561544975,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4984.081627479525,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4/execution/solver/runs/rd100/shifting/minmaxsum/component-minmax",
+    "minsum_component_integral": 4891.872537384421,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 6315.365717718632,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4/execution/solver/runs/rd100/shifting/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 4412.251959699027,
+    "peak_cost": 4984.081627479525
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4/result/result.json",
+  "source_solution_path": "runs/run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4/result/solution.json",
+  "source_solution_sha256": "4642781957e3d7f3d43a92aaab26c4596ca8d3317aefbfd3cfb0f7a854c808b3",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

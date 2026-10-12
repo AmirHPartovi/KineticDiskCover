@@ -1,0 +1,52 @@
+[2026-10-12 07:49:41.722] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f/input for instances
+2026-10-12 07:49:41 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:41 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:41 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:41.728] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:41.728] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:41.728] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:41.731] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f/input/instance.json
+[2026-10-12 07:49:41.731] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-12 07:49:41.731] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-12 07:49:41.731] [info] [stationary.cpp:264] NN: cost=3207.388661, feasible=true, active_stations=7
+[2026-10-12 07:49:41.751] [info] [genetic_solver.cpp:274] GA: cost=3106.574348986 gens=500
+[2026-10-12 07:49:41.754] [info] [solution.cpp:1026] extend: 12 intervals over [0, 1]
+[2026-10-12 07:49:41.754] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=16060.146598, LB=1598.360240, gap=9.0479
+[2026-10-12 07:49:41.754] [info] [stationary.cpp:264] NN: cost=4698.533680, feasible=true, active_stations=7
+[2026-10-12 07:49:41.771] [info] [genetic_solver.cpp:274] GA: cost=4698.533680125 gens=500
+[2026-10-12 07:49:41.771] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:41.774] [info] [solution.cpp:1026] extend: 13 intervals over [0, 1]
+[2026-10-12 07:49:41.774] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 13 intervals
+[2026-10-12 07:49:41.775] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.775] [info] [solution.cpp:1097] combine: 14 intervals
+[2026-10-12 07:49:41.775] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 14 intervals
+[2026-10-12 07:49:41.776] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.776] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.510610, peak=6087.449514, LB=1934.141241, gap=2.1474
+[2026-10-12 07:49:41.776] [info] [stationary.cpp:264] NN: cost=1773.050060, feasible=true, active_stations=8
+[2026-10-12 07:49:41.793] [info] [genetic_solver.cpp:274] GA: cost=1674.081582467 gens=500
+[2026-10-12 07:49:41.794] [info] [solution.cpp:1026] extend: 7 intervals over [0.5106095541867778, 1]
+[2026-10-12 07:49:41.795] [info] [solution.cpp:1026] extend: 9 intervals over [0, 0.5106095541867778]
+[2026-10-12 07:49:41.795] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:41.796] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.796] [info] [solution.cpp:1097] combine: 21 intervals
+[2026-10-12 07:49:41.796] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 21 intervals
+[2026-10-12 07:49:41.798] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.798] [info] [minmax.cpp:202] MinMax iter 3: t_max=1.000000, peak=4698.533680, LB=1934.141241, gap=1.4293
+[2026-10-12 07:49:41.798] [info] [stationary.cpp:264] NN: cost=4698.533680, feasible=true, active_stations=7
+[2026-10-12 07:49:41.816] [info] [genetic_solver.cpp:274] GA: cost=4698.533680125 gens=500
+[2026-10-12 07:49:41.816] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:41.819] [info] [solution.cpp:1026] extend: 13 intervals over [0, 1]
+[2026-10-12 07:49:41.819] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 13 intervals
+[2026-10-12 07:49:41.820] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.820] [info] [solution.cpp:1097] combine: 21 intervals
+[2026-10-12 07:49:41.820] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 21 intervals
+[2026-10-12 07:49:41.822] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.822] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-10-12 07:49:41.822] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 21 intervals
+[2026-10-12 07:49:41.824] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:41.824] [info] [minmax.cpp:467] MinMax: done. peak=4698.533680, certified_LB=1934.141241, gap=1.4293, iters=3, t=0.083s
+[2026-10-12 07:49:41.824] [info] [trace.cpp:93] TraceWriter: wrote 3 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f/execution/solver/runs/berlin52/genetic/minmax/trace.csv
+[2026-10-12 07:49:41.824] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 22568 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f/execution/solver/runs/berlin52/genetic/minmax/solution.json
+[2026-10-12 07:49:41.824] [info] [batch_runner.cpp:1352] BatchRunner: berlin52 / genetic / minmax cost=4698.533680 t=0.093s verified=true
+[2026-10-12 07:49:41.825] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

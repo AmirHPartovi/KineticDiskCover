@@ -1,0 +1,17 @@
+[2026-10-12 07:58:51.013] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042851Z__brute-force__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__089e766a2d55/input for instances
+2026-10-12 07:58:51 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:58:51 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:58:51 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:58:51.018] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:58:51.018] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:58:51.018] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042851Z__brute-force__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__089e766a2d55/execution/solver/experiment_manifest.json)
+[2026-10-12 07:58:51.019] [info] [io.cpp:137] read_json: loaded 25 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042851Z__brute-force__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__089e766a2d55/input/instance.json
+[2026-10-12 07:58:51.019] [info] [minmax.cpp:110] MinMax: start n=25, m=25, T=1
+[2026-10-12 07:58:51.019] [warning] [brute_force_solver.cpp:107] BruteForce: assignment count exceeds configured cap 100000
+[2026-10-12 07:58:51.019] [info] [minsum.cpp:512] MinSum: start n=25, m=25
+[2026-10-12 07:58:51.019] [warning] [brute_force_solver.cpp:107] BruteForce: assignment count exceeds configured cap 100000
+[2026-10-12 07:58:51.019] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042851Z__brute-force__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__089e766a2d55/execution/solver/runs/eil76/brute-force/minmaxsum/trace.csv
+[2026-10-12 07:58:51.019] [info] [candidate.cpp:199] InstancePrecompute: built 625 candidates
+[2026-10-12 07:58:51.020] [info] [batch_runner.cpp:1352] BatchRunner: eil76 / brute-force / minmaxsum cost=nan t=0.000s verified=false
+[2026-10-12 07:58:51.020] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

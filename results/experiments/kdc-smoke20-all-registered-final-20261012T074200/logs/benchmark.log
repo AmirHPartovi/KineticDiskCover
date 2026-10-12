@@ -1,0 +1,93 @@
+[2026-10-12T07:45:53+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+usage: run_batch.py [-h] --instances INSTANCES
+                    [--dataset-profile {full,smoke20}]
+                    [--dataset-manifest DATASET_MANIFEST] [--output OUTPUT]
+                    [--algorithms ALGORITHMS] [--plan-only]
+                    [--profile {fast,exact-reference,debug}] [--seed SEED]
+                    [--repeats REPEATS] [--resume]
+                    [--safety-timeout SAFETY_TIMEOUT]
+                    [--modes {minmax,minsum,minmaxsum,both,all}]
+                    [--exact-reference {ip-kont,branch-and-bound,auto}]
+                    [--threads THREADS] [--time-limit TIME_LIMIT]
+                    [--fast-time-limit FAST_TIME_LIMIT]
+                    [--exact-time-limit EXACT_TIME_LIMIT]
+                    [--minsum-refinement-policy {adaptive,sampled}]
+                    [--minmax-budget-fraction MINMAX_BUDGET_FRACTION]
+                    [--minsum-budget-fraction MINSUM_BUDGET_FRACTION]
+                    [--brute-force-max-assignments BRUTE_FORCE_MAX_ASSIGNMENTS]
+                    [--brute-force-time-limit-sec BRUTE_FORCE_TIME_LIMIT_SEC]
+                    [--save-solutions] [--save-traces]
+run_batch.py: error: cannot resume: experiment has no immutable run plan
+[2026-10-12T07:46:50+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+Traceback (most recent call last):
+  File "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py", line 200, in <module>
+    sys.exit(main())
+  File "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py", line 196, in main
+    return run_immutable_batch(batch_args)
+  File "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch_limited.py", line 964, in main
+    create_experiment(
+  File "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/kdc_tools/storage.py", line 347, in create_experiment
+    raise FileExistsError(
+FileExistsError: experiment already exists; use explicit validated resume: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+[2026-10-12T07:49:16+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+20 instances × 11 algorithms × 3 objectives; 660 new attempts of 660 planned logical runs.
+Finished 25/660 run attempts.
+Finished 50/660 run attempts.
+Finished 75/660 run attempts.
+Finished 100/660 run attempts.
+Finished 125/660 run attempts.
+Finished 150/660 run attempts.
+Finished 175/660 run attempts.
+Finished 200/660 run attempts.
+Finished 225/660 run attempts.
+Finished 250/660 run attempts.
+Finished 275/660 run attempts.
+Finished 300/660 run attempts.
+Finished 325/660 run attempts.
+Finished 350/660 run attempts.
+Finished 375/660 run attempts.
+Finished 400/660 run attempts.
+Finished 425/660 run attempts.
+Finished 450/660 run attempts.
+Finished 475/660 run attempts.
+Finished 500/660 run attempts.
+Finished 525/660 run attempts.
+Finished 550/660 run attempts.
+Finished 575/660 run attempts.
+Finished 600/660 run attempts.
+Finished 625/660 run attempts.
+Finished 650/660 run attempts.
+Finished 660/660 run attempts.
+Aggregate: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/aggregates/results.json
+Aggregate complete: False
+[2026-10-12T07:56:17+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.BPpzbX/selection.json 
+usage: run_batch.py [-h] [--instances INSTANCES]
+                    [--dataset-profile {full,smoke20}]
+                    [--dataset-manifest DATASET_MANIFEST] [--output OUTPUT]
+                    [--preflight-report PREFLIGHT_REPORT]
+                    [--algorithms ALGORITHMS] [--plan-only]
+                    [--profile {fast,exact-reference,debug}] [--seed SEED]
+                    [--repeats REPEATS]
+                    [--modes {minmax,minsum,minmaxsum,both,all}]
+                    [--exact-reference {ip-kont,branch-and-bound,auto}]
+                    [--parallel] [--threads THREADS] [--time-limit TIME_LIMIT]
+                    [--fast-time-limit FAST_TIME_LIMIT]
+                    [--exact-time-limit EXACT_TIME_LIMIT]
+                    [--minsum-refinement-policy {adaptive,sampled}]
+                    [--minmax-budget-fraction MINMAX_BUDGET_FRACTION]
+                    [--minsum-budget-fraction MINSUM_BUDGET_FRACTION]
+                    [--brute-force-max-assignments BRUTE_FORCE_MAX_ASSIGNMENTS]
+                    [--brute-force-time-limit-sec BRUTE_FORCE_TIME_LIMIT_SEC]
+                    [--force] [--save-solutions] [--save-traces] [--resume]
+run_batch.py: error: invalid selection manifest: [Errno 2] No such file or directory: '/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.BPpzbX/selection.json'
+[2026-10-12T07:57:27+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.6rQArY/selection.json 
+20 instances × 11 algorithms × 3 objectives; 173 new attempts of 660 planned logical runs.
+Finished 25/173 run attempts.
+Finished 50/173 run attempts.
+Finished 75/173 run attempts.
+Finished 100/173 run attempts.
+Finished 125/173 run attempts.
+Finished 150/173 run attempts.
+Finished 173/173 run attempts.
+Aggregate: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/aggregates/results.json
+Aggregate complete: False

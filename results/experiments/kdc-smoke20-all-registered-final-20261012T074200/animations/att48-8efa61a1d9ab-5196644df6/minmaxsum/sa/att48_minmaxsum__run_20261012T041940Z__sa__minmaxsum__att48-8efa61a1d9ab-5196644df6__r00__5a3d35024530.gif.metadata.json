@@ -1,0 +1,42 @@
+{
+  "actual_backend": "sa",
+  "algorithm": "sa",
+  "animation_path": "att48_minmaxsum__run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530.gif",
+  "animation_sha256": "97478c42131e439dc2c8d26dd00c2048581a025e5062d36915788fe986f1d6b8",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "att48-8efa61a1d9ab-5196644df6",
+  "instance_name": "att48",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": false,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": null,
+    "minmax_component_optimality": "FAILED",
+    "minmax_component_peak": null,
+    "minmax_component_status": "FAILED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530/execution/solver/runs/att48/sa/minmaxsum/component-minmax",
+    "minsum_component_integral": 1538.2906711792505,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 2739.5551262630015,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530/execution/solver/runs/att48/sa/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 1538.2906711792505,
+    "peak_cost": 2739.5551262630015
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530/result/result.json",
+  "source_solution_path": "runs/run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530/result/solution.json",
+  "source_solution_sha256": "0c50f4d04f27171efed7408249b33e1137d2e06e3caffabb05f9bd210b3523f6",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

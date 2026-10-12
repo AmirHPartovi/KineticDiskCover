@@ -1,0 +1,42 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "animation_path": "st70_minmaxsum__run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4.gif",
+  "animation_sha256": "ef0d61d6290aac388a794c9b6f48d995c489dd6256a968e549a2e7a77a279b34",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "st70-fa79167d4566-93e4a763b9",
+  "instance_name": "st70",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3850.362944529044,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4999.468104125146,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4/execution/solver/runs/st70/primal-dual/minmaxsum/component-minmax",
+    "minsum_component_integral": 5017.466672742551,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 7236.808623621344,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4/execution/solver/runs/st70/primal-dual/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3813.053860846527,
+    "peak_cost": 4913.707783237187
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4/result/result.json",
+  "source_solution_path": "runs/run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4/result/solution.json",
+  "source_solution_sha256": "c20e0b13f254bbbb4bd89a2595ed7e8b249c5d8759c44a58d3d67fc4522f375b",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

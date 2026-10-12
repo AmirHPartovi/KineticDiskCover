@@ -1,0 +1,42 @@
+{
+  "actual_backend": "greedy",
+  "algorithm": "greedy",
+  "animation_path": "kroE100_minmaxsum__run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5.gif",
+  "animation_sha256": "b5520d27638c24c87373eca1334e54b0fb07a7baaac6346191945e47820826d8",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "kroE100-02a50775c87e-d8d2268527",
+  "instance_name": "kroE100",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 4081.309602760123,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 6126.273972681284,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5/execution/solver/runs/kroE100/greedy/minmaxsum/component-minmax",
+    "minsum_component_integral": 5822.589545529537,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 8233.704635428423,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5/execution/solver/runs/kroE100/greedy/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 4002.079249656442,
+    "peak_cost": 6126.273972681284
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5/result/result.json",
+  "source_solution_path": "runs/run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5/result/solution.json",
+  "source_solution_sha256": "dc58f722a2bac38c6fe10cf4dd14ef4c4daa98ad45a69a64d2304f12ce123997",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

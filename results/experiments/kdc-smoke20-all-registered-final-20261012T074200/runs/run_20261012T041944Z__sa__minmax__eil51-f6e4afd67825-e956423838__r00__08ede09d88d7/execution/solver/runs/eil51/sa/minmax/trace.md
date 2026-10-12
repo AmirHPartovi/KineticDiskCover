@@ -1,0 +1,51 @@
+# Data dictionary and preview: trace.csv
+
+- **Purpose:** Documents the existing experiment-scoped export `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv` without altering its source data.
+- **Experiment:** `kdc-smoke20-all-registered-final-20261012T074200`
+- **Source manifest/result:** `validated canonical aggregate/run-record export`
+- **Generation:** `scripts/report_experiment.py --stage tables`
+- **Rows:** 6
+- **File scope:** runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv
+- **Sort order:** preserved from the source export
+- **Filters:** none applied by companion generation
+- **Status counts:** not applicable or status column absent
+- **Missing/null handling:** unavailable or inapplicable measurements remain blank/null; no unrelated metric is substituted.
+- **Limitations:** The sidecar documents the existing export; values and status semantics remain those of its canonical source.
+
+## Derived metric formulas
+
+No metrics are recomputed here; all row values are direct serialized source fields.
+
+## Column definitions
+
+- `iter` — Serialized source field `iter` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `t_max` — Serialized source field `t_max` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `objective` — objective identifier.
+- `lower_bound` — reported lower bound; its certification is represented separately.
+- `gap` — Serialized source field `gap` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `wall_time` — Serialized source field `wall_time` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `num_ip_solves` — Serialized source field `num_ip_solves` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_cost_at_peak_time` — Serialized source field `static_cost_at_peak_time` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_status` — Serialized source field `static_solver_status` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_exact` — Serialized source field `static_solver_exact` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_lower_bound` — Serialized source field `static_lower_bound` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_upper_bound` — Serialized source field `static_upper_bound` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_peak` — Serialized source field `candidate_peak` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `combined_peak` — Serialized source field `combined_peak` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `peak_improvement` — Serialized source field `peak_improvement` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `certified_gap` — Serialized source field `certified_gap` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `heuristic_gap` — Serialized source field `heuristic_gap` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_accepted` — Serialized source field `candidate_accepted` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `has_certified_gap` — Serialized source field `has_certified_gap` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `stop_reason` — Serialized source field `stop_reason` from `runs/run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7/execution/solver/runs/eil51/sa/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+
+## Preview
+
+| iter | t_max | objective | lower_bound | gap | wall_time | num_ip_solves | static_cost_at_peak_time | static_solver_status | static_solver_exact | static_lower_bound | static_upper_bound | candidate_peak | combined_peak | peak_improvement | certified_gap | heuristic_gap | candidate_accepted | has_certified_gap | stop_reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 1 | 26956.090244629722 | 728.31140203227187 | 69.696629213483135 | 0.0087702079999999998 | 2 | 3204.5701689419948 | FEASIBLE | 0 | 728.31140203227187 | 3204.5701689419948 | 12942.202599853343 | 9552.8701314604059 | 17403.220113169315 | 36.011764705882335 | 26956.090244629722 | 1 | 1 | candidate_accepted |
+| 2 | 0.37029585874984727 | 9552.8701314604059 | 728.31140203227187 | 12.116463788434707 | 0.023308333000000001 | 3 | 998.92430213545447 | FEASIBLE | 0 | 232.34977840958044 | 998.92430213545447 | 12938.237847867405 | 5013.6577669735261 | 4539.2123644868798 | 12.116463788434707 | 9552.8701314604059 | 1 | 1 | candidate_accepted |
+| 3 | 0.72181810039023253 | 5013.6577669735261 | 728.31140203227187 | 5.8839479280201745 | 0.033990040999999999 | 4 | 1280.3629798517381 | FEASIBLE | 0 | 581.85879782169968 | 1280.3629798517381 | 10442.535331593223 | 4129.2394073632395 | 884.41835961028664 | 5.8839479280201745 | 5013.6577669735261 | 1 | 1 | candidate_accepted |
+| 4 | 0.13091305142209328 | 4129.2394073632395 | 728.31140203227187 | 4.6696069783351692 | 0.048755374999999997 | 5 | 2163.2958584940693 | FEASIBLE | 0 | 421.27400934464106 | 2163.2958584940693 | 21519.459837694703 | 3412.4666810729404 | 716.77272629029903 | 4.6696069783351692 | 4129.2394073632395 | 1 | 1 | candidate_accepted |
+| 5 | 0.92234815485723876 | 3412.4666810729404 | 728.31140203227187 | 3.6854500307846783 | 0.060185165999999998 | 6 | 2762.0027591055209 | FEASIBLE | 0 | 585.96264770874802 | 2762.0027591055209 | 26420.567154900105 | 3204.5701689420021 | 207.89651213093839 | 3.6854500307846783 | 3412.4666810729404 | 1 | 1 | candidate_accepted |
+| 6 | 1 | 3204.5701689420021 | 728.31140203227187 | 3.4000000000000079 | 0.070317083000000002 | 7 | 3204.5701689419948 | FEASIBLE | 0 | 728.31140203227187 | 3204.5701689419948 | 12942.202599853343 | 3204.5701689420021 | 0 | 3.4000000000000079 | 3204.5701689420021 | 1 | 1 | heuristic_no_improvement |

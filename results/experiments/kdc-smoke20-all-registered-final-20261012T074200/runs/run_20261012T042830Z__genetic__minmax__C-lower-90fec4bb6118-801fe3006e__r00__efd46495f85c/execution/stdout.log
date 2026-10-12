@@ -1,0 +1,25 @@
+[2026-10-12 07:58:30.993] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042830Z__genetic__minmax__C-lower-90fec4bb6118-801fe3006e__r00__efd46495f85c/input for instances
+2026-10-12 07:58:30 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:58:30 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:58:30 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:58:30.999] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:58:30.999] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:58:31.000] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042830Z__genetic__minmax__C-lower-90fec4bb6118-801fe3006e__r00__efd46495f85c/execution/solver/experiment_manifest.json)
+[2026-10-12 07:58:31.000] [info] [io.cpp:137] read_json: loaded 34 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042830Z__genetic__minmax__C-lower-90fec4bb6118-801fe3006e__r00__efd46495f85c/input/instance.json
+[2026-10-12 07:58:31.001] [info] [minmax.cpp:110] MinMax: start n=34, m=25, T=1
+[2026-10-12 07:58:31.001] [info] [candidate.cpp:199] InstancePrecompute: built 850 candidates
+[2026-10-12 07:58:31.001] [info] [stationary.cpp:264] NN: cost=1268.566300, feasible=true, active_stations=12
+[2026-10-12 07:58:31.026] [info] [genetic_solver.cpp:274] GA: cost=1268.566299652 gens=500
+[2026-10-12 07:58:31.091] [info] [solution.cpp:1026] extend: 113 intervals over [0, 1]
+[2026-10-12 07:58:31.091] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.622681, peak=5144.305346, LB=647.679679, gap=6.9427
+[2026-10-12 07:58:31.092] [info] [stationary.cpp:264] NN: cost=1132.743469, feasible=true, active_stations=8
+[2026-10-12 07:58:31.116] [info] [genetic_solver.cpp:274] GA: cost=1101.694231745 gens=500
+[2026-10-12 07:58:31.135] [info] [solution.cpp:1026] extend: 43 intervals over [0.6226811642320058, 1]
+[2026-10-12 07:58:31.206] [info] [solution.cpp:1026] extend: 72 intervals over [0, 0.6226811642320058]
+[2026-10-12 07:58:31.206] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 114 intervals
+[2026-10-12 07:58:31.213] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=false, supporting_points_ok=false, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=false
+[2026-10-12 07:58:31.214] [error] [batch_runner.cpp:1305] BatchRunner: C-lower / genetic / minmax failed: MinMax candidate verification failed: coverage continuous verification failed
+[2026-10-12 07:58:31.214] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042830Z__genetic__minmax__C-lower-90fec4bb6118-801fe3006e__r00__efd46495f85c/execution/solver/runs/C-lower/genetic/minmax/trace.csv
+[2026-10-12 07:58:31.214] [info] [batch_runner.cpp:1352] BatchRunner: C-lower / genetic / minmax cost=0.000000 t=0.213s verified=false
+[2026-10-12 07:58:31.215] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

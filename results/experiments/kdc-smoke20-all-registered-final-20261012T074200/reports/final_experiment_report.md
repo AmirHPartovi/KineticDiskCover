@@ -1,0 +1,1828 @@
+# Development / smoke validation report
+
+This is a smoke / development validation run and must not be interpreted as the full scientific benchmark.
+
+## 1. Experiment configuration
+
+- Status: **PARTIAL**
+- Experiment ID: `kdc-smoke20-all-registered-final-20261012T074200`
+- Reproduction command: `bash scripts/run_experiment.sh --pipeline smoke --dataset data/instances/public_instance_set --algorithms all-registered --modes all --exact-reference auto --threads 2 --with-animations --animation-policy all-solutions --build-dir build/prompt8-clean-20261012 --output results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --resume`
+- Pipeline: `smoke` (development / smoke validation)
+- Algorithms/profile: `ip-kont, branch-and-bound, nn, greedy, brute-force, primal-dual, local-search, sa, genetic, lp-rounding, shifting` / debug
+- Objectives: minmax, minsum, minmaxsum
+- Seed/repeats/threads: 42 / 1 / 2
+
+## 2. Dataset description
+
+- Profile/source: `smoke20` / `data/instances/public_instance_set`
+- Canonical instances: 20
+- Fingerprint: `72c8c40bfc4ade1d15e7069bbf0513e0700af9ecd0267b86273185262841c124`
+- Selection policy: eligible valid unique instances only; choose one smallest candidate per family first, then round-robin across represented families in deterministic size/path order; reject the selection if the requested count cannot be met
+- Selected files:
+  - `data/instances/public_instance_set/us-night-0000030.instance.mdc` (us-night, n=1, m=25)
+  - `data/instances/public_instance_set/sbgdb-20200507-pntset-0000030.mdc` (sbgdb-20200507-pntset, n=1, m=25)
+  - `data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000030.mdc` (sbgdb-20200507-fpg-poly, n=1, m=25)
+  - `data/instances/public_instance_set/uniform-0000030-2.mdc` (uniform, n=2, m=25)
+  - `data/instances/public_instance_set/london-0000030.instance.mdc` (london, n=2, m=25)
+  - `data/instances/public_instance_set/stars-0000030.instance.mdc` (stars, n=2, m=25)
+  - `data/instances/public_instance_set/euro-night-0000030.mdc` (euro-night, n=2, m=25)
+  - `data/instances/public_instance_set/att48.mdc` (att48, n=11, m=25)
+  - `data/instances/public_instance_set/berlin52.mdc` (berlin52, n=13, m=25)
+  - `data/instances/public_instance_set/eil51.mdc` (eil51, n=13, m=25)
+  - `data/instances/public_instance_set/st70.mdc` (st70, n=22, m=25)
+  - `data/instances/public_instance_set/eil76.mdc` (eil76, n=25, m=25)
+  - `data/instances/public_instance_set/pr76.mdc` (pr76, n=25, m=25)
+  - `data/instances/public_instance_set/C-right.mdc` (c-right, n=26, m=25)
+  - `data/instances/public_instance_set/C-lower.mdc` (c-lower, n=34, m=25)
+  - `data/instances/public_instance_set/gr96.mdc` (gr96, n=35, m=25)
+  - `data/instances/public_instance_set/rat99.mdc` (rat99, n=37, m=25)
+  - `data/instances/public_instance_set/kroE100.mdc` (kroe100, n=37, m=25)
+  - `data/instances/public_instance_set/rd100.mdc` (rd100, n=37, m=25)
+  - `data/instances/public_instance_set/kroD100.mdc` (krod100, n=37, m=25)
+- Source dataset fingerprint: `81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721`
+
+## 3. Environment
+
+- Commit: `f28b4e3866a51575ea47dddb3362694d84c6de25` (dirty=True)
+- Compiler/build: /usr/bin/c++ / Release
+- Python: 3.9.6; host: Darwin 27.2.0
+
+## 4. Exact-reference selection
+
+- Requested: auto
+- Selected: branch-and-bound
+- Actual: branch-and-bound
+
+## 5-11. FAST benchmark, per-objective results, runtime, quality, and reliability
+
+See the [data-correct comparative report](experiment_report.md) for the complete coverage, result, timing, bound, MinMaxSum, failure, family and artifact tables, figure generation statuses, and companion audit.
+
+This compatibility summary is generated from the validated experiment-scoped report.
+
+[Open the complete comparative report](experiment_report.md).
+
+
+### Raw integrity
+
+# Raw result integrity report
+
+- Runs: 660 (expected 660)
+- Instances: 20
+- Algorithms: 11
+- Successful (not marked failed): 570
+- Feasible: 502
+- Verified: 502
+- Failed: 90
+- Timeouts: 23
+- OPTIMAL / FEASIBLE / TIME_LIMIT / INFEASIBLE / FAILED: 13 / 474 / 23 / 0 / 150
+- Duplicate run keys: 0
+- Missing solution files among declared paths: 0
+- Missing trace files among declared paths: 0
+- Declared solution/trace paths checked: 1102
+- Missing records against expected count: 0
+- Canonical aggregate complete: False
+
+## By objective
+
+| Objective | Runs | Successful | Feasible | Verified | Failed | Timeouts | OPTIMAL | FEASIBLE | TIME_LIMIT | INFEASIBLE | FAILED |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| minmax | 220 | 168 | 148 | 148 | 52 | 3 | 13 | 132 | 3 | 0 | 72 |
+| minsum | 220 | 207 | 187 | 187 | 13 | 10 | 0 | 177 | 10 | 0 | 33 |
+| minmaxsum | 220 | 195 | 167 | 167 | 25 | 10 | 0 | 165 | 10 | 0 | 45 |
+
+## Exact backend provenance
+
+- requested=auto; actual=branch-and-bound
+
+## Missing declared paths
+
+### Solutions
+
+- None
+
+### Traces
+
+- None
+
+
+## 12. Bound semantics
+
+`certified_gap` is only meaningful for certified lower bounds and feasible upper bounds. Empirical ratios are not theoretical approximation guarantees.
+
+## 13. Exact-reference evidence
+
+{
+  "calibration_instances": [],
+  "successful_runs": [],
+  "rejected_runs": [
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minmax",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    },
+    {
+      "accepted": false,
+      "backend": "branch-and-bound",
+      "instance": null,
+      "objective": "minsum",
+      "rejection_reason": "dataset contains no valid calibration instance within the configured size cap"
+    }
+  ],
+  "runtime_statistics": {
+    "branch-and-bound_median_sec": -1.0,
+    "by_objective": {
+      "minmax": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      },
+      "minsum": {
+        "branch-and-bound_median_sec": -1.0,
+        "ip-kont_median_sec": -1.0,
+        "paired_run_count": 0
+      }
+    },
+    "ip-kont_median_sec": -1.0,
+    "paired_run_count": 0,
+    "runtime_metric": "median solver total_time_sec over paired accepted runs for the same instance and objective"
+  },
+  "selection_rule": "native KONT/COPT API/license/runtime probe failed; selected the built-in branch-and-bound algorithm. Kinetic optimality certification is not used for backend availability.",
+  "selected_backend": "branch-and-bound",
+  "actual_backend": "branch-and-bound",
+  "kont_runtime_available": false
+}
+
+## 14. Exact-animation results
+
+# Animation and snapshot report
+
+- Policy: `all-solutions`
+- Objectives: `all`
+- Planned solver slots: 660
+- Comparison sheets: 60
+- Renderable solutions with snapshots: 502
+- Per-solution animations: 502
+- Ineligible slots: 158
+- Rendering failures: 0
+- Feasibility, verification, and optimality are displayed from each run record; rendering does not imply certification.
+
+## Comparison sheets
+
+- `snapshots/comparisons/C-lower-90fec4bb6118-801fe3006e/minmax.html`
+- `snapshots/comparisons/C-lower-90fec4bb6118-801fe3006e/minmaxsum.html`
+- `snapshots/comparisons/C-lower-90fec4bb6118-801fe3006e/minsum.html`
+- `snapshots/comparisons/C-right-8bf4b5770668-e0f2e6a705/minmax.html`
+- `snapshots/comparisons/C-right-8bf4b5770668-e0f2e6a705/minmaxsum.html`
+- `snapshots/comparisons/C-right-8bf4b5770668-e0f2e6a705/minsum.html`
+- `snapshots/comparisons/att48-8efa61a1d9ab-5196644df6/minmax.html`
+- `snapshots/comparisons/att48-8efa61a1d9ab-5196644df6/minmaxsum.html`
+- `snapshots/comparisons/att48-8efa61a1d9ab-5196644df6/minsum.html`
+- `snapshots/comparisons/berlin52-3939d9e3cc19-6ce5d7089a/minmax.html`
+- `snapshots/comparisons/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum.html`
+- `snapshots/comparisons/berlin52-3939d9e3cc19-6ce5d7089a/minsum.html`
+- `snapshots/comparisons/eil51-f6e4afd67825-e956423838/minmax.html`
+- `snapshots/comparisons/eil51-f6e4afd67825-e956423838/minmaxsum.html`
+- `snapshots/comparisons/eil51-f6e4afd67825-e956423838/minsum.html`
+- `snapshots/comparisons/eil76-e404104dd7bb-8eb626a3b8/minmax.html`
+- `snapshots/comparisons/eil76-e404104dd7bb-8eb626a3b8/minmaxsum.html`
+- `snapshots/comparisons/eil76-e404104dd7bb-8eb626a3b8/minsum.html`
+- `snapshots/comparisons/euro-night-0000030-e7069adc74e0-164a859873/minmax.html`
+- `snapshots/comparisons/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum.html`
+- `snapshots/comparisons/euro-night-0000030-e7069adc74e0-164a859873/minsum.html`
+- `snapshots/comparisons/gr96-a23a7ba30c4c-e195dfa06d/minmax.html`
+- `snapshots/comparisons/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum.html`
+- `snapshots/comparisons/gr96-a23a7ba30c4c-e195dfa06d/minsum.html`
+- `snapshots/comparisons/kroD100-100b54b48d61-5062f763b8/minmax.html`
+- `snapshots/comparisons/kroD100-100b54b48d61-5062f763b8/minmaxsum.html`
+- `snapshots/comparisons/kroD100-100b54b48d61-5062f763b8/minsum.html`
+- `snapshots/comparisons/kroE100-02a50775c87e-d8d2268527/minmax.html`
+- `snapshots/comparisons/kroE100-02a50775c87e-d8d2268527/minmaxsum.html`
+- `snapshots/comparisons/kroE100-02a50775c87e-d8d2268527/minsum.html`
+- `snapshots/comparisons/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax.html`
+- `snapshots/comparisons/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum.html`
+- `snapshots/comparisons/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum.html`
+- `snapshots/comparisons/pr76-4001f85eab1a-dc636944a6/minmax.html`
+- `snapshots/comparisons/pr76-4001f85eab1a-dc636944a6/minmaxsum.html`
+- `snapshots/comparisons/pr76-4001f85eab1a-dc636944a6/minsum.html`
+- `snapshots/comparisons/rat99-a364923ee329-1be1f1f758/minmax.html`
+- `snapshots/comparisons/rat99-a364923ee329-1be1f1f758/minmaxsum.html`
+- `snapshots/comparisons/rat99-a364923ee329-1be1f1f758/minsum.html`
+- `snapshots/comparisons/rd100-9407ab41999f-b9917bc5f5/minmax.html`
+- `snapshots/comparisons/rd100-9407ab41999f-b9917bc5f5/minmaxsum.html`
+- `snapshots/comparisons/rd100-9407ab41999f-b9917bc5f5/minsum.html`
+- `snapshots/comparisons/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax.html`
+- `snapshots/comparisons/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum.html`
+- `snapshots/comparisons/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum.html`
+- `snapshots/comparisons/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax.html`
+- `snapshots/comparisons/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum.html`
+- `snapshots/comparisons/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum.html`
+- `snapshots/comparisons/st70-fa79167d4566-93e4a763b9/minmax.html`
+- `snapshots/comparisons/st70-fa79167d4566-93e4a763b9/minmaxsum.html`
+- `snapshots/comparisons/st70-fa79167d4566-93e4a763b9/minsum.html`
+- `snapshots/comparisons/stars-0000030.instance-1955c914c741-2f24c57225/minmax.html`
+- `snapshots/comparisons/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum.html`
+- `snapshots/comparisons/stars-0000030.instance-1955c914c741-2f24c57225/minsum.html`
+- `snapshots/comparisons/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax.html`
+- `snapshots/comparisons/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum.html`
+- `snapshots/comparisons/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum.html`
+- `snapshots/comparisons/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax.html`
+- `snapshots/comparisons/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum.html`
+- `snapshots/comparisons/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum.html`
+
+## Per-solution animations
+
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/lp-rounding/C-lower_minmaxsum__run_20261012T041921Z__lp-rounding__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__4697d065cb6d.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/shifting/C-lower_minmaxsum__run_20261012T041924Z__shifting__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__6fc4dca6c984.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/branch-and-bound/C-lower_minsum__run_20261012T042837Z__branch-and-bound__minsum__C-lower-90fec4bb6118-801fe3006e__r00__92a90ccb0b91.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/genetic/C-lower_minsum__run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/greedy/C-lower_minsum__run_20261012T041926Z__greedy__minsum__C-lower-90fec4bb6118-801fe3006e__r00__9a2ea1dde3ea.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/local-search/C-lower_minsum__run_20261012T041926Z__local-search__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ff17f0623213.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/lp-rounding/C-lower_minsum__run_20261012T041927Z__lp-rounding__minsum__C-lower-90fec4bb6118-801fe3006e__r00__81f120d4bcb7.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/nn/C-lower_minsum__run_20261012T041927Z__nn__minsum__C-lower-90fec4bb6118-801fe3006e__r00__f619481ea048.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/primal-dual/C-lower_minsum__run_20261012T041927Z__primal-dual__minsum__C-lower-90fec4bb6118-801fe3006e__r00__5e31303971d7.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/sa/C-lower_minsum__run_20261012T041928Z__sa__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ee6153b9852b.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/shifting/C-lower_minsum__run_20261012T041928Z__shifting__minsum__C-lower-90fec4bb6118-801fe3006e__r00__7ffe94a11f75.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmax/genetic/C-right_minmax__run_20261012T041929Z__genetic__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__a1ea8b2d4738.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/genetic/C-right_minmaxsum__run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/greedy/C-right_minmaxsum__run_20261012T041932Z__greedy__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea6414cc00cc.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/local-search/C-right_minmaxsum__run_20261012T041933Z__local-search__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__79cec54e5e8d.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/lp-rounding/C-right_minmaxsum__run_20261012T041933Z__lp-rounding__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__b3b6b25987aa.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/primal-dual/C-right_minmaxsum__run_20261012T041934Z__primal-dual__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f3644399249.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/sa/C-right_minmaxsum__run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/branch-and-bound/C-right_minsum__run_20261012T042842Z__branch-and-bound__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__336e8889ae1c.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/genetic/C-right_minsum__run_20261012T041936Z__genetic__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__8db0f04f7ff4.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/greedy/C-right_minsum__run_20261012T041937Z__greedy__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea9bfbe44a15.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/local-search/C-right_minsum__run_20261012T041937Z__local-search__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f33b20ba6a5.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/lp-rounding/C-right_minsum__run_20261012T041937Z__lp-rounding__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__7d82bd84a114.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/nn/C-right_minsum__run_20261012T041938Z__nn__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__a99905a16a9a.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/primal-dual/C-right_minsum__run_20261012T041938Z__primal-dual__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__185a9acb7ac1.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/sa/C-right_minsum__run_20261012T041938Z__sa__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__01d8517d9d66.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/shifting/C-right_minsum__run_20261012T041938Z__shifting__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__53aa21742e22.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/branch-and-bound/att48_minmax__run_20261012T041938Z__branch-and-bound__minmax__att48-8efa61a1d9ab-5196644df6__r00__70fd050872bb.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/genetic/att48_minmax__run_20261012T041939Z__genetic__minmax__att48-8efa61a1d9ab-5196644df6__r00__f598af0598e6.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/greedy/att48_minmax__run_20261012T041939Z__greedy__minmax__att48-8efa61a1d9ab-5196644df6__r00__b436c081d879.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/local-search/att48_minmax__run_20261012T041939Z__local-search__minmax__att48-8efa61a1d9ab-5196644df6__r00__fe1900be63f5.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/lp-rounding/att48_minmax__run_20261012T041939Z__lp-rounding__minmax__att48-8efa61a1d9ab-5196644df6__r00__eed4d316c8c6.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/nn/att48_minmax__run_20261012T041939Z__nn__minmax__att48-8efa61a1d9ab-5196644df6__r00__85c1528a18e7.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/primal-dual/att48_minmax__run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/shifting/att48_minmax__run_20261012T041939Z__shifting__minmax__att48-8efa61a1d9ab-5196644df6__r00__7379967a13ba.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/branch-and-bound/att48_minmaxsum__run_20261012T041939Z__branch-and-bound__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__454d22ca526a.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/genetic/att48_minmaxsum__run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/greedy/att48_minmaxsum__run_20261012T041939Z__greedy__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__fb13b226f040.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/local-search/att48_minmaxsum__run_20261012T041940Z__local-search__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__25fb0b3da5df.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/lp-rounding/att48_minmaxsum__run_20261012T041940Z__lp-rounding__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__c137daeb5550.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/nn/att48_minmaxsum__run_20261012T041940Z__nn__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__ea9182f8a815.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/primal-dual/att48_minmaxsum__run_20261012T041940Z__primal-dual__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__e776d7bb732d.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/sa/att48_minmaxsum__run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/shifting/att48_minmaxsum__run_20261012T041940Z__shifting__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__316cddb5226b.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/branch-and-bound/att48_minsum__run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/genetic/att48_minsum__run_20261012T041940Z__genetic__minsum__att48-8efa61a1d9ab-5196644df6__r00__1b84b889428a.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/greedy/att48_minsum__run_20261012T041940Z__greedy__minsum__att48-8efa61a1d9ab-5196644df6__r00__c186b67e8cb5.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/local-search/att48_minsum__run_20261012T041941Z__local-search__minsum__att48-8efa61a1d9ab-5196644df6__r00__55e7540ec649.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/lp-rounding/att48_minsum__run_20261012T041941Z__lp-rounding__minsum__att48-8efa61a1d9ab-5196644df6__r00__4e76c012c57d.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/nn/att48_minsum__run_20261012T041941Z__nn__minsum__att48-8efa61a1d9ab-5196644df6__r00__ef0f6e149c34.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/primal-dual/att48_minsum__run_20261012T041941Z__primal-dual__minsum__att48-8efa61a1d9ab-5196644df6__r00__d49fbd6c1231.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/sa/att48_minsum__run_20261012T041941Z__sa__minsum__att48-8efa61a1d9ab-5196644df6__r00__35e4f4ef6a5b.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/shifting/att48_minsum__run_20261012T041941Z__shifting__minsum__att48-8efa61a1d9ab-5196644df6__r00__1c7611bd81f2.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/branch-and-bound/berlin52_minmax__run_20261012T041941Z__branch-and-bound__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__2ad5886378c4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/genetic/berlin52_minmax__run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/local-search/berlin52_minmax__run_20261012T041941Z__local-search__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__6ae54b8d48ff.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/lp-rounding/berlin52_minmax__run_20261012T041941Z__lp-rounding__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__568ba0cfe167.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/nn/berlin52_minmax__run_20261012T041941Z__nn__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__61eefddee780.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/primal-dual/berlin52_minmax__run_20261012T041941Z__primal-dual__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__4fecee7aaf89.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/sa/berlin52_minmax__run_20261012T041941Z__sa__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__af3833cf1102.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/shifting/berlin52_minmax__run_20261012T041941Z__shifting__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__95eb1ee958dc.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/branch-and-bound/berlin52_minmaxsum__run_20261012T041942Z__branch-and-bound__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__74c0c7ac230c.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/genetic/berlin52_minmaxsum__run_20261012T041942Z__genetic__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__50e80f72dc3d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/greedy/berlin52_minmaxsum__run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/local-search/berlin52_minmaxsum__run_20261012T041942Z__local-search__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__5147d7624289.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/lp-rounding/berlin52_minmaxsum__run_20261012T041942Z__lp-rounding__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e90ee9cb14fd.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/nn/berlin52_minmaxsum__run_20261012T041942Z__nn__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__3999c0c83d37.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/primal-dual/berlin52_minmaxsum__run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/sa/berlin52_minmaxsum__run_20261012T041942Z__sa__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__b6baa6cac112.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/shifting/berlin52_minmaxsum__run_20261012T041942Z__shifting__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__f79cc77eee19.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/branch-and-bound/berlin52_minsum__run_20261012T041943Z__branch-and-bound__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__9da39c4a3f7e.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/genetic/berlin52_minsum__run_20261012T041943Z__genetic__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2cd868b32654.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/greedy/berlin52_minsum__run_20261012T041943Z__greedy__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__042a8f44c4b8.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/local-search/berlin52_minsum__run_20261012T041943Z__local-search__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__699d047804c4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/lp-rounding/berlin52_minsum__run_20261012T041943Z__lp-rounding__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__079042715ab4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/nn/berlin52_minsum__run_20261012T041943Z__nn__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2c42eafaf561.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/primal-dual/berlin52_minsum__run_20261012T041943Z__primal-dual__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__084a073db85d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/sa/berlin52_minsum__run_20261012T041943Z__sa__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e92686d333a5.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/shifting/berlin52_minsum__run_20261012T041943Z__shifting__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__229995532be2.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/branch-and-bound/eil51_minmax__run_20261012T041943Z__branch-and-bound__minmax__eil51-f6e4afd67825-e956423838__r00__79cb5397042d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/genetic/eil51_minmax__run_20261012T041944Z__genetic__minmax__eil51-f6e4afd67825-e956423838__r00__26fe9d486cf9.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/greedy/eil51_minmax__run_20261012T041944Z__greedy__minmax__eil51-f6e4afd67825-e956423838__r00__9988c3710e0b.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/local-search/eil51_minmax__run_20261012T041944Z__local-search__minmax__eil51-f6e4afd67825-e956423838__r00__655ad189793d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/lp-rounding/eil51_minmax__run_20261012T041944Z__lp-rounding__minmax__eil51-f6e4afd67825-e956423838__r00__1bb4ed19a22d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/nn/eil51_minmax__run_20261012T041944Z__nn__minmax__eil51-f6e4afd67825-e956423838__r00__9c9ff986ea77.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/primal-dual/eil51_minmax__run_20261012T041944Z__primal-dual__minmax__eil51-f6e4afd67825-e956423838__r00__a6846d0f076a.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/sa/eil51_minmax__run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/shifting/eil51_minmax__run_20261012T041944Z__shifting__minmax__eil51-f6e4afd67825-e956423838__r00__f292b8681710.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/branch-and-bound/eil51_minmaxsum__run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/genetic/eil51_minmaxsum__run_20261012T041944Z__genetic__minmaxsum__eil51-f6e4afd67825-e956423838__r00__af3b4f29bfd4.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/greedy/eil51_minmaxsum__run_20261012T041944Z__greedy__minmaxsum__eil51-f6e4afd67825-e956423838__r00__438b91628e37.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/local-search/eil51_minmaxsum__run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/lp-rounding/eil51_minmaxsum__run_20261012T041945Z__lp-rounding__minmaxsum__eil51-f6e4afd67825-e956423838__r00__19b8db8c0dbc.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/nn/eil51_minmaxsum__run_20261012T041945Z__nn__minmaxsum__eil51-f6e4afd67825-e956423838__r00__f7f609f5bf10.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/primal-dual/eil51_minmaxsum__run_20261012T041945Z__primal-dual__minmaxsum__eil51-f6e4afd67825-e956423838__r00__7fc06b5400c2.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/sa/eil51_minmaxsum__run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/shifting/eil51_minmaxsum__run_20261012T041945Z__shifting__minmaxsum__eil51-f6e4afd67825-e956423838__r00__ccf707b3d17e.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/branch-and-bound/eil51_minsum__run_20261012T041946Z__branch-and-bound__minsum__eil51-f6e4afd67825-e956423838__r00__c8b2cd74afa6.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/genetic/eil51_minsum__run_20261012T041946Z__genetic__minsum__eil51-f6e4afd67825-e956423838__r00__85bc48d6e3aa.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/greedy/eil51_minsum__run_20261012T041946Z__greedy__minsum__eil51-f6e4afd67825-e956423838__r00__6e24affd6afd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/local-search/eil51_minsum__run_20261012T041946Z__local-search__minsum__eil51-f6e4afd67825-e956423838__r00__2c5841c0e9e2.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/lp-rounding/eil51_minsum__run_20261012T041946Z__lp-rounding__minsum__eil51-f6e4afd67825-e956423838__r00__a558ce448f41.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/nn/eil51_minsum__run_20261012T041946Z__nn__minsum__eil51-f6e4afd67825-e956423838__r00__bdb020807cdc.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/primal-dual/eil51_minsum__run_20261012T041946Z__primal-dual__minsum__eil51-f6e4afd67825-e956423838__r00__5e6efb5c82fd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/sa/eil51_minsum__run_20261012T041946Z__sa__minsum__eil51-f6e4afd67825-e956423838__r00__920734d74d7d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/shifting/eil51_minsum__run_20261012T041946Z__shifting__minsum__eil51-f6e4afd67825-e956423838__r00__c664bc88073a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/genetic/eil76_minmax__run_20261012T041947Z__genetic__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f9336b4b9713.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/greedy/eil76_minmax__run_20261012T041947Z__greedy__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__04fde6254882.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/local-search/eil76_minmax__run_20261012T041948Z__local-search__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__9d26823af7f3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/lp-rounding/eil76_minmax__run_20261012T041948Z__lp-rounding__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f8d80c838806.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/nn/eil76_minmax__run_20261012T041948Z__nn__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__61d237e7b9d3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/primal-dual/eil76_minmax__run_20261012T041948Z__primal-dual__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__73535d51649c.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/sa/eil76_minmax__run_20261012T041949Z__sa__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__55e3fc6653d8.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/shifting/eil76_minmax__run_20261012T041949Z__shifting__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__e0f549a2dc1e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/genetic/eil76_minmaxsum__run_20261012T041952Z__genetic__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__978d9e51c73b.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/greedy/eil76_minmaxsum__run_20261012T041953Z__greedy__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__7737a1b88b8a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/local-search/eil76_minmaxsum__run_20261012T041954Z__local-search__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__62cbcc99580f.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/lp-rounding/eil76_minmaxsum__run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/nn/eil76_minmaxsum__run_20261012T041955Z__nn__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__04a96121b05a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/primal-dual/eil76_minmaxsum__run_20261012T041955Z__primal-dual__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__23fcecedfe31.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/sa/eil76_minmaxsum__run_20261012T041955Z__sa__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__b2a494ffa7d2.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/shifting/eil76_minmaxsum__run_20261012T041956Z__shifting__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__a5781109d6d3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/branch-and-bound/eil76_minsum__run_20261012T042851Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbe1a1ffe88e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/genetic/eil76_minsum__run_20261012T041959Z__genetic__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__38ae8f20a9ee.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/greedy/eil76_minsum__run_20261012T042000Z__greedy__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__d0bfeb40bae2.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/local-search/eil76_minsum__run_20261012T042000Z__local-search__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__894d53f3f42e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/lp-rounding/eil76_minsum__run_20261012T042001Z__lp-rounding__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__ec8ef714fe8e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/nn/eil76_minsum__run_20261012T042001Z__nn__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__834e12b6094d.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/primal-dual/eil76_minsum__run_20261012T042001Z__primal-dual__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbb761136a1b.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/sa/eil76_minsum__run_20261012T042001Z__sa__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__00d4f5197b7a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/shifting/eil76_minsum__run_20261012T042002Z__shifting__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__711d59d98b93.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/branch-and-bound/euro-night-0000030_minmax__run_20261012T042002Z__branch-and-bound__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__c4d033ab6bec.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/brute-force/euro-night-0000030_minmax__run_20261012T042002Z__brute-force__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__83e9acf750c6.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/genetic/euro-night-0000030_minmax__run_20261012T042002Z__genetic__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__6b905b128889.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/greedy/euro-night-0000030_minmax__run_20261012T042002Z__greedy__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__d313fad51bc7.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/local-search/euro-night-0000030_minmax__run_20261012T042003Z__local-search__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__dce98987c6d5.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/lp-rounding/euro-night-0000030_minmax__run_20261012T042003Z__lp-rounding__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0795c8ba2b33.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/nn/euro-night-0000030_minmax__run_20261012T042003Z__nn__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__f18489cd0412.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/primal-dual/euro-night-0000030_minmax__run_20261012T042003Z__primal-dual__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0d6d64f2cf7e.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/sa/euro-night-0000030_minmax__run_20261012T042003Z__sa__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__9020cd7ea813.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/shifting/euro-night-0000030_minmax__run_20261012T042003Z__shifting__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__915f9cdd9066.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/branch-and-bound/euro-night-0000030_minmaxsum__run_20261012T042003Z__branch-and-bound__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bb1d82cf8191.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/brute-force/euro-night-0000030_minmaxsum__run_20261012T042003Z__brute-force__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__113739fade6d.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/genetic/euro-night-0000030_minmaxsum__run_20261012T042003Z__genetic__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__3fdc975e7fe9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/greedy/euro-night-0000030_minmaxsum__run_20261012T042003Z__greedy__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__249211093f6c.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/local-search/euro-night-0000030_minmaxsum__run_20261012T042003Z__local-search__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__5a727af115bb.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/lp-rounding/euro-night-0000030_minmaxsum__run_20261012T042003Z__lp-rounding__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bd80c0117e53.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/nn/euro-night-0000030_minmaxsum__run_20261012T042003Z__nn__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__87cef848c06b.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/primal-dual/euro-night-0000030_minmaxsum__run_20261012T042003Z__primal-dual__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__203e8e4d4a20.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/sa/euro-night-0000030_minmaxsum__run_20261012T042003Z__sa__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__d255ea5b99c9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/shifting/euro-night-0000030_minmaxsum__run_20261012T042003Z__shifting__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__28d255102685.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/branch-and-bound/euro-night-0000030_minsum__run_20261012T042003Z__branch-and-bound__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__07f760a844b9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/brute-force/euro-night-0000030_minsum__run_20261012T042003Z__brute-force__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__c8fd03112b9f.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/genetic/euro-night-0000030_minsum__run_20261012T042003Z__genetic__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__930f64ddab65.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/greedy/euro-night-0000030_minsum__run_20261012T042003Z__greedy__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__146ec8464823.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/local-search/euro-night-0000030_minsum__run_20261012T042003Z__local-search__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__8ee1703781bb.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/lp-rounding/euro-night-0000030_minsum__run_20261012T042004Z__lp-rounding__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__d287be06043c.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/nn/euro-night-0000030_minsum__run_20261012T042004Z__nn__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__4fb1a156e6bc.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/primal-dual/euro-night-0000030_minsum__run_20261012T042004Z__primal-dual__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__0064c7e709cc.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/sa/euro-night-0000030_minsum__run_20261012T042004Z__sa__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__164f179b5e88.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/shifting/euro-night-0000030_minsum__run_20261012T042004Z__shifting__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__fb66fbd4d903.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/branch-and-bound/gr96_minmax__run_20261012T042855Z__branch-and-bound__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__9f10dfe77271.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/genetic/gr96_minmax__run_20261012T042004Z__genetic__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__2f927ed61151.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/greedy/gr96_minmax__run_20261012T042004Z__greedy__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__18d5449ae3c4.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/local-search/gr96_minmax__run_20261012T042005Z__local-search__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__4bba16b3367b.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/lp-rounding/gr96_minmax__run_20261012T042005Z__lp-rounding__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__1dbd9e838c2e.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/nn/gr96_minmax__run_20261012T042006Z__nn__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__216b3589d2eb.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/primal-dual/gr96_minmax__run_20261012T042006Z__primal-dual__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__e579c80f51ab.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/sa/gr96_minmax__run_20261012T042006Z__sa__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f3fcd5afcd3f.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/shifting/gr96_minmax__run_20261012T042006Z__shifting__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f250b5f5d431.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/branch-and-bound/gr96_minmaxsum__run_20261012T042857Z__branch-and-bound__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__661be34621bf.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/genetic/gr96_minmaxsum__run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/greedy/gr96_minmaxsum__run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/local-search/gr96_minmaxsum__run_20261012T042009Z__local-search__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ac8c67bb06b2.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/lp-rounding/gr96_minmaxsum__run_20261012T042010Z__lp-rounding__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__c0e5ad1a75be.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/nn/gr96_minmaxsum__run_20261012T042011Z__nn__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__be7f4c36cfea.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/primal-dual/gr96_minmaxsum__run_20261012T042012Z__primal-dual__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ad8c4a597492.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/sa/gr96_minmaxsum__run_20261012T042012Z__sa__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__faf923656be9.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/shifting/gr96_minmaxsum__run_20261012T042013Z__shifting__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__970e2bcb6d92.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/branch-and-bound/gr96_minsum__run_20261012T042858Z__branch-and-bound__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9430de6bc32e.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/genetic/gr96_minsum__run_20261012T042014Z__genetic__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__7ebcc93a4c99.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/greedy/gr96_minsum__run_20261012T042015Z__greedy__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__171089f1ef80.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/local-search/gr96_minsum__run_20261012T042015Z__local-search__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__380110d85e2f.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/lp-rounding/gr96_minsum__run_20261012T042016Z__lp-rounding__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__6d6432877702.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/nn/gr96_minsum__run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/primal-dual/gr96_minsum__run_20261012T042016Z__primal-dual__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__34246bc97509.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/sa/gr96_minsum__run_20261012T042017Z__sa__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__5fa62e870b0a.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/shifting/gr96_minsum__run_20261012T042017Z__shifting__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9d5fe72ed86b.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/greedy/kroD100_minmax__run_20261012T042018Z__greedy__minmax__kroD100-100b54b48d61-5062f763b8__r00__b31d241eba68.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/lp-rounding/kroD100_minmax__run_20261012T042019Z__lp-rounding__minmax__kroD100-100b54b48d61-5062f763b8__r00__91fa6af024ac.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/shifting/kroD100_minmax__run_20261012T042020Z__shifting__minmax__kroD100-100b54b48d61-5062f763b8__r00__b240d95a223e.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/genetic/kroD100_minmaxsum__run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/greedy/kroD100_minmaxsum__run_20261012T042022Z__greedy__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__ba17948acb2d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/local-search/kroD100_minmaxsum__run_20261012T042023Z__local-search__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__b14e618944c4.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/lp-rounding/kroD100_minmaxsum__run_20261012T042024Z__lp-rounding__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__dd79fa332295.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/nn/kroD100_minmaxsum__run_20261012T042024Z__nn__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__0895d8572d9b.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/sa/kroD100_minmaxsum__run_20261012T042025Z__sa__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f722d1e4128c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/shifting/kroD100_minmaxsum__run_20261012T042025Z__shifting__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f733370d9392.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/branch-and-bound/kroD100_minsum__run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/genetic/kroD100_minsum__run_20261012T042027Z__genetic__minsum__kroD100-100b54b48d61-5062f763b8__r00__f73b373d8706.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/greedy/kroD100_minsum__run_20261012T042028Z__greedy__minsum__kroD100-100b54b48d61-5062f763b8__r00__049a2f577600.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/local-search/kroD100_minsum__run_20261012T042028Z__local-search__minsum__kroD100-100b54b48d61-5062f763b8__r00__03f5bfa927e1.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/lp-rounding/kroD100_minsum__run_20261012T042028Z__lp-rounding__minsum__kroD100-100b54b48d61-5062f763b8__r00__a82f1b0d1573.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/nn/kroD100_minsum__run_20261012T042029Z__nn__minsum__kroD100-100b54b48d61-5062f763b8__r00__f77e88657825.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/primal-dual/kroD100_minsum__run_20261012T042029Z__primal-dual__minsum__kroD100-100b54b48d61-5062f763b8__r00__336d399f4a6d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/sa/kroD100_minsum__run_20261012T042030Z__sa__minsum__kroD100-100b54b48d61-5062f763b8__r00__a84784f7216c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/shifting/kroD100_minsum__run_20261012T042030Z__shifting__minsum__kroD100-100b54b48d61-5062f763b8__r00__a98de6b893a5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/genetic/kroE100_minmax__run_20261012T042031Z__genetic__minmax__kroE100-02a50775c87e-d8d2268527__r00__5aef121ce0d5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/greedy/kroE100_minmax__run_20261012T042032Z__greedy__minmax__kroE100-02a50775c87e-d8d2268527__r00__3b15e4506a1b.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/local-search/kroE100_minmax__run_20261012T042032Z__local-search__minmax__kroE100-02a50775c87e-d8d2268527__r00__a9755cd00dd2.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/lp-rounding/kroE100_minmax__run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/nn/kroE100_minmax__run_20261012T042033Z__nn__minmax__kroE100-02a50775c87e-d8d2268527__r00__be521ac7dca4.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/sa/kroE100_minmax__run_20261012T042033Z__sa__minmax__kroE100-02a50775c87e-d8d2268527__r00__65b5ecd43da7.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/shifting/kroE100_minmax__run_20261012T042033Z__shifting__minmax__kroE100-02a50775c87e-d8d2268527__r00__fd2e22f8f357.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/genetic/kroE100_minmaxsum__run_20261012T042034Z__genetic__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__03bfb8c72d1a.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/greedy/kroE100_minmaxsum__run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/local-search/kroE100_minmaxsum__run_20261012T042036Z__local-search__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__393b3ce16f1f.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/lp-rounding/kroE100_minmaxsum__run_20261012T042037Z__lp-rounding__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__000e3e77697d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/nn/kroE100_minmaxsum__run_20261012T042038Z__nn__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__1b9e0b8fb3b5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/sa/kroE100_minmaxsum__run_20261012T042039Z__sa__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__792916ec94e5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/shifting/kroE100_minmaxsum__run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/branch-and-bound/kroE100_minsum__run_20261012T042908Z__branch-and-bound__minsum__kroE100-02a50775c87e-d8d2268527__r00__f7986cfc7383.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/genetic/kroE100_minsum__run_20261012T042041Z__genetic__minsum__kroE100-02a50775c87e-d8d2268527__r00__56bfeb84a0df.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/greedy/kroE100_minsum__run_20261012T042042Z__greedy__minsum__kroE100-02a50775c87e-d8d2268527__r00__f73ec1f0f2aa.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/local-search/kroE100_minsum__run_20261012T042042Z__local-search__minsum__kroE100-02a50775c87e-d8d2268527__r00__f64de820763c.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/lp-rounding/kroE100_minsum__run_20261012T042043Z__lp-rounding__minsum__kroE100-02a50775c87e-d8d2268527__r00__ab4d0eae54c8.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/nn/kroE100_minsum__run_20261012T042043Z__nn__minsum__kroE100-02a50775c87e-d8d2268527__r00__5fa3fa0d3e6d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/primal-dual/kroE100_minsum__run_20261012T042043Z__primal-dual__minsum__kroE100-02a50775c87e-d8d2268527__r00__3c66e594285b.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/sa/kroE100_minsum__run_20261012T042044Z__sa__minsum__kroE100-02a50775c87e-d8d2268527__r00__efc23b17a416.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/shifting/kroE100_minsum__run_20261012T042044Z__shifting__minsum__kroE100-02a50775c87e-d8d2268527__r00__6c035c241d6d.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/branch-and-bound/london-0000030.instance_minmax__run_20261012T042044Z__branch-and-bound__minmax__london-0000030.instance-0928f729f528-3__r00__682c92c46558.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/brute-force/london-0000030.instance_minmax__run_20261012T042044Z__brute-force__minmax__london-0000030.instance-0928f729f528-3__r00__3bd008be0690.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/genetic/london-0000030.instance_minmax__run_20261012T042044Z__genetic__minmax__london-0000030.instance-0928f729f528-3__r00__4eb7a03dccb8.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/greedy/london-0000030.instance_minmax__run_20261012T042044Z__greedy__minmax__london-0000030.instance-0928f729f528-3__r00__3142e7881a8f.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/local-search/london-0000030.instance_minmax__run_20261012T042044Z__local-search__minmax__london-0000030.instance-0928f729f528-3__r00__7fe17d30abcf.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/lp-rounding/london-0000030.instance_minmax__run_20261012T042045Z__lp-rounding__minmax__london-0000030.instance-0928f729f528-3__r00__5c2840c69d0d.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/nn/london-0000030.instance_minmax__run_20261012T042045Z__nn__minmax__london-0000030.instance-0928f729f528-3__r00__28d55d227372.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/primal-dual/london-0000030.instance_minmax__run_20261012T042045Z__primal-dual__minmax__london-0000030.instance-0928f729f528-3__r00__76142aade921.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/sa/london-0000030.instance_minmax__run_20261012T042045Z__sa__minmax__london-0000030.instance-0928f729f528-3__r00__0a9a2ab37cc9.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/shifting/london-0000030.instance_minmax__run_20261012T042045Z__shifting__minmax__london-0000030.instance-0928f729f528-3__r00__bb7dc0538276.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/branch-and-bound/london-0000030.instance_minmaxsum__run_20261012T042045Z__branch-and-bound__minmaxsum__london-0000030.instance-0928f729f528-3__r00__66d6a6fd7229.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/brute-force/london-0000030.instance_minmaxsum__run_20261012T042045Z__brute-force__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d0e28c749f27.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/genetic/london-0000030.instance_minmaxsum__run_20261012T042045Z__genetic__minmaxsum__london-0000030.instance-0928f729f528-3__r00__bcd8564b28ed.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/greedy/london-0000030.instance_minmaxsum__run_20261012T042045Z__greedy__minmaxsum__london-0000030.instance-0928f729f528-3__r00__202ef659eff4.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/local-search/london-0000030.instance_minmaxsum__run_20261012T042045Z__local-search__minmaxsum__london-0000030.instance-0928f729f528-3__r00__61989cc38dde.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/lp-rounding/london-0000030.instance_minmaxsum__run_20261012T042045Z__lp-rounding__minmaxsum__london-0000030.instance-0928f729f528-3__r00__5546a2be152a.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/nn/london-0000030.instance_minmaxsum__run_20261012T042045Z__nn__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d6d98840a758.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/primal-dual/london-0000030.instance_minmaxsum__run_20261012T042045Z__primal-dual__minmaxsum__london-0000030.instance-0928f729f528-3__r00__06cf1e01eedd.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/sa/london-0000030.instance_minmaxsum__run_20261012T042045Z__sa__minmaxsum__london-0000030.instance-0928f729f528-3__r00__4156ee300b60.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/shifting/london-0000030.instance_minmaxsum__run_20261012T042045Z__shifting__minmaxsum__london-0000030.instance-0928f729f528-3__r00__cebc834adb5b.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/branch-and-bound/london-0000030.instance_minsum__run_20261012T042045Z__branch-and-bound__minsum__london-0000030.instance-0928f729f528-3__r00__06a79e3ced8e.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/brute-force/london-0000030.instance_minsum__run_20261012T042045Z__brute-force__minsum__london-0000030.instance-0928f729f528-3__r00__f33c927b3354.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/genetic/london-0000030.instance_minsum__run_20261012T042045Z__genetic__minsum__london-0000030.instance-0928f729f528-3__r00__f2276166fcc0.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/greedy/london-0000030.instance_minsum__run_20261012T042045Z__greedy__minsum__london-0000030.instance-0928f729f528-3__r00__da70606d31e9.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/local-search/london-0000030.instance_minsum__run_20261012T042045Z__local-search__minsum__london-0000030.instance-0928f729f528-3__r00__e3a8dcbc1a6c.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/lp-rounding/london-0000030.instance_minsum__run_20261012T042046Z__lp-rounding__minsum__london-0000030.instance-0928f729f528-3__r00__5130ed389f91.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/nn/london-0000030.instance_minsum__run_20261012T042046Z__nn__minsum__london-0000030.instance-0928f729f528-3__r00__19ec1338f44d.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/primal-dual/london-0000030.instance_minsum__run_20261012T042046Z__primal-dual__minsum__london-0000030.instance-0928f729f528-3__r00__de0589c5f712.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/sa/london-0000030.instance_minsum__run_20261012T042046Z__sa__minsum__london-0000030.instance-0928f729f528-3__r00__02e5cd375255.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/shifting/london-0000030.instance_minsum__run_20261012T042046Z__shifting__minsum__london-0000030.instance-0928f729f528-3__r00__d766166cf227.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/genetic/pr76_minmax__run_20261012T042046Z__genetic__minmax__pr76-4001f85eab1a-dc636944a6__r00__6ed6d80bc5f7.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/local-search/pr76_minmax__run_20261012T042046Z__local-search__minmax__pr76-4001f85eab1a-dc636944a6__r00__9fbf0bef2c0e.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/lp-rounding/pr76_minmax__run_20261012T042047Z__lp-rounding__minmax__pr76-4001f85eab1a-dc636944a6__r00__bf55969c27f3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/nn/pr76_minmax__run_20261012T042047Z__nn__minmax__pr76-4001f85eab1a-dc636944a6__r00__f0993f97dc70.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/primal-dual/pr76_minmax__run_20261012T042047Z__primal-dual__minmax__pr76-4001f85eab1a-dc636944a6__r00__275640f2b9a9.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/sa/pr76_minmax__run_20261012T042047Z__sa__minmax__pr76-4001f85eab1a-dc636944a6__r00__3ebeb501d9b3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/genetic/pr76_minmaxsum__run_20261012T042048Z__genetic__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__739d66734b83.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/greedy/pr76_minmaxsum__run_20261012T042049Z__greedy__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__b45a84504469.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/local-search/pr76_minmaxsum__run_20261012T042049Z__local-search__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__64eb93db1488.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/lp-rounding/pr76_minmaxsum__run_20261012T042050Z__lp-rounding__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__44bc35a06dcd.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/nn/pr76_minmaxsum__run_20261012T042051Z__nn__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__41a41d78548f.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/primal-dual/pr76_minmaxsum__run_20261012T042051Z__primal-dual__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__9cb99d1dd14e.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/sa/pr76_minmaxsum__run_20261012T042051Z__sa__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__4f5cc0096679.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/shifting/pr76_minmaxsum__run_20261012T042052Z__shifting__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__92f12cf6087a.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/branch-and-bound/pr76_minsum__run_20261012T042913Z__branch-and-bound__minsum__pr76-4001f85eab1a-dc636944a6__r00__e65a4c0e2a48.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/genetic/pr76_minsum__run_20261012T042052Z__genetic__minsum__pr76-4001f85eab1a-dc636944a6__r00__db380aaa3421.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/greedy/pr76_minsum__run_20261012T042053Z__greedy__minsum__pr76-4001f85eab1a-dc636944a6__r00__c8dd06bf910a.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/local-search/pr76_minsum__run_20261012T042053Z__local-search__minsum__pr76-4001f85eab1a-dc636944a6__r00__95ea4335bdf3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/lp-rounding/pr76_minsum__run_20261012T042054Z__lp-rounding__minsum__pr76-4001f85eab1a-dc636944a6__r00__bbaff0a53a9c.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/nn/pr76_minsum__run_20261012T042054Z__nn__minsum__pr76-4001f85eab1a-dc636944a6__r00__47c2840382e9.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/primal-dual/pr76_minsum__run_20261012T042055Z__primal-dual__minsum__pr76-4001f85eab1a-dc636944a6__r00__383e337a4198.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/sa/pr76_minsum__run_20261012T042055Z__sa__minsum__pr76-4001f85eab1a-dc636944a6__r00__276b22e9c643.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/shifting/pr76_minsum__run_20261012T042055Z__shifting__minsum__pr76-4001f85eab1a-dc636944a6__r00__20432cd3f8cb.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/branch-and-bound/rat99_minmax__run_20261012T042915Z__branch-and-bound__minmax__rat99-a364923ee329-1be1f1f758__r00__8b1e245ad76c.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/primal-dual/rat99_minmax__run_20261012T042057Z__primal-dual__minmax__rat99-a364923ee329-1be1f1f758__r00__b2582a426bef.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/branch-and-bound/rat99_minmaxsum__run_20261012T042918Z__branch-and-bound__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a2f25a0becc5.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/genetic/rat99_minmaxsum__run_20261012T042057Z__genetic__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a8a8fac1ebf9.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/greedy/rat99_minmaxsum__run_20261012T042058Z__greedy__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__b1fc3419a5c7.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/local-search/rat99_minmaxsum__run_20261012T042100Z__local-search__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__13d92479556b.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/nn/rat99_minmaxsum__run_20261012T042101Z__nn__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__821335ed2219.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/primal-dual/rat99_minmaxsum__run_20261012T042101Z__primal-dual__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__7f3532e12947.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/sa/rat99_minmaxsum__run_20261012T042102Z__sa__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__bf8e3a7996dc.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/branch-and-bound/rat99_minsum__run_20261012T042920Z__branch-and-bound__minsum__rat99-a364923ee329-1be1f1f758__r00__66987dbb852e.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/genetic/rat99_minsum__run_20261012T042103Z__genetic__minsum__rat99-a364923ee329-1be1f1f758__r00__3cb11cf95ac3.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/greedy/rat99_minsum__run_20261012T042104Z__greedy__minsum__rat99-a364923ee329-1be1f1f758__r00__192ba58fb814.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/local-search/rat99_minsum__run_20261012T042105Z__local-search__minsum__rat99-a364923ee329-1be1f1f758__r00__93c640ecb273.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/lp-rounding/rat99_minsum__run_20261012T042105Z__lp-rounding__minsum__rat99-a364923ee329-1be1f1f758__r00__67147e878078.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/nn/rat99_minsum__run_20261012T042105Z__nn__minsum__rat99-a364923ee329-1be1f1f758__r00__83dae3bd475e.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/primal-dual/rat99_minsum__run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/sa/rat99_minsum__run_20261012T042106Z__sa__minsum__rat99-a364923ee329-1be1f1f758__r00__c0770c25bb14.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/shifting/rat99_minsum__run_20261012T042106Z__shifting__minsum__rat99-a364923ee329-1be1f1f758__r00__4d6e0ad22dda.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/genetic/rd100_minmax__run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/greedy/rd100_minmax__run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/local-search/rd100_minmax__run_20261012T042108Z__local-search__minmax__rd100-9407ab41999f-b9917bc5f5__r00__09ba6ffc41db.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/lp-rounding/rd100_minmax__run_20261012T042109Z__lp-rounding__minmax__rd100-9407ab41999f-b9917bc5f5__r00__e1f22b23670e.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/nn/rd100_minmax__run_20261012T042109Z__nn__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53bffbdc0343.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/primal-dual/rd100_minmax__run_20261012T042110Z__primal-dual__minmax__rd100-9407ab41999f-b9917bc5f5__r00__874e550378b4.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/sa/rd100_minmax__run_20261012T042110Z__sa__minmax__rd100-9407ab41999f-b9917bc5f5__r00__3c51a7950bb2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/shifting/rd100_minmax__run_20261012T042111Z__shifting__minmax__rd100-9407ab41999f-b9917bc5f5__r00__8904b91217f2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/genetic/rd100_minmaxsum__run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/greedy/rd100_minmaxsum__run_20261012T042114Z__greedy__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__1b19e6267480.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/local-search/rd100_minmaxsum__run_20261012T042115Z__local-search__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__34e06adb7445.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/lp-rounding/rd100_minmaxsum__run_20261012T042116Z__lp-rounding__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__f82060b5d63d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/nn/rd100_minmaxsum__run_20261012T042117Z__nn__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__fa3ad72db464.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/primal-dual/rd100_minmaxsum__run_20261012T042119Z__primal-dual__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__55a180f1ac09.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/sa/rd100_minmaxsum__run_20261012T042119Z__sa__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__b70e14350739.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/shifting/rd100_minmaxsum__run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/branch-and-bound/rd100_minsum__run_20261012T042924Z__branch-and-bound__minsum__rd100-9407ab41999f-b9917bc5f5__r00__2b6215fba68f.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/genetic/rd100_minsum__run_20261012T042122Z__genetic__minsum__rd100-9407ab41999f-b9917bc5f5__r00__88837c06c0a1.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/greedy/rd100_minsum__run_20261012T042123Z__greedy__minsum__rd100-9407ab41999f-b9917bc5f5__r00__adb3963e4a2b.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/local-search/rd100_minsum__run_20261012T042123Z__local-search__minsum__rd100-9407ab41999f-b9917bc5f5__r00__987524367dc2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/lp-rounding/rd100_minsum__run_20261012T042124Z__lp-rounding__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9bb770934db9.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/nn/rd100_minsum__run_20261012T042124Z__nn__minsum__rd100-9407ab41999f-b9917bc5f5__r00__5d1412f50428.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/primal-dual/rd100_minsum__run_20261012T042125Z__primal-dual__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9b581c20331c.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/sa/rd100_minsum__run_20261012T042125Z__sa__minsum__rd100-9407ab41999f-b9917bc5f5__r00__e08fb440d06d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/shifting/rd100_minsum__run_20261012T042125Z__shifting__minsum__rd100-9407ab41999f-b9917bc5f5__r00__7e9874a34551.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f4a8a5958e70.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/genetic/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__genetic__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f470589e8f33.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/greedy/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__greedy__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__48671dabb677.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/local-search/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__5cbecc0cc6eb.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__lp-rounding__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f89365304ce3.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/nn/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__nn__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__82bc20c46678.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__9cf884e94539.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/sa/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__sa__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__95b24a0da5ef.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/shifting/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__shifting__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__6a9e42f7b845.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__branch-and-bound__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__096da43c7228.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__brute-force__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__963d8915b6fa.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__genetic__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a4ef4a301437.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__greedy__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76d6eb848fd0.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__local-search__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__d7fddfdd1817.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__lp-rounding__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__50b100f13522.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/nn/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__nn__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6aff2c2f543d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/sa/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__sa__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__8623f588bccc.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__shifting__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__7dd3737ae185.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__branch-and-bound__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__adbfaee74290.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__brute-force__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__69ba38e27418.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__genetic__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__905e419e3496.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__greedy__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6cde22060acb.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__local-search__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__b520b5b4badf.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__lp-rounding__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__c9cbbfd7eb5d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/nn/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__nn__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__ac3e5638725b.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__primal-dual__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a2c261f0de02.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/sa/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__sa__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__940a1a391eed.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__shifting__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76c3ad98b57f.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/branch-and-bound/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042127Z__branch-and-bound__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__70c7be54f7a4.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/brute-force/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__brute-force__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a0cf11a139a.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/genetic/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__genetic__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__20f9c1822512.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/greedy/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__greedy__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3a1ca70398c1.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/local-search/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__local-search__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8162fb9072d8.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/lp-rounding/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__lp-rounding__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__7e3e8abb5a31.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/nn/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__nn__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c9e2e03f0ff6.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/primal-dual/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__primal-dual__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d28bb8ee5a78.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/sa/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__sa__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8e0013d19d51.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/shifting/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__shifting__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__e1510ee93e16.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__branch-and-bound__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__eb36998e1afe.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/brute-force/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__brute-force__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c7f69494647f.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/genetic/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__genetic__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__a52caf14e892.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/greedy/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__greedy__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d903f155a12f.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/local-search/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__local-search__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__14e002aeb816.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/lp-rounding/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__lp-rounding__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d95e9928eed4.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/nn/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__nn__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__b294132c3a59.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/primal-dual/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__primal-dual__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a49a5bdd800.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/sa/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__sa__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__462eb134595c.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/shifting/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__shifting__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__85606052fc27.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__branch-and-bound__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__319ebbf06140.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/brute-force/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/genetic/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__genetic__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__623d3564b076.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/greedy/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__greedy__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__6f883dec42fe.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/local-search/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__local-search__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d3fe871d325a.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/lp-rounding/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__lp-rounding__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__fccfa1c5121c.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/nn/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__nn__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__ce5906898064.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/primal-dual/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__primal-dual__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__32dbe63e1085.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/sa/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__sa__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3c3222069fd3.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/shifting/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__shifting__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__bfec546ef8cd.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/branch-and-bound/st70_minmax__run_20261012T042927Z__branch-and-bound__minmax__st70-fa79167d4566-93e4a763b9__r00__d97fb1f873c4.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/genetic/st70_minmax__run_20261012T042129Z__genetic__minmax__st70-fa79167d4566-93e4a763b9__r00__d10ddda7efc6.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/greedy/st70_minmax__run_20261012T042129Z__greedy__minmax__st70-fa79167d4566-93e4a763b9__r00__83f88b5fd18c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/local-search/st70_minmax__run_20261012T042129Z__local-search__minmax__st70-fa79167d4566-93e4a763b9__r00__afe9aa5b3fec.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/lp-rounding/st70_minmax__run_20261012T042129Z__lp-rounding__minmax__st70-fa79167d4566-93e4a763b9__r00__9e959426a3b5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/nn/st70_minmax__run_20261012T042130Z__nn__minmax__st70-fa79167d4566-93e4a763b9__r00__927b2c644a5a.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/primal-dual/st70_minmax__run_20261012T042130Z__primal-dual__minmax__st70-fa79167d4566-93e4a763b9__r00__f672a03a8d1e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/sa/st70_minmax__run_20261012T042130Z__sa__minmax__st70-fa79167d4566-93e4a763b9__r00__59bc106c407c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/shifting/st70_minmax__run_20261012T042130Z__shifting__minmax__st70-fa79167d4566-93e4a763b9__r00__864e88d06438.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/genetic/st70_minmaxsum__run_20261012T042132Z__genetic__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__fb4cd6c9b288.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/greedy/st70_minmaxsum__run_20261012T042133Z__greedy__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__988fb18d97b5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/local-search/st70_minmaxsum__run_20261012T042134Z__local-search__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__5cac2848652c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/lp-rounding/st70_minmaxsum__run_20261012T042134Z__lp-rounding__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__b8bd97155ac8.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/nn/st70_minmaxsum__run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/primal-dual/st70_minmaxsum__run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/sa/st70_minmaxsum__run_20261012T042135Z__sa__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__97c9659dac0b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/shifting/st70_minmaxsum__run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/branch-and-bound/st70_minsum__run_20261012T042930Z__branch-and-bound__minsum__st70-fa79167d4566-93e4a763b9__r00__82e68af7d04e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/genetic/st70_minsum__run_20261012T042141Z__genetic__minsum__st70-fa79167d4566-93e4a763b9__r00__8ccfe3c0321e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/greedy/st70_minsum__run_20261012T042141Z__greedy__minsum__st70-fa79167d4566-93e4a763b9__r00__c14215268e0b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/local-search/st70_minsum__run_20261012T042142Z__local-search__minsum__st70-fa79167d4566-93e4a763b9__r00__53444307d4ff.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/lp-rounding/st70_minsum__run_20261012T042142Z__lp-rounding__minsum__st70-fa79167d4566-93e4a763b9__r00__5d347992250b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/nn/st70_minsum__run_20261012T042142Z__nn__minsum__st70-fa79167d4566-93e4a763b9__r00__45f6ebd74805.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/primal-dual/st70_minsum__run_20261012T042142Z__primal-dual__minsum__st70-fa79167d4566-93e4a763b9__r00__fc7da6e5dd95.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/sa/st70_minsum__run_20261012T042143Z__sa__minsum__st70-fa79167d4566-93e4a763b9__r00__78cfa353cea2.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/shifting/st70_minsum__run_20261012T042143Z__shifting__minsum__st70-fa79167d4566-93e4a763b9__r00__9a2b1bb8bc8b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/branch-and-bound/stars-0000030.instance_minmax__run_20261012T042143Z__branch-and-bound__minmax__stars-0000030.instance-1955c914c741-2f__r00__c3eb2bdc272e.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/brute-force/stars-0000030.instance_minmax__run_20261012T042143Z__brute-force__minmax__stars-0000030.instance-1955c914c741-2f__r00__7d2d390164e5.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/genetic/stars-0000030.instance_minmax__run_20261012T042143Z__genetic__minmax__stars-0000030.instance-1955c914c741-2f__r00__bdb63d5a9323.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/greedy/stars-0000030.instance_minmax__run_20261012T042143Z__greedy__minmax__stars-0000030.instance-1955c914c741-2f__r00__de55664536a0.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/local-search/stars-0000030.instance_minmax__run_20261012T042143Z__local-search__minmax__stars-0000030.instance-1955c914c741-2f__r00__50a3052ef325.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/lp-rounding/stars-0000030.instance_minmax__run_20261012T042143Z__lp-rounding__minmax__stars-0000030.instance-1955c914c741-2f__r00__22c9b25a163b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/nn/stars-0000030.instance_minmax__run_20261012T042143Z__nn__minmax__stars-0000030.instance-1955c914c741-2f__r00__4e492fab67c2.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/primal-dual/stars-0000030.instance_minmax__run_20261012T042143Z__primal-dual__minmax__stars-0000030.instance-1955c914c741-2f__r00__f1532fa8f49e.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/sa/stars-0000030.instance_minmax__run_20261012T042143Z__sa__minmax__stars-0000030.instance-1955c914c741-2f__r00__0f7d8540edc6.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/shifting/stars-0000030.instance_minmax__run_20261012T042143Z__shifting__minmax__stars-0000030.instance-1955c914c741-2f__r00__70f09504ef1b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/branch-and-bound/stars-0000030.instance_minmaxsum__run_20261012T042143Z__branch-and-bound__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__f536870ebe98.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/brute-force/stars-0000030.instance_minmaxsum__run_20261012T042143Z__brute-force__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__56e22b152d71.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/genetic/stars-0000030.instance_minmaxsum__run_20261012T042143Z__genetic__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__30db97600e98.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/greedy/stars-0000030.instance_minmaxsum__run_20261012T042143Z__greedy__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__0bc5543cac5a.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/local-search/stars-0000030.instance_minmaxsum__run_20261012T042144Z__local-search__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__782eef3f0925.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/lp-rounding/stars-0000030.instance_minmaxsum__run_20261012T042144Z__lp-rounding__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__120a37dd79f4.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/nn/stars-0000030.instance_minmaxsum__run_20261012T042144Z__nn__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__1edb78c9e043.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/primal-dual/stars-0000030.instance_minmaxsum__run_20261012T042144Z__primal-dual__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__9c71136ad837.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/sa/stars-0000030.instance_minmaxsum__run_20261012T042144Z__sa__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__fab1facbef6c.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/shifting/stars-0000030.instance_minmaxsum__run_20261012T042144Z__shifting__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__13dfa35080b9.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/branch-and-bound/stars-0000030.instance_minsum__run_20261012T042144Z__branch-and-bound__minsum__stars-0000030.instance-1955c914c741-2f__r00__e145cc6298ab.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/brute-force/stars-0000030.instance_minsum__run_20261012T042144Z__brute-force__minsum__stars-0000030.instance-1955c914c741-2f__r00__d47703fd48da.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/genetic/stars-0000030.instance_minsum__run_20261012T042144Z__genetic__minsum__stars-0000030.instance-1955c914c741-2f__r00__f612e039e706.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/greedy/stars-0000030.instance_minsum__run_20261012T042144Z__greedy__minsum__stars-0000030.instance-1955c914c741-2f__r00__2407fa80bf9b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/local-search/stars-0000030.instance_minsum__run_20261012T042144Z__local-search__minsum__stars-0000030.instance-1955c914c741-2f__r00__d905a0631386.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/lp-rounding/stars-0000030.instance_minsum__run_20261012T042144Z__lp-rounding__minsum__stars-0000030.instance-1955c914c741-2f__r00__76269445f0cd.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/nn/stars-0000030.instance_minsum__run_20261012T042144Z__nn__minsum__stars-0000030.instance-1955c914c741-2f__r00__90e197375288.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/primal-dual/stars-0000030.instance_minsum__run_20261012T042144Z__primal-dual__minsum__stars-0000030.instance-1955c914c741-2f__r00__9aa238f8fa60.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/sa/stars-0000030.instance_minsum__run_20261012T042144Z__sa__minsum__stars-0000030.instance-1955c914c741-2f__r00__3cf5a723c2c5.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/shifting/stars-0000030.instance_minsum__run_20261012T042144Z__shifting__minsum__stars-0000030.instance-1955c914c741-2f__r00__2bec4de3e765.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/branch-and-bound/uniform-0000030-2_minmax__run_20261012T042144Z__branch-and-bound__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d294f38efc8a.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/brute-force/uniform-0000030-2_minmax__run_20261012T042144Z__brute-force__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__dd4d51f8c0ff.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/genetic/uniform-0000030-2_minmax__run_20261012T042144Z__genetic__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e17b34c2f464.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/greedy/uniform-0000030-2_minmax__run_20261012T042144Z__greedy__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__48c50924d1ab.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/local-search/uniform-0000030-2_minmax__run_20261012T042144Z__local-search__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__6ad72f9d708e.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/lp-rounding/uniform-0000030-2_minmax__run_20261012T042144Z__lp-rounding__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__56c514ddf4e9.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/nn/uniform-0000030-2_minmax__run_20261012T042144Z__nn__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e4b64722299c.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/primal-dual/uniform-0000030-2_minmax__run_20261012T042145Z__primal-dual__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1101cb17393b.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/sa/uniform-0000030-2_minmax__run_20261012T042145Z__sa__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__907888ac5770.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/shifting/uniform-0000030-2_minmax__run_20261012T042145Z__shifting__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__10516aa30071.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/branch-and-bound/uniform-0000030-2_minmaxsum__run_20261012T042145Z__branch-and-bound__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__c0b4a7f254ae.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/brute-force/uniform-0000030-2_minmaxsum__run_20261012T042145Z__brute-force__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__87b26cb82c7d.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/genetic/uniform-0000030-2_minmaxsum__run_20261012T042145Z__genetic__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1aef78b020e4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/greedy/uniform-0000030-2_minmaxsum__run_20261012T042145Z__greedy__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__b80b7d00912a.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/local-search/uniform-0000030-2_minmaxsum__run_20261012T042145Z__local-search__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__44385fb888a4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/lp-rounding/uniform-0000030-2_minmaxsum__run_20261012T042145Z__lp-rounding__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__798a68522900.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/nn/uniform-0000030-2_minmaxsum__run_20261012T042145Z__nn__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__0fbe6a4953cd.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/primal-dual/uniform-0000030-2_minmaxsum__run_20261012T042145Z__primal-dual__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d904f8d6d994.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/sa/uniform-0000030-2_minmaxsum__run_20261012T042145Z__sa__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__46697e074ec3.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/shifting/uniform-0000030-2_minmaxsum__run_20261012T042145Z__shifting__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__2f89d6351d54.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/branch-and-bound/uniform-0000030-2_minsum__run_20261012T042145Z__branch-and-bound__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__13529ae356b4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/brute-force/uniform-0000030-2_minsum__run_20261012T042145Z__brute-force__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__4ed4534a46fa.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/genetic/uniform-0000030-2_minsum__run_20261012T042145Z__genetic__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__07c625631bd7.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/greedy/uniform-0000030-2_minsum__run_20261012T042145Z__greedy__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__8c1ef9886b41.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/local-search/uniform-0000030-2_minsum__run_20261012T042145Z__local-search__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1900e7f4c46b.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/lp-rounding/uniform-0000030-2_minsum__run_20261012T042145Z__lp-rounding__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__625b28674680.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/nn/uniform-0000030-2_minsum__run_20261012T042145Z__nn__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__483b601d2335.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/primal-dual/uniform-0000030-2_minsum__run_20261012T042145Z__primal-dual__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__86ab38b36ebe.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/sa/uniform-0000030-2_minsum__run_20261012T042145Z__sa__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__942b6947d6b6.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/shifting/uniform-0000030-2_minsum__run_20261012T042145Z__shifting__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__9deb6a511ef0.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/branch-and-bound/us-night-0000030.instance_minmax__run_20261012T042145Z__branch-and-bound__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__780a9dfc6157.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/brute-force/us-night-0000030.instance_minmax__run_20261012T042145Z__brute-force__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__8ed1be9dd7fc.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/genetic/us-night-0000030.instance_minmax__run_20261012T042145Z__genetic__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__1b588d86292f.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/greedy/us-night-0000030.instance_minmax__run_20261012T042145Z__greedy__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__ad1948387ce6.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/local-search/us-night-0000030.instance_minmax__run_20261012T042146Z__local-search__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__085a1c42fc27.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/lp-rounding/us-night-0000030.instance_minmax__run_20261012T042146Z__lp-rounding__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__a297b587d59d.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/nn/us-night-0000030.instance_minmax__run_20261012T042146Z__nn__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__255862e110bb.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/primal-dual/us-night-0000030.instance_minmax__run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/sa/us-night-0000030.instance_minmax__run_20261012T042146Z__sa__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__193d06530261.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/shifting/us-night-0000030.instance_minmax__run_20261012T042146Z__shifting__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__426e7a5266dd.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/branch-and-bound/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__branch-and-bound__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__313da6fde4ad.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/brute-force/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__brute-force__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__34bcece638d8.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/genetic/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__genetic__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__2a558be5d979.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/greedy/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__greedy__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__56c9fd05590a.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/local-search/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__local-search__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__c223874e9577.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/lp-rounding/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__lp-rounding__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__9395aa04de52.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/nn/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__nn__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__eb5590002711.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/primal-dual/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__primal-dual__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__48e34418b746.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/sa/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__sa__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__878492806341.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/shifting/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__shifting__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__a5d047c3d136.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/branch-and-bound/us-night-0000030.instance_minsum__run_20261012T042146Z__branch-and-bound__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__06dd29a82cb2.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/brute-force/us-night-0000030.instance_minsum__run_20261012T042146Z__brute-force__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__32048a68441b.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/genetic/us-night-0000030.instance_minsum__run_20261012T042146Z__genetic__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__44c457ef394f.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/greedy/us-night-0000030.instance_minsum__run_20261012T042146Z__greedy__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e03dfe1a7c5e.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/local-search/us-night-0000030.instance_minsum__run_20261012T042146Z__local-search__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__14d7a05cf6ab.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/lp-rounding/us-night-0000030.instance_minsum__run_20261012T042146Z__lp-rounding__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1528ca035f83.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/nn/us-night-0000030.instance_minsum__run_20261012T042146Z__nn__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e77ce9cd40c5.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/primal-dual/us-night-0000030.instance_minsum__run_20261012T042146Z__primal-dual__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1d09ea49d868.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/sa/us-night-0000030.instance_minsum__run_20261012T042146Z__sa__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__df3c497ba28e.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/shifting/us-night-0000030.instance_minsum__run_20261012T042146Z__shifting__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__123adaefcf3a.gif`
+
+
+## 15. Generated tables
+
+- `tables/00_index.md`
+- `tables/bounds_and_gaps.csv`
+- `tables/bounds_and_gaps.md`
+- `tables/complete_run_coverage.csv`
+- `tables/complete_run_coverage.md`
+- `tables/completeness_artifacts.csv`
+- `tables/completeness_artifacts.md`
+- `tables/exact_reference_comparison.csv`
+- `tables/exact_reference_comparison.md`
+- `tables/failures_timeouts_backends.csv`
+- `tables/failures_timeouts_backends.md`
+- `tables/feasibility_verification.csv`
+- `tables/feasibility_verification.md`
+- `tables/minmaxsum_components.csv`
+- `tables/minmaxsum_components.md`
+- `tables/objective_quality.csv`
+- `tables/objective_quality.md`
+- `tables/per_family_comparison.csv`
+- `tables/per_family_comparison.md`
+- `tables/per_instance_comparison.csv`
+- `tables/per_instance_comparison.md`
+- `tables/per_instance_run_rows.csv`
+- `tables/per_instance_run_rows.md`
+- `tables/per_run_master_results.csv`
+- `tables/per_run_master_results.md`
+- `tables/runtime_comparison.csv`
+- `tables/runtime_comparison.md`
+
+## 16. Generated figures
+
+- `figures/REPORT.md`
+- `figures/figure_status.json`
+- `figures/report_family_level_comparison.pdf`
+- `figures/report_family_level_comparison.png`
+- `figures/report_minmaxsum_pareto.pdf`
+- `figures/report_minmaxsum_pareto.png`
+- `figures/report_minmaxsum_peak_integral.pdf`
+- `figures/report_minmaxsum_peak_integral.png`
+- `figures/report_objective_quality_minmax_minsum.pdf`
+- `figures/report_objective_quality_minmax_minsum.png`
+- `figures/report_per_instance_normalized_quality.pdf`
+- `figures/report_per_instance_normalized_quality.png`
+- `figures/report_performance_vs_n_m.pdf`
+- `figures/report_performance_vs_n_m.png`
+- `figures/report_reliability_comparison.pdf`
+- `figures/report_reliability_comparison.png`
+- `figures/report_runtime_by_algorithm_objective.pdf`
+- `figures/report_runtime_by_algorithm_objective.png`
+- `figures/report_runtime_distribution_by_algorithm.pdf`
+- `figures/report_runtime_distribution_by_algorithm.png`
+- `figures/report_runtime_versus_quality.pdf`
+- `figures/report_runtime_versus_quality.png`
+
+## 17. Generated animations
+
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/lp-rounding/C-lower_minmaxsum__run_20261012T041921Z__lp-rounding__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__4697d065cb6d.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/lp-rounding/C-lower_minmaxsum__run_20261012T041921Z__lp-rounding__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__4697d065cb6d.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/shifting/C-lower_minmaxsum__run_20261012T041924Z__shifting__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__6fc4dca6c984.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minmaxsum/shifting/C-lower_minmaxsum__run_20261012T041924Z__shifting__minmaxsum__C-lower-90fec4bb6118-801fe3006e__r00__6fc4dca6c984.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/branch-and-bound/C-lower_minsum__run_20261012T042837Z__branch-and-bound__minsum__C-lower-90fec4bb6118-801fe3006e__r00__92a90ccb0b91.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/branch-and-bound/C-lower_minsum__run_20261012T042837Z__branch-and-bound__minsum__C-lower-90fec4bb6118-801fe3006e__r00__92a90ccb0b91.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/genetic/C-lower_minsum__run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/genetic/C-lower_minsum__run_20261012T041925Z__genetic__minsum__C-lower-90fec4bb6118-801fe3006e__r00__8471093b2529.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/greedy/C-lower_minsum__run_20261012T041926Z__greedy__minsum__C-lower-90fec4bb6118-801fe3006e__r00__9a2ea1dde3ea.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/greedy/C-lower_minsum__run_20261012T041926Z__greedy__minsum__C-lower-90fec4bb6118-801fe3006e__r00__9a2ea1dde3ea.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/local-search/C-lower_minsum__run_20261012T041926Z__local-search__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ff17f0623213.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/local-search/C-lower_minsum__run_20261012T041926Z__local-search__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ff17f0623213.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/lp-rounding/C-lower_minsum__run_20261012T041927Z__lp-rounding__minsum__C-lower-90fec4bb6118-801fe3006e__r00__81f120d4bcb7.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/lp-rounding/C-lower_minsum__run_20261012T041927Z__lp-rounding__minsum__C-lower-90fec4bb6118-801fe3006e__r00__81f120d4bcb7.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/nn/C-lower_minsum__run_20261012T041927Z__nn__minsum__C-lower-90fec4bb6118-801fe3006e__r00__f619481ea048.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/nn/C-lower_minsum__run_20261012T041927Z__nn__minsum__C-lower-90fec4bb6118-801fe3006e__r00__f619481ea048.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/primal-dual/C-lower_minsum__run_20261012T041927Z__primal-dual__minsum__C-lower-90fec4bb6118-801fe3006e__r00__5e31303971d7.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/primal-dual/C-lower_minsum__run_20261012T041927Z__primal-dual__minsum__C-lower-90fec4bb6118-801fe3006e__r00__5e31303971d7.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/sa/C-lower_minsum__run_20261012T041928Z__sa__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ee6153b9852b.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/sa/C-lower_minsum__run_20261012T041928Z__sa__minsum__C-lower-90fec4bb6118-801fe3006e__r00__ee6153b9852b.gif.metadata.json`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/shifting/C-lower_minsum__run_20261012T041928Z__shifting__minsum__C-lower-90fec4bb6118-801fe3006e__r00__7ffe94a11f75.gif`
+- `animations/C-lower-90fec4bb6118-801fe3006e/minsum/shifting/C-lower_minsum__run_20261012T041928Z__shifting__minsum__C-lower-90fec4bb6118-801fe3006e__r00__7ffe94a11f75.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmax/genetic/C-right_minmax__run_20261012T041929Z__genetic__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__a1ea8b2d4738.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmax/genetic/C-right_minmax__run_20261012T041929Z__genetic__minmax__C-right-8bf4b5770668-e0f2e6a705__r00__a1ea8b2d4738.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/genetic/C-right_minmaxsum__run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/genetic/C-right_minmaxsum__run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/greedy/C-right_minmaxsum__run_20261012T041932Z__greedy__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea6414cc00cc.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/greedy/C-right_minmaxsum__run_20261012T041932Z__greedy__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea6414cc00cc.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/local-search/C-right_minmaxsum__run_20261012T041933Z__local-search__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__79cec54e5e8d.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/local-search/C-right_minmaxsum__run_20261012T041933Z__local-search__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__79cec54e5e8d.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/lp-rounding/C-right_minmaxsum__run_20261012T041933Z__lp-rounding__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__b3b6b25987aa.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/lp-rounding/C-right_minmaxsum__run_20261012T041933Z__lp-rounding__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__b3b6b25987aa.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/primal-dual/C-right_minmaxsum__run_20261012T041934Z__primal-dual__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f3644399249.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/primal-dual/C-right_minmaxsum__run_20261012T041934Z__primal-dual__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f3644399249.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/sa/C-right_minmaxsum__run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minmaxsum/sa/C-right_minmaxsum__run_20261012T041935Z__sa__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7e656d7afb71.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/branch-and-bound/C-right_minsum__run_20261012T042842Z__branch-and-bound__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__336e8889ae1c.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/branch-and-bound/C-right_minsum__run_20261012T042842Z__branch-and-bound__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__336e8889ae1c.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/genetic/C-right_minsum__run_20261012T041936Z__genetic__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__8db0f04f7ff4.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/genetic/C-right_minsum__run_20261012T041936Z__genetic__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__8db0f04f7ff4.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/greedy/C-right_minsum__run_20261012T041937Z__greedy__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea9bfbe44a15.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/greedy/C-right_minsum__run_20261012T041937Z__greedy__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__ea9bfbe44a15.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/local-search/C-right_minsum__run_20261012T041937Z__local-search__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f33b20ba6a5.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/local-search/C-right_minsum__run_20261012T041937Z__local-search__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__6f33b20ba6a5.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/lp-rounding/C-right_minsum__run_20261012T041937Z__lp-rounding__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__7d82bd84a114.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/lp-rounding/C-right_minsum__run_20261012T041937Z__lp-rounding__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__7d82bd84a114.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/nn/C-right_minsum__run_20261012T041938Z__nn__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__a99905a16a9a.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/nn/C-right_minsum__run_20261012T041938Z__nn__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__a99905a16a9a.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/primal-dual/C-right_minsum__run_20261012T041938Z__primal-dual__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__185a9acb7ac1.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/primal-dual/C-right_minsum__run_20261012T041938Z__primal-dual__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__185a9acb7ac1.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/sa/C-right_minsum__run_20261012T041938Z__sa__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__01d8517d9d66.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/sa/C-right_minsum__run_20261012T041938Z__sa__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__01d8517d9d66.gif.metadata.json`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/shifting/C-right_minsum__run_20261012T041938Z__shifting__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__53aa21742e22.gif`
+- `animations/C-right-8bf4b5770668-e0f2e6a705/minsum/shifting/C-right_minsum__run_20261012T041938Z__shifting__minsum__C-right-8bf4b5770668-e0f2e6a705__r00__53aa21742e22.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/branch-and-bound/att48_minmax__run_20261012T041938Z__branch-and-bound__minmax__att48-8efa61a1d9ab-5196644df6__r00__70fd050872bb.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/branch-and-bound/att48_minmax__run_20261012T041938Z__branch-and-bound__minmax__att48-8efa61a1d9ab-5196644df6__r00__70fd050872bb.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/genetic/att48_minmax__run_20261012T041939Z__genetic__minmax__att48-8efa61a1d9ab-5196644df6__r00__f598af0598e6.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/genetic/att48_minmax__run_20261012T041939Z__genetic__minmax__att48-8efa61a1d9ab-5196644df6__r00__f598af0598e6.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/greedy/att48_minmax__run_20261012T041939Z__greedy__minmax__att48-8efa61a1d9ab-5196644df6__r00__b436c081d879.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/greedy/att48_minmax__run_20261012T041939Z__greedy__minmax__att48-8efa61a1d9ab-5196644df6__r00__b436c081d879.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/local-search/att48_minmax__run_20261012T041939Z__local-search__minmax__att48-8efa61a1d9ab-5196644df6__r00__fe1900be63f5.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/local-search/att48_minmax__run_20261012T041939Z__local-search__minmax__att48-8efa61a1d9ab-5196644df6__r00__fe1900be63f5.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/lp-rounding/att48_minmax__run_20261012T041939Z__lp-rounding__minmax__att48-8efa61a1d9ab-5196644df6__r00__eed4d316c8c6.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/lp-rounding/att48_minmax__run_20261012T041939Z__lp-rounding__minmax__att48-8efa61a1d9ab-5196644df6__r00__eed4d316c8c6.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/nn/att48_minmax__run_20261012T041939Z__nn__minmax__att48-8efa61a1d9ab-5196644df6__r00__85c1528a18e7.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/nn/att48_minmax__run_20261012T041939Z__nn__minmax__att48-8efa61a1d9ab-5196644df6__r00__85c1528a18e7.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/primal-dual/att48_minmax__run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/primal-dual/att48_minmax__run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/shifting/att48_minmax__run_20261012T041939Z__shifting__minmax__att48-8efa61a1d9ab-5196644df6__r00__7379967a13ba.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmax/shifting/att48_minmax__run_20261012T041939Z__shifting__minmax__att48-8efa61a1d9ab-5196644df6__r00__7379967a13ba.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/branch-and-bound/att48_minmaxsum__run_20261012T041939Z__branch-and-bound__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__454d22ca526a.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/branch-and-bound/att48_minmaxsum__run_20261012T041939Z__branch-and-bound__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__454d22ca526a.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/genetic/att48_minmaxsum__run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/genetic/att48_minmaxsum__run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/greedy/att48_minmaxsum__run_20261012T041939Z__greedy__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__fb13b226f040.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/greedy/att48_minmaxsum__run_20261012T041939Z__greedy__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__fb13b226f040.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/local-search/att48_minmaxsum__run_20261012T041940Z__local-search__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__25fb0b3da5df.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/local-search/att48_minmaxsum__run_20261012T041940Z__local-search__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__25fb0b3da5df.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/lp-rounding/att48_minmaxsum__run_20261012T041940Z__lp-rounding__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__c137daeb5550.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/lp-rounding/att48_minmaxsum__run_20261012T041940Z__lp-rounding__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__c137daeb5550.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/nn/att48_minmaxsum__run_20261012T041940Z__nn__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__ea9182f8a815.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/nn/att48_minmaxsum__run_20261012T041940Z__nn__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__ea9182f8a815.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/primal-dual/att48_minmaxsum__run_20261012T041940Z__primal-dual__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__e776d7bb732d.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/primal-dual/att48_minmaxsum__run_20261012T041940Z__primal-dual__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__e776d7bb732d.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/sa/att48_minmaxsum__run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/sa/att48_minmaxsum__run_20261012T041940Z__sa__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__5a3d35024530.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/shifting/att48_minmaxsum__run_20261012T041940Z__shifting__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__316cddb5226b.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minmaxsum/shifting/att48_minmaxsum__run_20261012T041940Z__shifting__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__316cddb5226b.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/branch-and-bound/att48_minsum__run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/branch-and-bound/att48_minsum__run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/genetic/att48_minsum__run_20261012T041940Z__genetic__minsum__att48-8efa61a1d9ab-5196644df6__r00__1b84b889428a.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/genetic/att48_minsum__run_20261012T041940Z__genetic__minsum__att48-8efa61a1d9ab-5196644df6__r00__1b84b889428a.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/greedy/att48_minsum__run_20261012T041940Z__greedy__minsum__att48-8efa61a1d9ab-5196644df6__r00__c186b67e8cb5.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/greedy/att48_minsum__run_20261012T041940Z__greedy__minsum__att48-8efa61a1d9ab-5196644df6__r00__c186b67e8cb5.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/local-search/att48_minsum__run_20261012T041941Z__local-search__minsum__att48-8efa61a1d9ab-5196644df6__r00__55e7540ec649.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/local-search/att48_minsum__run_20261012T041941Z__local-search__minsum__att48-8efa61a1d9ab-5196644df6__r00__55e7540ec649.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/lp-rounding/att48_minsum__run_20261012T041941Z__lp-rounding__minsum__att48-8efa61a1d9ab-5196644df6__r00__4e76c012c57d.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/lp-rounding/att48_minsum__run_20261012T041941Z__lp-rounding__minsum__att48-8efa61a1d9ab-5196644df6__r00__4e76c012c57d.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/nn/att48_minsum__run_20261012T041941Z__nn__minsum__att48-8efa61a1d9ab-5196644df6__r00__ef0f6e149c34.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/nn/att48_minsum__run_20261012T041941Z__nn__minsum__att48-8efa61a1d9ab-5196644df6__r00__ef0f6e149c34.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/primal-dual/att48_minsum__run_20261012T041941Z__primal-dual__minsum__att48-8efa61a1d9ab-5196644df6__r00__d49fbd6c1231.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/primal-dual/att48_minsum__run_20261012T041941Z__primal-dual__minsum__att48-8efa61a1d9ab-5196644df6__r00__d49fbd6c1231.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/sa/att48_minsum__run_20261012T041941Z__sa__minsum__att48-8efa61a1d9ab-5196644df6__r00__35e4f4ef6a5b.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/sa/att48_minsum__run_20261012T041941Z__sa__minsum__att48-8efa61a1d9ab-5196644df6__r00__35e4f4ef6a5b.gif.metadata.json`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/shifting/att48_minsum__run_20261012T041941Z__shifting__minsum__att48-8efa61a1d9ab-5196644df6__r00__1c7611bd81f2.gif`
+- `animations/att48-8efa61a1d9ab-5196644df6/minsum/shifting/att48_minsum__run_20261012T041941Z__shifting__minsum__att48-8efa61a1d9ab-5196644df6__r00__1c7611bd81f2.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/branch-and-bound/berlin52_minmax__run_20261012T041941Z__branch-and-bound__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__2ad5886378c4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/branch-and-bound/berlin52_minmax__run_20261012T041941Z__branch-and-bound__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__2ad5886378c4.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/genetic/berlin52_minmax__run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/genetic/berlin52_minmax__run_20261012T041941Z__genetic__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__3a86ccab2d8f.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/local-search/berlin52_minmax__run_20261012T041941Z__local-search__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__6ae54b8d48ff.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/local-search/berlin52_minmax__run_20261012T041941Z__local-search__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__6ae54b8d48ff.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/lp-rounding/berlin52_minmax__run_20261012T041941Z__lp-rounding__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__568ba0cfe167.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/lp-rounding/berlin52_minmax__run_20261012T041941Z__lp-rounding__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__568ba0cfe167.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/nn/berlin52_minmax__run_20261012T041941Z__nn__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__61eefddee780.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/nn/berlin52_minmax__run_20261012T041941Z__nn__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__61eefddee780.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/primal-dual/berlin52_minmax__run_20261012T041941Z__primal-dual__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__4fecee7aaf89.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/primal-dual/berlin52_minmax__run_20261012T041941Z__primal-dual__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__4fecee7aaf89.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/sa/berlin52_minmax__run_20261012T041941Z__sa__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__af3833cf1102.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/sa/berlin52_minmax__run_20261012T041941Z__sa__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__af3833cf1102.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/shifting/berlin52_minmax__run_20261012T041941Z__shifting__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__95eb1ee958dc.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmax/shifting/berlin52_minmax__run_20261012T041941Z__shifting__minmax__berlin52-3939d9e3cc19-6ce5d7089a__r00__95eb1ee958dc.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/branch-and-bound/berlin52_minmaxsum__run_20261012T041942Z__branch-and-bound__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__74c0c7ac230c.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/branch-and-bound/berlin52_minmaxsum__run_20261012T041942Z__branch-and-bound__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__74c0c7ac230c.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/genetic/berlin52_minmaxsum__run_20261012T041942Z__genetic__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__50e80f72dc3d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/genetic/berlin52_minmaxsum__run_20261012T041942Z__genetic__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__50e80f72dc3d.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/greedy/berlin52_minmaxsum__run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/greedy/berlin52_minmaxsum__run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/local-search/berlin52_minmaxsum__run_20261012T041942Z__local-search__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__5147d7624289.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/local-search/berlin52_minmaxsum__run_20261012T041942Z__local-search__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__5147d7624289.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/lp-rounding/berlin52_minmaxsum__run_20261012T041942Z__lp-rounding__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e90ee9cb14fd.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/lp-rounding/berlin52_minmaxsum__run_20261012T041942Z__lp-rounding__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e90ee9cb14fd.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/nn/berlin52_minmaxsum__run_20261012T041942Z__nn__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__3999c0c83d37.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/nn/berlin52_minmaxsum__run_20261012T041942Z__nn__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__3999c0c83d37.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/primal-dual/berlin52_minmaxsum__run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/primal-dual/berlin52_minmaxsum__run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/sa/berlin52_minmaxsum__run_20261012T041942Z__sa__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__b6baa6cac112.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/sa/berlin52_minmaxsum__run_20261012T041942Z__sa__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__b6baa6cac112.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/shifting/berlin52_minmaxsum__run_20261012T041942Z__shifting__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__f79cc77eee19.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minmaxsum/shifting/berlin52_minmaxsum__run_20261012T041942Z__shifting__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__f79cc77eee19.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/branch-and-bound/berlin52_minsum__run_20261012T041943Z__branch-and-bound__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__9da39c4a3f7e.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/branch-and-bound/berlin52_minsum__run_20261012T041943Z__branch-and-bound__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__9da39c4a3f7e.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/genetic/berlin52_minsum__run_20261012T041943Z__genetic__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2cd868b32654.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/genetic/berlin52_minsum__run_20261012T041943Z__genetic__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2cd868b32654.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/greedy/berlin52_minsum__run_20261012T041943Z__greedy__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__042a8f44c4b8.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/greedy/berlin52_minsum__run_20261012T041943Z__greedy__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__042a8f44c4b8.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/local-search/berlin52_minsum__run_20261012T041943Z__local-search__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__699d047804c4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/local-search/berlin52_minsum__run_20261012T041943Z__local-search__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__699d047804c4.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/lp-rounding/berlin52_minsum__run_20261012T041943Z__lp-rounding__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__079042715ab4.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/lp-rounding/berlin52_minsum__run_20261012T041943Z__lp-rounding__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__079042715ab4.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/nn/berlin52_minsum__run_20261012T041943Z__nn__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2c42eafaf561.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/nn/berlin52_minsum__run_20261012T041943Z__nn__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__2c42eafaf561.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/primal-dual/berlin52_minsum__run_20261012T041943Z__primal-dual__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__084a073db85d.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/primal-dual/berlin52_minsum__run_20261012T041943Z__primal-dual__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__084a073db85d.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/sa/berlin52_minsum__run_20261012T041943Z__sa__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e92686d333a5.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/sa/berlin52_minsum__run_20261012T041943Z__sa__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__e92686d333a5.gif.metadata.json`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/shifting/berlin52_minsum__run_20261012T041943Z__shifting__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__229995532be2.gif`
+- `animations/berlin52-3939d9e3cc19-6ce5d7089a/minsum/shifting/berlin52_minsum__run_20261012T041943Z__shifting__minsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__229995532be2.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/branch-and-bound/eil51_minmax__run_20261012T041943Z__branch-and-bound__minmax__eil51-f6e4afd67825-e956423838__r00__79cb5397042d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/branch-and-bound/eil51_minmax__run_20261012T041943Z__branch-and-bound__minmax__eil51-f6e4afd67825-e956423838__r00__79cb5397042d.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/genetic/eil51_minmax__run_20261012T041944Z__genetic__minmax__eil51-f6e4afd67825-e956423838__r00__26fe9d486cf9.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/genetic/eil51_minmax__run_20261012T041944Z__genetic__minmax__eil51-f6e4afd67825-e956423838__r00__26fe9d486cf9.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/greedy/eil51_minmax__run_20261012T041944Z__greedy__minmax__eil51-f6e4afd67825-e956423838__r00__9988c3710e0b.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/greedy/eil51_minmax__run_20261012T041944Z__greedy__minmax__eil51-f6e4afd67825-e956423838__r00__9988c3710e0b.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/local-search/eil51_minmax__run_20261012T041944Z__local-search__minmax__eil51-f6e4afd67825-e956423838__r00__655ad189793d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/local-search/eil51_minmax__run_20261012T041944Z__local-search__minmax__eil51-f6e4afd67825-e956423838__r00__655ad189793d.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/lp-rounding/eil51_minmax__run_20261012T041944Z__lp-rounding__minmax__eil51-f6e4afd67825-e956423838__r00__1bb4ed19a22d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/lp-rounding/eil51_minmax__run_20261012T041944Z__lp-rounding__minmax__eil51-f6e4afd67825-e956423838__r00__1bb4ed19a22d.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/nn/eil51_minmax__run_20261012T041944Z__nn__minmax__eil51-f6e4afd67825-e956423838__r00__9c9ff986ea77.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/nn/eil51_minmax__run_20261012T041944Z__nn__minmax__eil51-f6e4afd67825-e956423838__r00__9c9ff986ea77.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/primal-dual/eil51_minmax__run_20261012T041944Z__primal-dual__minmax__eil51-f6e4afd67825-e956423838__r00__a6846d0f076a.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/primal-dual/eil51_minmax__run_20261012T041944Z__primal-dual__minmax__eil51-f6e4afd67825-e956423838__r00__a6846d0f076a.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/sa/eil51_minmax__run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/sa/eil51_minmax__run_20261012T041944Z__sa__minmax__eil51-f6e4afd67825-e956423838__r00__08ede09d88d7.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/shifting/eil51_minmax__run_20261012T041944Z__shifting__minmax__eil51-f6e4afd67825-e956423838__r00__f292b8681710.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmax/shifting/eil51_minmax__run_20261012T041944Z__shifting__minmax__eil51-f6e4afd67825-e956423838__r00__f292b8681710.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/branch-and-bound/eil51_minmaxsum__run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/branch-and-bound/eil51_minmaxsum__run_20261012T041944Z__branch-and-bound__minmaxsum__eil51-f6e4afd67825-e956423838__r00__16866b92163b.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/genetic/eil51_minmaxsum__run_20261012T041944Z__genetic__minmaxsum__eil51-f6e4afd67825-e956423838__r00__af3b4f29bfd4.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/genetic/eil51_minmaxsum__run_20261012T041944Z__genetic__minmaxsum__eil51-f6e4afd67825-e956423838__r00__af3b4f29bfd4.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/greedy/eil51_minmaxsum__run_20261012T041944Z__greedy__minmaxsum__eil51-f6e4afd67825-e956423838__r00__438b91628e37.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/greedy/eil51_minmaxsum__run_20261012T041944Z__greedy__minmaxsum__eil51-f6e4afd67825-e956423838__r00__438b91628e37.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/local-search/eil51_minmaxsum__run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/local-search/eil51_minmaxsum__run_20261012T041945Z__local-search__minmaxsum__eil51-f6e4afd67825-e956423838__r00__c3b74f46da80.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/lp-rounding/eil51_minmaxsum__run_20261012T041945Z__lp-rounding__minmaxsum__eil51-f6e4afd67825-e956423838__r00__19b8db8c0dbc.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/lp-rounding/eil51_minmaxsum__run_20261012T041945Z__lp-rounding__minmaxsum__eil51-f6e4afd67825-e956423838__r00__19b8db8c0dbc.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/nn/eil51_minmaxsum__run_20261012T041945Z__nn__minmaxsum__eil51-f6e4afd67825-e956423838__r00__f7f609f5bf10.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/nn/eil51_minmaxsum__run_20261012T041945Z__nn__minmaxsum__eil51-f6e4afd67825-e956423838__r00__f7f609f5bf10.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/primal-dual/eil51_minmaxsum__run_20261012T041945Z__primal-dual__minmaxsum__eil51-f6e4afd67825-e956423838__r00__7fc06b5400c2.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/primal-dual/eil51_minmaxsum__run_20261012T041945Z__primal-dual__minmaxsum__eil51-f6e4afd67825-e956423838__r00__7fc06b5400c2.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/sa/eil51_minmaxsum__run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/sa/eil51_minmaxsum__run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/shifting/eil51_minmaxsum__run_20261012T041945Z__shifting__minmaxsum__eil51-f6e4afd67825-e956423838__r00__ccf707b3d17e.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minmaxsum/shifting/eil51_minmaxsum__run_20261012T041945Z__shifting__minmaxsum__eil51-f6e4afd67825-e956423838__r00__ccf707b3d17e.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/branch-and-bound/eil51_minsum__run_20261012T041946Z__branch-and-bound__minsum__eil51-f6e4afd67825-e956423838__r00__c8b2cd74afa6.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/branch-and-bound/eil51_minsum__run_20261012T041946Z__branch-and-bound__minsum__eil51-f6e4afd67825-e956423838__r00__c8b2cd74afa6.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/genetic/eil51_minsum__run_20261012T041946Z__genetic__minsum__eil51-f6e4afd67825-e956423838__r00__85bc48d6e3aa.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/genetic/eil51_minsum__run_20261012T041946Z__genetic__minsum__eil51-f6e4afd67825-e956423838__r00__85bc48d6e3aa.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/greedy/eil51_minsum__run_20261012T041946Z__greedy__minsum__eil51-f6e4afd67825-e956423838__r00__6e24affd6afd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/greedy/eil51_minsum__run_20261012T041946Z__greedy__minsum__eil51-f6e4afd67825-e956423838__r00__6e24affd6afd.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/local-search/eil51_minsum__run_20261012T041946Z__local-search__minsum__eil51-f6e4afd67825-e956423838__r00__2c5841c0e9e2.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/local-search/eil51_minsum__run_20261012T041946Z__local-search__minsum__eil51-f6e4afd67825-e956423838__r00__2c5841c0e9e2.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/lp-rounding/eil51_minsum__run_20261012T041946Z__lp-rounding__minsum__eil51-f6e4afd67825-e956423838__r00__a558ce448f41.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/lp-rounding/eil51_minsum__run_20261012T041946Z__lp-rounding__minsum__eil51-f6e4afd67825-e956423838__r00__a558ce448f41.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/nn/eil51_minsum__run_20261012T041946Z__nn__minsum__eil51-f6e4afd67825-e956423838__r00__bdb020807cdc.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/nn/eil51_minsum__run_20261012T041946Z__nn__minsum__eil51-f6e4afd67825-e956423838__r00__bdb020807cdc.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/primal-dual/eil51_minsum__run_20261012T041946Z__primal-dual__minsum__eil51-f6e4afd67825-e956423838__r00__5e6efb5c82fd.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/primal-dual/eil51_minsum__run_20261012T041946Z__primal-dual__minsum__eil51-f6e4afd67825-e956423838__r00__5e6efb5c82fd.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/sa/eil51_minsum__run_20261012T041946Z__sa__minsum__eil51-f6e4afd67825-e956423838__r00__920734d74d7d.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/sa/eil51_minsum__run_20261012T041946Z__sa__minsum__eil51-f6e4afd67825-e956423838__r00__920734d74d7d.gif.metadata.json`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/shifting/eil51_minsum__run_20261012T041946Z__shifting__minsum__eil51-f6e4afd67825-e956423838__r00__c664bc88073a.gif`
+- `animations/eil51-f6e4afd67825-e956423838/minsum/shifting/eil51_minsum__run_20261012T041946Z__shifting__minsum__eil51-f6e4afd67825-e956423838__r00__c664bc88073a.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/genetic/eil76_minmax__run_20261012T041947Z__genetic__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f9336b4b9713.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/genetic/eil76_minmax__run_20261012T041947Z__genetic__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f9336b4b9713.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/greedy/eil76_minmax__run_20261012T041947Z__greedy__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__04fde6254882.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/greedy/eil76_minmax__run_20261012T041947Z__greedy__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__04fde6254882.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/local-search/eil76_minmax__run_20261012T041948Z__local-search__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__9d26823af7f3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/local-search/eil76_minmax__run_20261012T041948Z__local-search__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__9d26823af7f3.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/lp-rounding/eil76_minmax__run_20261012T041948Z__lp-rounding__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f8d80c838806.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/lp-rounding/eil76_minmax__run_20261012T041948Z__lp-rounding__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__f8d80c838806.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/nn/eil76_minmax__run_20261012T041948Z__nn__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__61d237e7b9d3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/nn/eil76_minmax__run_20261012T041948Z__nn__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__61d237e7b9d3.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/primal-dual/eil76_minmax__run_20261012T041948Z__primal-dual__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__73535d51649c.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/primal-dual/eil76_minmax__run_20261012T041948Z__primal-dual__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__73535d51649c.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/sa/eil76_minmax__run_20261012T041949Z__sa__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__55e3fc6653d8.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/sa/eil76_minmax__run_20261012T041949Z__sa__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__55e3fc6653d8.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/shifting/eil76_minmax__run_20261012T041949Z__shifting__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__e0f549a2dc1e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmax/shifting/eil76_minmax__run_20261012T041949Z__shifting__minmax__eil76-e404104dd7bb-8eb626a3b8__r00__e0f549a2dc1e.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/genetic/eil76_minmaxsum__run_20261012T041952Z__genetic__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__978d9e51c73b.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/genetic/eil76_minmaxsum__run_20261012T041952Z__genetic__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__978d9e51c73b.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/greedy/eil76_minmaxsum__run_20261012T041953Z__greedy__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__7737a1b88b8a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/greedy/eil76_minmaxsum__run_20261012T041953Z__greedy__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__7737a1b88b8a.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/local-search/eil76_minmaxsum__run_20261012T041954Z__local-search__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__62cbcc99580f.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/local-search/eil76_minmaxsum__run_20261012T041954Z__local-search__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__62cbcc99580f.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/lp-rounding/eil76_minmaxsum__run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/lp-rounding/eil76_minmaxsum__run_20261012T041954Z__lp-rounding__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__43102e8de555.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/nn/eil76_minmaxsum__run_20261012T041955Z__nn__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__04a96121b05a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/nn/eil76_minmaxsum__run_20261012T041955Z__nn__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__04a96121b05a.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/primal-dual/eil76_minmaxsum__run_20261012T041955Z__primal-dual__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__23fcecedfe31.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/primal-dual/eil76_minmaxsum__run_20261012T041955Z__primal-dual__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__23fcecedfe31.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/sa/eil76_minmaxsum__run_20261012T041955Z__sa__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__b2a494ffa7d2.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/sa/eil76_minmaxsum__run_20261012T041955Z__sa__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__b2a494ffa7d2.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/shifting/eil76_minmaxsum__run_20261012T041956Z__shifting__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__a5781109d6d3.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minmaxsum/shifting/eil76_minmaxsum__run_20261012T041956Z__shifting__minmaxsum__eil76-e404104dd7bb-8eb626a3b8__r00__a5781109d6d3.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/branch-and-bound/eil76_minsum__run_20261012T042851Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbe1a1ffe88e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/branch-and-bound/eil76_minsum__run_20261012T042851Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbe1a1ffe88e.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/genetic/eil76_minsum__run_20261012T041959Z__genetic__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__38ae8f20a9ee.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/genetic/eil76_minsum__run_20261012T041959Z__genetic__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__38ae8f20a9ee.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/greedy/eil76_minsum__run_20261012T042000Z__greedy__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__d0bfeb40bae2.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/greedy/eil76_minsum__run_20261012T042000Z__greedy__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__d0bfeb40bae2.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/local-search/eil76_minsum__run_20261012T042000Z__local-search__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__894d53f3f42e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/local-search/eil76_minsum__run_20261012T042000Z__local-search__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__894d53f3f42e.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/lp-rounding/eil76_minsum__run_20261012T042001Z__lp-rounding__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__ec8ef714fe8e.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/lp-rounding/eil76_minsum__run_20261012T042001Z__lp-rounding__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__ec8ef714fe8e.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/nn/eil76_minsum__run_20261012T042001Z__nn__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__834e12b6094d.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/nn/eil76_minsum__run_20261012T042001Z__nn__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__834e12b6094d.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/primal-dual/eil76_minsum__run_20261012T042001Z__primal-dual__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbb761136a1b.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/primal-dual/eil76_minsum__run_20261012T042001Z__primal-dual__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__bbb761136a1b.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/sa/eil76_minsum__run_20261012T042001Z__sa__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__00d4f5197b7a.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/sa/eil76_minsum__run_20261012T042001Z__sa__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__00d4f5197b7a.gif.metadata.json`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/shifting/eil76_minsum__run_20261012T042002Z__shifting__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__711d59d98b93.gif`
+- `animations/eil76-e404104dd7bb-8eb626a3b8/minsum/shifting/eil76_minsum__run_20261012T042002Z__shifting__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__711d59d98b93.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/branch-and-bound/euro-night-0000030_minmax__run_20261012T042002Z__branch-and-bound__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__c4d033ab6bec.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/branch-and-bound/euro-night-0000030_minmax__run_20261012T042002Z__branch-and-bound__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__c4d033ab6bec.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/brute-force/euro-night-0000030_minmax__run_20261012T042002Z__brute-force__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__83e9acf750c6.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/brute-force/euro-night-0000030_minmax__run_20261012T042002Z__brute-force__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__83e9acf750c6.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/genetic/euro-night-0000030_minmax__run_20261012T042002Z__genetic__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__6b905b128889.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/genetic/euro-night-0000030_minmax__run_20261012T042002Z__genetic__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__6b905b128889.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/greedy/euro-night-0000030_minmax__run_20261012T042002Z__greedy__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__d313fad51bc7.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/greedy/euro-night-0000030_minmax__run_20261012T042002Z__greedy__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__d313fad51bc7.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/local-search/euro-night-0000030_minmax__run_20261012T042003Z__local-search__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__dce98987c6d5.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/local-search/euro-night-0000030_minmax__run_20261012T042003Z__local-search__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__dce98987c6d5.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/lp-rounding/euro-night-0000030_minmax__run_20261012T042003Z__lp-rounding__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0795c8ba2b33.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/lp-rounding/euro-night-0000030_minmax__run_20261012T042003Z__lp-rounding__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0795c8ba2b33.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/nn/euro-night-0000030_minmax__run_20261012T042003Z__nn__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__f18489cd0412.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/nn/euro-night-0000030_minmax__run_20261012T042003Z__nn__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__f18489cd0412.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/primal-dual/euro-night-0000030_minmax__run_20261012T042003Z__primal-dual__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0d6d64f2cf7e.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/primal-dual/euro-night-0000030_minmax__run_20261012T042003Z__primal-dual__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__0d6d64f2cf7e.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/sa/euro-night-0000030_minmax__run_20261012T042003Z__sa__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__9020cd7ea813.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/sa/euro-night-0000030_minmax__run_20261012T042003Z__sa__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__9020cd7ea813.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/shifting/euro-night-0000030_minmax__run_20261012T042003Z__shifting__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__915f9cdd9066.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmax/shifting/euro-night-0000030_minmax__run_20261012T042003Z__shifting__minmax__euro-night-0000030-e7069adc74e0-164a85__r00__915f9cdd9066.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/branch-and-bound/euro-night-0000030_minmaxsum__run_20261012T042003Z__branch-and-bound__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bb1d82cf8191.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/branch-and-bound/euro-night-0000030_minmaxsum__run_20261012T042003Z__branch-and-bound__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bb1d82cf8191.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/brute-force/euro-night-0000030_minmaxsum__run_20261012T042003Z__brute-force__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__113739fade6d.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/brute-force/euro-night-0000030_minmaxsum__run_20261012T042003Z__brute-force__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__113739fade6d.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/genetic/euro-night-0000030_minmaxsum__run_20261012T042003Z__genetic__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__3fdc975e7fe9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/genetic/euro-night-0000030_minmaxsum__run_20261012T042003Z__genetic__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__3fdc975e7fe9.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/greedy/euro-night-0000030_minmaxsum__run_20261012T042003Z__greedy__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__249211093f6c.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/greedy/euro-night-0000030_minmaxsum__run_20261012T042003Z__greedy__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__249211093f6c.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/local-search/euro-night-0000030_minmaxsum__run_20261012T042003Z__local-search__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__5a727af115bb.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/local-search/euro-night-0000030_minmaxsum__run_20261012T042003Z__local-search__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__5a727af115bb.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/lp-rounding/euro-night-0000030_minmaxsum__run_20261012T042003Z__lp-rounding__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bd80c0117e53.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/lp-rounding/euro-night-0000030_minmaxsum__run_20261012T042003Z__lp-rounding__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__bd80c0117e53.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/nn/euro-night-0000030_minmaxsum__run_20261012T042003Z__nn__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__87cef848c06b.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/nn/euro-night-0000030_minmaxsum__run_20261012T042003Z__nn__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__87cef848c06b.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/primal-dual/euro-night-0000030_minmaxsum__run_20261012T042003Z__primal-dual__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__203e8e4d4a20.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/primal-dual/euro-night-0000030_minmaxsum__run_20261012T042003Z__primal-dual__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__203e8e4d4a20.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/sa/euro-night-0000030_minmaxsum__run_20261012T042003Z__sa__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__d255ea5b99c9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/sa/euro-night-0000030_minmaxsum__run_20261012T042003Z__sa__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__d255ea5b99c9.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/shifting/euro-night-0000030_minmaxsum__run_20261012T042003Z__shifting__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__28d255102685.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minmaxsum/shifting/euro-night-0000030_minmaxsum__run_20261012T042003Z__shifting__minmaxsum__euro-night-0000030-e7069adc74e0-164a85__r00__28d255102685.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/branch-and-bound/euro-night-0000030_minsum__run_20261012T042003Z__branch-and-bound__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__07f760a844b9.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/branch-and-bound/euro-night-0000030_minsum__run_20261012T042003Z__branch-and-bound__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__07f760a844b9.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/brute-force/euro-night-0000030_minsum__run_20261012T042003Z__brute-force__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__c8fd03112b9f.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/brute-force/euro-night-0000030_minsum__run_20261012T042003Z__brute-force__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__c8fd03112b9f.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/genetic/euro-night-0000030_minsum__run_20261012T042003Z__genetic__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__930f64ddab65.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/genetic/euro-night-0000030_minsum__run_20261012T042003Z__genetic__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__930f64ddab65.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/greedy/euro-night-0000030_minsum__run_20261012T042003Z__greedy__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__146ec8464823.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/greedy/euro-night-0000030_minsum__run_20261012T042003Z__greedy__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__146ec8464823.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/local-search/euro-night-0000030_minsum__run_20261012T042003Z__local-search__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__8ee1703781bb.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/local-search/euro-night-0000030_minsum__run_20261012T042003Z__local-search__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__8ee1703781bb.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/lp-rounding/euro-night-0000030_minsum__run_20261012T042004Z__lp-rounding__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__d287be06043c.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/lp-rounding/euro-night-0000030_minsum__run_20261012T042004Z__lp-rounding__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__d287be06043c.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/nn/euro-night-0000030_minsum__run_20261012T042004Z__nn__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__4fb1a156e6bc.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/nn/euro-night-0000030_minsum__run_20261012T042004Z__nn__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__4fb1a156e6bc.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/primal-dual/euro-night-0000030_minsum__run_20261012T042004Z__primal-dual__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__0064c7e709cc.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/primal-dual/euro-night-0000030_minsum__run_20261012T042004Z__primal-dual__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__0064c7e709cc.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/sa/euro-night-0000030_minsum__run_20261012T042004Z__sa__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__164f179b5e88.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/sa/euro-night-0000030_minsum__run_20261012T042004Z__sa__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__164f179b5e88.gif.metadata.json`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/shifting/euro-night-0000030_minsum__run_20261012T042004Z__shifting__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__fb66fbd4d903.gif`
+- `animations/euro-night-0000030-e7069adc74e0-164a859873/minsum/shifting/euro-night-0000030_minsum__run_20261012T042004Z__shifting__minsum__euro-night-0000030-e7069adc74e0-164a85__r00__fb66fbd4d903.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/branch-and-bound/gr96_minmax__run_20261012T042855Z__branch-and-bound__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__9f10dfe77271.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/branch-and-bound/gr96_minmax__run_20261012T042855Z__branch-and-bound__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__9f10dfe77271.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/genetic/gr96_minmax__run_20261012T042004Z__genetic__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__2f927ed61151.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/genetic/gr96_minmax__run_20261012T042004Z__genetic__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__2f927ed61151.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/greedy/gr96_minmax__run_20261012T042004Z__greedy__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__18d5449ae3c4.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/greedy/gr96_minmax__run_20261012T042004Z__greedy__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__18d5449ae3c4.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/local-search/gr96_minmax__run_20261012T042005Z__local-search__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__4bba16b3367b.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/local-search/gr96_minmax__run_20261012T042005Z__local-search__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__4bba16b3367b.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/lp-rounding/gr96_minmax__run_20261012T042005Z__lp-rounding__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__1dbd9e838c2e.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/lp-rounding/gr96_minmax__run_20261012T042005Z__lp-rounding__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__1dbd9e838c2e.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/nn/gr96_minmax__run_20261012T042006Z__nn__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__216b3589d2eb.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/nn/gr96_minmax__run_20261012T042006Z__nn__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__216b3589d2eb.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/primal-dual/gr96_minmax__run_20261012T042006Z__primal-dual__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__e579c80f51ab.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/primal-dual/gr96_minmax__run_20261012T042006Z__primal-dual__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__e579c80f51ab.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/sa/gr96_minmax__run_20261012T042006Z__sa__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f3fcd5afcd3f.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/sa/gr96_minmax__run_20261012T042006Z__sa__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f3fcd5afcd3f.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/shifting/gr96_minmax__run_20261012T042006Z__shifting__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f250b5f5d431.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmax/shifting/gr96_minmax__run_20261012T042006Z__shifting__minmax__gr96-a23a7ba30c4c-e195dfa06d__r00__f250b5f5d431.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/branch-and-bound/gr96_minmaxsum__run_20261012T042857Z__branch-and-bound__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__661be34621bf.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/branch-and-bound/gr96_minmaxsum__run_20261012T042857Z__branch-and-bound__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__661be34621bf.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/genetic/gr96_minmaxsum__run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/genetic/gr96_minmaxsum__run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/greedy/gr96_minmaxsum__run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/greedy/gr96_minmaxsum__run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/local-search/gr96_minmaxsum__run_20261012T042009Z__local-search__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ac8c67bb06b2.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/local-search/gr96_minmaxsum__run_20261012T042009Z__local-search__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ac8c67bb06b2.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/lp-rounding/gr96_minmaxsum__run_20261012T042010Z__lp-rounding__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__c0e5ad1a75be.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/lp-rounding/gr96_minmaxsum__run_20261012T042010Z__lp-rounding__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__c0e5ad1a75be.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/nn/gr96_minmaxsum__run_20261012T042011Z__nn__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__be7f4c36cfea.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/nn/gr96_minmaxsum__run_20261012T042011Z__nn__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__be7f4c36cfea.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/primal-dual/gr96_minmaxsum__run_20261012T042012Z__primal-dual__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ad8c4a597492.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/primal-dual/gr96_minmaxsum__run_20261012T042012Z__primal-dual__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__ad8c4a597492.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/sa/gr96_minmaxsum__run_20261012T042012Z__sa__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__faf923656be9.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/sa/gr96_minmaxsum__run_20261012T042012Z__sa__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__faf923656be9.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/shifting/gr96_minmaxsum__run_20261012T042013Z__shifting__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__970e2bcb6d92.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minmaxsum/shifting/gr96_minmaxsum__run_20261012T042013Z__shifting__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__970e2bcb6d92.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/branch-and-bound/gr96_minsum__run_20261012T042858Z__branch-and-bound__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9430de6bc32e.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/branch-and-bound/gr96_minsum__run_20261012T042858Z__branch-and-bound__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9430de6bc32e.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/genetic/gr96_minsum__run_20261012T042014Z__genetic__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__7ebcc93a4c99.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/genetic/gr96_minsum__run_20261012T042014Z__genetic__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__7ebcc93a4c99.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/greedy/gr96_minsum__run_20261012T042015Z__greedy__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__171089f1ef80.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/greedy/gr96_minsum__run_20261012T042015Z__greedy__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__171089f1ef80.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/local-search/gr96_minsum__run_20261012T042015Z__local-search__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__380110d85e2f.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/local-search/gr96_minsum__run_20261012T042015Z__local-search__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__380110d85e2f.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/lp-rounding/gr96_minsum__run_20261012T042016Z__lp-rounding__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__6d6432877702.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/lp-rounding/gr96_minsum__run_20261012T042016Z__lp-rounding__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__6d6432877702.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/nn/gr96_minsum__run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/nn/gr96_minsum__run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/primal-dual/gr96_minsum__run_20261012T042016Z__primal-dual__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__34246bc97509.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/primal-dual/gr96_minsum__run_20261012T042016Z__primal-dual__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__34246bc97509.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/sa/gr96_minsum__run_20261012T042017Z__sa__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__5fa62e870b0a.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/sa/gr96_minsum__run_20261012T042017Z__sa__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__5fa62e870b0a.gif.metadata.json`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/shifting/gr96_minsum__run_20261012T042017Z__shifting__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9d5fe72ed86b.gif`
+- `animations/gr96-a23a7ba30c4c-e195dfa06d/minsum/shifting/gr96_minsum__run_20261012T042017Z__shifting__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__9d5fe72ed86b.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/greedy/kroD100_minmax__run_20261012T042018Z__greedy__minmax__kroD100-100b54b48d61-5062f763b8__r00__b31d241eba68.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/greedy/kroD100_minmax__run_20261012T042018Z__greedy__minmax__kroD100-100b54b48d61-5062f763b8__r00__b31d241eba68.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/lp-rounding/kroD100_minmax__run_20261012T042019Z__lp-rounding__minmax__kroD100-100b54b48d61-5062f763b8__r00__91fa6af024ac.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/lp-rounding/kroD100_minmax__run_20261012T042019Z__lp-rounding__minmax__kroD100-100b54b48d61-5062f763b8__r00__91fa6af024ac.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/shifting/kroD100_minmax__run_20261012T042020Z__shifting__minmax__kroD100-100b54b48d61-5062f763b8__r00__b240d95a223e.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmax/shifting/kroD100_minmax__run_20261012T042020Z__shifting__minmax__kroD100-100b54b48d61-5062f763b8__r00__b240d95a223e.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/genetic/kroD100_minmaxsum__run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/genetic/kroD100_minmaxsum__run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/greedy/kroD100_minmaxsum__run_20261012T042022Z__greedy__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__ba17948acb2d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/greedy/kroD100_minmaxsum__run_20261012T042022Z__greedy__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__ba17948acb2d.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/local-search/kroD100_minmaxsum__run_20261012T042023Z__local-search__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__b14e618944c4.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/local-search/kroD100_minmaxsum__run_20261012T042023Z__local-search__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__b14e618944c4.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/lp-rounding/kroD100_minmaxsum__run_20261012T042024Z__lp-rounding__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__dd79fa332295.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/lp-rounding/kroD100_minmaxsum__run_20261012T042024Z__lp-rounding__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__dd79fa332295.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/nn/kroD100_minmaxsum__run_20261012T042024Z__nn__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__0895d8572d9b.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/nn/kroD100_minmaxsum__run_20261012T042024Z__nn__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__0895d8572d9b.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/sa/kroD100_minmaxsum__run_20261012T042025Z__sa__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f722d1e4128c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/sa/kroD100_minmaxsum__run_20261012T042025Z__sa__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f722d1e4128c.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/shifting/kroD100_minmaxsum__run_20261012T042025Z__shifting__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f733370d9392.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minmaxsum/shifting/kroD100_minmaxsum__run_20261012T042025Z__shifting__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__f733370d9392.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/branch-and-bound/kroD100_minsum__run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/branch-and-bound/kroD100_minsum__run_20261012T042903Z__branch-and-bound__minsum__kroD100-100b54b48d61-5062f763b8__r00__19dd4e16dc5d.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/genetic/kroD100_minsum__run_20261012T042027Z__genetic__minsum__kroD100-100b54b48d61-5062f763b8__r00__f73b373d8706.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/genetic/kroD100_minsum__run_20261012T042027Z__genetic__minsum__kroD100-100b54b48d61-5062f763b8__r00__f73b373d8706.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/greedy/kroD100_minsum__run_20261012T042028Z__greedy__minsum__kroD100-100b54b48d61-5062f763b8__r00__049a2f577600.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/greedy/kroD100_minsum__run_20261012T042028Z__greedy__minsum__kroD100-100b54b48d61-5062f763b8__r00__049a2f577600.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/local-search/kroD100_minsum__run_20261012T042028Z__local-search__minsum__kroD100-100b54b48d61-5062f763b8__r00__03f5bfa927e1.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/local-search/kroD100_minsum__run_20261012T042028Z__local-search__minsum__kroD100-100b54b48d61-5062f763b8__r00__03f5bfa927e1.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/lp-rounding/kroD100_minsum__run_20261012T042028Z__lp-rounding__minsum__kroD100-100b54b48d61-5062f763b8__r00__a82f1b0d1573.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/lp-rounding/kroD100_minsum__run_20261012T042028Z__lp-rounding__minsum__kroD100-100b54b48d61-5062f763b8__r00__a82f1b0d1573.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/nn/kroD100_minsum__run_20261012T042029Z__nn__minsum__kroD100-100b54b48d61-5062f763b8__r00__f77e88657825.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/nn/kroD100_minsum__run_20261012T042029Z__nn__minsum__kroD100-100b54b48d61-5062f763b8__r00__f77e88657825.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/primal-dual/kroD100_minsum__run_20261012T042029Z__primal-dual__minsum__kroD100-100b54b48d61-5062f763b8__r00__336d399f4a6d.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/primal-dual/kroD100_minsum__run_20261012T042029Z__primal-dual__minsum__kroD100-100b54b48d61-5062f763b8__r00__336d399f4a6d.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/sa/kroD100_minsum__run_20261012T042030Z__sa__minsum__kroD100-100b54b48d61-5062f763b8__r00__a84784f7216c.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/sa/kroD100_minsum__run_20261012T042030Z__sa__minsum__kroD100-100b54b48d61-5062f763b8__r00__a84784f7216c.gif.metadata.json`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/shifting/kroD100_minsum__run_20261012T042030Z__shifting__minsum__kroD100-100b54b48d61-5062f763b8__r00__a98de6b893a5.gif`
+- `animations/kroD100-100b54b48d61-5062f763b8/minsum/shifting/kroD100_minsum__run_20261012T042030Z__shifting__minsum__kroD100-100b54b48d61-5062f763b8__r00__a98de6b893a5.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/genetic/kroE100_minmax__run_20261012T042031Z__genetic__minmax__kroE100-02a50775c87e-d8d2268527__r00__5aef121ce0d5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/genetic/kroE100_minmax__run_20261012T042031Z__genetic__minmax__kroE100-02a50775c87e-d8d2268527__r00__5aef121ce0d5.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/greedy/kroE100_minmax__run_20261012T042032Z__greedy__minmax__kroE100-02a50775c87e-d8d2268527__r00__3b15e4506a1b.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/greedy/kroE100_minmax__run_20261012T042032Z__greedy__minmax__kroE100-02a50775c87e-d8d2268527__r00__3b15e4506a1b.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/local-search/kroE100_minmax__run_20261012T042032Z__local-search__minmax__kroE100-02a50775c87e-d8d2268527__r00__a9755cd00dd2.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/local-search/kroE100_minmax__run_20261012T042032Z__local-search__minmax__kroE100-02a50775c87e-d8d2268527__r00__a9755cd00dd2.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/lp-rounding/kroE100_minmax__run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/lp-rounding/kroE100_minmax__run_20261012T042032Z__lp-rounding__minmax__kroE100-02a50775c87e-d8d2268527__r00__eb4a29caf35d.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/nn/kroE100_minmax__run_20261012T042033Z__nn__minmax__kroE100-02a50775c87e-d8d2268527__r00__be521ac7dca4.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/nn/kroE100_minmax__run_20261012T042033Z__nn__minmax__kroE100-02a50775c87e-d8d2268527__r00__be521ac7dca4.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/sa/kroE100_minmax__run_20261012T042033Z__sa__minmax__kroE100-02a50775c87e-d8d2268527__r00__65b5ecd43da7.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/sa/kroE100_minmax__run_20261012T042033Z__sa__minmax__kroE100-02a50775c87e-d8d2268527__r00__65b5ecd43da7.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/shifting/kroE100_minmax__run_20261012T042033Z__shifting__minmax__kroE100-02a50775c87e-d8d2268527__r00__fd2e22f8f357.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmax/shifting/kroE100_minmax__run_20261012T042033Z__shifting__minmax__kroE100-02a50775c87e-d8d2268527__r00__fd2e22f8f357.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/genetic/kroE100_minmaxsum__run_20261012T042034Z__genetic__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__03bfb8c72d1a.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/genetic/kroE100_minmaxsum__run_20261012T042034Z__genetic__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__03bfb8c72d1a.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/greedy/kroE100_minmaxsum__run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/greedy/kroE100_minmaxsum__run_20261012T042035Z__greedy__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__9b05f66917c5.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/local-search/kroE100_minmaxsum__run_20261012T042036Z__local-search__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__393b3ce16f1f.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/local-search/kroE100_minmaxsum__run_20261012T042036Z__local-search__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__393b3ce16f1f.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/lp-rounding/kroE100_minmaxsum__run_20261012T042037Z__lp-rounding__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__000e3e77697d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/lp-rounding/kroE100_minmaxsum__run_20261012T042037Z__lp-rounding__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__000e3e77697d.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/nn/kroE100_minmaxsum__run_20261012T042038Z__nn__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__1b9e0b8fb3b5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/nn/kroE100_minmaxsum__run_20261012T042038Z__nn__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__1b9e0b8fb3b5.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/sa/kroE100_minmaxsum__run_20261012T042039Z__sa__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__792916ec94e5.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/sa/kroE100_minmaxsum__run_20261012T042039Z__sa__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__792916ec94e5.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/shifting/kroE100_minmaxsum__run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minmaxsum/shifting/kroE100_minmaxsum__run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/branch-and-bound/kroE100_minsum__run_20261012T042908Z__branch-and-bound__minsum__kroE100-02a50775c87e-d8d2268527__r00__f7986cfc7383.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/branch-and-bound/kroE100_minsum__run_20261012T042908Z__branch-and-bound__minsum__kroE100-02a50775c87e-d8d2268527__r00__f7986cfc7383.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/genetic/kroE100_minsum__run_20261012T042041Z__genetic__minsum__kroE100-02a50775c87e-d8d2268527__r00__56bfeb84a0df.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/genetic/kroE100_minsum__run_20261012T042041Z__genetic__minsum__kroE100-02a50775c87e-d8d2268527__r00__56bfeb84a0df.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/greedy/kroE100_minsum__run_20261012T042042Z__greedy__minsum__kroE100-02a50775c87e-d8d2268527__r00__f73ec1f0f2aa.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/greedy/kroE100_minsum__run_20261012T042042Z__greedy__minsum__kroE100-02a50775c87e-d8d2268527__r00__f73ec1f0f2aa.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/local-search/kroE100_minsum__run_20261012T042042Z__local-search__minsum__kroE100-02a50775c87e-d8d2268527__r00__f64de820763c.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/local-search/kroE100_minsum__run_20261012T042042Z__local-search__minsum__kroE100-02a50775c87e-d8d2268527__r00__f64de820763c.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/lp-rounding/kroE100_minsum__run_20261012T042043Z__lp-rounding__minsum__kroE100-02a50775c87e-d8d2268527__r00__ab4d0eae54c8.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/lp-rounding/kroE100_minsum__run_20261012T042043Z__lp-rounding__minsum__kroE100-02a50775c87e-d8d2268527__r00__ab4d0eae54c8.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/nn/kroE100_minsum__run_20261012T042043Z__nn__minsum__kroE100-02a50775c87e-d8d2268527__r00__5fa3fa0d3e6d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/nn/kroE100_minsum__run_20261012T042043Z__nn__minsum__kroE100-02a50775c87e-d8d2268527__r00__5fa3fa0d3e6d.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/primal-dual/kroE100_minsum__run_20261012T042043Z__primal-dual__minsum__kroE100-02a50775c87e-d8d2268527__r00__3c66e594285b.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/primal-dual/kroE100_minsum__run_20261012T042043Z__primal-dual__minsum__kroE100-02a50775c87e-d8d2268527__r00__3c66e594285b.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/sa/kroE100_minsum__run_20261012T042044Z__sa__minsum__kroE100-02a50775c87e-d8d2268527__r00__efc23b17a416.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/sa/kroE100_minsum__run_20261012T042044Z__sa__minsum__kroE100-02a50775c87e-d8d2268527__r00__efc23b17a416.gif.metadata.json`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/shifting/kroE100_minsum__run_20261012T042044Z__shifting__minsum__kroE100-02a50775c87e-d8d2268527__r00__6c035c241d6d.gif`
+- `animations/kroE100-02a50775c87e-d8d2268527/minsum/shifting/kroE100_minsum__run_20261012T042044Z__shifting__minsum__kroE100-02a50775c87e-d8d2268527__r00__6c035c241d6d.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/branch-and-bound/london-0000030.instance_minmax__run_20261012T042044Z__branch-and-bound__minmax__london-0000030.instance-0928f729f528-3__r00__682c92c46558.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/branch-and-bound/london-0000030.instance_minmax__run_20261012T042044Z__branch-and-bound__minmax__london-0000030.instance-0928f729f528-3__r00__682c92c46558.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/brute-force/london-0000030.instance_minmax__run_20261012T042044Z__brute-force__minmax__london-0000030.instance-0928f729f528-3__r00__3bd008be0690.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/brute-force/london-0000030.instance_minmax__run_20261012T042044Z__brute-force__minmax__london-0000030.instance-0928f729f528-3__r00__3bd008be0690.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/genetic/london-0000030.instance_minmax__run_20261012T042044Z__genetic__minmax__london-0000030.instance-0928f729f528-3__r00__4eb7a03dccb8.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/genetic/london-0000030.instance_minmax__run_20261012T042044Z__genetic__minmax__london-0000030.instance-0928f729f528-3__r00__4eb7a03dccb8.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/greedy/london-0000030.instance_minmax__run_20261012T042044Z__greedy__minmax__london-0000030.instance-0928f729f528-3__r00__3142e7881a8f.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/greedy/london-0000030.instance_minmax__run_20261012T042044Z__greedy__minmax__london-0000030.instance-0928f729f528-3__r00__3142e7881a8f.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/local-search/london-0000030.instance_minmax__run_20261012T042044Z__local-search__minmax__london-0000030.instance-0928f729f528-3__r00__7fe17d30abcf.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/local-search/london-0000030.instance_minmax__run_20261012T042044Z__local-search__minmax__london-0000030.instance-0928f729f528-3__r00__7fe17d30abcf.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/lp-rounding/london-0000030.instance_minmax__run_20261012T042045Z__lp-rounding__minmax__london-0000030.instance-0928f729f528-3__r00__5c2840c69d0d.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/lp-rounding/london-0000030.instance_minmax__run_20261012T042045Z__lp-rounding__minmax__london-0000030.instance-0928f729f528-3__r00__5c2840c69d0d.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/nn/london-0000030.instance_minmax__run_20261012T042045Z__nn__minmax__london-0000030.instance-0928f729f528-3__r00__28d55d227372.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/nn/london-0000030.instance_minmax__run_20261012T042045Z__nn__minmax__london-0000030.instance-0928f729f528-3__r00__28d55d227372.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/primal-dual/london-0000030.instance_minmax__run_20261012T042045Z__primal-dual__minmax__london-0000030.instance-0928f729f528-3__r00__76142aade921.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/primal-dual/london-0000030.instance_minmax__run_20261012T042045Z__primal-dual__minmax__london-0000030.instance-0928f729f528-3__r00__76142aade921.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/sa/london-0000030.instance_minmax__run_20261012T042045Z__sa__minmax__london-0000030.instance-0928f729f528-3__r00__0a9a2ab37cc9.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/sa/london-0000030.instance_minmax__run_20261012T042045Z__sa__minmax__london-0000030.instance-0928f729f528-3__r00__0a9a2ab37cc9.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/shifting/london-0000030.instance_minmax__run_20261012T042045Z__shifting__minmax__london-0000030.instance-0928f729f528-3__r00__bb7dc0538276.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmax/shifting/london-0000030.instance_minmax__run_20261012T042045Z__shifting__minmax__london-0000030.instance-0928f729f528-3__r00__bb7dc0538276.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/branch-and-bound/london-0000030.instance_minmaxsum__run_20261012T042045Z__branch-and-bound__minmaxsum__london-0000030.instance-0928f729f528-3__r00__66d6a6fd7229.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/branch-and-bound/london-0000030.instance_minmaxsum__run_20261012T042045Z__branch-and-bound__minmaxsum__london-0000030.instance-0928f729f528-3__r00__66d6a6fd7229.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/brute-force/london-0000030.instance_minmaxsum__run_20261012T042045Z__brute-force__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d0e28c749f27.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/brute-force/london-0000030.instance_minmaxsum__run_20261012T042045Z__brute-force__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d0e28c749f27.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/genetic/london-0000030.instance_minmaxsum__run_20261012T042045Z__genetic__minmaxsum__london-0000030.instance-0928f729f528-3__r00__bcd8564b28ed.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/genetic/london-0000030.instance_minmaxsum__run_20261012T042045Z__genetic__minmaxsum__london-0000030.instance-0928f729f528-3__r00__bcd8564b28ed.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/greedy/london-0000030.instance_minmaxsum__run_20261012T042045Z__greedy__minmaxsum__london-0000030.instance-0928f729f528-3__r00__202ef659eff4.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/greedy/london-0000030.instance_minmaxsum__run_20261012T042045Z__greedy__minmaxsum__london-0000030.instance-0928f729f528-3__r00__202ef659eff4.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/local-search/london-0000030.instance_minmaxsum__run_20261012T042045Z__local-search__minmaxsum__london-0000030.instance-0928f729f528-3__r00__61989cc38dde.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/local-search/london-0000030.instance_minmaxsum__run_20261012T042045Z__local-search__minmaxsum__london-0000030.instance-0928f729f528-3__r00__61989cc38dde.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/lp-rounding/london-0000030.instance_minmaxsum__run_20261012T042045Z__lp-rounding__minmaxsum__london-0000030.instance-0928f729f528-3__r00__5546a2be152a.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/lp-rounding/london-0000030.instance_minmaxsum__run_20261012T042045Z__lp-rounding__minmaxsum__london-0000030.instance-0928f729f528-3__r00__5546a2be152a.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/nn/london-0000030.instance_minmaxsum__run_20261012T042045Z__nn__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d6d98840a758.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/nn/london-0000030.instance_minmaxsum__run_20261012T042045Z__nn__minmaxsum__london-0000030.instance-0928f729f528-3__r00__d6d98840a758.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/primal-dual/london-0000030.instance_minmaxsum__run_20261012T042045Z__primal-dual__minmaxsum__london-0000030.instance-0928f729f528-3__r00__06cf1e01eedd.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/primal-dual/london-0000030.instance_minmaxsum__run_20261012T042045Z__primal-dual__minmaxsum__london-0000030.instance-0928f729f528-3__r00__06cf1e01eedd.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/sa/london-0000030.instance_minmaxsum__run_20261012T042045Z__sa__minmaxsum__london-0000030.instance-0928f729f528-3__r00__4156ee300b60.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/sa/london-0000030.instance_minmaxsum__run_20261012T042045Z__sa__minmaxsum__london-0000030.instance-0928f729f528-3__r00__4156ee300b60.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/shifting/london-0000030.instance_minmaxsum__run_20261012T042045Z__shifting__minmaxsum__london-0000030.instance-0928f729f528-3__r00__cebc834adb5b.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minmaxsum/shifting/london-0000030.instance_minmaxsum__run_20261012T042045Z__shifting__minmaxsum__london-0000030.instance-0928f729f528-3__r00__cebc834adb5b.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/branch-and-bound/london-0000030.instance_minsum__run_20261012T042045Z__branch-and-bound__minsum__london-0000030.instance-0928f729f528-3__r00__06a79e3ced8e.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/branch-and-bound/london-0000030.instance_minsum__run_20261012T042045Z__branch-and-bound__minsum__london-0000030.instance-0928f729f528-3__r00__06a79e3ced8e.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/brute-force/london-0000030.instance_minsum__run_20261012T042045Z__brute-force__minsum__london-0000030.instance-0928f729f528-3__r00__f33c927b3354.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/brute-force/london-0000030.instance_minsum__run_20261012T042045Z__brute-force__minsum__london-0000030.instance-0928f729f528-3__r00__f33c927b3354.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/genetic/london-0000030.instance_minsum__run_20261012T042045Z__genetic__minsum__london-0000030.instance-0928f729f528-3__r00__f2276166fcc0.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/genetic/london-0000030.instance_minsum__run_20261012T042045Z__genetic__minsum__london-0000030.instance-0928f729f528-3__r00__f2276166fcc0.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/greedy/london-0000030.instance_minsum__run_20261012T042045Z__greedy__minsum__london-0000030.instance-0928f729f528-3__r00__da70606d31e9.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/greedy/london-0000030.instance_minsum__run_20261012T042045Z__greedy__minsum__london-0000030.instance-0928f729f528-3__r00__da70606d31e9.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/local-search/london-0000030.instance_minsum__run_20261012T042045Z__local-search__minsum__london-0000030.instance-0928f729f528-3__r00__e3a8dcbc1a6c.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/local-search/london-0000030.instance_minsum__run_20261012T042045Z__local-search__minsum__london-0000030.instance-0928f729f528-3__r00__e3a8dcbc1a6c.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/lp-rounding/london-0000030.instance_minsum__run_20261012T042046Z__lp-rounding__minsum__london-0000030.instance-0928f729f528-3__r00__5130ed389f91.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/lp-rounding/london-0000030.instance_minsum__run_20261012T042046Z__lp-rounding__minsum__london-0000030.instance-0928f729f528-3__r00__5130ed389f91.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/nn/london-0000030.instance_minsum__run_20261012T042046Z__nn__minsum__london-0000030.instance-0928f729f528-3__r00__19ec1338f44d.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/nn/london-0000030.instance_minsum__run_20261012T042046Z__nn__minsum__london-0000030.instance-0928f729f528-3__r00__19ec1338f44d.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/primal-dual/london-0000030.instance_minsum__run_20261012T042046Z__primal-dual__minsum__london-0000030.instance-0928f729f528-3__r00__de0589c5f712.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/primal-dual/london-0000030.instance_minsum__run_20261012T042046Z__primal-dual__minsum__london-0000030.instance-0928f729f528-3__r00__de0589c5f712.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/sa/london-0000030.instance_minsum__run_20261012T042046Z__sa__minsum__london-0000030.instance-0928f729f528-3__r00__02e5cd375255.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/sa/london-0000030.instance_minsum__run_20261012T042046Z__sa__minsum__london-0000030.instance-0928f729f528-3__r00__02e5cd375255.gif.metadata.json`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/shifting/london-0000030.instance_minsum__run_20261012T042046Z__shifting__minsum__london-0000030.instance-0928f729f528-3__r00__d766166cf227.gif`
+- `animations/london-0000030.instance-0928f729f528-3bd5c0ea09/minsum/shifting/london-0000030.instance_minsum__run_20261012T042046Z__shifting__minsum__london-0000030.instance-0928f729f528-3__r00__d766166cf227.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/genetic/pr76_minmax__run_20261012T042046Z__genetic__minmax__pr76-4001f85eab1a-dc636944a6__r00__6ed6d80bc5f7.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/genetic/pr76_minmax__run_20261012T042046Z__genetic__minmax__pr76-4001f85eab1a-dc636944a6__r00__6ed6d80bc5f7.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/local-search/pr76_minmax__run_20261012T042046Z__local-search__minmax__pr76-4001f85eab1a-dc636944a6__r00__9fbf0bef2c0e.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/local-search/pr76_minmax__run_20261012T042046Z__local-search__minmax__pr76-4001f85eab1a-dc636944a6__r00__9fbf0bef2c0e.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/lp-rounding/pr76_minmax__run_20261012T042047Z__lp-rounding__minmax__pr76-4001f85eab1a-dc636944a6__r00__bf55969c27f3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/lp-rounding/pr76_minmax__run_20261012T042047Z__lp-rounding__minmax__pr76-4001f85eab1a-dc636944a6__r00__bf55969c27f3.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/nn/pr76_minmax__run_20261012T042047Z__nn__minmax__pr76-4001f85eab1a-dc636944a6__r00__f0993f97dc70.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/nn/pr76_minmax__run_20261012T042047Z__nn__minmax__pr76-4001f85eab1a-dc636944a6__r00__f0993f97dc70.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/primal-dual/pr76_minmax__run_20261012T042047Z__primal-dual__minmax__pr76-4001f85eab1a-dc636944a6__r00__275640f2b9a9.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/primal-dual/pr76_minmax__run_20261012T042047Z__primal-dual__minmax__pr76-4001f85eab1a-dc636944a6__r00__275640f2b9a9.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/sa/pr76_minmax__run_20261012T042047Z__sa__minmax__pr76-4001f85eab1a-dc636944a6__r00__3ebeb501d9b3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmax/sa/pr76_minmax__run_20261012T042047Z__sa__minmax__pr76-4001f85eab1a-dc636944a6__r00__3ebeb501d9b3.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/genetic/pr76_minmaxsum__run_20261012T042048Z__genetic__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__739d66734b83.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/genetic/pr76_minmaxsum__run_20261012T042048Z__genetic__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__739d66734b83.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/greedy/pr76_minmaxsum__run_20261012T042049Z__greedy__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__b45a84504469.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/greedy/pr76_minmaxsum__run_20261012T042049Z__greedy__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__b45a84504469.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/local-search/pr76_minmaxsum__run_20261012T042049Z__local-search__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__64eb93db1488.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/local-search/pr76_minmaxsum__run_20261012T042049Z__local-search__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__64eb93db1488.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/lp-rounding/pr76_minmaxsum__run_20261012T042050Z__lp-rounding__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__44bc35a06dcd.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/lp-rounding/pr76_minmaxsum__run_20261012T042050Z__lp-rounding__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__44bc35a06dcd.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/nn/pr76_minmaxsum__run_20261012T042051Z__nn__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__41a41d78548f.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/nn/pr76_minmaxsum__run_20261012T042051Z__nn__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__41a41d78548f.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/primal-dual/pr76_minmaxsum__run_20261012T042051Z__primal-dual__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__9cb99d1dd14e.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/primal-dual/pr76_minmaxsum__run_20261012T042051Z__primal-dual__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__9cb99d1dd14e.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/sa/pr76_minmaxsum__run_20261012T042051Z__sa__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__4f5cc0096679.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/sa/pr76_minmaxsum__run_20261012T042051Z__sa__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__4f5cc0096679.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/shifting/pr76_minmaxsum__run_20261012T042052Z__shifting__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__92f12cf6087a.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minmaxsum/shifting/pr76_minmaxsum__run_20261012T042052Z__shifting__minmaxsum__pr76-4001f85eab1a-dc636944a6__r00__92f12cf6087a.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/branch-and-bound/pr76_minsum__run_20261012T042913Z__branch-and-bound__minsum__pr76-4001f85eab1a-dc636944a6__r00__e65a4c0e2a48.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/branch-and-bound/pr76_minsum__run_20261012T042913Z__branch-and-bound__minsum__pr76-4001f85eab1a-dc636944a6__r00__e65a4c0e2a48.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/genetic/pr76_minsum__run_20261012T042052Z__genetic__minsum__pr76-4001f85eab1a-dc636944a6__r00__db380aaa3421.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/genetic/pr76_minsum__run_20261012T042052Z__genetic__minsum__pr76-4001f85eab1a-dc636944a6__r00__db380aaa3421.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/greedy/pr76_minsum__run_20261012T042053Z__greedy__minsum__pr76-4001f85eab1a-dc636944a6__r00__c8dd06bf910a.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/greedy/pr76_minsum__run_20261012T042053Z__greedy__minsum__pr76-4001f85eab1a-dc636944a6__r00__c8dd06bf910a.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/local-search/pr76_minsum__run_20261012T042053Z__local-search__minsum__pr76-4001f85eab1a-dc636944a6__r00__95ea4335bdf3.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/local-search/pr76_minsum__run_20261012T042053Z__local-search__minsum__pr76-4001f85eab1a-dc636944a6__r00__95ea4335bdf3.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/lp-rounding/pr76_minsum__run_20261012T042054Z__lp-rounding__minsum__pr76-4001f85eab1a-dc636944a6__r00__bbaff0a53a9c.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/lp-rounding/pr76_minsum__run_20261012T042054Z__lp-rounding__minsum__pr76-4001f85eab1a-dc636944a6__r00__bbaff0a53a9c.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/nn/pr76_minsum__run_20261012T042054Z__nn__minsum__pr76-4001f85eab1a-dc636944a6__r00__47c2840382e9.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/nn/pr76_minsum__run_20261012T042054Z__nn__minsum__pr76-4001f85eab1a-dc636944a6__r00__47c2840382e9.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/primal-dual/pr76_minsum__run_20261012T042055Z__primal-dual__minsum__pr76-4001f85eab1a-dc636944a6__r00__383e337a4198.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/primal-dual/pr76_minsum__run_20261012T042055Z__primal-dual__minsum__pr76-4001f85eab1a-dc636944a6__r00__383e337a4198.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/sa/pr76_minsum__run_20261012T042055Z__sa__minsum__pr76-4001f85eab1a-dc636944a6__r00__276b22e9c643.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/sa/pr76_minsum__run_20261012T042055Z__sa__minsum__pr76-4001f85eab1a-dc636944a6__r00__276b22e9c643.gif.metadata.json`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/shifting/pr76_minsum__run_20261012T042055Z__shifting__minsum__pr76-4001f85eab1a-dc636944a6__r00__20432cd3f8cb.gif`
+- `animations/pr76-4001f85eab1a-dc636944a6/minsum/shifting/pr76_minsum__run_20261012T042055Z__shifting__minsum__pr76-4001f85eab1a-dc636944a6__r00__20432cd3f8cb.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/branch-and-bound/rat99_minmax__run_20261012T042915Z__branch-and-bound__minmax__rat99-a364923ee329-1be1f1f758__r00__8b1e245ad76c.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/branch-and-bound/rat99_minmax__run_20261012T042915Z__branch-and-bound__minmax__rat99-a364923ee329-1be1f1f758__r00__8b1e245ad76c.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/primal-dual/rat99_minmax__run_20261012T042057Z__primal-dual__minmax__rat99-a364923ee329-1be1f1f758__r00__b2582a426bef.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmax/primal-dual/rat99_minmax__run_20261012T042057Z__primal-dual__minmax__rat99-a364923ee329-1be1f1f758__r00__b2582a426bef.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/branch-and-bound/rat99_minmaxsum__run_20261012T042918Z__branch-and-bound__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a2f25a0becc5.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/branch-and-bound/rat99_minmaxsum__run_20261012T042918Z__branch-and-bound__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a2f25a0becc5.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/genetic/rat99_minmaxsum__run_20261012T042057Z__genetic__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a8a8fac1ebf9.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/genetic/rat99_minmaxsum__run_20261012T042057Z__genetic__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__a8a8fac1ebf9.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/greedy/rat99_minmaxsum__run_20261012T042058Z__greedy__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__b1fc3419a5c7.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/greedy/rat99_minmaxsum__run_20261012T042058Z__greedy__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__b1fc3419a5c7.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/local-search/rat99_minmaxsum__run_20261012T042100Z__local-search__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__13d92479556b.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/local-search/rat99_minmaxsum__run_20261012T042100Z__local-search__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__13d92479556b.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/nn/rat99_minmaxsum__run_20261012T042101Z__nn__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__821335ed2219.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/nn/rat99_minmaxsum__run_20261012T042101Z__nn__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__821335ed2219.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/primal-dual/rat99_minmaxsum__run_20261012T042101Z__primal-dual__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__7f3532e12947.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/primal-dual/rat99_minmaxsum__run_20261012T042101Z__primal-dual__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__7f3532e12947.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/sa/rat99_minmaxsum__run_20261012T042102Z__sa__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__bf8e3a7996dc.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minmaxsum/sa/rat99_minmaxsum__run_20261012T042102Z__sa__minmaxsum__rat99-a364923ee329-1be1f1f758__r00__bf8e3a7996dc.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/branch-and-bound/rat99_minsum__run_20261012T042920Z__branch-and-bound__minsum__rat99-a364923ee329-1be1f1f758__r00__66987dbb852e.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/branch-and-bound/rat99_minsum__run_20261012T042920Z__branch-and-bound__minsum__rat99-a364923ee329-1be1f1f758__r00__66987dbb852e.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/genetic/rat99_minsum__run_20261012T042103Z__genetic__minsum__rat99-a364923ee329-1be1f1f758__r00__3cb11cf95ac3.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/genetic/rat99_minsum__run_20261012T042103Z__genetic__minsum__rat99-a364923ee329-1be1f1f758__r00__3cb11cf95ac3.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/greedy/rat99_minsum__run_20261012T042104Z__greedy__minsum__rat99-a364923ee329-1be1f1f758__r00__192ba58fb814.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/greedy/rat99_minsum__run_20261012T042104Z__greedy__minsum__rat99-a364923ee329-1be1f1f758__r00__192ba58fb814.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/local-search/rat99_minsum__run_20261012T042105Z__local-search__minsum__rat99-a364923ee329-1be1f1f758__r00__93c640ecb273.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/local-search/rat99_minsum__run_20261012T042105Z__local-search__minsum__rat99-a364923ee329-1be1f1f758__r00__93c640ecb273.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/lp-rounding/rat99_minsum__run_20261012T042105Z__lp-rounding__minsum__rat99-a364923ee329-1be1f1f758__r00__67147e878078.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/lp-rounding/rat99_minsum__run_20261012T042105Z__lp-rounding__minsum__rat99-a364923ee329-1be1f1f758__r00__67147e878078.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/nn/rat99_minsum__run_20261012T042105Z__nn__minsum__rat99-a364923ee329-1be1f1f758__r00__83dae3bd475e.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/nn/rat99_minsum__run_20261012T042105Z__nn__minsum__rat99-a364923ee329-1be1f1f758__r00__83dae3bd475e.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/primal-dual/rat99_minsum__run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/primal-dual/rat99_minsum__run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/sa/rat99_minsum__run_20261012T042106Z__sa__minsum__rat99-a364923ee329-1be1f1f758__r00__c0770c25bb14.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/sa/rat99_minsum__run_20261012T042106Z__sa__minsum__rat99-a364923ee329-1be1f1f758__r00__c0770c25bb14.gif.metadata.json`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/shifting/rat99_minsum__run_20261012T042106Z__shifting__minsum__rat99-a364923ee329-1be1f1f758__r00__4d6e0ad22dda.gif`
+- `animations/rat99-a364923ee329-1be1f1f758/minsum/shifting/rat99_minsum__run_20261012T042106Z__shifting__minsum__rat99-a364923ee329-1be1f1f758__r00__4d6e0ad22dda.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/genetic/rd100_minmax__run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/genetic/rd100_minmax__run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/greedy/rd100_minmax__run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/greedy/rd100_minmax__run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/local-search/rd100_minmax__run_20261012T042108Z__local-search__minmax__rd100-9407ab41999f-b9917bc5f5__r00__09ba6ffc41db.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/local-search/rd100_minmax__run_20261012T042108Z__local-search__minmax__rd100-9407ab41999f-b9917bc5f5__r00__09ba6ffc41db.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/lp-rounding/rd100_minmax__run_20261012T042109Z__lp-rounding__minmax__rd100-9407ab41999f-b9917bc5f5__r00__e1f22b23670e.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/lp-rounding/rd100_minmax__run_20261012T042109Z__lp-rounding__minmax__rd100-9407ab41999f-b9917bc5f5__r00__e1f22b23670e.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/nn/rd100_minmax__run_20261012T042109Z__nn__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53bffbdc0343.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/nn/rd100_minmax__run_20261012T042109Z__nn__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53bffbdc0343.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/primal-dual/rd100_minmax__run_20261012T042110Z__primal-dual__minmax__rd100-9407ab41999f-b9917bc5f5__r00__874e550378b4.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/primal-dual/rd100_minmax__run_20261012T042110Z__primal-dual__minmax__rd100-9407ab41999f-b9917bc5f5__r00__874e550378b4.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/sa/rd100_minmax__run_20261012T042110Z__sa__minmax__rd100-9407ab41999f-b9917bc5f5__r00__3c51a7950bb2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/sa/rd100_minmax__run_20261012T042110Z__sa__minmax__rd100-9407ab41999f-b9917bc5f5__r00__3c51a7950bb2.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/shifting/rd100_minmax__run_20261012T042111Z__shifting__minmax__rd100-9407ab41999f-b9917bc5f5__r00__8904b91217f2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmax/shifting/rd100_minmax__run_20261012T042111Z__shifting__minmax__rd100-9407ab41999f-b9917bc5f5__r00__8904b91217f2.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/genetic/rd100_minmaxsum__run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/genetic/rd100_minmaxsum__run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/greedy/rd100_minmaxsum__run_20261012T042114Z__greedy__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__1b19e6267480.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/greedy/rd100_minmaxsum__run_20261012T042114Z__greedy__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__1b19e6267480.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/local-search/rd100_minmaxsum__run_20261012T042115Z__local-search__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__34e06adb7445.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/local-search/rd100_minmaxsum__run_20261012T042115Z__local-search__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__34e06adb7445.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/lp-rounding/rd100_minmaxsum__run_20261012T042116Z__lp-rounding__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__f82060b5d63d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/lp-rounding/rd100_minmaxsum__run_20261012T042116Z__lp-rounding__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__f82060b5d63d.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/nn/rd100_minmaxsum__run_20261012T042117Z__nn__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__fa3ad72db464.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/nn/rd100_minmaxsum__run_20261012T042117Z__nn__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__fa3ad72db464.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/primal-dual/rd100_minmaxsum__run_20261012T042119Z__primal-dual__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__55a180f1ac09.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/primal-dual/rd100_minmaxsum__run_20261012T042119Z__primal-dual__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__55a180f1ac09.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/sa/rd100_minmaxsum__run_20261012T042119Z__sa__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__b70e14350739.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/sa/rd100_minmaxsum__run_20261012T042119Z__sa__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__b70e14350739.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/shifting/rd100_minmaxsum__run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minmaxsum/shifting/rd100_minmaxsum__run_20261012T042119Z__shifting__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__df0f80ab49e4.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/branch-and-bound/rd100_minsum__run_20261012T042924Z__branch-and-bound__minsum__rd100-9407ab41999f-b9917bc5f5__r00__2b6215fba68f.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/branch-and-bound/rd100_minsum__run_20261012T042924Z__branch-and-bound__minsum__rd100-9407ab41999f-b9917bc5f5__r00__2b6215fba68f.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/genetic/rd100_minsum__run_20261012T042122Z__genetic__minsum__rd100-9407ab41999f-b9917bc5f5__r00__88837c06c0a1.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/genetic/rd100_minsum__run_20261012T042122Z__genetic__minsum__rd100-9407ab41999f-b9917bc5f5__r00__88837c06c0a1.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/greedy/rd100_minsum__run_20261012T042123Z__greedy__minsum__rd100-9407ab41999f-b9917bc5f5__r00__adb3963e4a2b.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/greedy/rd100_minsum__run_20261012T042123Z__greedy__minsum__rd100-9407ab41999f-b9917bc5f5__r00__adb3963e4a2b.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/local-search/rd100_minsum__run_20261012T042123Z__local-search__minsum__rd100-9407ab41999f-b9917bc5f5__r00__987524367dc2.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/local-search/rd100_minsum__run_20261012T042123Z__local-search__minsum__rd100-9407ab41999f-b9917bc5f5__r00__987524367dc2.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/lp-rounding/rd100_minsum__run_20261012T042124Z__lp-rounding__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9bb770934db9.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/lp-rounding/rd100_minsum__run_20261012T042124Z__lp-rounding__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9bb770934db9.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/nn/rd100_minsum__run_20261012T042124Z__nn__minsum__rd100-9407ab41999f-b9917bc5f5__r00__5d1412f50428.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/nn/rd100_minsum__run_20261012T042124Z__nn__minsum__rd100-9407ab41999f-b9917bc5f5__r00__5d1412f50428.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/primal-dual/rd100_minsum__run_20261012T042125Z__primal-dual__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9b581c20331c.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/primal-dual/rd100_minsum__run_20261012T042125Z__primal-dual__minsum__rd100-9407ab41999f-b9917bc5f5__r00__9b581c20331c.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/sa/rd100_minsum__run_20261012T042125Z__sa__minsum__rd100-9407ab41999f-b9917bc5f5__r00__e08fb440d06d.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/sa/rd100_minsum__run_20261012T042125Z__sa__minsum__rd100-9407ab41999f-b9917bc5f5__r00__e08fb440d06d.gif.metadata.json`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/shifting/rd100_minsum__run_20261012T042125Z__shifting__minsum__rd100-9407ab41999f-b9917bc5f5__r00__7e9874a34551.gif`
+- `animations/rd100-9407ab41999f-b9917bc5f5/minsum/shifting/rd100_minsum__run_20261012T042125Z__shifting__minsum__rd100-9407ab41999f-b9917bc5f5__r00__7e9874a34551.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f4a8a5958e70.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__branch-and-bound__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f4a8a5958e70.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/genetic/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__genetic__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f470589e8f33.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/genetic/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042126Z__genetic__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f470589e8f33.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/greedy/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__greedy__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__48671dabb677.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/greedy/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__greedy__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__48671dabb677.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/local-search/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__5cbecc0cc6eb.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/local-search/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__local-search__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__5cbecc0cc6eb.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__lp-rounding__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f89365304ce3.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__lp-rounding__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__f89365304ce3.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/nn/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__nn__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__82bc20c46678.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/nn/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__nn__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__82bc20c46678.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__9cf884e94539.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__primal-dual__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__9cf884e94539.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/sa/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__sa__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__95b24a0da5ef.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/sa/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__sa__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__95b24a0da5ef.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/shifting/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__shifting__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__6a9e42f7b845.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmax/shifting/sbgdb-20200507-fpg-poly_0000000030_minmax__run_20261012T042127Z__shifting__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__6a9e42f7b845.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__branch-and-bound__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__096da43c7228.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__branch-and-bound__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__096da43c7228.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__brute-force__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__963d8915b6fa.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__brute-force__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__963d8915b6fa.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__genetic__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a4ef4a301437.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__genetic__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a4ef4a301437.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__greedy__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76d6eb848fd0.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__greedy__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76d6eb848fd0.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__local-search__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__d7fddfdd1817.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__local-search__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__d7fddfdd1817.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__lp-rounding__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__50b100f13522.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__lp-rounding__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__50b100f13522.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/nn/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__nn__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6aff2c2f543d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/nn/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__nn__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6aff2c2f543d.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/sa/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__sa__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__8623f588bccc.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/sa/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__sa__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__8623f588bccc.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__shifting__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__7dd3737ae185.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minmaxsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__shifting__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__7dd3737ae185.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__branch-and-bound__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__adbfaee74290.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/branch-and-bound/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__branch-and-bound__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__adbfaee74290.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__brute-force__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__69ba38e27418.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/brute-force/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__brute-force__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__69ba38e27418.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__genetic__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__905e419e3496.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/genetic/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__genetic__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__905e419e3496.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__greedy__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6cde22060acb.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/greedy/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__greedy__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__6cde22060acb.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__local-search__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__b520b5b4badf.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/local-search/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__local-search__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__b520b5b4badf.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__lp-rounding__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__c9cbbfd7eb5d.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/lp-rounding/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__lp-rounding__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__c9cbbfd7eb5d.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/nn/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__nn__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__ac3e5638725b.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/nn/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__nn__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__ac3e5638725b.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__primal-dual__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a2c261f0de02.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/primal-dual/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__primal-dual__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__a2c261f0de02.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/sa/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__sa__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__940a1a391eed.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/sa/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__sa__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__940a1a391eed.gif.metadata.json`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__shifting__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76c3ad98b57f.gif`
+- `animations/sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c/minsum/shifting/sbgdb-20200507-fpg-poly_0000000030_minsum__run_20261012T042127Z__shifting__minsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__76c3ad98b57f.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/branch-and-bound/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042127Z__branch-and-bound__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__70c7be54f7a4.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/branch-and-bound/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042127Z__branch-and-bound__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__70c7be54f7a4.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/brute-force/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__brute-force__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a0cf11a139a.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/brute-force/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__brute-force__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a0cf11a139a.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/genetic/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__genetic__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__20f9c1822512.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/genetic/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__genetic__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__20f9c1822512.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/greedy/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__greedy__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3a1ca70398c1.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/greedy/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__greedy__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3a1ca70398c1.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/local-search/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__local-search__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8162fb9072d8.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/local-search/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__local-search__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8162fb9072d8.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/lp-rounding/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__lp-rounding__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__7e3e8abb5a31.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/lp-rounding/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__lp-rounding__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__7e3e8abb5a31.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/nn/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__nn__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c9e2e03f0ff6.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/nn/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__nn__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c9e2e03f0ff6.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/primal-dual/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__primal-dual__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d28bb8ee5a78.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/primal-dual/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__primal-dual__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d28bb8ee5a78.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/sa/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__sa__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8e0013d19d51.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/sa/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__sa__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__8e0013d19d51.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/shifting/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__shifting__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__e1510ee93e16.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmax/shifting/sbgdb-20200507-pntset-0000030_minmax__run_20261012T042128Z__shifting__minmax__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__e1510ee93e16.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__branch-and-bound__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__eb36998e1afe.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__branch-and-bound__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__eb36998e1afe.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/brute-force/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__brute-force__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c7f69494647f.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/brute-force/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__brute-force__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__c7f69494647f.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/genetic/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__genetic__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__a52caf14e892.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/genetic/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__genetic__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__a52caf14e892.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/greedy/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__greedy__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d903f155a12f.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/greedy/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__greedy__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d903f155a12f.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/local-search/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__local-search__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__14e002aeb816.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/local-search/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__local-search__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__14e002aeb816.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/lp-rounding/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__lp-rounding__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d95e9928eed4.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/lp-rounding/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__lp-rounding__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d95e9928eed4.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/nn/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__nn__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__b294132c3a59.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/nn/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__nn__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__b294132c3a59.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/primal-dual/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__primal-dual__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a49a5bdd800.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/primal-dual/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__primal-dual__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__1a49a5bdd800.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/sa/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__sa__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__462eb134595c.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/sa/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__sa__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__462eb134595c.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/shifting/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__shifting__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__85606052fc27.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minmaxsum/shifting/sbgdb-20200507-pntset-0000030_minmaxsum__run_20261012T042128Z__shifting__minmaxsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__85606052fc27.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__branch-and-bound__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__319ebbf06140.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/branch-and-bound/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__branch-and-bound__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__319ebbf06140.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/brute-force/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/brute-force/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/genetic/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__genetic__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__623d3564b076.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/genetic/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__genetic__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__623d3564b076.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/greedy/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__greedy__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__6f883dec42fe.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/greedy/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__greedy__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__6f883dec42fe.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/local-search/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__local-search__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d3fe871d325a.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/local-search/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__local-search__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__d3fe871d325a.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/lp-rounding/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__lp-rounding__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__fccfa1c5121c.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/lp-rounding/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__lp-rounding__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__fccfa1c5121c.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/nn/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__nn__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__ce5906898064.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/nn/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__nn__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__ce5906898064.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/primal-dual/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__primal-dual__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__32dbe63e1085.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/primal-dual/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__primal-dual__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__32dbe63e1085.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/sa/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__sa__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3c3222069fd3.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/sa/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__sa__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__3c3222069fd3.gif.metadata.json`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/shifting/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__shifting__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__bfec546ef8cd.gif`
+- `animations/sbgdb-20200507-pntset-0000030-ffc4aabe37f9-d00c0eac6b/minsum/shifting/sbgdb-20200507-pntset-0000030_minsum__run_20261012T042128Z__shifting__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__bfec546ef8cd.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/branch-and-bound/st70_minmax__run_20261012T042927Z__branch-and-bound__minmax__st70-fa79167d4566-93e4a763b9__r00__d97fb1f873c4.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/branch-and-bound/st70_minmax__run_20261012T042927Z__branch-and-bound__minmax__st70-fa79167d4566-93e4a763b9__r00__d97fb1f873c4.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/genetic/st70_minmax__run_20261012T042129Z__genetic__minmax__st70-fa79167d4566-93e4a763b9__r00__d10ddda7efc6.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/genetic/st70_minmax__run_20261012T042129Z__genetic__minmax__st70-fa79167d4566-93e4a763b9__r00__d10ddda7efc6.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/greedy/st70_minmax__run_20261012T042129Z__greedy__minmax__st70-fa79167d4566-93e4a763b9__r00__83f88b5fd18c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/greedy/st70_minmax__run_20261012T042129Z__greedy__minmax__st70-fa79167d4566-93e4a763b9__r00__83f88b5fd18c.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/local-search/st70_minmax__run_20261012T042129Z__local-search__minmax__st70-fa79167d4566-93e4a763b9__r00__afe9aa5b3fec.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/local-search/st70_minmax__run_20261012T042129Z__local-search__minmax__st70-fa79167d4566-93e4a763b9__r00__afe9aa5b3fec.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/lp-rounding/st70_minmax__run_20261012T042129Z__lp-rounding__minmax__st70-fa79167d4566-93e4a763b9__r00__9e959426a3b5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/lp-rounding/st70_minmax__run_20261012T042129Z__lp-rounding__minmax__st70-fa79167d4566-93e4a763b9__r00__9e959426a3b5.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/nn/st70_minmax__run_20261012T042130Z__nn__minmax__st70-fa79167d4566-93e4a763b9__r00__927b2c644a5a.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/nn/st70_minmax__run_20261012T042130Z__nn__minmax__st70-fa79167d4566-93e4a763b9__r00__927b2c644a5a.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/primal-dual/st70_minmax__run_20261012T042130Z__primal-dual__minmax__st70-fa79167d4566-93e4a763b9__r00__f672a03a8d1e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/primal-dual/st70_minmax__run_20261012T042130Z__primal-dual__minmax__st70-fa79167d4566-93e4a763b9__r00__f672a03a8d1e.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/sa/st70_minmax__run_20261012T042130Z__sa__minmax__st70-fa79167d4566-93e4a763b9__r00__59bc106c407c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/sa/st70_minmax__run_20261012T042130Z__sa__minmax__st70-fa79167d4566-93e4a763b9__r00__59bc106c407c.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/shifting/st70_minmax__run_20261012T042130Z__shifting__minmax__st70-fa79167d4566-93e4a763b9__r00__864e88d06438.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmax/shifting/st70_minmax__run_20261012T042130Z__shifting__minmax__st70-fa79167d4566-93e4a763b9__r00__864e88d06438.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/genetic/st70_minmaxsum__run_20261012T042132Z__genetic__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__fb4cd6c9b288.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/genetic/st70_minmaxsum__run_20261012T042132Z__genetic__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__fb4cd6c9b288.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/greedy/st70_minmaxsum__run_20261012T042133Z__greedy__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__988fb18d97b5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/greedy/st70_minmaxsum__run_20261012T042133Z__greedy__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__988fb18d97b5.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/local-search/st70_minmaxsum__run_20261012T042134Z__local-search__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__5cac2848652c.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/local-search/st70_minmaxsum__run_20261012T042134Z__local-search__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__5cac2848652c.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/lp-rounding/st70_minmaxsum__run_20261012T042134Z__lp-rounding__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__b8bd97155ac8.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/lp-rounding/st70_minmaxsum__run_20261012T042134Z__lp-rounding__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__b8bd97155ac8.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/nn/st70_minmaxsum__run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/nn/st70_minmaxsum__run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/primal-dual/st70_minmaxsum__run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/primal-dual/st70_minmaxsum__run_20261012T042135Z__primal-dual__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__20fd64434cd4.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/sa/st70_minmaxsum__run_20261012T042135Z__sa__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__97c9659dac0b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/sa/st70_minmaxsum__run_20261012T042135Z__sa__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__97c9659dac0b.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/shifting/st70_minmaxsum__run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minmaxsum/shifting/st70_minmaxsum__run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/branch-and-bound/st70_minsum__run_20261012T042930Z__branch-and-bound__minsum__st70-fa79167d4566-93e4a763b9__r00__82e68af7d04e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/branch-and-bound/st70_minsum__run_20261012T042930Z__branch-and-bound__minsum__st70-fa79167d4566-93e4a763b9__r00__82e68af7d04e.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/genetic/st70_minsum__run_20261012T042141Z__genetic__minsum__st70-fa79167d4566-93e4a763b9__r00__8ccfe3c0321e.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/genetic/st70_minsum__run_20261012T042141Z__genetic__minsum__st70-fa79167d4566-93e4a763b9__r00__8ccfe3c0321e.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/greedy/st70_minsum__run_20261012T042141Z__greedy__minsum__st70-fa79167d4566-93e4a763b9__r00__c14215268e0b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/greedy/st70_minsum__run_20261012T042141Z__greedy__minsum__st70-fa79167d4566-93e4a763b9__r00__c14215268e0b.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/local-search/st70_minsum__run_20261012T042142Z__local-search__minsum__st70-fa79167d4566-93e4a763b9__r00__53444307d4ff.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/local-search/st70_minsum__run_20261012T042142Z__local-search__minsum__st70-fa79167d4566-93e4a763b9__r00__53444307d4ff.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/lp-rounding/st70_minsum__run_20261012T042142Z__lp-rounding__minsum__st70-fa79167d4566-93e4a763b9__r00__5d347992250b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/lp-rounding/st70_minsum__run_20261012T042142Z__lp-rounding__minsum__st70-fa79167d4566-93e4a763b9__r00__5d347992250b.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/nn/st70_minsum__run_20261012T042142Z__nn__minsum__st70-fa79167d4566-93e4a763b9__r00__45f6ebd74805.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/nn/st70_minsum__run_20261012T042142Z__nn__minsum__st70-fa79167d4566-93e4a763b9__r00__45f6ebd74805.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/primal-dual/st70_minsum__run_20261012T042142Z__primal-dual__minsum__st70-fa79167d4566-93e4a763b9__r00__fc7da6e5dd95.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/primal-dual/st70_minsum__run_20261012T042142Z__primal-dual__minsum__st70-fa79167d4566-93e4a763b9__r00__fc7da6e5dd95.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/sa/st70_minsum__run_20261012T042143Z__sa__minsum__st70-fa79167d4566-93e4a763b9__r00__78cfa353cea2.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/sa/st70_minsum__run_20261012T042143Z__sa__minsum__st70-fa79167d4566-93e4a763b9__r00__78cfa353cea2.gif.metadata.json`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/shifting/st70_minsum__run_20261012T042143Z__shifting__minsum__st70-fa79167d4566-93e4a763b9__r00__9a2b1bb8bc8b.gif`
+- `animations/st70-fa79167d4566-93e4a763b9/minsum/shifting/st70_minsum__run_20261012T042143Z__shifting__minsum__st70-fa79167d4566-93e4a763b9__r00__9a2b1bb8bc8b.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/branch-and-bound/stars-0000030.instance_minmax__run_20261012T042143Z__branch-and-bound__minmax__stars-0000030.instance-1955c914c741-2f__r00__c3eb2bdc272e.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/branch-and-bound/stars-0000030.instance_minmax__run_20261012T042143Z__branch-and-bound__minmax__stars-0000030.instance-1955c914c741-2f__r00__c3eb2bdc272e.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/brute-force/stars-0000030.instance_minmax__run_20261012T042143Z__brute-force__minmax__stars-0000030.instance-1955c914c741-2f__r00__7d2d390164e5.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/brute-force/stars-0000030.instance_minmax__run_20261012T042143Z__brute-force__minmax__stars-0000030.instance-1955c914c741-2f__r00__7d2d390164e5.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/genetic/stars-0000030.instance_minmax__run_20261012T042143Z__genetic__minmax__stars-0000030.instance-1955c914c741-2f__r00__bdb63d5a9323.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/genetic/stars-0000030.instance_minmax__run_20261012T042143Z__genetic__minmax__stars-0000030.instance-1955c914c741-2f__r00__bdb63d5a9323.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/greedy/stars-0000030.instance_minmax__run_20261012T042143Z__greedy__minmax__stars-0000030.instance-1955c914c741-2f__r00__de55664536a0.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/greedy/stars-0000030.instance_minmax__run_20261012T042143Z__greedy__minmax__stars-0000030.instance-1955c914c741-2f__r00__de55664536a0.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/local-search/stars-0000030.instance_minmax__run_20261012T042143Z__local-search__minmax__stars-0000030.instance-1955c914c741-2f__r00__50a3052ef325.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/local-search/stars-0000030.instance_minmax__run_20261012T042143Z__local-search__minmax__stars-0000030.instance-1955c914c741-2f__r00__50a3052ef325.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/lp-rounding/stars-0000030.instance_minmax__run_20261012T042143Z__lp-rounding__minmax__stars-0000030.instance-1955c914c741-2f__r00__22c9b25a163b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/lp-rounding/stars-0000030.instance_minmax__run_20261012T042143Z__lp-rounding__minmax__stars-0000030.instance-1955c914c741-2f__r00__22c9b25a163b.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/nn/stars-0000030.instance_minmax__run_20261012T042143Z__nn__minmax__stars-0000030.instance-1955c914c741-2f__r00__4e492fab67c2.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/nn/stars-0000030.instance_minmax__run_20261012T042143Z__nn__minmax__stars-0000030.instance-1955c914c741-2f__r00__4e492fab67c2.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/primal-dual/stars-0000030.instance_minmax__run_20261012T042143Z__primal-dual__minmax__stars-0000030.instance-1955c914c741-2f__r00__f1532fa8f49e.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/primal-dual/stars-0000030.instance_minmax__run_20261012T042143Z__primal-dual__minmax__stars-0000030.instance-1955c914c741-2f__r00__f1532fa8f49e.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/sa/stars-0000030.instance_minmax__run_20261012T042143Z__sa__minmax__stars-0000030.instance-1955c914c741-2f__r00__0f7d8540edc6.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/sa/stars-0000030.instance_minmax__run_20261012T042143Z__sa__minmax__stars-0000030.instance-1955c914c741-2f__r00__0f7d8540edc6.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/shifting/stars-0000030.instance_minmax__run_20261012T042143Z__shifting__minmax__stars-0000030.instance-1955c914c741-2f__r00__70f09504ef1b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmax/shifting/stars-0000030.instance_minmax__run_20261012T042143Z__shifting__minmax__stars-0000030.instance-1955c914c741-2f__r00__70f09504ef1b.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/branch-and-bound/stars-0000030.instance_minmaxsum__run_20261012T042143Z__branch-and-bound__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__f536870ebe98.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/branch-and-bound/stars-0000030.instance_minmaxsum__run_20261012T042143Z__branch-and-bound__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__f536870ebe98.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/brute-force/stars-0000030.instance_minmaxsum__run_20261012T042143Z__brute-force__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__56e22b152d71.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/brute-force/stars-0000030.instance_minmaxsum__run_20261012T042143Z__brute-force__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__56e22b152d71.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/genetic/stars-0000030.instance_minmaxsum__run_20261012T042143Z__genetic__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__30db97600e98.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/genetic/stars-0000030.instance_minmaxsum__run_20261012T042143Z__genetic__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__30db97600e98.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/greedy/stars-0000030.instance_minmaxsum__run_20261012T042143Z__greedy__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__0bc5543cac5a.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/greedy/stars-0000030.instance_minmaxsum__run_20261012T042143Z__greedy__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__0bc5543cac5a.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/local-search/stars-0000030.instance_minmaxsum__run_20261012T042144Z__local-search__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__782eef3f0925.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/local-search/stars-0000030.instance_minmaxsum__run_20261012T042144Z__local-search__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__782eef3f0925.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/lp-rounding/stars-0000030.instance_minmaxsum__run_20261012T042144Z__lp-rounding__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__120a37dd79f4.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/lp-rounding/stars-0000030.instance_minmaxsum__run_20261012T042144Z__lp-rounding__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__120a37dd79f4.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/nn/stars-0000030.instance_minmaxsum__run_20261012T042144Z__nn__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__1edb78c9e043.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/nn/stars-0000030.instance_minmaxsum__run_20261012T042144Z__nn__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__1edb78c9e043.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/primal-dual/stars-0000030.instance_minmaxsum__run_20261012T042144Z__primal-dual__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__9c71136ad837.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/primal-dual/stars-0000030.instance_minmaxsum__run_20261012T042144Z__primal-dual__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__9c71136ad837.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/sa/stars-0000030.instance_minmaxsum__run_20261012T042144Z__sa__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__fab1facbef6c.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/sa/stars-0000030.instance_minmaxsum__run_20261012T042144Z__sa__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__fab1facbef6c.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/shifting/stars-0000030.instance_minmaxsum__run_20261012T042144Z__shifting__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__13dfa35080b9.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minmaxsum/shifting/stars-0000030.instance_minmaxsum__run_20261012T042144Z__shifting__minmaxsum__stars-0000030.instance-1955c914c741-2f__r00__13dfa35080b9.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/branch-and-bound/stars-0000030.instance_minsum__run_20261012T042144Z__branch-and-bound__minsum__stars-0000030.instance-1955c914c741-2f__r00__e145cc6298ab.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/branch-and-bound/stars-0000030.instance_minsum__run_20261012T042144Z__branch-and-bound__minsum__stars-0000030.instance-1955c914c741-2f__r00__e145cc6298ab.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/brute-force/stars-0000030.instance_minsum__run_20261012T042144Z__brute-force__minsum__stars-0000030.instance-1955c914c741-2f__r00__d47703fd48da.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/brute-force/stars-0000030.instance_minsum__run_20261012T042144Z__brute-force__minsum__stars-0000030.instance-1955c914c741-2f__r00__d47703fd48da.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/genetic/stars-0000030.instance_minsum__run_20261012T042144Z__genetic__minsum__stars-0000030.instance-1955c914c741-2f__r00__f612e039e706.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/genetic/stars-0000030.instance_minsum__run_20261012T042144Z__genetic__minsum__stars-0000030.instance-1955c914c741-2f__r00__f612e039e706.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/greedy/stars-0000030.instance_minsum__run_20261012T042144Z__greedy__minsum__stars-0000030.instance-1955c914c741-2f__r00__2407fa80bf9b.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/greedy/stars-0000030.instance_minsum__run_20261012T042144Z__greedy__minsum__stars-0000030.instance-1955c914c741-2f__r00__2407fa80bf9b.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/local-search/stars-0000030.instance_minsum__run_20261012T042144Z__local-search__minsum__stars-0000030.instance-1955c914c741-2f__r00__d905a0631386.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/local-search/stars-0000030.instance_minsum__run_20261012T042144Z__local-search__minsum__stars-0000030.instance-1955c914c741-2f__r00__d905a0631386.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/lp-rounding/stars-0000030.instance_minsum__run_20261012T042144Z__lp-rounding__minsum__stars-0000030.instance-1955c914c741-2f__r00__76269445f0cd.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/lp-rounding/stars-0000030.instance_minsum__run_20261012T042144Z__lp-rounding__minsum__stars-0000030.instance-1955c914c741-2f__r00__76269445f0cd.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/nn/stars-0000030.instance_minsum__run_20261012T042144Z__nn__minsum__stars-0000030.instance-1955c914c741-2f__r00__90e197375288.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/nn/stars-0000030.instance_minsum__run_20261012T042144Z__nn__minsum__stars-0000030.instance-1955c914c741-2f__r00__90e197375288.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/primal-dual/stars-0000030.instance_minsum__run_20261012T042144Z__primal-dual__minsum__stars-0000030.instance-1955c914c741-2f__r00__9aa238f8fa60.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/primal-dual/stars-0000030.instance_minsum__run_20261012T042144Z__primal-dual__minsum__stars-0000030.instance-1955c914c741-2f__r00__9aa238f8fa60.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/sa/stars-0000030.instance_minsum__run_20261012T042144Z__sa__minsum__stars-0000030.instance-1955c914c741-2f__r00__3cf5a723c2c5.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/sa/stars-0000030.instance_minsum__run_20261012T042144Z__sa__minsum__stars-0000030.instance-1955c914c741-2f__r00__3cf5a723c2c5.gif.metadata.json`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/shifting/stars-0000030.instance_minsum__run_20261012T042144Z__shifting__minsum__stars-0000030.instance-1955c914c741-2f__r00__2bec4de3e765.gif`
+- `animations/stars-0000030.instance-1955c914c741-2f24c57225/minsum/shifting/stars-0000030.instance_minsum__run_20261012T042144Z__shifting__minsum__stars-0000030.instance-1955c914c741-2f__r00__2bec4de3e765.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/branch-and-bound/uniform-0000030-2_minmax__run_20261012T042144Z__branch-and-bound__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d294f38efc8a.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/branch-and-bound/uniform-0000030-2_minmax__run_20261012T042144Z__branch-and-bound__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d294f38efc8a.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/brute-force/uniform-0000030-2_minmax__run_20261012T042144Z__brute-force__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__dd4d51f8c0ff.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/brute-force/uniform-0000030-2_minmax__run_20261012T042144Z__brute-force__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__dd4d51f8c0ff.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/genetic/uniform-0000030-2_minmax__run_20261012T042144Z__genetic__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e17b34c2f464.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/genetic/uniform-0000030-2_minmax__run_20261012T042144Z__genetic__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e17b34c2f464.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/greedy/uniform-0000030-2_minmax__run_20261012T042144Z__greedy__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__48c50924d1ab.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/greedy/uniform-0000030-2_minmax__run_20261012T042144Z__greedy__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__48c50924d1ab.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/local-search/uniform-0000030-2_minmax__run_20261012T042144Z__local-search__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__6ad72f9d708e.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/local-search/uniform-0000030-2_minmax__run_20261012T042144Z__local-search__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__6ad72f9d708e.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/lp-rounding/uniform-0000030-2_minmax__run_20261012T042144Z__lp-rounding__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__56c514ddf4e9.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/lp-rounding/uniform-0000030-2_minmax__run_20261012T042144Z__lp-rounding__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__56c514ddf4e9.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/nn/uniform-0000030-2_minmax__run_20261012T042144Z__nn__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e4b64722299c.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/nn/uniform-0000030-2_minmax__run_20261012T042144Z__nn__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__e4b64722299c.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/primal-dual/uniform-0000030-2_minmax__run_20261012T042145Z__primal-dual__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1101cb17393b.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/primal-dual/uniform-0000030-2_minmax__run_20261012T042145Z__primal-dual__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1101cb17393b.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/sa/uniform-0000030-2_minmax__run_20261012T042145Z__sa__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__907888ac5770.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/sa/uniform-0000030-2_minmax__run_20261012T042145Z__sa__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__907888ac5770.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/shifting/uniform-0000030-2_minmax__run_20261012T042145Z__shifting__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__10516aa30071.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmax/shifting/uniform-0000030-2_minmax__run_20261012T042145Z__shifting__minmax__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__10516aa30071.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/branch-and-bound/uniform-0000030-2_minmaxsum__run_20261012T042145Z__branch-and-bound__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__c0b4a7f254ae.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/branch-and-bound/uniform-0000030-2_minmaxsum__run_20261012T042145Z__branch-and-bound__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__c0b4a7f254ae.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/brute-force/uniform-0000030-2_minmaxsum__run_20261012T042145Z__brute-force__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__87b26cb82c7d.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/brute-force/uniform-0000030-2_minmaxsum__run_20261012T042145Z__brute-force__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__87b26cb82c7d.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/genetic/uniform-0000030-2_minmaxsum__run_20261012T042145Z__genetic__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1aef78b020e4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/genetic/uniform-0000030-2_minmaxsum__run_20261012T042145Z__genetic__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1aef78b020e4.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/greedy/uniform-0000030-2_minmaxsum__run_20261012T042145Z__greedy__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__b80b7d00912a.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/greedy/uniform-0000030-2_minmaxsum__run_20261012T042145Z__greedy__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__b80b7d00912a.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/local-search/uniform-0000030-2_minmaxsum__run_20261012T042145Z__local-search__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__44385fb888a4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/local-search/uniform-0000030-2_minmaxsum__run_20261012T042145Z__local-search__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__44385fb888a4.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/lp-rounding/uniform-0000030-2_minmaxsum__run_20261012T042145Z__lp-rounding__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__798a68522900.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/lp-rounding/uniform-0000030-2_minmaxsum__run_20261012T042145Z__lp-rounding__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__798a68522900.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/nn/uniform-0000030-2_minmaxsum__run_20261012T042145Z__nn__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__0fbe6a4953cd.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/nn/uniform-0000030-2_minmaxsum__run_20261012T042145Z__nn__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__0fbe6a4953cd.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/primal-dual/uniform-0000030-2_minmaxsum__run_20261012T042145Z__primal-dual__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d904f8d6d994.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/primal-dual/uniform-0000030-2_minmaxsum__run_20261012T042145Z__primal-dual__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__d904f8d6d994.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/sa/uniform-0000030-2_minmaxsum__run_20261012T042145Z__sa__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__46697e074ec3.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/sa/uniform-0000030-2_minmaxsum__run_20261012T042145Z__sa__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__46697e074ec3.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/shifting/uniform-0000030-2_minmaxsum__run_20261012T042145Z__shifting__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__2f89d6351d54.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minmaxsum/shifting/uniform-0000030-2_minmaxsum__run_20261012T042145Z__shifting__minmaxsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__2f89d6351d54.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/branch-and-bound/uniform-0000030-2_minsum__run_20261012T042145Z__branch-and-bound__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__13529ae356b4.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/branch-and-bound/uniform-0000030-2_minsum__run_20261012T042145Z__branch-and-bound__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__13529ae356b4.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/brute-force/uniform-0000030-2_minsum__run_20261012T042145Z__brute-force__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__4ed4534a46fa.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/brute-force/uniform-0000030-2_minsum__run_20261012T042145Z__brute-force__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__4ed4534a46fa.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/genetic/uniform-0000030-2_minsum__run_20261012T042145Z__genetic__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__07c625631bd7.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/genetic/uniform-0000030-2_minsum__run_20261012T042145Z__genetic__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__07c625631bd7.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/greedy/uniform-0000030-2_minsum__run_20261012T042145Z__greedy__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__8c1ef9886b41.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/greedy/uniform-0000030-2_minsum__run_20261012T042145Z__greedy__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__8c1ef9886b41.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/local-search/uniform-0000030-2_minsum__run_20261012T042145Z__local-search__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1900e7f4c46b.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/local-search/uniform-0000030-2_minsum__run_20261012T042145Z__local-search__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__1900e7f4c46b.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/lp-rounding/uniform-0000030-2_minsum__run_20261012T042145Z__lp-rounding__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__625b28674680.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/lp-rounding/uniform-0000030-2_minsum__run_20261012T042145Z__lp-rounding__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__625b28674680.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/nn/uniform-0000030-2_minsum__run_20261012T042145Z__nn__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__483b601d2335.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/nn/uniform-0000030-2_minsum__run_20261012T042145Z__nn__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__483b601d2335.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/primal-dual/uniform-0000030-2_minsum__run_20261012T042145Z__primal-dual__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__86ab38b36ebe.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/primal-dual/uniform-0000030-2_minsum__run_20261012T042145Z__primal-dual__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__86ab38b36ebe.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/sa/uniform-0000030-2_minsum__run_20261012T042145Z__sa__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__942b6947d6b6.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/sa/uniform-0000030-2_minsum__run_20261012T042145Z__sa__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__942b6947d6b6.gif.metadata.json`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/shifting/uniform-0000030-2_minsum__run_20261012T042145Z__shifting__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__9deb6a511ef0.gif`
+- `animations/uniform-0000030-2-cbaabccb536e-ac5ba17054/minsum/shifting/uniform-0000030-2_minsum__run_20261012T042145Z__shifting__minsum__uniform-0000030-2-cbaabccb536e-ac5ba17__r00__9deb6a511ef0.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/branch-and-bound/us-night-0000030.instance_minmax__run_20261012T042145Z__branch-and-bound__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__780a9dfc6157.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/branch-and-bound/us-night-0000030.instance_minmax__run_20261012T042145Z__branch-and-bound__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__780a9dfc6157.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/brute-force/us-night-0000030.instance_minmax__run_20261012T042145Z__brute-force__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__8ed1be9dd7fc.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/brute-force/us-night-0000030.instance_minmax__run_20261012T042145Z__brute-force__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__8ed1be9dd7fc.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/genetic/us-night-0000030.instance_minmax__run_20261012T042145Z__genetic__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__1b588d86292f.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/genetic/us-night-0000030.instance_minmax__run_20261012T042145Z__genetic__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__1b588d86292f.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/greedy/us-night-0000030.instance_minmax__run_20261012T042145Z__greedy__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__ad1948387ce6.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/greedy/us-night-0000030.instance_minmax__run_20261012T042145Z__greedy__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__ad1948387ce6.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/local-search/us-night-0000030.instance_minmax__run_20261012T042146Z__local-search__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__085a1c42fc27.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/local-search/us-night-0000030.instance_minmax__run_20261012T042146Z__local-search__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__085a1c42fc27.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/lp-rounding/us-night-0000030.instance_minmax__run_20261012T042146Z__lp-rounding__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__a297b587d59d.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/lp-rounding/us-night-0000030.instance_minmax__run_20261012T042146Z__lp-rounding__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__a297b587d59d.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/nn/us-night-0000030.instance_minmax__run_20261012T042146Z__nn__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__255862e110bb.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/nn/us-night-0000030.instance_minmax__run_20261012T042146Z__nn__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__255862e110bb.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/primal-dual/us-night-0000030.instance_minmax__run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/primal-dual/us-night-0000030.instance_minmax__run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/sa/us-night-0000030.instance_minmax__run_20261012T042146Z__sa__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__193d06530261.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/sa/us-night-0000030.instance_minmax__run_20261012T042146Z__sa__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__193d06530261.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/shifting/us-night-0000030.instance_minmax__run_20261012T042146Z__shifting__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__426e7a5266dd.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmax/shifting/us-night-0000030.instance_minmax__run_20261012T042146Z__shifting__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__426e7a5266dd.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/branch-and-bound/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__branch-and-bound__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__313da6fde4ad.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/branch-and-bound/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__branch-and-bound__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__313da6fde4ad.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/brute-force/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__brute-force__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__34bcece638d8.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/brute-force/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__brute-force__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__34bcece638d8.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/genetic/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__genetic__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__2a558be5d979.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/genetic/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__genetic__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__2a558be5d979.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/greedy/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__greedy__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__56c9fd05590a.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/greedy/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__greedy__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__56c9fd05590a.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/local-search/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__local-search__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__c223874e9577.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/local-search/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__local-search__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__c223874e9577.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/lp-rounding/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__lp-rounding__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__9395aa04de52.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/lp-rounding/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__lp-rounding__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__9395aa04de52.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/nn/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__nn__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__eb5590002711.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/nn/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__nn__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__eb5590002711.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/primal-dual/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__primal-dual__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__48e34418b746.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/primal-dual/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__primal-dual__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__48e34418b746.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/sa/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__sa__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__878492806341.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/sa/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__sa__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__878492806341.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/shifting/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__shifting__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__a5d047c3d136.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minmaxsum/shifting/us-night-0000030.instance_minmaxsum__run_20261012T042146Z__shifting__minmaxsum__us-night-0000030.instance-89cc3fc4c0fb__r00__a5d047c3d136.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/branch-and-bound/us-night-0000030.instance_minsum__run_20261012T042146Z__branch-and-bound__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__06dd29a82cb2.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/branch-and-bound/us-night-0000030.instance_minsum__run_20261012T042146Z__branch-and-bound__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__06dd29a82cb2.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/brute-force/us-night-0000030.instance_minsum__run_20261012T042146Z__brute-force__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__32048a68441b.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/brute-force/us-night-0000030.instance_minsum__run_20261012T042146Z__brute-force__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__32048a68441b.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/genetic/us-night-0000030.instance_minsum__run_20261012T042146Z__genetic__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__44c457ef394f.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/genetic/us-night-0000030.instance_minsum__run_20261012T042146Z__genetic__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__44c457ef394f.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/greedy/us-night-0000030.instance_minsum__run_20261012T042146Z__greedy__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e03dfe1a7c5e.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/greedy/us-night-0000030.instance_minsum__run_20261012T042146Z__greedy__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e03dfe1a7c5e.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/local-search/us-night-0000030.instance_minsum__run_20261012T042146Z__local-search__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__14d7a05cf6ab.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/local-search/us-night-0000030.instance_minsum__run_20261012T042146Z__local-search__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__14d7a05cf6ab.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/lp-rounding/us-night-0000030.instance_minsum__run_20261012T042146Z__lp-rounding__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1528ca035f83.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/lp-rounding/us-night-0000030.instance_minsum__run_20261012T042146Z__lp-rounding__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1528ca035f83.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/nn/us-night-0000030.instance_minsum__run_20261012T042146Z__nn__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e77ce9cd40c5.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/nn/us-night-0000030.instance_minsum__run_20261012T042146Z__nn__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__e77ce9cd40c5.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/primal-dual/us-night-0000030.instance_minsum__run_20261012T042146Z__primal-dual__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1d09ea49d868.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/primal-dual/us-night-0000030.instance_minsum__run_20261012T042146Z__primal-dual__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__1d09ea49d868.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/sa/us-night-0000030.instance_minsum__run_20261012T042146Z__sa__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__df3c497ba28e.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/sa/us-night-0000030.instance_minsum__run_20261012T042146Z__sa__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__df3c497ba28e.gif.metadata.json`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/shifting/us-night-0000030.instance_minsum__run_20261012T042146Z__shifting__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__123adaefcf3a.gif`
+- `animations/us-night-0000030.instance-89cc3fc4c0fb-3704ac03dc/minsum/shifting/us-night-0000030.instance_minsum__run_20261012T042146Z__shifting__minsum__us-night-0000030.instance-89cc3fc4c0fb__r00__123adaefcf3a.gif.metadata.json`
+
+## 18. Reproduction command
+
+`bash scripts/run_experiment.sh --pipeline smoke --dataset data/instances/public_instance_set --algorithms all-registered --modes all --exact-reference auto --threads 2 --with-animations --animation-policy all-solutions --build-dir build/prompt8-clean-20261012 --output results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --resume`
+
+## 19. Failed/skipped stages
+
+None recorded.
+
+## 20. Remaining limitations
+
+This report covers 20 dataset instance(s) only; it does not imply that other dataset inputs were executed.
+Native KONT/COPT availability: unavailable or not used.
+A visualization is not a feasibility or optimality proof. Exact animation is emitted only from serialized solver output. Visualization artifacts show feasibility, verification, and optimality exactly as recorded; failed, skipped, invalid, and time-limited slots remain visible in comparison sheets. Review `visualization_manifest.json` and `result_integrity_report.md`.

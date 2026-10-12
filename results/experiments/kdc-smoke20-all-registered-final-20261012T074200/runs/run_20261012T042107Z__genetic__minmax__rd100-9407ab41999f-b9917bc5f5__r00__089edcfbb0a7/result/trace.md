@@ -1,0 +1,57 @@
+# Data dictionary and preview: trace.csv
+
+- **Purpose:** Documents the existing experiment-scoped export `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv` without altering its source data.
+- **Experiment:** `kdc-smoke20-all-registered-final-20261012T074200`
+- **Source manifest/result:** `validated canonical aggregate/run-record export`
+- **Generation:** `scripts/report_experiment.py --stage tables`
+- **Rows:** 12
+- **File scope:** runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv
+- **Sort order:** preserved from the source export
+- **Filters:** none applied by companion generation
+- **Status counts:** not applicable or status column absent
+- **Missing/null handling:** unavailable or inapplicable measurements remain blank/null; no unrelated metric is substituted.
+- **Limitations:** The sidecar documents the existing export; values and status semantics remain those of its canonical source.
+
+## Derived metric formulas
+
+No metrics are recomputed here; all row values are direct serialized source fields.
+
+## Column definitions
+
+- `iter` — Serialized source field `iter` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `t_max` — Serialized source field `t_max` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `objective` — objective identifier.
+- `lower_bound` — reported lower bound; its certification is represented separately.
+- `gap` — Serialized source field `gap` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `wall_time` — Serialized source field `wall_time` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `num_ip_solves` — Serialized source field `num_ip_solves` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_cost_at_peak_time` — Serialized source field `static_cost_at_peak_time` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_status` — Serialized source field `static_solver_status` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_exact` — Serialized source field `static_solver_exact` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_lower_bound` — Serialized source field `static_lower_bound` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_upper_bound` — Serialized source field `static_upper_bound` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_peak` — Serialized source field `candidate_peak` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `combined_peak` — Serialized source field `combined_peak` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `peak_improvement` — Serialized source field `peak_improvement` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `certified_gap` — Serialized source field `certified_gap` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `heuristic_gap` — Serialized source field `heuristic_gap` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_accepted` — Serialized source field `candidate_accepted` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `has_certified_gap` — Serialized source field `has_certified_gap` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `stop_reason` — Serialized source field `stop_reason` from `runs/run_20261012T042107Z__genetic__minmax__rd100-9407ab41999f-b9917bc5f5__r00__089edcfbb0a7/result/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+
+## Preview
+
+| iter | t_max | objective | lower_bound | gap | wall_time | num_ip_solves | static_cost_at_peak_time | static_solver_status | static_solver_exact | static_lower_bound | static_upper_bound | candidate_peak | combined_peak | peak_improvement | certified_gap | heuristic_gap | candidate_accepted | has_certified_gap | stop_reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0.97240280499317266 | 9383.2260979269104 | 2057.1353349137871 | 5.1420272822362296 | 0.064971374999999998 | 2 | 4540.5142069732701 | FEASIBLE | 0 | 2057.1353349137871 | 4540.5142069732701 | 11690.101223607606 | 9072.9918091031323 | 310.23428882377812 | 3.5613071433242158 | 9383.2260979269104 | 1 | 1 | candidate_accepted |
+| 2 | 0.47065013844276515 | 9072.9918091031323 | 2057.1353349137871 | 3.4104982570256488 | 0.16149670799999999 | 3 | 3939.2811713216497 | FEASIBLE | 0 | 665.15592803622519 | 3939.2811713216497 | 12954.326425528481 | 6767.6408232521435 | 2305.3509858509888 | 3.4104982570256488 | 9072.9918091031323 | 1 | 1 | candidate_accepted |
+| 3 | 0.7111640379471893 | 6767.6408232521435 | 2057.1353349137871 | 2.2898374299402962 | 0.25640724999999998 | 4 | 4200.8978127382525 | FEASIBLE | 0 | 964.16323276716969 | 4200.8978127382525 | 8717.970074639099 | 6348.0486200087662 | 419.5922032433773 | 2.2898374299402962 | 6767.6408232521435 | 1 | 1 | candidate_accepted |
+| 4 | 0.15528824965365323 | 6348.0486200087662 | 2057.1353349137871 | 2.0858682519664211 | 0.350530958 | 5 | 4175.8609958611059 | FEASIBLE | 0 | 784.17269078530751 | 4175.8609958611059 | 16209.411919155658 | 5810.359719415671 | 537.68890059309524 | 2.0858682519664211 | 6348.0486200087662 | 1 | 1 | candidate_accepted |
+| 5 | 0.8809956040914918 | 5810.359719415671 | 2057.1353349137871 | 1.8244907473037881 | 0.44442041599999998 | 6 | 4473.5520579571194 | FEASIBLE | 0 | 1627.5045608450801 | 4473.5520579571194 | 8063.9253171999771 | 5614.5634916205845 | 195.79622779508645 | 1.8244907473037881 | 5810.359719415671 | 1 | 1 | candidate_accepted |
+| 6 | 0.26496341902164056 | 5614.5634916205845 | 2057.1353349137871 | 1.7293116774234429 | 0.53912933299999999 | 7 | 4334.505131682944 | FEASIBLE | 0 | 753.79810417290298 | 4334.505131682944 | 9656.518258153812 | 5289.4526999203772 | 325.1107917002073 | 1.7293116774234429 | 5614.5634916205845 | 1 | 1 | candidate_accepted |
+| 7 | 0.57291780420529814 | 5289.4526999203772 | 2057.1353349137871 | 1.571271131338597 | 0.62974420799999997 | 8 | 3941.8354102728686 | FEASIBLE | 0 | 670.60500483852411 | 3941.8354102728686 | 12140.589393068614 | 5004.3583802693329 | 285.09431965104432 | 1.571271131338597 | 5289.4526999203772 | 1 | 1 | candidate_accepted |
+| 8 | 0.066604760319104464 | 5004.3583802693329 | 2057.1353349137871 | 1.4326831080751727 | 0.71262691600000005 | 9 | 4064.4346457452739 | FEASIBLE | 0 | 1209.9483880615883 | 4064.4346457452739 | 11935.173528641346 | 4891.2906609464408 | 113.06771932289212 | 1.4326831080751727 | 5004.3583802693329 | 1 | 1 | candidate_accepted |
+| 9 | 1 | 4891.2906609464408 | 2196.8329737042695 | 1.3777194324219952 | 0.80668316600000001 | 10 | 4771.8538789236318 | FEASIBLE | 0 | 2196.8329737042695 | 4771.8538789236318 | 16989.23524405287 | 4883.5601556065512 | 7.7305053398895325 | 1.2265191389124197 | 4891.2906609464408 | 1 | 1 | candidate_accepted |
+| 10 | 0.92168115064663947 | 4883.5601556065512 | 2196.8329737042695 | 1.2230002071445421 | 0.89204916599999995 | 11 | 4577.5257452585056 | FEASIBLE | 0 | 1812.4595859487833 | 4577.5257452585056 | 13131.632100533719 | 4802.8587791591635 | 80.701376447387702 | 1.2230002071445421 | 4883.5601556065512 | 1 | 1 | candidate_accepted |
+| 11 | 0.65473892292047531 | 4802.8587791591635 | 2196.8329737042695 | 1.1862648806935236 | 0.97790220800000005 | 12 | 3822.274583291799 | FEASIBLE | 0 | 799.66745362277493 | 3822.274583291799 | 9792.8603871639425 | 4771.8538789236336 | 31.004900235529931 | 1.1862648806935236 | 4802.8587791591635 | 1 | 1 | candidate_accepted |
+| 12 | 1 | 4771.8538789236336 | 2196.8329737042695 | 1.1721514270961617 | 1.064716666 | 13 | 4771.8538789236318 | FEASIBLE | 0 | 2196.8329737042695 | 4771.8538789236318 | 16989.23524405287 | 4771.8538789236336 | 0 | 1.1721514270961617 | 4771.8538789236336 | 1 | 1 | heuristic_no_improvement |

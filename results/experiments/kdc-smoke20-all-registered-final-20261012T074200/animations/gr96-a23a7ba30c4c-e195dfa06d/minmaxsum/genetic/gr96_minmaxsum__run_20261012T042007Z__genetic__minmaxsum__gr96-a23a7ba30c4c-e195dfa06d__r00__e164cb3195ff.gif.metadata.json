@@ -1,0 +1,42 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "animation_path": "gr96_minmaxsum__run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff.gif",
+  "animation_sha256": "8acbb636d3725d46add6931444a4f402ce90ea8061b64775ab1a7ba1752701f7",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "gr96-a23a7ba30c4c-e195dfa06d",
+  "instance_name": "gr96",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": false,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3490.870276970767,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4798.119831970603,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff/execution/solver/runs/gr96/genetic/minmaxsum/component-minmax",
+    "minsum_component_integral": null,
+    "minsum_component_optimality": "FAILED",
+    "minsum_component_peak": null,
+    "minsum_component_status": "FAILED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff/execution/solver/runs/gr96/genetic/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3490.870276970767,
+    "peak_cost": 4798.119831970603
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff/result/result.json",
+  "source_solution_path": "runs/run_20261012T042007Z__genetic__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e164cb3195ff/result/solution.json",
+  "source_solution_sha256": "74a1ac70a86970f3ce4e13f656327abe28ef6aee240c30aa8e84f21f40147ef6",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

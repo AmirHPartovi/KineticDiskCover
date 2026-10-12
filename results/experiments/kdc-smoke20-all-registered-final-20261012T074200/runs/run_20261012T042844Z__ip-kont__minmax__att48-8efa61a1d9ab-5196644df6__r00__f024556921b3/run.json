@@ -1,0 +1,145 @@
+{
+  "actual_backend": null,
+  "algorithm": "ip-kont",
+  "artifacts": [
+    {
+      "media_type": "application/json",
+      "path": "execution/skip_reason.json",
+      "sha256": "4f5c8484048cb4169f411a2d2fcce52934f92524882308c4a295030c5c241174",
+      "size_bytes": 152
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "fc9a0c6b693ba7a9003881f89e0f040a04d366a4b5561ddcbe441d999f65deab",
+      "size_bytes": 70
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+      "size_bytes": 5289
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "767a7aa314a1c1a666d4db50efb7a0601168ba43013f7c5eac56e7c78dac0713",
+      "size_bytes": 526
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "9b14b756795d9eec0c8c3abdf3180b23f85ac24fe0df1777c5efd7957e385d93",
+      "size_bytes": 1769
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "f621bc718a6cbc0e5c48e7993ac5383a0ac3ebfcd67cd5b0c3e3351d4997ff27",
+      "size_bytes": 517
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "b8725b8954187632ac76e5b92480bc23cbf3da04f5551dd27dccaff87a0dc5cb",
+      "size_bytes": 537
+    }
+  ],
+  "backend_details": {
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "backend_version": "unknown",
+    "capabilities": {},
+    "native": false
+  },
+  "configuration_sha256": "c9a05af4ed0f9e25f167192f764407067f494d55ef883778ea4f73534b3854b2",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "family": "att48",
+  "finished_at": "2026-10-12T04:28:44.805481Z",
+  "input_sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+  "instance_id": "att48-8efa61a1d9ab-5196644df6",
+  "m": 25,
+  "n": 11,
+  "objective": "minmax",
+  "provenance": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "solver_version": "unknown",
+    "source_commit": null
+  },
+  "repeat": 0,
+  "requested_backend": "auto",
+  "rerun_of": "run_20261012T041939Z__ip-kont__minmax__att48-8efa61a1d9ab-5196644df6__r00__0026a73ebfee",
+  "resolved_configuration": {
+    "actual_threads": 1,
+    "actual_time_limit_sec": 10.0,
+    "algorithm_category": "exact_candidate",
+    "backend_capabilities": {},
+    "backend_detection": {
+      "actual": "branch-and-bound",
+      "requested": "auto",
+      "selected": "branch-and-bound"
+    },
+    "benchmark_profile": "DEBUG",
+    "brute_force_max_assignments": 100000,
+    "brute_force_time_limit_sec": 0.5,
+    "dataset_profile": "smoke20",
+    "diagnostic_max_assignments": null,
+    "exact_time_limit_sec": 10.0,
+    "execution_disposition": {
+      "message": "ip-kont is registered but the native KONT/COPT backend is unavailable",
+      "reason_code": "BACKEND_UNAVAILABLE",
+      "status": "SKIPPED"
+    },
+    "experiment_label": "smoke / development validation",
+    "fast_time_limit_sec": 5.0,
+    "minmax_budget_fraction": 0.5,
+    "minsum_budget_fraction": 0.5,
+    "minsum_refinement_policy": "adaptive",
+    "per_static_time_limit_sec": 2.0,
+    "reference_designated": false,
+    "requested_algorithm": "ip-kont",
+    "requested_backend": "auto",
+    "requested_threads": 2,
+    "requested_time_limit_sec": 10.0,
+    "resolved_algorithm": "ip-kont",
+    "selected_backend": "branch-and-bound"
+  },
+  "result": {
+    "error_message": "{\"message\": \"ip-kont is registered but the native KONT/COPT backend is unavailable\", \"reason_code\": \"BACKEND_UNAVAILABLE\", \"status\": \"SKIPPED\"}",
+    "feasible": false,
+    "lower_bound": null,
+    "objective_value": null,
+    "optimality_status": "FAILED",
+    "solver_result": {},
+    "upper_bound": null
+  },
+  "run_id": "run_20261012T042844Z__ip-kont__minmax__att48-8efa61a1d9ab-5196644df6__r00__f024556921b3",
+  "run_key": "86bc1e89f4ce15fd4a0c422e1ae6a58e4ccda415df9f1d48ba481542fa6822a1",
+  "schema_version": 1,
+  "seed": 42,
+  "selected_backend": "branch-and-bound",
+  "started_at": "2026-10-12T04:28:44.799360Z",
+  "status": "SKIPPED",
+  "verification": {
+    "checked_at": "2026-10-12T04:28:44.802323Z",
+    "continuous": false,
+    "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+    "kind": "NONE",
+    "message": "ip-kont is registered but the native KONT/COPT backend is unavailable",
+    "passed": false,
+    "result_sha256": "f621bc718a6cbc0e5c48e7993ac5383a0ac3ebfcd67cd5b0c3e3351d4997ff27",
+    "run_id": "run_20261012T042844Z__ip-kont__minmax__att48-8efa61a1d9ab-5196644df6__r00__f024556921b3",
+    "schema_version": 1,
+    "status": "NOT_RUN",
+    "verification_mode": "not-run"
+  }
+}

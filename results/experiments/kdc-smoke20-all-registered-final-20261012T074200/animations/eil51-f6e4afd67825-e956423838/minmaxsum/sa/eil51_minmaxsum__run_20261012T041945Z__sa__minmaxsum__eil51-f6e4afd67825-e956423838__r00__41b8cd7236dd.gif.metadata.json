@@ -1,0 +1,42 @@
+{
+  "actual_backend": "sa",
+  "algorithm": "sa",
+  "animation_path": "eil51_minmaxsum__run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd.gif",
+  "animation_sha256": "e336327790b8e8f68738a367f109484ee72bdd9581c514bb61fa1054c90a28b9",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "eil51-f6e4afd67825-e956423838",
+  "instance_name": "eil51",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 1887.9951954365686,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 3204.570168942002,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd/execution/solver/runs/eil51/sa/minmaxsum/component-minmax",
+    "minsum_component_integral": 1916.1794626536664,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 3474.4738061657335,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd/execution/solver/runs/eil51/sa/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 1837.7958192675392,
+    "peak_cost": 3204.570168942002
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd/result/result.json",
+  "source_solution_path": "runs/run_20261012T041945Z__sa__minmaxsum__eil51-f6e4afd67825-e956423838__r00__41b8cd7236dd/result/solution.json",
+  "source_solution_sha256": "892d847ec22b32c4f2cde3378f14f5dba3ebf641e8438545daaf931d90614a7e",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

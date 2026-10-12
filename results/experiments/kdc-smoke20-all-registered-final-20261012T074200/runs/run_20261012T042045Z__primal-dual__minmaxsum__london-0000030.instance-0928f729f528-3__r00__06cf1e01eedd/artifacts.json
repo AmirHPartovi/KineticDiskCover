@@ -1,0 +1,119 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "42f9f561086717f4d70b8dee6f56c503cd01986fd7013920f0fdafb04502ac47",
+      "size_bytes": 904
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "b01bd779aeb0e3d71f63f87b6fb89c2101e6f2cdf56b89c7776a2a81984369ec",
+      "size_bytes": 463
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "a577f9262b5fe1022cfbbad9190c5ea22566d0cbe00ba4e5fb6b7538f58cbafe",
+      "size_bytes": 3146
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "a5a0310733c78bb5ba81e3fb9568e090399972bdf46d4480559e59301f6e9ca6",
+      "size_bytes": 3098
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "8832b44d0cfeb4e2a39794e5393867040c0b5acb1981b6075cf98cebab72d3bc",
+      "size_bytes": 6432
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minmaxsum/result.json",
+      "sha256": "726ca8d28c9c7c099313f3ef6a0062698c085e85ce9a8c2387c56c58628e4cc1",
+      "size_bytes": 6176
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minmaxsum/solution.json",
+      "sha256": "660601db184a662b731eeacbf904ea9a24077c5283896ad5454983600da8d9fe",
+      "size_bytes": 5417
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/london-0000030.instance/primal-dual/minmaxsum/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "cc5d25b616b6fc744726455e10ed3104d4c674a96c1d38bf39c972eb0ff31d5a",
+      "size_bytes": 14815
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "379dd7fdc9c0c765a68d0476abb95918cf9e9246cd2c59b1ef426c0a7831d393",
+      "size_bytes": 235
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "size_bytes": 2854
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "1587d76bfe7e6f811c7eba3346bc0a617c1961474e55941e9a092005352b94b2",
+      "size_bytes": 563
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "defea60a9d99697889e9a136d80ee55b7e898590aa6002d5d3232623ed391eaf",
+      "size_bytes": 1527
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "2bc6fcb168ff39843660554eb165d58ecf996853e08db58a8bf5ef20ae2b4b99",
+      "size_bytes": 6453
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "660601db184a662b731eeacbf904ea9a24077c5283896ad5454983600da8d9fe",
+      "size_bytes": 5417
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "8ee6a92935c13653e26d139747421b6b6ca5557d976b0c6b9f84b3a2c97486f5",
+      "size_bytes": 14620
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "c43552c50e6197dff401c7957a4804d687d74356b120a8017e6ae98ebdc71ada",
+      "size_bytes": 502
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,42 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "animation_path": "berlin52_minmaxsum__run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d.gif",
+  "animation_sha256": "66c8ff609debd786edbab904265dc996e42a9345baa3cb4529f61c44d6a105ce",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "berlin52-3939d9e3cc19-6ce5d7089a",
+  "instance_name": "berlin52",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 2556.5611343925366,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4698.533680124574,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d/execution/solver/runs/berlin52/primal-dual/minmaxsum/component-minmax",
+    "minsum_component_integral": 2539.986948033329,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 4698.533680124574,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d/execution/solver/runs/berlin52/primal-dual/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 2293.7352110676857,
+    "peak_cost": 4698.533680124574
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d/result/result.json",
+  "source_solution_path": "runs/run_20261012T041942Z__primal-dual__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__abdd1705c36d/result/solution.json",
+  "source_solution_sha256": "43e58d6f2df723b382858f1eae3a4438fd2dcd7efbe7eb97e5e5b1841eb7cd6b",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

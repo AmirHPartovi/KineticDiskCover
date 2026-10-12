@@ -1,0 +1,3319 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-12T06:02:32.506326+00:00",
+  "name": "smoke20",
+  "profile": "smoke20",
+  "policy_version": "smoke-family-balanced-v1",
+  "selector_version": "2.0",
+  "selection_policy": "eligible valid unique instances only; choose one smallest candidate per family first, then round-robin across represented families in deterministic size/path order; reject the selection if the requested count cannot be met",
+  "policy_parameters": {
+    "seed": 0,
+    "ordering": "n,m,n*m,file_size_bytes,relative_source",
+    "family_fill": "round_robin"
+  },
+  "size_limits": {
+    "max_n": 50,
+    "max_m": 25
+  },
+  "count": 20,
+  "source_root": "data/instances/public_instance_set",
+  "source_dataset_fingerprint": "81450bc74e582372abac761376730e1fc786af37a25f9d2cbf988638fb06e721",
+  "selected_instance_count": 20,
+  "family_coverage": {
+    "available_eligible_families": 30,
+    "represented_families": [
+      "att48",
+      "berlin52",
+      "c-lower",
+      "c-right",
+      "eil51",
+      "eil76",
+      "euro-night",
+      "gr96",
+      "krod100",
+      "kroe100",
+      "london",
+      "pr76",
+      "rat99",
+      "rd100",
+      "sbgdb-20200507-fpg-poly",
+      "sbgdb-20200507-pntset",
+      "st70",
+      "stars",
+      "uniform",
+      "us-night"
+    ],
+    "selected_counts": {
+      "att48": 1,
+      "berlin52": 1,
+      "c-lower": 1,
+      "c-right": 1,
+      "eil51": 1,
+      "eil76": 1,
+      "euro-night": 1,
+      "gr96": 1,
+      "krod100": 1,
+      "kroe100": 1,
+      "london": 1,
+      "pr76": 1,
+      "rat99": 1,
+      "rd100": 1,
+      "sbgdb-20200507-fpg-poly": 1,
+      "sbgdb-20200507-pntset": 1,
+      "st70": 1,
+      "stars": 1,
+      "uniform": 1,
+      "us-night": 1
+    }
+  },
+  "classification_rule": "top-level directory name when files are grouped by directory; otherwise known public filename prefixes (us-night, euro-night, london, paris, stars, uniform, sbgdb date/type, many_holes), then normalized filename stem",
+  "instances": [
+    {
+      "instance_id": "6093b7e92f3f01af4e198ad510f6a36e0cb6e7cdcbc01786516c8b6210201ca7",
+      "family": "us-night",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/us-night-0000030.instance.mdc",
+      "relative_source": "us-night-0000030.instance.mdc",
+      "source_sha256": "89cc3fc4c0fbe027a9b8759bd278f62531c28aa58f29008e0bfe6c51bb1b2ad9",
+      "canonical_path": "instances/us-night/us-night-0000030.instance-89cc3fc4c0fb.json",
+      "canonical_sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185",
+      "n": 1,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1679,
+      "selection_rank": 1,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/us-night/us-night-0000030.instance-89cc3fc4c0fb.json",
+      "materialized_sha256": "3704ac03dcb9e707e674a5d29fb7eba81c0ab4d4bf0bb48f0660aab0ccc34185"
+    },
+    {
+      "instance_id": "dc38958ed96ecdcddc819cc27b23ac85d21c3b8ebc543fcfb8a526ebccec45ca",
+      "family": "sbgdb-20200507-pntset",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000030.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000030.mdc",
+      "source_sha256": "ffc4aabe37f9ed2cf60d2a9fcd17bfe484812a9238bdd13a144105c20cff10e6",
+      "canonical_path": "instances/sbgdb-20200507-pntset/sbgdb-20200507-pntset-0000030-ffc4aabe37f9.json",
+      "canonical_sha256": "d00c0eac6bbe042c04afc34c9da251b437bacbec21d7b2b5b61d846e903b8ad9",
+      "n": 1,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1683,
+      "selection_rank": 2,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/sbgdb-20200507-pntset/sbgdb-20200507-pntset-0000030-ffc4aabe37f9.json",
+      "materialized_sha256": "d00c0eac6bbe042c04afc34c9da251b437bacbec21d7b2b5b61d846e903b8ad9"
+    },
+    {
+      "instance_id": "c7b68fcfa56098310b62700f3165b9008704df7c96c39e2f9f794c01a312fe31",
+      "family": "sbgdb-20200507-fpg-poly",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000030.mdc",
+      "source_sha256": "7493750b7865f0c242247028e6c27da92e8ccb54d73331418b979ea178147b6a",
+      "canonical_path": "instances/sbgdb-20200507-fpg-poly/sbgdb-20200507-fpg-poly_0000000030-7493750b7865.json",
+      "canonical_sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd",
+      "n": 1,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1723,
+      "selection_rank": 3,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/sbgdb-20200507-fpg-poly/sbgdb-20200507-fpg-poly_0000000030-7493750b7865.json",
+      "materialized_sha256": "f90cd72a4cfc0d6177d9ae260f55c9593086a9f25031e96bd7d6a03eb11260cd"
+    },
+    {
+      "instance_id": "c0078b959ff9de9c1b640d9821a2acf0e47195fc6ed9a1095c1b7dfb39493c09",
+      "family": "uniform",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/uniform-0000030-2.mdc",
+      "relative_source": "uniform-0000030-2.mdc",
+      "source_sha256": "cbaabccb536ed99942d3b3772832ec3a58187cd716d0fee8b2cca38f98183b9e",
+      "canonical_path": "instances/uniform/uniform-0000030-2-cbaabccb536e.json",
+      "canonical_sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d",
+      "n": 2,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1779,
+      "selection_rank": 4,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/uniform/uniform-0000030-2-cbaabccb536e.json",
+      "materialized_sha256": "ac5ba1705422cea0478e670bd5ce5b602720614393deaafd3d6ce0813d074b2d"
+    },
+    {
+      "instance_id": "752bb899997a069c76447e4e2a091c02a879414ec1308d1f6c487a22395f1e34",
+      "family": "london",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/london-0000030.instance.mdc",
+      "relative_source": "london-0000030.instance.mdc",
+      "source_sha256": "0928f729f52886a6a99b6ff3352347460e0958436f3b7375a63da6788fcd8887",
+      "canonical_path": "instances/london/london-0000030.instance-0928f729f528.json",
+      "canonical_sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "n": 2,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1790,
+      "selection_rank": 5,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/london/london-0000030.instance-0928f729f528.json",
+      "materialized_sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93"
+    },
+    {
+      "instance_id": "a9f3666001ffdf590101de7e84d4e2002e90427a70fc4f01e017672b973a4a82",
+      "family": "stars",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/stars-0000030.instance.mdc",
+      "relative_source": "stars-0000030.instance.mdc",
+      "source_sha256": "1955c914c7410f738387ff1e95bac363bfb7357b0e5b333159ad3f16dbb4c9c4",
+      "canonical_path": "instances/stars/stars-0000030.instance-1955c914c741.json",
+      "canonical_sha256": "2f24c57225fcd058c9f9a0838ccc248221fa4044c56e7a1cdf24e9459c40f07b",
+      "n": 2,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1791,
+      "selection_rank": 6,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/stars/stars-0000030.instance-1955c914c741.json",
+      "materialized_sha256": "2f24c57225fcd058c9f9a0838ccc248221fa4044c56e7a1cdf24e9459c40f07b"
+    },
+    {
+      "instance_id": "20154c49ca14ced4787a14fe08537a1767ce40a5b4904e52131a6b65f038432f",
+      "family": "euro-night",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/euro-night-0000030.mdc",
+      "relative_source": "euro-night-0000030.mdc",
+      "source_sha256": "e7069adc74e0bfd0a52c160d05be6be3ab32aae9233d6eb8bf78abe30246f125",
+      "canonical_path": "instances/euro-night/euro-night-0000030-e7069adc74e0.json",
+      "canonical_sha256": "164a859873e6cfef07efad3a2e749a7b5e95575e5915b4d07af6e2ab0b6fa069",
+      "n": 2,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 1792,
+      "selection_rank": 7,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/euro-night/euro-night-0000030-e7069adc74e0.json",
+      "materialized_sha256": "164a859873e6cfef07efad3a2e749a7b5e95575e5915b4d07af6e2ab0b6fa069"
+    },
+    {
+      "instance_id": "ea6346d9e69eb9fe4b81d92aaeca918fcff0ae3e83bc7418e1d64cfe99fa98bc",
+      "family": "att48",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/att48.mdc",
+      "relative_source": "att48.mdc",
+      "source_sha256": "8efa61a1d9ab8fa13553ad56c76096e4c1a178a27ce03d87ca080f6c8d58a91f",
+      "canonical_path": "instances/att48/att48-8efa61a1d9ab.json",
+      "canonical_sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d",
+      "n": 11,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 2866,
+      "selection_rank": 8,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/att48/att48-8efa61a1d9ab.json",
+      "materialized_sha256": "5196644df6029af2bac1e231da0c0ebe087908de06ee6b9d5423c899ef12df3d"
+    },
+    {
+      "instance_id": "053e19cc106dd9aa3df97407a21bfb51363e69eed63f63780082d143eb718fb2",
+      "family": "berlin52",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/berlin52.mdc",
+      "relative_source": "berlin52.mdc",
+      "source_sha256": "3939d9e3cc19729916df1e7e8bfb198827657566a94afdd70ba5aa630f47af7d",
+      "canonical_path": "instances/berlin52/berlin52-3939d9e3cc19.json",
+      "canonical_sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "n": 13,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 3106,
+      "selection_rank": 9,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/berlin52/berlin52-3939d9e3cc19.json",
+      "materialized_sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4"
+    },
+    {
+      "instance_id": "28d7d5cd89e60df7e333769dd1ffa32ec25a056d6352c4b8ffe49fb993c6ba49",
+      "family": "eil51",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/eil51.mdc",
+      "relative_source": "eil51.mdc",
+      "source_sha256": "f6e4afd678253f29a791daaa73035ab647a9e6c3972e72259f6cde70cb7309c6",
+      "canonical_path": "instances/eil51/eil51-f6e4afd67825.json",
+      "canonical_sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a",
+      "n": 13,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 3111,
+      "selection_rank": 10,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/eil51/eil51-f6e4afd67825.json",
+      "materialized_sha256": "e956423838558ad972fd4ff2d9dacd5ab7ad057254b02fc8a78f402f85c1fc2a"
+    },
+    {
+      "instance_id": "f8ab3317d5e68988651a68b81fe3408be7e83c859f4d00514e8b1fae74c03410",
+      "family": "st70",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/st70.mdc",
+      "relative_source": "st70.mdc",
+      "source_sha256": "fa79167d45663a2d440a54d2e7109165286fb26486f9df8dfabb126e6625ab2a",
+      "canonical_path": "instances/st70/st70-fa79167d4566.json",
+      "canonical_sha256": "93e4a763b9ec21867e20f0c0c9880449e301c77823383f79a0566fa86a694c35",
+      "n": 22,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 4210,
+      "selection_rank": 11,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/st70/st70-fa79167d4566.json",
+      "materialized_sha256": "93e4a763b9ec21867e20f0c0c9880449e301c77823383f79a0566fa86a694c35"
+    },
+    {
+      "instance_id": "b1e39f2e03173748ec584017fdc39fb6f1eb44e8d860def9aab3283d2ef120b3",
+      "family": "eil76",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/eil76.mdc",
+      "relative_source": "eil76.mdc",
+      "source_sha256": "e404104dd7bbfcdf1cc805a658a41a8b24a5bb7fc1536a189e8f630b8c715edc",
+      "canonical_path": "instances/eil76/eil76-e404104dd7bb.json",
+      "canonical_sha256": "8eb626a3b8a85dc92eca59f76574cd56d1d56545509d946911ff42d5f2a8e217",
+      "n": 25,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 4532,
+      "selection_rank": 12,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/eil76/eil76-e404104dd7bb.json",
+      "materialized_sha256": "8eb626a3b8a85dc92eca59f76574cd56d1d56545509d946911ff42d5f2a8e217"
+    },
+    {
+      "instance_id": "3ca995d939fe0f575fc31e0a0662fae65f31d3f63b180ac1caa12e027d7b7615",
+      "family": "pr76",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/pr76.mdc",
+      "relative_source": "pr76.mdc",
+      "source_sha256": "4001f85eab1a67494f9d95d97b8ae52a890946d301b390d83c6e039e725bcb2d",
+      "canonical_path": "instances/pr76/pr76-4001f85eab1a.json",
+      "canonical_sha256": "dc636944a6c6e59d94465f836ab29a2d1b4880344e3f7420e53c64dbacf5ec1f",
+      "n": 25,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 4586,
+      "selection_rank": 13,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/pr76/pr76-4001f85eab1a.json",
+      "materialized_sha256": "dc636944a6c6e59d94465f836ab29a2d1b4880344e3f7420e53c64dbacf5ec1f"
+    },
+    {
+      "instance_id": "5258bacc376bd628b4be34380a70fd49dc7ee697bc1012c3fceab298a5c2686a",
+      "family": "c-right",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/C-right.mdc",
+      "relative_source": "C-right.mdc",
+      "source_sha256": "8bf4b57706687d5c1778e4f3f1c34f75889c4a7f3216063e4d561c7c260db1dc",
+      "canonical_path": "instances/c-right/C-right-8bf4b5770668.json",
+      "canonical_sha256": "e0f2e6a705e1f142a47b9698d5471e23d9703171f47a6d4380e2e8a9bc861068",
+      "n": 26,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 4725,
+      "selection_rank": 14,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/c-right/C-right-8bf4b5770668.json",
+      "materialized_sha256": "e0f2e6a705e1f142a47b9698d5471e23d9703171f47a6d4380e2e8a9bc861068"
+    },
+    {
+      "instance_id": "02dff84e0ce2a750b49c59c8727f95596d3b07449551a952f2649d3298cfdce8",
+      "family": "c-lower",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/C-lower.mdc",
+      "relative_source": "C-lower.mdc",
+      "source_sha256": "90fec4bb611842d765ae230f25a41c6be10b89b037818d2defc60de02c0d716f",
+      "canonical_path": "instances/c-lower/C-lower-90fec4bb6118.json",
+      "canonical_sha256": "801fe3006e85061467a244362f0dbea9d9502d40aa44223639459f2d9c664959",
+      "n": 34,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 5751,
+      "selection_rank": 15,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/c-lower/C-lower-90fec4bb6118.json",
+      "materialized_sha256": "801fe3006e85061467a244362f0dbea9d9502d40aa44223639459f2d9c664959"
+    },
+    {
+      "instance_id": "7d665313c602cbd36d20bee80c61329eac626cd6b25f3d01b7af9ff21da293c1",
+      "family": "gr96",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/gr96.mdc",
+      "relative_source": "gr96.mdc",
+      "source_sha256": "a23a7ba30c4c48ba26908eb7bf475f375d8cb93f8868b05676ed13116d2629e5",
+      "canonical_path": "instances/gr96/gr96-a23a7ba30c4c.json",
+      "canonical_sha256": "e195dfa06d76d1f470cebb9e47e6f0c4a62b1437255ecdeb6a717dcb2041e7f6",
+      "n": 35,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 5859,
+      "selection_rank": 16,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/gr96/gr96-a23a7ba30c4c.json",
+      "materialized_sha256": "e195dfa06d76d1f470cebb9e47e6f0c4a62b1437255ecdeb6a717dcb2041e7f6"
+    },
+    {
+      "instance_id": "fc3ff8643f3748ed9cb5f4ed2f53b63c22d4593b572a75882e967ea8451acf63",
+      "family": "rat99",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/rat99.mdc",
+      "relative_source": "rat99.mdc",
+      "source_sha256": "a364923ee3293989da30dffff5b2e8d0bee82f9483c87931485ba22684441316",
+      "canonical_path": "instances/rat99/rat99-a364923ee329.json",
+      "canonical_sha256": "1be1f1f758469bd9ba7b2081ffc84b609a37c2526650e53025ae7d1528e6a652",
+      "n": 37,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 6013,
+      "selection_rank": 17,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/rat99/rat99-a364923ee329.json",
+      "materialized_sha256": "1be1f1f758469bd9ba7b2081ffc84b609a37c2526650e53025ae7d1528e6a652"
+    },
+    {
+      "instance_id": "602f8f89ede68e0503d27260f14dcba0b2bff2721969f50170728624f4577ccb",
+      "family": "kroe100",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/kroE100.mdc",
+      "relative_source": "kroE100.mdc",
+      "source_sha256": "02a50775c87efbd79ef6f358a48407aa18127d29e21674b1f5293a207f841213",
+      "canonical_path": "instances/kroe100/kroE100-02a50775c87e.json",
+      "canonical_sha256": "d8d2268527f2d0aaca9e020ee58b7b68c366057fcda56f5a4b223ef07e6d1e71",
+      "n": 37,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 6016,
+      "selection_rank": 18,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/kroe100/kroE100-02a50775c87e.json",
+      "materialized_sha256": "d8d2268527f2d0aaca9e020ee58b7b68c366057fcda56f5a4b223ef07e6d1e71"
+    },
+    {
+      "instance_id": "139c782256107bdffd8644f5b6c68ba7a6d0a7a03b360104feca1b9ad3ac4bd6",
+      "family": "rd100",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/rd100.mdc",
+      "relative_source": "rd100.mdc",
+      "source_sha256": "9407ab41999fe62a7fa675466301c2597562f3d96036650d3bafaa1d9f9a321d",
+      "canonical_path": "instances/rd100/rd100-9407ab41999f.json",
+      "canonical_sha256": "b9917bc5f53094215a92532eef1dbf69a6a4f8b06305afbc1f380d545aec9c24",
+      "n": 37,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 6022,
+      "selection_rank": 19,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/rd100/rd100-9407ab41999f.json",
+      "materialized_sha256": "b9917bc5f53094215a92532eef1dbf69a6a4f8b06305afbc1f380d545aec9c24"
+    },
+    {
+      "instance_id": "febf405fe5abc75b0e2c921e663ac073e8ca42e74ba9a6c5c3d593fdbe3ebd41",
+      "family": "krod100",
+      "family_classification_rule": "filename_prefix_or_normalized_stem",
+      "source": "data/instances/public_instance_set/kroD100.mdc",
+      "relative_source": "kroD100.mdc",
+      "source_sha256": "100b54b48d61397be0940fe539fd6b31ba7af3150389e870623b25faf9b8b05d",
+      "canonical_path": "instances/krod100/kroD100-100b54b48d61.json",
+      "canonical_sha256": "5062f763b8822534031f9d579f9ce5cd15dee3b8ce11d66e59ae6c88dbc63897",
+      "n": 37,
+      "m": 25,
+      "T_end": 1.0,
+      "file_size_bytes": 6025,
+      "selection_rank": 20,
+      "selection_reason": "first eligible candidate from family, selected for broad family coverage",
+      "size_limit_exception": null,
+      "materialized_file": "instances/krod100/kroD100-100b54b48d61.json",
+      "materialized_sha256": "5062f763b8822534031f9d579f9ce5cd15dee3b8ce11d66e59ae6c88dbc63897"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "source": "data/instances/public_instance_set/bier127.mdc",
+      "relative_source": "bier127.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 51,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/ch130.mdc",
+      "relative_source": "ch130.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 52,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/xqf131.mdc",
+      "relative_source": "xqf131.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 53,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr136.mdc",
+      "relative_source": "pr136.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 55,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/C-upper.mdc",
+      "relative_source": "C-upper.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 55,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/C0-upper.mdc",
+      "relative_source": "C0-upper.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 55,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/C0-lower.mdc",
+      "relative_source": "C0-lower.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 56,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gr137.mdc",
+      "relative_source": "gr137.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 56,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr144.mdc",
+      "relative_source": "pr144.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 59,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/d198.mdc",
+      "relative_source": "d198.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 60,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/ch150.mdc",
+      "relative_source": "ch150.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 62,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroA150.mdc",
+      "relative_source": "kroA150.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 62,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroB150.mdc",
+      "relative_source": "kroB150.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 62,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr152.mdc",
+      "relative_source": "pr152.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 63,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/u159.mdc",
+      "relative_source": "u159.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 67,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gr229.mdc",
+      "relative_source": "gr229.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 67,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rat195.mdc",
+      "relative_source": "rat195.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 85,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000200-1.mdc",
+      "relative_source": "uniform-0000200-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000200.instance.mdc",
+      "relative_source": "us-night-0000200.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroA200.mdc",
+      "relative_source": "kroA200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000200-2.mdc",
+      "relative_source": "uniform-0000200-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000200.mdc",
+      "relative_source": "stars-0000200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroB200.mdc",
+      "relative_source": "kroB200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000200.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000200.instance.mdc",
+      "relative_source": "euro-night-0000200.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000200.instance.mdc",
+      "relative_source": "paris-0000200.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000200.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 87,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr264.mdc",
+      "relative_source": "pr264.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 96,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/ts225.mdc",
+      "relative_source": "ts225.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 100,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/tsp225.mdc",
+      "relative_source": "tsp225.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 100,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr226.mdc",
+      "relative_source": "pr226.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 100,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/xqg237.mdc",
+      "relative_source": "xqg237.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 106,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/right-bend-lower.mdc",
+      "relative_source": "right-bend-lower.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 107,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/right-bend-upper.mdc",
+      "relative_source": "right-bend-upper.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 107,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/thick-left-angle-lower.mdc",
+      "relative_source": "thick-left-angle-lower.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 110,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/left-bend-lower.mdc",
+      "relative_source": "left-bend-lower.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 110,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/thick-left-angle-upper.mdc",
+      "relative_source": "thick-left-angle-upper.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 111,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/left-bend-upper.mdc",
+      "relative_source": "left-bend-upper.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 111,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gil262.mdc",
+      "relative_source": "gil262.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 118,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/a280.mdc",
+      "relative_source": "a280.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 127,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gr431.mdc",
+      "relative_source": "gr431.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 136,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000300-1.mdc",
+      "relative_source": "uniform-0000300-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr299.mdc",
+      "relative_source": "pr299.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000300.instance.mdc",
+      "relative_source": "us-night-0000300.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000300.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000300.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000300-2.mdc",
+      "relative_source": "uniform-0000300-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000300.instance.mdc",
+      "relative_source": "stars-0000300.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000300.instance.mdc",
+      "relative_source": "paris-0000300.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000300.mdc",
+      "relative_source": "euro-night-0000300.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000300.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000300.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 137,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes.mdc",
+      "relative_source": "many_holes.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_6.mdc",
+      "relative_source": "many_holes_3_6.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_9.mdc",
+      "relative_source": "many_holes_5_9.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_3.mdc",
+      "relative_source": "many_holes_2_3.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_2.mdc",
+      "relative_source": "many_holes_5_2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_8.mdc",
+      "relative_source": "many_holes_1_8.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_4.mdc",
+      "relative_source": "many_holes_4_4.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_1.mdc",
+      "relative_source": "many_holes_5_1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_3.mdc",
+      "relative_source": "many_holes_1_3.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_0.mdc",
+      "relative_source": "many_holes_4_0.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_5.mdc",
+      "relative_source": "many_holes_1_5.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_2.mdc",
+      "relative_source": "many_holes_2_2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_8.mdc",
+      "relative_source": "many_holes_3_8.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_9.mdc",
+      "relative_source": "many_holes_1_9.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_8.mdc",
+      "relative_source": "many_holes_5_8.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_5.mdc",
+      "relative_source": "many_holes_3_5.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_3.mdc",
+      "relative_source": "many_holes_5_3.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_0.mdc",
+      "relative_source": "many_holes_3_0.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_1.mdc",
+      "relative_source": "many_holes_1_1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_9.mdc",
+      "relative_source": "many_holes_3_9.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_7.mdc",
+      "relative_source": "many_holes_3_7.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_0.mdc",
+      "relative_source": "many_holes_2_0.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_4.mdc",
+      "relative_source": "many_holes_2_4.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_6.mdc",
+      "relative_source": "many_holes_2_6.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_1.mdc",
+      "relative_source": "many_holes_3_1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_6.mdc",
+      "relative_source": "many_holes_5_6.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_6.mdc",
+      "relative_source": "many_holes_1_6.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_7.mdc",
+      "relative_source": "many_holes_4_7.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_0.mdc",
+      "relative_source": "many_holes_1_0.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_1.mdc",
+      "relative_source": "many_holes_2_1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_4.mdc",
+      "relative_source": "many_holes_3_4.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_0.mdc",
+      "relative_source": "many_holes_5_0.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_3.mdc",
+      "relative_source": "many_holes_3_3.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_3.mdc",
+      "relative_source": "many_holes_4_3.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_7.mdc",
+      "relative_source": "many_holes_5_7.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_5.mdc",
+      "relative_source": "many_holes_2_5.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_7.mdc",
+      "relative_source": "many_holes_2_7.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_3_2.mdc",
+      "relative_source": "many_holes_3_2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_1.mdc",
+      "relative_source": "many_holes_4_1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_9.mdc",
+      "relative_source": "many_holes_2_9.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_2.mdc",
+      "relative_source": "many_holes_1_2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_2_8.mdc",
+      "relative_source": "many_holes_2_8.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_6.mdc",
+      "relative_source": "many_holes_4_6.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_7.mdc",
+      "relative_source": "many_holes_1_7.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_9.mdc",
+      "relative_source": "many_holes_4_9.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_8.mdc",
+      "relative_source": "many_holes_4_8.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_5.mdc",
+      "relative_source": "many_holes_5_5.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_2.mdc",
+      "relative_source": "many_holes_4_2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_1_4.mdc",
+      "relative_source": "many_holes_1_4.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_5_4.mdc",
+      "relative_source": "many_holes_5_4.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/many_holes_4_5.mdc",
+      "relative_source": "many_holes_4_5.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 140,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/lin318.mdc",
+      "relative_source": "lin318.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 146,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/linhp318.mdc",
+      "relative_source": "linhp318.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 146,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pma343.mdc",
+      "relative_source": "pma343.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 155,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pka379.mdc",
+      "relative_source": "pka379.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 177,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/bcl380.mdc",
+      "relative_source": "bcl380.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 177,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/ali535.mdc",
+      "relative_source": "ali535.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 183,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pbl395.mdc",
+      "relative_source": "pbl395.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 185,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000400.instance.mdc",
+      "relative_source": "us-night-0000400.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000400-1.mdc",
+      "relative_source": "uniform-0000400-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000400.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000400.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000400.instance.mdc",
+      "relative_source": "stars-0000400.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000400-2.mdc",
+      "relative_source": "uniform-0000400-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rd400.mdc",
+      "relative_source": "rd400.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000400.instance.mdc",
+      "relative_source": "paris-0000400.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000400.instance.mdc",
+      "relative_source": "euro-night-0000400.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000400.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000400.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 187,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/d493.mdc",
+      "relative_source": "d493.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 192,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pbk411.mdc",
+      "relative_source": "pbk411.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 193,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/fl417.mdc",
+      "relative_source": "fl417.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 196,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pbn423.mdc",
+      "relative_source": "pbn423.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 199,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pbm436.mdc",
+      "relative_source": "pbm436.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 205,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr439.mdc",
+      "relative_source": "pr439.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 207,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pcb442.mdc",
+      "relative_source": "pcb442.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 208,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000500.instance.mdc",
+      "relative_source": "us-night-0000500.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000500.mdc",
+      "relative_source": "stars-0000500.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000500-2.mdc",
+      "relative_source": "uniform-0000500-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000500.mdc",
+      "relative_source": "paris-0000500.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000500.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000500.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000500-1.mdc",
+      "relative_source": "uniform-0000500-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000500.instance.mdc",
+      "relative_source": "euro-night-0000500.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000500.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000500.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 237,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/att532.mdc",
+      "relative_source": "att532.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 253,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/u574.mdc",
+      "relative_source": "u574.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 274,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rat575.mdc",
+      "relative_source": "rat575.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 275,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000600.instance.mdc",
+      "relative_source": "us-night-0000600.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000600.instance.mdc",
+      "relative_source": "stars-0000600.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000600-2.mdc",
+      "relative_source": "uniform-0000600-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000600.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000600.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000600-1.mdc",
+      "relative_source": "uniform-0000600-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000600.mdc",
+      "relative_source": "euro-night-0000600.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000600.instance.mdc",
+      "relative_source": "paris-0000600.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000600.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000600.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 287,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gr666.mdc",
+      "relative_source": "gr666.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 301,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/p654.mdc",
+      "relative_source": "p654.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 314,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/d657.mdc",
+      "relative_source": "d657.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 316,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/xql662.mdc",
+      "relative_source": "xql662.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 318,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000700.mdc",
+      "relative_source": "us-night-0000700.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000700.instance.mdc",
+      "relative_source": "stars-0000700.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000700.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000700.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000700-2.mdc",
+      "relative_source": "uniform-0000700-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000700-1.mdc",
+      "relative_source": "uniform-0000700-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000700.mdc",
+      "relative_source": "paris-0000700.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000700.instance.mdc",
+      "relative_source": "euro-night-0000700.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000700.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000700.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 337,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rbx711.mdc",
+      "relative_source": "rbx711.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 343,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/u724.mdc",
+      "relative_source": "u724.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 349,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rbu737.mdc",
+      "relative_source": "rbu737.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 356,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rat783.mdc",
+      "relative_source": "rat783.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 379,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000800.mdc",
+      "relative_source": "us-night-0000800.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000800-2.mdc",
+      "relative_source": "uniform-0000800-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000800.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000800.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000800.instance.mdc",
+      "relative_source": "stars-0000800.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000800-1.mdc",
+      "relative_source": "uniform-0000800-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000800.mdc",
+      "relative_source": "paris-0000800.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000800.instance.mdc",
+      "relative_source": "euro-night-0000800.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000800.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000800.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 387,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/dkg813.mdc",
+      "relative_source": "dkg813.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 394,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000900-2.mdc",
+      "relative_source": "uniform-0000900-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000900.instance.mdc",
+      "relative_source": "us-night-0000900.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000900.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000900.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000900.instance.mdc",
+      "relative_source": "stars-0000900.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000900-1.mdc",
+      "relative_source": "uniform-0000900-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0000900.instance.mdc",
+      "relative_source": "paris-0000900.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000900.mdc",
+      "relative_source": "euro-night-0000900.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000900.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000900.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 437,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/lim963.mdc",
+      "relative_source": "lim963.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 469,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pbd984.mdc",
+      "relative_source": "pbd984.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 479,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0001000.instance.mdc",
+      "relative_source": "us-night-0001000.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/dsj1000.mdc",
+      "relative_source": "dsj1000.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0001000.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0001000.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0001000-1.mdc",
+      "relative_source": "uniform-0001000-1.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0001000-2.mdc",
+      "relative_source": "uniform-0001000-2.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/skylake-0001000.instance.mdc",
+      "relative_source": "skylake-0001000.instance.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/paris-0001000.mdc",
+      "relative_source": "paris-0001000.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0001000.mdc",
+      "relative_source": "euro-night-0001000.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000001000.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000001000.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 487,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr1002.mdc",
+      "relative_source": "pr1002.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 488,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/u1060.mdc",
+      "relative_source": "u1060.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 517,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/vm1084.mdc",
+      "relative_source": "vm1084.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 529,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/xit1083.mdc",
+      "relative_source": "xit1083.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 529,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000001100.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000001100.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 537,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pcb1173.mdc",
+      "relative_source": "pcb1173.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 574,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000001200.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000001200.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 587,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/d1291.mdc",
+      "relative_source": "d1291.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 633,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000001300.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000001300.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 637,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rl1304.mdc",
+      "relative_source": "rl1304.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 639,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/rl1323.mdc",
+      "relative_source": "rl1323.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 649,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/dka1376.mdc",
+      "relative_source": "dka1376.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 675,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/nrw1379.mdc",
+      "relative_source": "nrw1379.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 677,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/dca1389.mdc",
+      "relative_source": "dca1389.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 682,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/fl1400.mdc",
+      "relative_source": "fl1400.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 687,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000001400.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000001400.mdc",
+      "reason_code": "size_limit_exceeded",
+      "reason": {
+        "n": 687,
+        "m": 25,
+        "max_n": 50,
+        "max_m": 25
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000030-1.mdc",
+      "relative_source": "uniform-0000030-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000035.instance.mdc",
+      "relative_source": "us-night-0000035.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000035-1.mdc",
+      "relative_source": "uniform-0000035-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000035-2.mdc",
+      "relative_source": "uniform-0000035-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000035.mdc",
+      "relative_source": "stars-0000035.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000035.mdc",
+      "relative_source": "london-0000035.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000035.instance.mdc",
+      "relative_source": "euro-night-0000035.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000040.instance.mdc",
+      "relative_source": "us-night-0000040.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000040-1.mdc",
+      "relative_source": "uniform-0000040-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000040-2.mdc",
+      "relative_source": "uniform-0000040-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000040.instance.mdc",
+      "relative_source": "stars-0000040.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000040.instance.mdc",
+      "relative_source": "london-0000040.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000040.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000040.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000040.mdc",
+      "relative_source": "euro-night-0000040.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000040.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000040.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000045.mdc",
+      "relative_source": "stars-0000045.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000045.mdc",
+      "relative_source": "london-0000045.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000045-2.mdc",
+      "relative_source": "uniform-0000045-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000045-1.mdc",
+      "relative_source": "uniform-0000045-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000045.mdc",
+      "relative_source": "us-night-0000045.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000045.instance.mdc",
+      "relative_source": "euro-night-0000045.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000050-1.mdc",
+      "relative_source": "uniform-0000050-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000050-2.mdc",
+      "relative_source": "uniform-0000050-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000050.instance.mdc",
+      "relative_source": "stars-0000050.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000050.mdc",
+      "relative_source": "us-night-0000050.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000050.instance.mdc",
+      "relative_source": "london-0000050.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000050.mdc",
+      "relative_source": "euro-night-0000050.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000050.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000050.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000050.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000050.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000060.mdc",
+      "relative_source": "london-0000060.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000060-1.mdc",
+      "relative_source": "uniform-0000060-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000060.mdc",
+      "relative_source": "us-night-0000060.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000060.instance.mdc",
+      "relative_source": "stars-0000060.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000060-2.mdc",
+      "relative_source": "uniform-0000060-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000060.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000060.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000060.instance.mdc",
+      "relative_source": "euro-night-0000060.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000060.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000060.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000080.mdc",
+      "relative_source": "us-night-0000080.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000070-2.mdc",
+      "relative_source": "uniform-0000070-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000070.mdc",
+      "relative_source": "us-night-0000070.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000070.instance.mdc",
+      "relative_source": "london-0000070.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000070-1.mdc",
+      "relative_source": "uniform-0000070-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000070.instance.mdc",
+      "relative_source": "stars-0000070.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000070.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000070.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000070.instance.mdc",
+      "relative_source": "euro-night-0000070.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000070.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000070.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000080-1.mdc",
+      "relative_source": "uniform-0000080-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000080.instance.mdc",
+      "relative_source": "london-0000080.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000080.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000080.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000080.instance.mdc",
+      "relative_source": "stars-0000080.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000080-2.mdc",
+      "relative_source": "uniform-0000080-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000080.mdc",
+      "relative_source": "euro-night-0000080.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000080.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000080.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000090-1.mdc",
+      "relative_source": "uniform-0000090-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000090-2.mdc",
+      "relative_source": "uniform-0000090-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000090.mdc",
+      "relative_source": "us-night-0000090.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000090.instance.mdc",
+      "relative_source": "stars-0000090.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000090.mdc",
+      "relative_source": "euro-night-0000090.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000090.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000090.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000090.instance.mdc",
+      "relative_source": "london-0000090.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000090.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000090.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroC100.mdc",
+      "relative_source": "kroC100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroA100.mdc",
+      "relative_source": "kroA100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/us-night-0000100.instance.mdc",
+      "relative_source": "us-night-0000100.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/kroB100.mdc",
+      "relative_source": "kroB100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/london-0000100.instance.mdc",
+      "relative_source": "london-0000100.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/stars-0000100.instance.mdc",
+      "relative_source": "stars-0000100.instance.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000100-1.mdc",
+      "relative_source": "uniform-0000100-1.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/euro-night-0000100.mdc",
+      "relative_source": "euro-night-0000100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-pntset-0000100.mdc",
+      "relative_source": "sbgdb-20200507-pntset-0000100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/uniform-0000100-2.mdc",
+      "relative_source": "uniform-0000100-2.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/sbgdb-20200507-fpg-poly_0000000100.mdc",
+      "relative_source": "sbgdb-20200507-fpg-poly_0000000100.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/eil101.mdc",
+      "relative_source": "eil101.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr107.mdc",
+      "relative_source": "pr107.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/lin105.mdc",
+      "relative_source": "lin105.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/gr202.mdc",
+      "relative_source": "gr202.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/resize-upper.mdc",
+      "relative_source": "resize-upper.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/resize-lower.mdc",
+      "relative_source": "resize-lower.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    },
+    {
+      "source": "data/instances/public_instance_set/pr124.mdc",
+      "relative_source": "pr124.mdc",
+      "reason_code": "valid_candidate_not_selected",
+      "reason": {
+        "message": "selection count reached after deterministic family-balanced ordering"
+      }
+    }
+  ]
+}

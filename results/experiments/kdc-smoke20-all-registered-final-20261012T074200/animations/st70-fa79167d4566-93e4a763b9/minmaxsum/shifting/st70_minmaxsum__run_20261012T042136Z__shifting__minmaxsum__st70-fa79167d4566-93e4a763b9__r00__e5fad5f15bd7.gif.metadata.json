@@ -1,0 +1,42 @@
+{
+  "actual_backend": "shifting",
+  "algorithm": "shifting",
+  "animation_path": "st70_minmaxsum__run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7.gif",
+  "animation_sha256": "0ffd85b863bd7eef06faab46704af5df40be0294e2693e3f37d3206b8739ecae",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "st70-fa79167d4566-93e4a763b9",
+  "instance_name": "st70",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": false,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3949.7126546372015,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 5120.984955236319,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7/execution/solver/runs/st70/shifting/minmaxsum/component-minmax",
+    "minsum_component_integral": null,
+    "minsum_component_optimality": "FAILED",
+    "minsum_component_peak": null,
+    "minsum_component_status": "FAILED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7/execution/solver/runs/st70/shifting/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3949.7126546372015,
+    "peak_cost": 5120.984955236319
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7/result/result.json",
+  "source_solution_path": "runs/run_20261012T042136Z__shifting__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__e5fad5f15bd7/result/solution.json",
+  "source_solution_sha256": "ad80de67bf0438f1819a20c1b99602f0a361a9495276758f0056822a432743c9",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

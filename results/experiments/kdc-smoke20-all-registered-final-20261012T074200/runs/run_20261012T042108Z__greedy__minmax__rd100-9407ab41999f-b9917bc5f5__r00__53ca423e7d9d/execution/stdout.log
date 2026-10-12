@@ -1,0 +1,102 @@
+[2026-10-12 07:51:08.697] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d/input for instances
+2026-10-12 07:51:08 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:51:08 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:51:08 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:51:08.703] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:51:08.703] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:51:08.703] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d/execution/solver/experiment_manifest.json)
+[2026-10-12 07:51:08.704] [info] [io.cpp:137] read_json: loaded 37 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d/input/instance.json
+[2026-10-12 07:51:08.705] [info] [minmax.cpp:110] MinMax: start n=37, m=25, T=1
+[2026-10-12 07:51:08.705] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5118.399883301 LB=1527.708306517 ratio=3.3504
+[2026-10-12 07:51:08.705] [info] [candidate.cpp:199] InstancePrecompute: built 925 candidates
+[2026-10-12 07:51:08.746] [info] [solution.cpp:1026] extend: 61 intervals over [0, 1]
+[2026-10-12 07:51:08.746] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.980088, peak=10636.717663, LB=1527.708307, gap=5.9625
+[2026-10-12 07:51:08.746] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5319.542599451 LB=2095.573230420 ratio=2.5385
+[2026-10-12 07:51:08.747] [info] [solution.cpp:1026] extend: 2 intervals over [0.9800881089978687, 1]
+[2026-10-12 07:51:08.785] [info] [solution.cpp:1026] extend: 57 intervals over [0, 0.9800881089978687]
+[2026-10-12 07:51:08.785] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 59 intervals
+[2026-10-12 07:51:08.803] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.803] [info] [solution.cpp:1097] combine: 78 intervals
+[2026-10-12 07:51:08.803] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 78 intervals
+[2026-10-12 07:51:08.826] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.826] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.370219, peak=8710.577476, LB=2095.573230, gap=3.1567
+[2026-10-12 07:51:08.826] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3749.431753810 LB=687.471593449 ratio=5.4539
+[2026-10-12 07:51:08.847] [info] [solution.cpp:1026] extend: 31 intervals over [0.3702185897136191, 1]
+[2026-10-12 07:51:08.860] [info] [solution.cpp:1026] extend: 22 intervals over [0, 0.3702185897136191]
+[2026-10-12 07:51:08.860] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 53 intervals
+[2026-10-12 07:51:08.875] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.875] [info] [solution.cpp:1097] combine: 80 intervals
+[2026-10-12 07:51:08.875] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 80 intervals
+[2026-10-12 07:51:08.899] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.899] [info] [minmax.cpp:202] MinMax iter 3: t_max=0.750654, peak=7301.940446, LB=2095.573230, gap=2.4845
+[2026-10-12 07:51:08.899] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=4583.845889381 LB=1102.756515536 ratio=4.1567
+[2026-10-12 07:51:08.906] [info] [solution.cpp:1026] extend: 10 intervals over [0.7506541525707481, 1]
+[2026-10-12 07:51:08.937] [info] [solution.cpp:1026] extend: 43 intervals over [0, 0.7506541525707481]
+[2026-10-12 07:51:08.937] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 52 intervals
+[2026-10-12 07:51:08.953] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.953] [info] [solution.cpp:1097] combine: 62 intervals
+[2026-10-12 07:51:08.953] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 62 intervals
+[2026-10-12 07:51:08.971] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:08.971] [info] [minmax.cpp:202] MinMax iter 4: t_max=0.657088, peak=6417.611747, LB=2095.573230, gap=2.0625
+[2026-10-12 07:51:08.971] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=4395.547750722 LB=806.957531148 ratio=5.4471
+[2026-10-12 07:51:08.981] [info] [solution.cpp:1026] extend: 16 intervals over [0.6570880748223513, 1]
+[2026-10-12 07:51:09.001] [info] [solution.cpp:1026] extend: 30 intervals over [0, 0.6570880748223513]
+[2026-10-12 07:51:09.001] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 45 intervals
+[2026-10-12 07:51:09.014] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.014] [info] [solution.cpp:1097] combine: 60 intervals
+[2026-10-12 07:51:09.014] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 60 intervals
+[2026-10-12 07:51:09.031] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.031] [info] [minmax.cpp:202] MinMax iter 5: t_max=0.120024, peak=6348.441061, LB=2095.573230, gap=2.0295
+[2026-10-12 07:51:09.031] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3978.236045400 LB=942.463056895 ratio=4.2211
+[2026-10-12 07:51:09.067] [info] [solution.cpp:1026] extend: 57 intervals over [0.12002425760856707, 1]
+[2026-10-12 07:51:09.072] [info] [solution.cpp:1026] extend: 8 intervals over [0, 0.12002425760856707]
+[2026-10-12 07:51:09.072] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 64 intervals
+[2026-10-12 07:51:09.092] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.092] [info] [solution.cpp:1097] combine: 61 intervals
+[2026-10-12 07:51:09.092] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 61 intervals
+[2026-10-12 07:51:09.109] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.109] [info] [minmax.cpp:202] MinMax iter 6: t_max=0.930562, peak=5670.231183, LB=2095.573230, gap=1.7058
+[2026-10-12 07:51:09.109] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5262.355475418 LB=1854.168590830 ratio=2.8381
+[2026-10-12 07:51:09.111] [info] [solution.cpp:1026] extend: 3 intervals over [0.9305616957978343, 1]
+[2026-10-12 07:51:09.149] [info] [solution.cpp:1026] extend: 53 intervals over [0, 0.9305616957978343]
+[2026-10-12 07:51:09.149] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 55 intervals
+[2026-10-12 07:51:09.166] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.166] [info] [solution.cpp:1097] combine: 65 intervals
+[2026-10-12 07:51:09.166] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 65 intervals
+[2026-10-12 07:51:09.186] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.186] [info] [minmax.cpp:202] MinMax iter 7: t_max=0.951549, peak=5481.332519, LB=2095.573230, gap=1.6157
+[2026-10-12 07:51:09.186] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5397.589298363 LB=1954.643226119 ratio=2.7614
+[2026-10-12 07:51:09.187] [info] [solution.cpp:1026] extend: 2 intervals over [0.9515486304970958, 1]
+[2026-10-12 07:51:09.224] [info] [solution.cpp:1026] extend: 56 intervals over [0, 0.9515486304970958]
+[2026-10-12 07:51:09.224] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 57 intervals
+[2026-10-12 07:51:09.241] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.241] [info] [solution.cpp:1097] combine: 66 intervals
+[2026-10-12 07:51:09.241] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 66 intervals
+[2026-10-12 07:51:09.259] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.260] [info] [minmax.cpp:202] MinMax iter 8: t_max=0.511690, peak=5442.504980, LB=2095.573230, gap=1.5971
+[2026-10-12 07:51:09.260] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=4761.057211863 LB=814.899464255 ratio=5.8425
+[2026-10-12 07:51:09.273] [info] [solution.cpp:1026] extend: 19 intervals over [0.5116900735297583, 1]
+[2026-10-12 07:51:09.290] [info] [solution.cpp:1026] extend: 23 intervals over [0, 0.5116900735297583]
+[2026-10-12 07:51:09.290] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 41 intervals
+[2026-10-12 07:51:09.302] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.302] [info] [solution.cpp:1097] combine: 68 intervals
+[2026-10-12 07:51:09.302] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 68 intervals
+[2026-10-12 07:51:09.322] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.322] [info] [minmax.cpp:202] MinMax iter 9: t_max=1.000000, peak=5422.948392, LB=2095.573230, gap=1.5878
+[2026-10-12 07:51:09.322] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5422.948391663 LB=2196.832973704 ratio=2.4685
+[2026-10-12 07:51:09.322] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:51:09.361] [info] [solution.cpp:1026] extend: 59 intervals over [0, 1]
+[2026-10-12 07:51:09.361] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 59 intervals
+[2026-10-12 07:51:09.379] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.379] [info] [solution.cpp:1097] combine: 68 intervals
+[2026-10-12 07:51:09.379] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 68 intervals
+[2026-10-12 07:51:09.399] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.399] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-10-12 07:51:09.399] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 68 intervals
+[2026-10-12 07:51:09.420] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:09.420] [info] [minmax.cpp:467] MinMax: done. peak=5422.948392, certified_LB=2196.832974, gap=1.4685, iters=9, t=0.372s
+[2026-10-12 07:51:09.420] [info] [trace.cpp:93] TraceWriter: wrote 9 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d/execution/solver/runs/rd100/greedy/minmax/trace.csv
+[2026-10-12 07:51:09.421] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 104720 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042108Z__greedy__minmax__rd100-9407ab41999f-b9917bc5f5__r00__53ca423e7d9d/execution/solver/runs/rd100/greedy/minmax/solution.json
+[2026-10-12 07:51:09.421] [info] [batch_runner.cpp:1352] BatchRunner: rd100 / greedy / minmax cost=5422.948392 t=0.716s verified=true
+[2026-10-12 07:51:09.421] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

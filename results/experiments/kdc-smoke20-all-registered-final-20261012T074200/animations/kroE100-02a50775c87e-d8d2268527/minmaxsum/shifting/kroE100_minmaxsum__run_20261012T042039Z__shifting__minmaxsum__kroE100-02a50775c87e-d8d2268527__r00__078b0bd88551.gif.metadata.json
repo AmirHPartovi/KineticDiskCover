@@ -1,0 +1,42 @@
+{
+  "actual_backend": "shifting",
+  "algorithm": "shifting",
+  "animation_path": "kroE100_minmaxsum__run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551.gif",
+  "animation_sha256": "7c9963e68c5907585a411f701bd5e31a2384dcde5cf962843d5ede52a0c06c69",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "kroE100-02a50775c87e-d8d2268527",
+  "instance_name": "kroE100",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": false,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 4569.165389072825,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 6234.458190278414,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551/execution/solver/runs/kroE100/shifting/minmaxsum/component-minmax",
+    "minsum_component_integral": null,
+    "minsum_component_optimality": "FAILED",
+    "minsum_component_peak": null,
+    "minsum_component_status": "FAILED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551/execution/solver/runs/kroE100/shifting/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 4569.165389072825,
+    "peak_cost": 6234.458190278414
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551/result/result.json",
+  "source_solution_path": "runs/run_20261012T042039Z__shifting__minmaxsum__kroE100-02a50775c87e-d8d2268527__r00__078b0bd88551/result/solution.json",
+  "source_solution_sha256": "b91d14f3e5d7b4d3ad5cf06b36a556c72d6607b57bdf298b67d2cf0519e8f833",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

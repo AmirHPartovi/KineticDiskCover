@@ -1,0 +1,42 @@
+{
+  "actual_backend": "nn",
+  "algorithm": "nn",
+  "animation_path": "st70_minmaxsum__run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5.gif",
+  "animation_sha256": "d5544a26c26fc1ba6b062e9d67232cfa1bbe8731ce52859e03650e7593328f2d",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "st70-fa79167d4566-93e4a763b9",
+  "instance_name": "st70",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3813.7928758782,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4744.818068697897,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5/execution/solver/runs/st70/nn/minmaxsum/component-minmax",
+    "minsum_component_integral": 3920.931577841307,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 5337.658366202745,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5/execution/solver/runs/st70/nn/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3759.0164252798604,
+    "peak_cost": 4695.906369838276
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5/result/result.json",
+  "source_solution_path": "runs/run_20261012T042135Z__nn__minmaxsum__st70-fa79167d4566-93e4a763b9__r00__80ab2bc87ae5/result/solution.json",
+  "source_solution_sha256": "a9bddb43f668da053ad610e1e76e88d56cba248c0e0e046451e38fb98914e0d8",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

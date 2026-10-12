@@ -1,0 +1,61 @@
+[2026-10-12 07:49:42.225] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf/input for instances
+2026-10-12 07:49:42 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:42 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:42 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:42.231] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:42.231] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:42.232] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:42.232] [info] [io.cpp:137] read_json: loaded 13 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf/input/instance.json
+[2026-10-12 07:49:42.233] [info] [minmax.cpp:110] MinMax: start n=13, m=25, T=1
+[2026-10-12 07:49:42.233] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-12 07:49:42.233] [info] [candidate.cpp:199] InstancePrecompute: built 325 candidates
+[2026-10-12 07:49:42.236] [info] [solution.cpp:1026] extend: 15 intervals over [0, 1]
+[2026-10-12 07:49:42.236] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=16693.036444, LB=1598.360240, gap=9.4439
+[2026-10-12 07:49:42.236] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5243.144327500 LB=1934.141241316 ratio=2.7108
+[2026-10-12 07:49:42.236] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:49:42.239] [info] [solution.cpp:1026] extend: 15 intervals over [0, 1]
+[2026-10-12 07:49:42.239] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:42.240] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=false, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=false
+[2026-10-12 07:49:42.240] [info] [minsum.cpp:512] MinSum: start n=13, m=25
+[2026-10-12 07:49:42.240] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-12 07:49:42.243] [info] [solution.cpp:1026] extend: 15 intervals over [0, 1]
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3220.723887222 LB=1598.360239824 ratio=2.0150
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=1518.365550281 LB=1000.308672533 ratio=1.5179
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=1636.232282884 LB=653.559447303 ratio=2.5036
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2569.348083246 LB=962.603319804 ratio=2.6692
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=5243.144327500 LB=1934.141241316 ratio=2.7108
+[2026-10-12 07:49:42.243] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.7413,1.0000], t_mid=0.8707, int=7434.321435, LB=1095.680545, gap=5.7851
+[2026-10-12 07:49:42.243] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=3663.403844404 LB=1372.073455916 ratio=2.6700
+[2026-10-12 07:49:42.244] [info] [solution.cpp:1026] extend: 2 intervals over [0.8706739451398604, 1]
+[2026-10-12 07:49:42.246] [info] [solution.cpp:1026] extend: 10 intervals over [0, 0.8706739451398604]
+[2026-10-12 07:49:42.246] [info] [solution.cpp:1097] combine: 15 intervals
+[2026-10-12 07:49:42.254] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:42.255] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:42.255] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-12 07:49:42.255] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-12 07:49:42.255] [info] [solution.cpp:1026] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-12 07:49:42.258] [info] [solution.cpp:1026] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-12 07:49:42.258] [info] [solution.cpp:1097] combine: 18 intervals
+[2026-10-12 07:49:42.269] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 2 (1/3)
+[2026-10-12 07:49:42.269] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-12 07:49:42.269] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-12 07:49:42.270] [info] [solution.cpp:1026] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-12 07:49:42.272] [info] [solution.cpp:1026] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-12 07:49:42.272] [info] [solution.cpp:1097] combine: 18 intervals
+[2026-10-12 07:49:42.284] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 3 (2/3)
+[2026-10-12 07:49:42.284] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.6376,0.9207], t_mid=0.7792, int=3966.984075, LB=1095.680545, gap=2.6206
+[2026-10-12 07:49:42.284] [info] [greedy_set_cover_solver.cpp:233] Greedy: cost=2753.178199933 LB=1051.368243987 ratio=2.6187
+[2026-10-12 07:49:42.284] [info] [solution.cpp:1026] extend: 3 intervals over [0.7791572077317265, 1]
+[2026-10-12 07:49:42.287] [info] [solution.cpp:1026] extend: 15 intervals over [0, 0.7791572077317265]
+[2026-10-12 07:49:42.287] [info] [solution.cpp:1097] combine: 18 intervals
+[2026-10-12 07:49:42.298] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 4 (3/3)
+[2026-10-12 07:49:42.298] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:42.300] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:42.300] [info] [minsum.cpp:881] MinSum: done. int=3966.984075, LB=1095.680545, gap=2.6206, iters=4, t=0.046s
+[2026-10-12 07:49:42.300] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 15 intervals
+[2026-10-12 07:49:42.301] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:42.302] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf/execution/solver/runs/berlin52/greedy/minmaxsum/trace.csv
+[2026-10-12 07:49:42.302] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 16200 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041942Z__greedy__minmaxsum__berlin52-3939d9e3cc19-6ce5d7089a__r00__4be0a64bccbf/execution/solver/runs/berlin52/greedy/minmaxsum/solution.json
+[2026-10-12 07:49:42.302] [info] [batch_runner.cpp:1352] BatchRunner: berlin52 / greedy / minmaxsum cost=5518.410044 t=0.069s verified=true
+[2026-10-12 07:49:42.303] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

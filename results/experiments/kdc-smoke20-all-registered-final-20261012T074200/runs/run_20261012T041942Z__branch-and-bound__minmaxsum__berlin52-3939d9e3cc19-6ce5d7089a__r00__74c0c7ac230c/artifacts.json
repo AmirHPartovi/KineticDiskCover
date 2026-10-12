@@ -1,0 +1,119 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "b7b4addadf55ffdabe70469e3ab3c3c5f296daceda96703d841191064a04016f",
+      "size_bytes": 880
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "152904780fb8b23c4db3164bd80ca2d302fb2d20e984fdb8fde2cf2217a98882",
+      "size_bytes": 458
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "cabf5aa8250d04e97a357cd94d4abefffa29c5c73744b6184a8cb52a84b5314a",
+      "size_bytes": 3148
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "1f3f544232561c1c909e538dff1db95f4ad78442589f487948acb619f88b1170",
+      "size_bytes": 3105
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "9b106c9007e1b2d2faf7f6d501cb7464e73d673f4d30c5639cfac9a1b38de2cb",
+      "size_bytes": 6384
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/branch-and-bound/minmaxsum/result.json",
+      "sha256": "48cee139727e52b00d741f0475e67fada1ed1123e005c772e60ae71359d5f2a5",
+      "size_bytes": 6128
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/branch-and-bound/minmaxsum/solution.json",
+      "sha256": "2887851cebf2b1f4c8f793b8feace621e21120d20e6b52603eb2c6434f2691ed",
+      "size_bytes": 19396
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/berlin52/branch-and-bound/minmaxsum/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "5be5d30884c8fef1352c43b124663ae3412c3b17b7c0720c8dcf225ab5bdfe2a",
+      "size_bytes": 16699
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "51bec9b1f0e04daf5363de875d536ed4ec8d7156f4e43251f95f41ad305ce2af",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "size_bytes": 5831
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "9076ffb3e56e0aff211223c6a1943353f8146d97f94085b2ecd0c996e6ebd76f",
+      "size_bytes": 538
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "dd9bfe5afa1f926ccc58613db60b0bec16c1de976f546abfa001846a03f2a7d3",
+      "size_bytes": 1533
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "1442166e063b65a6aafea556cd7812578e01b578a1d1bd8cec97618ff97e8dd6",
+      "size_bytes": 6421
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "2887851cebf2b1f4c8f793b8feace621e21120d20e6b52603eb2c6434f2691ed",
+      "size_bytes": 19396
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "1d187a97e659343bba7f37158d3824bf2516c26aab224e3b4bb512888abc16d4",
+      "size_bytes": 14556
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "5d26c828a61834692a9206b7c6fa77cf4f8ebbf03d48b9f40e6b6cdff91a304c",
+      "size_bytes": 501
+    }
+  ],
+  "schema_version": 1
+}

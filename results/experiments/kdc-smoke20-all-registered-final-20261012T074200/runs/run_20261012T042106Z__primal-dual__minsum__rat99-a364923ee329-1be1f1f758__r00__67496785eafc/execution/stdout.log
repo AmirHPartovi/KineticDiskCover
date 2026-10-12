@@ -1,0 +1,52 @@
+[2026-10-12 07:51:06.190] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc/input for instances
+2026-10-12 07:51:06 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:51:06 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:51:06 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:51:06.196] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:51:06.196] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:51:06.196] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc/execution/solver/experiment_manifest.json)
+[2026-10-12 07:51:06.197] [info] [io.cpp:137] read_json: loaded 37 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc/input/instance.json
+[2026-10-12 07:51:06.198] [info] [minsum.cpp:512] MinSum: start n=37, m=25
+[2026-10-12 07:51:06.198] [info] [candidate.cpp:199] InstancePrecompute: built 925 candidates
+[2026-10-12 07:51:06.199] [info] [candidate.cpp:345] build_coverage: nnz=17577
+[2026-10-12 07:51:06.199] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4004.508065370 LB=101.755407579 ratio=39.3543 |D|=11
+[2026-10-12 07:51:06.241] [info] [solution.cpp:1026] extend: 59 intervals over [0, 1]
+[2026-10-12 07:51:06.242] [info] [candidate.cpp:345] build_coverage: nnz=17577
+[2026-10-12 07:51:06.242] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4004.508065370 LB=101.755407579 ratio=39.3543 |D|=11
+[2026-10-12 07:51:06.243] [info] [candidate.cpp:345] build_coverage: nnz=17577
+[2026-10-12 07:51:06.244] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=3079.496389726 LB=84.292585752 ratio=36.5334 |D|=9
+[2026-10-12 07:51:06.245] [info] [candidate.cpp:345] build_coverage: nnz=17579
+[2026-10-12 07:51:06.246] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=3186.453699462 LB=88.765495914 ratio=35.8974 |D|=9
+[2026-10-12 07:51:06.247] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:51:06.247] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4141.111599354 LB=88.104125348 ratio=47.0025 |D|=11
+[2026-10-12 07:51:06.248] [info] [candidate.cpp:345] build_coverage: nnz=17579
+[2026-10-12 07:51:06.249] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=4271.035455552 LB=121.019268453 ratio=35.2922 |D|=10
+[2026-10-12 07:51:06.249] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.6258,0.6816], t_mid=0.6537, int=6032.323672, LB=93.137386, gap=63.7680
+[2026-10-12 07:51:06.250] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:51:06.250] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2779.114451465 LB=74.023792257 ratio=37.5435 |D|=11
+[2026-10-12 07:51:06.263] [info] [solution.cpp:1026] extend: 20 intervals over [0.6537135766779008, 1]
+[2026-10-12 07:51:06.288] [info] [solution.cpp:1026] extend: 40 intervals over [0, 0.6537135766779008]
+[2026-10-12 07:51:06.288] [info] [solution.cpp:1097] combine: 68 intervals
+[2026-10-12 07:51:06.328] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 1 (1/3)
+[2026-10-12 07:51:06.328] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.6258,0.6816], t_mid=0.6537, int=6032.323672, LB=93.137386, gap=63.7680
+[2026-10-12 07:51:06.329] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:51:06.330] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2779.114451465 LB=74.023792257 ratio=37.5435 |D|=11
+[2026-10-12 07:51:06.342] [info] [solution.cpp:1026] extend: 20 intervals over [0.6537135766779008, 1]
+[2026-10-12 07:51:06.368] [info] [solution.cpp:1026] extend: 40 intervals over [0, 0.6537135766779008]
+[2026-10-12 07:51:06.368] [info] [solution.cpp:1097] combine: 68 intervals
+[2026-10-12 07:51:06.408] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 2 (2/3)
+[2026-10-12 07:51:06.408] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.6258,0.6816], t_mid=0.6537, int=6032.323672, LB=93.137386, gap=63.7680
+[2026-10-12 07:51:06.409] [info] [candidate.cpp:345] build_coverage: nnz=17575
+[2026-10-12 07:51:06.409] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=2779.114451465 LB=74.023792257 ratio=37.5435 |D|=11
+[2026-10-12 07:51:06.422] [info] [solution.cpp:1026] extend: 20 intervals over [0.6537135766779008, 1]
+[2026-10-12 07:51:06.448] [info] [solution.cpp:1026] extend: 40 intervals over [0, 0.6537135766779008]
+[2026-10-12 07:51:06.448] [info] [solution.cpp:1097] combine: 68 intervals
+[2026-10-12 07:51:06.489] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 3 (3/3)
+[2026-10-12 07:51:06.489] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 59 intervals
+[2026-10-12 07:51:06.504] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:06.504] [info] [minsum.cpp:881] MinSum: done. int=6032.323672, LB=93.137386, gap=63.7680, iters=3, t=0.230s
+[2026-10-12 07:51:06.505] [info] [trace.cpp:93] TraceWriter: wrote 1 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc/execution/solver/runs/rat99/primal-dual/minsum/trace.csv
+[2026-10-12 07:51:06.505] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 90818 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042106Z__primal-dual__minsum__rat99-a364923ee329-1be1f1f758__r00__67496785eafc/execution/solver/runs/rat99/primal-dual/minsum/solution.json
+[2026-10-12 07:51:06.505] [info] [batch_runner.cpp:1352] BatchRunner: rat99 / primal-dual / minsum cost=6032.323672 t=0.308s verified=true
+[2026-10-12 07:51:06.506] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

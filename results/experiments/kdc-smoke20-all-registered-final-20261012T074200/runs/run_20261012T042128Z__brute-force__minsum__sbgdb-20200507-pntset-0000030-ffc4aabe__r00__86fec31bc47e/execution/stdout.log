@@ -1,0 +1,33 @@
+[2026-10-12 07:51:28.681] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e/input for instances
+2026-10-12 07:51:28 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:51:28 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:51:28 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:51:28.687] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:51:28.687] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:51:28.687] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e/execution/solver/experiment_manifest.json)
+[2026-10-12 07:51:28.688] [info] [io.cpp:137] read_json: loaded 1 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e/input/instance.json
+[2026-10-12 07:51:28.688] [info] [minsum.cpp:512] MinSum: start n=1, m=25
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=301.905700178 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [candidate.cpp:199] InstancePrecompute: built 25 candidates
+[2026-10-12 07:51:28.688] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=301.905700178 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=500.032649384 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=728.527413593 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=1019.920315038 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=1781.071512247 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.0000,1.0000], t_mid=0.5000, int=1597.459427, LB=822.492246, gap=0.9422
+[2026-10-12 07:51:28.688] [info] [brute_force_solver.cpp:212] BruteForce: cost=728.527413593 total=25 t=0.0000s
+[2026-10-12 07:51:28.688] [info] [solution.cpp:1026] extend: 1 intervals over [0.5, 1]
+[2026-10-12 07:51:28.688] [info] [solution.cpp:1026] extend: 1 intervals over [0, 0.5]
+[2026-10-12 07:51:28.688] [info] [solution.cpp:1097] combine: 2 intervals
+[2026-10-12 07:51:28.689] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:28.689] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:28.689] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.0000,0.3709], t_mid=0.1854, int=817.030595, LB=817.030595, gap=0.0000
+[2026-10-12 07:51:28.689] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:28.689] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:28.689] [info] [minsum.cpp:881] MinSum: done. int=817.030595, LB=817.030595, gap=0.0000, iters=2, t=0.000s
+[2026-10-12 07:51:28.689] [info] [trace.cpp:93] TraceWriter: wrote 2 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e/execution/solver/runs/sbgdb-20200507-pntset-0000030/brute-force/minsum/trace.csv
+[2026-10-12 07:51:28.689] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 2005 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042128Z__brute-force__minsum__sbgdb-20200507-pntset-0000030-ffc4aabe__r00__86fec31bc47e/execution/solver/runs/sbgdb-20200507-pntset-0000030/brute-force/minsum/solution.json
+[2026-10-12 07:51:28.689] [info] [batch_runner.cpp:1352] BatchRunner: sbgdb-20200507-pntset-0000030 / brute-force / minsum cost=817.030595 t=0.001s verified=true
+[2026-10-12 07:51:28.690] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

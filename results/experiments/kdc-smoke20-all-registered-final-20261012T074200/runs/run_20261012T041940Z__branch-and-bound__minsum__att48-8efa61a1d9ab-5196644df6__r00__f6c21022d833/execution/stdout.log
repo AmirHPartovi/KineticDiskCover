@@ -1,0 +1,123 @@
+[2026-10-12 07:49:40.602] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833/input for instances
+2026-10-12 07:49:40 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:40 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:40 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:40.607] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:40.607] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:40.608] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:40.608] [info] [io.cpp:137] read_json: loaded 11 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833/input/instance.json
+[2026-10-12 07:49:40.609] [info] [minsum.cpp:512] MinSum: start n=11, m=25
+[2026-10-12 07:49:40.609] [info] [candidate.cpp:199] InstancePrecompute: built 275 candidates
+[2026-10-12 07:49:40.609] [info] [stationary.cpp:264] NN: cost=2578.758013, feasible=true, active_stations=7
+[2026-10-12 07:49:40.611] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.611] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1978.379818462 LB=1978.379818462 nodes=450 t=0.0023s
+[2026-10-12 07:49:40.614] [info] [solution.cpp:1026] extend: 19 intervals over [0, 1]
+[2026-10-12 07:49:40.614] [info] [stationary.cpp:264] NN: cost=2578.758013, feasible=true, active_stations=7
+[2026-10-12 07:49:40.617] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.617] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1978.379818462 LB=1978.379818462 nodes=450 t=0.0022s
+[2026-10-12 07:49:40.617] [info] [stationary.cpp:264] NN: cost=1454.737246, feasible=true, active_stations=8
+[2026-10-12 07:49:40.618] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.618] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1188.280668000 LB=1188.280668000 nodes=421 t=0.0017s
+[2026-10-12 07:49:40.618] [info] [stationary.cpp:264] NN: cost=697.484841, feasible=true, active_stations=5
+[2026-10-12 07:49:40.619] [info] [branch_and_bound_solver.cpp:416] BnB: cost=697.484840748 LB=697.484840748 nodes=37 t=0.0002s
+[2026-10-12 07:49:40.619] [info] [stationary.cpp:264] NN: cost=1275.833844, feasible=true, active_stations=7
+[2026-10-12 07:49:40.619] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.619] [info] [branch_and_bound_solver.cpp:416] BnB: cost=981.838346407 LB=981.838346407 nodes=82 t=0.0004s
+[2026-10-12 07:49:40.619] [info] [stationary.cpp:264] NN: cost=2465.874725, feasible=true, active_stations=7
+[2026-10-12 07:49:40.643] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.643] [info] [branch_and_bound_solver.cpp:416] BnB: cost=2318.289942578 LB=2318.289942578 nodes=4937 t=0.0240s
+[2026-10-12 07:49:40.643] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.5767,0.7236], t_mid=0.6502, int=4711.034782, LB=1253.984684, gap=2.7569
+[2026-10-12 07:49:40.643] [info] [stationary.cpp:264] NN: cost=869.944261, feasible=true, active_stations=8
+[2026-10-12 07:49:40.644] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.644] [info] [branch_and_bound_solver.cpp:416] BnB: cost=774.253380712 LB=774.253380712 nodes=92 t=0.0005s
+[2026-10-12 07:49:40.645] [info] [solution.cpp:1026] extend: 7 intervals over [0.6501534154501616, 1]
+[2026-10-12 07:49:40.646] [info] [solution.cpp:1026] extend: 10 intervals over [0, 0.6501534154501616]
+[2026-10-12 07:49:40.646] [info] [solution.cpp:1097] combine: 17 intervals
+[2026-10-12 07:49:40.650] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 17 intervals
+[2026-10-12 07:49:40.651] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.651] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.1759,0.2664], t_mid=0.2211, int=1989.836458, LB=1253.984684, gap=0.5868
+[2026-10-12 07:49:40.651] [info] [stationary.cpp:264] NN: cost=1389.818559, feasible=true, active_stations=7
+[2026-10-12 07:49:40.652] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.652] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1320.108129269 LB=1320.108129269 nodes=247 t=0.0011s
+[2026-10-12 07:49:40.654] [info] [solution.cpp:1026] extend: 14 intervals over [0.22113670882138603, 1]
+[2026-10-12 07:49:40.655] [info] [solution.cpp:1026] extend: 3 intervals over [0, 0.22113670882138603]
+[2026-10-12 07:49:40.655] [info] [solution.cpp:1097] combine: 20 intervals
+[2026-10-12 07:49:40.660] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 20 intervals
+[2026-10-12 07:49:40.662] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.662] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.8491,0.9606], t_mid=0.9049, int=1625.010787, LB=1253.984684, gap=0.2959
+[2026-10-12 07:49:40.662] [info] [stationary.cpp:264] NN: cost=2389.365684, feasible=true, active_stations=7
+[2026-10-12 07:49:40.663] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.663] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1870.873082514 LB=1870.873082514 nodes=381 t=0.0018s
+[2026-10-12 07:49:40.664] [info] [solution.cpp:1026] extend: 3 intervals over [0.9048614825654367, 1]
+[2026-10-12 07:49:40.665] [info] [solution.cpp:1026] extend: 10 intervals over [0, 0.9048614825654367]
+[2026-10-12 07:49:40.665] [info] [solution.cpp:1097] combine: 23 intervals
+[2026-10-12 07:49:40.672] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 23 intervals
+[2026-10-12 07:49:40.673] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.673] [info] [minsum.cpp:633] MinSum iter 4: [t_a,t_b]=[0.2640,0.3774], t_mid=0.3207, int=1485.849865, LB=1254.955332, gap=0.1840
+[2026-10-12 07:49:40.673] [info] [stationary.cpp:264] NN: cost=1011.230124, feasible=true, active_stations=8
+[2026-10-12 07:49:40.676] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.676] [info] [branch_and_bound_solver.cpp:416] BnB: cost=943.856679999 LB=943.856679999 nodes=580 t=0.0023s
+[2026-10-12 07:49:40.677] [info] [solution.cpp:1026] extend: 11 intervals over [0.32069844682377685, 1]
+[2026-10-12 07:49:40.678] [info] [solution.cpp:1026] extend: 4 intervals over [0, 0.32069844682377685]
+[2026-10-12 07:49:40.678] [info] [solution.cpp:1097] combine: 22 intervals
+[2026-10-12 07:49:40.685] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 22 intervals
+[2026-10-12 07:49:40.687] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.687] [info] [minsum.cpp:633] MinSum iter 5: [t_a,t_b]=[0.0748,0.1164], t_mid=0.0956, int=1375.639516, LB=1254.955332, gap=0.0962
+[2026-10-12 07:49:40.687] [info] [stationary.cpp:264] NN: cost=2024.433114, feasible=true, active_stations=9
+[2026-10-12 07:49:40.699] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.699] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1934.371558181 LB=1934.371558181 nodes=2812 t=0.0121s
+[2026-10-12 07:49:40.700] [info] [solution.cpp:1026] extend: 9 intervals over [0.09557429495132994, 1]
+[2026-10-12 07:49:40.700] [info] [solution.cpp:1026] extend: 2 intervals over [0, 0.09557429495132994]
+[2026-10-12 07:49:40.701] [info] [solution.cpp:1097] combine: 24 intervals
+[2026-10-12 07:49:40.709] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 24 intervals
+[2026-10-12 07:49:40.710] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.710] [info] [minsum.cpp:633] MinSum iter 6: [t_a,t_b]=[0.5118,0.5658], t_mid=0.5388, int=1348.188259, LB=1268.342591, gap=0.0630
+[2026-10-12 07:49:40.710] [info] [stationary.cpp:264] NN: cost=833.955207, feasible=true, active_stations=6
+[2026-10-12 07:49:40.710] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.710] [info] [branch_and_bound_solver.cpp:416] BnB: cost=672.306128892 LB=672.306128892 nodes=40 t=0.0002s
+[2026-10-12 07:49:40.712] [info] [solution.cpp:1026] extend: 10 intervals over [0.5388422644174111, 1]
+[2026-10-12 07:49:40.713] [info] [solution.cpp:1026] extend: 9 intervals over [0, 0.5388422644174111]
+[2026-10-12 07:49:40.713] [info] [solution.cpp:1097] combine: 30 intervals
+[2026-10-12 07:49:40.722] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 30 intervals
+[2026-10-12 07:49:40.724] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.724] [info] [minsum.cpp:633] MinSum iter 7: [t_a,t_b]=[0.0501,0.0988], t_mid=0.0744, int=1312.706987, LB=1268.342591, gap=0.0350
+[2026-10-12 07:49:40.724] [info] [stationary.cpp:264] NN: cost=2137.487025, feasible=true, active_stations=9
+[2026-10-12 07:49:40.737] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.737] [info] [branch_and_bound_solver.cpp:416] BnB: cost=2104.723898360 LB=2104.723898360 nodes=3081 t=0.0133s
+[2026-10-12 07:49:40.739] [info] [solution.cpp:1026] extend: 12 intervals over [0.0744310682124589, 1]
+[2026-10-12 07:49:40.740] [info] [solution.cpp:1026] extend: 2 intervals over [0, 0.0744310682124589]
+[2026-10-12 07:49:40.740] [info] [solution.cpp:1097] combine: 31 intervals
+[2026-10-12 07:49:40.786] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 31 intervals
+[2026-10-12 07:49:40.800] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.800] [info] [minsum.cpp:633] MinSum iter 8: [t_a,t_b]=[0.8137,0.8431], t_mid=0.8284, int=1312.302884, LB=1272.636738, gap=0.0312
+[2026-10-12 07:49:40.800] [info] [stationary.cpp:264] NN: cost=1704.675968, feasible=true, active_stations=6
+[2026-10-12 07:49:40.802] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.802] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1388.329003870 LB=1388.329003870 nodes=199 t=0.0014s
+[2026-10-12 07:49:40.802] [info] [solution.cpp:1026] extend: 4 intervals over [0.8283678258724341, 1]
+[2026-10-12 07:49:40.803] [info] [solution.cpp:1026] extend: 5 intervals over [0, 0.8283678258724341]
+[2026-10-12 07:49:40.803] [info] [solution.cpp:1097] combine: 29 intervals
+[2026-10-12 07:49:40.814] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 8 (1/3)
+[2026-10-12 07:49:40.814] [info] [minsum.cpp:633] MinSum iter 9: [t_a,t_b]=[0.8137,0.8431], t_mid=0.8284, int=1312.302884, LB=1272.636738, gap=0.0312
+[2026-10-12 07:49:40.814] [info] [stationary.cpp:264] NN: cost=1704.675968, feasible=true, active_stations=6
+[2026-10-12 07:49:40.815] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.815] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1388.329003870 LB=1388.329003870 nodes=199 t=0.0009s
+[2026-10-12 07:49:40.816] [info] [solution.cpp:1026] extend: 4 intervals over [0.8283678258724341, 1]
+[2026-10-12 07:49:40.816] [info] [solution.cpp:1026] extend: 5 intervals over [0, 0.8283678258724341]
+[2026-10-12 07:49:40.816] [info] [solution.cpp:1097] combine: 29 intervals
+[2026-10-12 07:49:40.827] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 9 (2/3)
+[2026-10-12 07:49:40.827] [info] [minsum.cpp:633] MinSum iter 10: [t_a,t_b]=[0.8137,0.8431], t_mid=0.8284, int=1312.302884, LB=1272.636738, gap=0.0312
+[2026-10-12 07:49:40.827] [info] [stationary.cpp:264] NN: cost=1704.675968, feasible=true, active_stations=6
+[2026-10-12 07:49:40.828] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:40.828] [info] [branch_and_bound_solver.cpp:416] BnB: cost=1388.329003870 LB=1388.329003870 nodes=199 t=0.0012s
+[2026-10-12 07:49:40.829] [info] [solution.cpp:1026] extend: 4 intervals over [0.8283678258724341, 1]
+[2026-10-12 07:49:40.831] [info] [solution.cpp:1026] extend: 5 intervals over [0, 0.8283678258724341]
+[2026-10-12 07:49:40.831] [info] [solution.cpp:1097] combine: 29 intervals
+[2026-10-12 07:49:40.845] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 10 (3/3)
+[2026-10-12 07:49:40.845] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 31 intervals
+[2026-10-12 07:49:40.848] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:40.848] [info] [minsum.cpp:881] MinSum: done. int=1312.302884, LB=1272.636738, gap=0.0312, iters=10, t=0.142s
+[2026-10-12 07:49:40.848] [info] [trace.cpp:93] TraceWriter: wrote 8 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833/execution/solver/runs/att48/branch-and-bound/minsum/trace.csv
+[2026-10-12 07:49:40.849] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 31999 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041940Z__branch-and-bound__minsum__att48-8efa61a1d9ab-5196644df6__r00__f6c21022d833/execution/solver/runs/att48/branch-and-bound/minsum/solution.json
+[2026-10-12 07:49:40.849] [info] [batch_runner.cpp:1352] BatchRunner: att48 / branch-and-bound / minsum cost=1312.302884 t=0.240s verified=true
+[2026-10-12 07:49:40.850] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

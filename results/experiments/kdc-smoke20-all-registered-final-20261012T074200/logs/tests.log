@@ -1,0 +1,854 @@
+[2026-10-12T07:42:46+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.86 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.87 sec
+........................................................................ [ 61%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+118 passed, 608 warnings in 33.03s
+[2026-10-12T07:45:17+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.86 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.87 sec
+........................................................................ [ 61%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+118 passed, 608 warnings in 33.14s
+[2026-10-12T07:46:15+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.86 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.87 sec
+........................................................................ [ 61%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+118 passed, 608 warnings in 32.64s
+[2026-10-12T07:48:40+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.86 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.86 sec
+........................................................................ [ 61%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+118 passed, 608 warnings in 33.62s
+[2026-10-12T07:55:41+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.88 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.88 sec
+........................................................................ [ 60%]
+...............................................                          [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+119 passed, 608 warnings in 33.06s
+[2026-10-12T07:56:52+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.88 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.88 sec
+........................................................................ [ 60%]
+...............................................                          [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+119 passed, 608 warnings in 33.67s
+[2026-10-12T08:01:15+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+Test project /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012
+    Start 1: all
+1/1 Test #1: all ..............................   Passed    0.87 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.88 sec
+........................................................................ [ 60%]
+................................................                         [100%]
+=============================== warnings summary ===============================
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: 6 warnings
+tests/python/test_plot_comparisons.py: 25 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+tests/python/test_build_tables.py::test_minmaxsum_has_separate_peak_integral_table
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_build_tables.py:155: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_prepare_frame_keeps_joint_vectors_without_scalar_metrics
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/tests/python/test_plot_comparisons.py:65: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+    frame = pd.concat([frame, pd.DataFrame([joint_row])], ignore_index=True)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2010: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.space          = oneOf(self._space_widths)("space")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2012: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.style_literal  = oneOf(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2015: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.symbol         = Regex(
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2024: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.start_group    = Optional(r"\math" + oneOf(self._fontnames)("font")) + "{"
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2027: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    p.delim          = oneOf(self._delims)
+
+tests/python/test_plot_comparisons.py: 47 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1984: PyparsingDeprecationWarning: 'setName' deprecated - use 'set_name'
+    val.setName(key)
+
+tests/python/test_plot_comparisons.py: 44 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1987: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    val.setParseAction(getattr(self, key))
+
+tests/python/test_plot_comparisons.py: 16 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:1748: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    return Empty().setParseAction(raise_error)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2088: PyparsingDeprecationWarning: 'endQuoteChar' argument is deprecated, use 'end_quote_char'
+    p.text = cmd(r"\text", QuotedString('{', '\\', endQuoteChar="}"))
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2097: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    + OneOrMore(oneOf(["_", "^"]) - p.placeable)("subsuper")
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2146: PyparsingDeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    p.math_string   = QuotedString('$', '\\', unquoteResults=False)
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2147: PyparsingDeprecationWarning: 'leaveWhitespace' deprecated - use 'leave_whitespace'
+    p.non_math      = Regex(r"(?:(?:\\[$])|[^$])*").leaveWhitespace()
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2170: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    result = self._expression.parseString(s)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2197: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/pyparsing/util.py:466: PyparsingDeprecationWarning: 'parseAll' argument is deprecated, use 'parse_all'
+    return fn(self, *args, **kwargs)
+
+tests/python/test_plot_comparisons.py: 104 warnings
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/_mathtext.py:2178: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    ParserElement.resetCache()
+
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+tests/python/test_plot_comparisons.py::test_full_figure_set_report_and_file_pairs
+  /Users/amirpartovi/Library/Python/3.9/lib/python/site-packages/matplotlib/backends/backend_pdf.py:1758: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    img = Image.fromarray(rgb8, mode='P')
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1194: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(samples, labels=algorithms, showfliers=True)
+
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+tests/python/test_reporting.py::test_figure_generation_only_emits_plots_for_valid_observations
+  /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py:1290: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+    ax.boxplot(values, labels=algorithms)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+120 passed, 608 warnings in 33.86s

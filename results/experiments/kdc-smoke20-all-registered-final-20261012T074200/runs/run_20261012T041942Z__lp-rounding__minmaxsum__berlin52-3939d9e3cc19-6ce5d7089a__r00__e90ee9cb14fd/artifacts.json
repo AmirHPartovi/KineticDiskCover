@@ -1,0 +1,119 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "4295e4dd3c939836989390e0e7ffee56a2462770640c52579420f450fd8a9a76",
+      "size_bytes": 892
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "fd438f36a1fd6be0c7716dfad1691c69a564a3a5e1610b7128be9731eb09c4da",
+      "size_bytes": 448
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "5bb876b7b1370322b30f77b755385af27b1371a110e5ede6c0bb1da947b64c3a",
+      "size_bytes": 3128
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "ec9109dedcd580044d0174eca85da18bd02486395a00f6aca117b3df3768319e",
+      "size_bytes": 3052
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "bce49f91fe6d3911af2c42dc226958d466ebfb4b74a795ea670aa7ec2cec3de0",
+      "size_bytes": 6273
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/lp-rounding/minmaxsum/result.json",
+      "sha256": "91ac53f0628ca5a9fa07512f8b7332719020b3f3d266464feb7caf81d81532ac",
+      "size_bytes": 6017
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/berlin52/lp-rounding/minmaxsum/solution.json",
+      "sha256": "2887851cebf2b1f4c8f793b8feace621e21120d20e6b52603eb2c6434f2691ed",
+      "size_bytes": 19396
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/berlin52/lp-rounding/minmaxsum/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "94a9c208a3fd3b7aef3173183cea2b31c76f8506c232729c3b2785d80cde19e7",
+      "size_bytes": 14588
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "2df7e9cc80a0bae292e2779ea214416d2fa80b233a3851a38ba56870b0ca01d0",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "6ce5d7089a8adf10591d651bc379b598954b1ba35b36ff7b1a9d706d079b6db4",
+      "size_bytes": 5831
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "9076ffb3e56e0aff211223c6a1943353f8146d97f94085b2ecd0c996e6ebd76f",
+      "size_bytes": 538
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "e61f11b380da7211b70524ae508fea24c0b405da5de1990263bb0f3b66f160ea",
+      "size_bytes": 1506
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "5d4d6b5f3613b692fd2057c5f990ab3030a5ca4cd23acfb6117b935d7a0711ec",
+      "size_bytes": 6329
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "2887851cebf2b1f4c8f793b8feace621e21120d20e6b52603eb2c6434f2691ed",
+      "size_bytes": 19396
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "ddab92971416a7a0336673075b4d4bf7d20e9e95161dd5e5231732c255d36f82",
+      "size_bytes": 288
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "ac7909ad7048909c472eebc042b1a79d156f0d4af630017a0822f6723320d9ed",
+      "size_bytes": 14397
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "5ab3b88d395074ea60c029c9430e26bac120eedddee545d753205580451e7f4f",
+      "size_bytes": 496
+    }
+  ],
+  "schema_version": 1
+}

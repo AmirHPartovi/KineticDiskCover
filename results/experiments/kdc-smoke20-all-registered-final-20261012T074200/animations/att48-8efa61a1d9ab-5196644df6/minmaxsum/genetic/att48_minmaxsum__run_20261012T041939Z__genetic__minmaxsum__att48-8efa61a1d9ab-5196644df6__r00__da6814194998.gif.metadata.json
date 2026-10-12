@@ -1,0 +1,42 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "animation_path": "att48_minmaxsum__run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998.gif",
+  "animation_sha256": "1ba354cee15939f8e2c4f923a7916d3112bddc3f9523b0ce28e5e9d578dafb1b",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "att48-8efa61a1d9ab-5196644df6",
+  "instance_name": "att48",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 1448.2525471444108,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 2455.7713594478446,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998/execution/solver/runs/att48/genetic/minmaxsum/component-minmax",
+    "minsum_component_integral": 1415.9364336587846,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 2739.5551262630015,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998/execution/solver/runs/att48/genetic/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 1340.025283366064,
+    "peak_cost": 2455.7713594478446
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998/result/result.json",
+  "source_solution_path": "runs/run_20261012T041939Z__genetic__minmaxsum__att48-8efa61a1d9ab-5196644df6__r00__da6814194998/result/solution.json",
+  "source_solution_sha256": "e51e48131228218f7ea2bcb035f070eb1a278ec973b8fd84a13af1dfb60fc77b",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

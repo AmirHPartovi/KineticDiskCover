@@ -1,0 +1,42 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "animation_path": "C-right_minmaxsum__run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524.gif",
+  "animation_sha256": "5d9eeeff5bdb006e66bdea8862614b735225abf858939e0d8bad951ba03f9095",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "C-right-8bf4b5770668-e0f2e6a705",
+  "instance_name": "C-right",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 626.6207524613203,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 873.1808813179163,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524/execution/solver/runs/C-right/genetic/minmaxsum/component-minmax",
+    "minsum_component_integral": 3023.2408688388246,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 4982.918141812461,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524/execution/solver/runs/C-right/genetic/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 626.6207524613214,
+    "peak_cost": 873.1808813179163
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524/result/result.json",
+  "source_solution_path": "runs/run_20261012T041931Z__genetic__minmaxsum__C-right-8bf4b5770668-e0f2e6a705__r00__7dc4137e8524/result/solution.json",
+  "source_solution_sha256": "639589936fa2cdb0e0110997fc94495c94ca0e9bbf6cd3d50ebaf585d42bc71f",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

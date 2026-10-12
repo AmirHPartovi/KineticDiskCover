@@ -1,0 +1,42 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "animation_path": "rd100_minmaxsum__run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e.gif",
+  "animation_sha256": "badf702ec9c417f9542edbdb503807bdd67be3d5142c4a44e41b5af07bb49f3a",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "rd100-9407ab41999f-b9917bc5f5",
+  "instance_name": "rd100",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 4207.161199707479,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4792.15872359099,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e/execution/solver/runs/rd100/genetic/minmaxsum/component-minmax",
+    "minsum_component_integral": 5808.275349121727,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 8332.930045763194,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e/execution/solver/runs/rd100/genetic/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 4197.846355203154,
+    "peak_cost": 4716.9189674364825
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e/result/result.json",
+  "source_solution_path": "runs/run_20261012T042112Z__genetic__minmaxsum__rd100-9407ab41999f-b9917bc5f5__r00__88e868058b1e/result/solution.json",
+  "source_solution_sha256": "6c6f4a963f765c125124e16ecccdfbd5357b65461506f3d280b8530af8869ced",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

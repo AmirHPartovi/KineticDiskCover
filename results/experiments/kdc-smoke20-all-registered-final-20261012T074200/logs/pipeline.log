@@ -1,0 +1,131 @@
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE dataset START 2026-10-12T07:42:41+0330 ==========
+[2026-10-12T07:42:41+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py dataset --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --source /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.BSHku9/selection.json 
+[2026-10-12T07:42:41+0330] STAGE dataset ENDED exit_status=0 duration_sec=0
+
+========== STAGE build START 2026-10-12T07:42:42+0330 ==========
+[2026-10-12T07:42:42+0330] COMMAND: bash -c cmake\ -S\ \"\$1\"\ -B\ \"\$3\"\ -DCMAKE_BUILD_TYPE=Release\ -DBUILD_TESTS=ON\ -DBUILD_BENCHMARK=ON\ \&\&\ cmake\ --build\ \"\$3\"\ --parallel\ \"\$2\" _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover 2 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:42:46+0330] STAGE build ENDED exit_status=0 duration_sec=4
+
+========== STAGE tests START 2026-10-12T07:42:46+0330 ==========
+[2026-10-12T07:42:46+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:43:21+0330] STAGE tests ENDED exit_status=0 duration_sec=35
+
+========== STAGE certification START 2026-10-12T07:43:21+0330 ==========
+[2026-10-12T07:43:21+0330] COMMAND: bash -c set\ -o\ pipefail\;\ \"\$1\"\ \"\$2\"\ \"\$3\"\ \|\ tee\ \"\$4/certification/differential.csv\"\;\ rc=\$\{PIPESTATUS\[0\]\}\;\ printf\ \"%s\\n\"\ \"\$rc\"\ \>\ \"\$4/certification/exit_status.txt\"\;\ exit\ \"\$rc\" _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012/kdc-kinetic-certification 200 1 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 
+[2026-10-12T07:43:25+0330] STAGE certification ENDED exit_status=0 duration_sec=4
+[2026-10-12T07:43:25+0330] PIPELINE EXIT exit_status=1; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T07:45:17+0330 ==========
+[2026-10-12T07:45:17+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:45:52+0330] STAGE tests ENDED exit_status=0 duration_sec=35
+
+========== STAGE preflight START 2026-10-12T07:45:52+0330 ==========
+[2026-10-12T07:45:52+0330] COMMAND: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012/kdc-solver preflight --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md 
+[2026-10-12T07:45:52+0330] STAGE preflight ENDED exit_status=0 duration_sec=0
+
+========== STAGE backend_selection START 2026-10-12T07:45:53+0330 ==========
+[2026-10-12T07:45:53+0330] COMMAND: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012/kdc-solver calibrate --dataset /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/calibration/attempts/kdc-calibration-20261012T041553Z-b30c9b8fcd54 --exact-reference auto 
+[2026-10-12T07:45:53+0330] STAGE backend_selection ENDED exit_status=0 duration_sec=0
+
+========== STAGE benchmark START 2026-10-12T07:45:53+0330 ==========
+[2026-10-12T07:45:53+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+[2026-10-12T07:45:53+0330] STAGE benchmark ENDED exit_status=2 duration_sec=0
+[2026-10-12T07:45:53+0330] PIPELINE EXIT exit_status=2; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T07:46:15+0330 ==========
+[2026-10-12T07:46:15+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:46:49+0330] STAGE tests ENDED exit_status=0 duration_sec=34
+
+========== STAGE benchmark START 2026-10-12T07:46:50+0330 ==========
+[2026-10-12T07:46:50+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+[2026-10-12T07:46:50+0330] STAGE benchmark ENDED exit_status=1 duration_sec=0
+[2026-10-12T07:46:50+0330] PIPELINE EXIT exit_status=1; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T07:48:40+0330 ==========
+[2026-10-12T07:48:40+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:49:15+0330] STAGE tests ENDED exit_status=0 duration_sec=35
+
+========== STAGE benchmark START 2026-10-12T07:49:16+0330 ==========
+[2026-10-12T07:49:16+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset/selection_manifest 
+[2026-10-12T07:51:54+0330] STAGE benchmark ENDED exit_status=0 duration_sec=158
+
+========== STAGE result_validation START 2026-10-12T07:51:54+0330 ==========
+[2026-10-12T07:51:54+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --results /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch/master_results.json 
+[2026-10-12T07:51:54+0330] STAGE result_validation ENDED exit_status=1 duration_sec=0
+[2026-10-12T07:51:54+0330] PIPELINE EXIT exit_status=1; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+[2026-10-12T07:54:49+0330] PIPELINE EXIT exit_status=1; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T07:55:41+0330 ==========
+[2026-10-12T07:55:41+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:56:16+0330] STAGE tests ENDED exit_status=0 duration_sec=35
+
+========== STAGE benchmark START 2026-10-12T07:56:17+0330 ==========
+[2026-10-12T07:56:17+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.BPpzbX/selection.json 
+[2026-10-12T07:56:17+0330] STAGE benchmark ENDED exit_status=2 duration_sec=0
+[2026-10-12T07:56:17+0330] PIPELINE EXIT exit_status=2; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T07:56:52+0330 ==========
+[2026-10-12T07:56:52+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T07:57:27+0330] STAGE tests ENDED exit_status=0 duration_sec=36
+
+========== STAGE benchmark START 2026-10-12T07:57:27+0330 ==========
+[2026-10-12T07:57:27+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/run_batch.py --instances /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/dataset --output /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch --algorithms all-registered --profile debug --modes all --exact-reference auto --seed 42 --repeats 1 --parallel --threads 2 --time-limit 2 --fast-time-limit 5 --exact-time-limit 10 --brute-force-max-assignments 100000 --brute-force-time-limit-sec 0.5 --preflight-report /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/preflight/preflight_report.md --force --dataset-profile smoke20 --save-solutions --save-traces --resume --dataset-manifest /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/.selection-smoke.6rQArY/selection.json 
+[2026-10-12T07:59:46+0330] STAGE benchmark ENDED exit_status=0 duration_sec=139
+
+========== STAGE result_validation START 2026-10-12T07:59:47+0330 ==========
+[2026-10-12T07:59:47+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --results /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch/master_results.json 
+[2026-10-12T07:59:47+0330] STAGE result_validation ENDED exit_status=1 duration_sec=0
+[2026-10-12T07:59:47+0330] PIPELINE EXIT exit_status=1; writing partial-run report
+Experiment directory: /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200
+
+========== STAGE tests START 2026-10-12T08:01:15+0330 ==========
+[2026-10-12T08:01:15+0330] COMMAND: bash -c cd\ \"\$1\"\ \&\&\ ctest\ --test-dir\ \"\$2\"\ --output-on-failure\ \&\&\ python3\ -m\ pytest\ -q\ tests/python _ /Users/amirpartovi/Desktop/Codes/KineticDiskCover /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/prompt8-clean-20261012 
+[2026-10-12T08:01:50+0330] STAGE tests ENDED exit_status=0 duration_sec=35
+
+========== STAGE result_validation START 2026-10-12T08:01:51+0330 ==========
+[2026-10-12T08:01:51+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py validate --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --results /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/batch/master_results.json 
+[2026-10-12T08:01:51+0330] STAGE result_validation ENDED exit_status=0 duration_sec=0
+
+========== STAGE tables START 2026-10-12T08:01:51+0330 ==========
+[2026-10-12T08:01:51+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --stage tables 
+[2026-10-12T08:02:10+0330] STAGE tables ENDED exit_status=0 duration_sec=19
+
+========== STAGE figures START 2026-10-12T08:02:10+0330 ==========
+[2026-10-12T08:02:10+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --stage figures --dpi 300 
+[2026-10-12T08:02:32+0330] STAGE figures ENDED exit_status=0 duration_sec=22
+
+========== STAGE animations START 2026-10-12T08:02:32+0330 ==========
+[2026-10-12T08:02:32+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py animations --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --modes all --policy all-solutions --instances '' --top-n 0 --fps 12 --frames 48 --dpi 90 
+[2026-10-12T09:30:47+0330] STAGE animations ENDED exit_status=0 duration_sec=5295
+
+========== STAGE final_report START 2026-10-12T09:30:47+0330 ==========
+[2026-10-12T09:30:47+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --stage final 
+[2026-10-12T09:30:47+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/report_experiment.py --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 --stage final 
+Wrote final report for kdc-smoke20-all-registered-final-20261012T074200.
+[2026-10-12T09:31:03+0330] STAGE final_report ENDED exit_status=0 duration_sec=16
+
+========== STAGE final_report START 2026-10-12T09:31:03+0330 ==========
+[2026-10-12T09:31:03+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 
+[2026-10-12T09:31:03+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py finalize --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 
+[2026-10-12T09:31:08+0330] STAGE final_report ENDED exit_status=0 duration_sec=5
+
+========== STAGE summary START 2026-10-12T09:31:08+0330 ==========
+[2026-10-12T09:31:08+0330] COMMAND: python3 /Users/amirpartovi/Desktop/Codes/KineticDiskCover/scripts/experiment_pipeline.py emit-summary --experiment /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200 
+[2026-10-12T09:31:08+0330] STAGE summary ENDED exit_status=0 duration_sec=0
+
+Experiment status: PARTIAL
+Dataset profile: smoke20
+Selected instances: 20
+Algorithms: ip-kont, branch-and-bound, nn, greedy, brute-force, primal-dual, local-search, sa, genetic, lp-rounding, shifting
+Objectives: minmax, minsum, minmaxsum
+Threads: 2
+Time limits (static/fast/exact): 2.0 / 5.0 / 10.0 seconds
+Selected families: att48, berlin52, c-lower, c-right, eil51, eil76, euro-night, gr96, krod100, kroe100, london, pr76, rat99, rd100, sbgdb-20200507-fpg-poly, sbgdb-20200507-pntset, st70, stars, uniform, us-night

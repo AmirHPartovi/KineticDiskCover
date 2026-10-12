@@ -1,0 +1,50 @@
+# Data dictionary and preview: trace.csv
+
+- **Purpose:** Documents the existing experiment-scoped export `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv` without altering its source data.
+- **Experiment:** `kdc-smoke20-all-registered-final-20261012T074200`
+- **Source manifest/result:** `validated canonical aggregate/run-record export`
+- **Generation:** `scripts/report_experiment.py --stage tables`
+- **Rows:** 5
+- **File scope:** runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv
+- **Sort order:** preserved from the source export
+- **Filters:** none applied by companion generation
+- **Status counts:** not applicable or status column absent
+- **Missing/null handling:** unavailable or inapplicable measurements remain blank/null; no unrelated metric is substituted.
+- **Limitations:** The sidecar documents the existing export; values and status semantics remain those of its canonical source.
+
+## Derived metric formulas
+
+No metrics are recomputed here; all row values are direct serialized source fields.
+
+## Column definitions
+
+- `iter` — Serialized source field `iter` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `t_max` — Serialized source field `t_max` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `objective` — objective identifier.
+- `lower_bound` — reported lower bound; its certification is represented separately.
+- `gap` — Serialized source field `gap` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `wall_time` — Serialized source field `wall_time` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `num_ip_solves` — Serialized source field `num_ip_solves` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_cost_at_peak_time` — Serialized source field `static_cost_at_peak_time` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_status` — Serialized source field `static_solver_status` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_solver_exact` — Serialized source field `static_solver_exact` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_lower_bound` — Serialized source field `static_lower_bound` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `static_upper_bound` — Serialized source field `static_upper_bound` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_peak` — Serialized source field `candidate_peak` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `combined_peak` — Serialized source field `combined_peak` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `peak_improvement` — Serialized source field `peak_improvement` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `certified_gap` — Serialized source field `certified_gap` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `heuristic_gap` — Serialized source field `heuristic_gap` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `candidate_accepted` — Serialized source field `candidate_accepted` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `has_certified_gap` — Serialized source field `has_certified_gap` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+- `stop_reason` — Serialized source field `stop_reason` from `runs/run_20261012T041939Z__primal-dual__minmax__att48-8efa61a1d9ab-5196644df6__r00__7101e87ef183/execution/solver/runs/att48/primal-dual/minmax/trace.csv`; consult the canonical run record/schema for its originating semantics. It is not recomputed or substituted by this report.
+
+## Preview
+
+| iter | t_max | objective | lower_bound | gap | wall_time | num_ip_solves | static_cost_at_peak_time | static_solver_status | static_solver_exact | static_lower_bound | static_upper_bound | candidate_peak | combined_peak | peak_improvement | certified_gap | heuristic_gap | candidate_accepted | has_certified_gap | stop_reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0.4393122633315274 | 7522.7481189708697 | 0 | 7522.7481189708697 | 0.0030891669999999999 | 2 | 688.47178923538252 | FEASIBLE | 0 | 27.53887156941531 | 688.47178923538252 | 5603.4812482609414 | 5603.4812482609414 | 1919.2668707099283 | 0 | 97.95212952519735 | 1 | 0 | candidate_accepted |
+| 2 | 0.98903378517705243 | 5603.4812482609414 | 0 | 5603.4812482609414 | 0.0079527920000000002 | 3 | 2243.4027425626819 | FEASIBLE | 0 | 89.736109702507278 | 2243.4027425626819 | 7065.7651687125572 | 3384.6690536461097 | 2218.8121946148317 | 0 | 61.443995698471618 | 1 | 0 | candidate_accepted |
+| 3 | 0.11676464648243304 | 3384.6690536461097 | 0 | 3384.6690536461097 | 0.012263375 | 4 | 1845.7121612197934 | FEASIBLE | 0 | 73.82848644879175 | 1845.7121612197934 | 8895.4143530179117 | 2586.9807864241038 | 797.68826722200583 | 0 | 36.718027501603849 | 1 | 0 | candidate_accepted |
+| 4 | 0.029532298853972305 | 2586.9807864241038 | 0 | 2586.9807864241038 | 0.017261792000000001 | 5 | 2370.6902589205793 | FEASIBLE | 0 | 75.091159759812257 | 2370.6902589205793 | 8252.4091823860563 | 2465.8086514866081 | 121.17213493749568 | 0 | 27.828760183614492 | 1 | 0 | candidate_accepted |
+| 5 | 0.012642012348942156 | 2465.8086514866081 | 0 | 2465.8086514866081 | 0.022615834000000001 | 6 | 2465.8086514866086 | FEASIBLE | 0 | 77.134399320877932 | 2465.8086514866086 | 8252.4091823860563 | 2465.8086514866081 | 0 | 0 | 26.478443846755169 | 1 | 0 | heuristic_no_improvement |

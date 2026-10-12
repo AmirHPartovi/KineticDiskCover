@@ -1,0 +1,42 @@
+{
+  "actual_backend": "greedy",
+  "algorithm": "greedy",
+  "animation_path": "gr96_minmaxsum__run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6.gif",
+  "animation_sha256": "98fafb25ba4ca55c40cfcccfee9278145b02ca38d4237aa0ff495e172e5d2521",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "gr96-a23a7ba30c4c-e195dfa06d",
+  "instance_name": "gr96",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 3469.989307973687,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 4888.595797633877,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6/execution/solver/runs/gr96/greedy/minmaxsum/component-minmax",
+    "minsum_component_integral": 8169.112750218715,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 11672.744119764138,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6/execution/solver/runs/gr96/greedy/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 3469.989307973687,
+    "peak_cost": 4888.595797633877
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6/result/result.json",
+  "source_solution_path": "runs/run_20261012T042008Z__greedy__minmaxsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e1aebd6b1af6/result/solution.json",
+  "source_solution_sha256": "9ebf8e39907201dfd880fc57b4b9a17c9d50c5c7de495a49b91abbb9084d575e",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

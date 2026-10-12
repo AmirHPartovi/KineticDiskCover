@@ -1,0 +1,28 @@
+[2026-10-12 07:49:57.366] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041957Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__88f8200b134f/input for instances
+2026-10-12 07:49:57 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:57 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:57 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:57.371] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:57.372] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:57.372] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041957Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__88f8200b134f/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:57.373] [info] [io.cpp:137] read_json: loaded 25 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041957Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__88f8200b134f/input/instance.json
+[2026-10-12 07:49:57.373] [info] [minsum.cpp:512] MinSum: start n=25, m=25
+[2026-10-12 07:49:57.373] [info] [candidate.cpp:199] InstancePrecompute: built 625 candidates
+[2026-10-12 07:49:57.373] [info] [stationary.cpp:264] NN: cost=4864.457272, feasible=true, active_stations=13
+[2026-10-12 07:49:59.182] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:49:59.182] [info] [branch_and_bound_solver.cpp:416] BnB: cost=3710.984721443 LB=3710.984721443 nodes=209251 t=1.8089s
+[2026-10-12 07:49:59.319] [info] [solution.cpp:1026] extend: 30 intervals over [0, 1]
+[2026-10-12 07:49:59.319] [info] [stationary.cpp:264] NN: cost=4864.457272, feasible=true, active_stations=13
+[2026-10-12 07:50:01.070] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-10-12 07:50:01.070] [info] [branch_and_bound_solver.cpp:416] BnB: cost=3710.984721443 LB=3710.984721443 nodes=209251 t=1.7513s
+[2026-10-12 07:50:01.193] [info] [stationary.cpp:264] NN: cost=3293.282934, feasible=true, active_stations=9
+[2026-10-12 07:50:03.193] [warning] [branch_and_bound_solver.cpp:289] BnB: time limit 2.0000s reached
+[2026-10-12 07:50:03.193] [info] [branch_and_bound_solver.cpp:416] BnB: cost=3293.282934185 LB=2769.198144872 nodes=293700 t=2.0000s
+[2026-10-12 07:50:03.303] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 30 intervals
+[2026-10-12 07:50:03.307] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:03.307] [info] [minsum.cpp:881] MinSum: done. int=6195.473828, LB=810.022858, gap=6.6485, iters=0, t=5.930s
+[2026-10-12 07:50:03.308] [info] [trace.cpp:93] TraceWriter: wrote 1 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041957Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__88f8200b134f/execution/solver/runs/eil76/branch-and-bound/minsum/trace.csv
+[2026-10-12 07:50:03.308] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 39236 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041957Z__branch-and-bound__minsum__eil76-e404104dd7bb-8eb626a3b8__r00__88f8200b134f/execution/solver/runs/eil76/branch-and-bound/minsum/solution.json
+[2026-10-12 07:50:03.308] [info] [batch_runner.cpp:1352] BatchRunner: eil76 / branch-and-bound / minsum cost=6195.473828 t=5.935s verified=true
+[2026-10-12 07:50:03.309] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

@@ -1,0 +1,41 @@
+[2026-10-12 07:51:26.897] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121/input for instances
+2026-10-12 07:51:26 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:51:26 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:51:26 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:51:26.902] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:51:26.902] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:51:26.903] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121/execution/solver/experiment_manifest.json)
+[2026-10-12 07:51:26.903] [info] [io.cpp:137] read_json: loaded 1 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121/input/instance.json
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:110] MinMax: start n=1, m=25, T=1
+[2026-10-12 07:51:26.904] [info] [brute_force_solver.cpp:212] BruteForce: cost=159.982081460 total=25 t=0.0000s
+[2026-10-12 07:51:26.904] [info] [candidate.cpp:199] InstancePrecompute: built 25 candidates
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=8574.029153, LB=159.982081, gap=52.5937
+[2026-10-12 07:51:26.904] [info] [brute_force_solver.cpp:212] BruteForce: cost=2.987425048 total=25 t=0.0000s
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1097] combine: 2 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.424681, peak=2091.035983, LB=159.982081, gap=12.0704
+[2026-10-12 07:51:26.904] [info] [brute_force_solver.cpp:212] BruteForce: cost=412.817501550 total=25 t=0.0000s
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1026] extend: 1 intervals over [0.4246810480773336, 1]
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1026] extend: 1 intervals over [0, 0.4246810480773336]
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:26.904] [info] [solution.cpp:1097] combine: 3 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 3 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:202] MinMax iter 3: t_max=0.267200, peak=1092.124814, LB=412.817502, gap=1.6455
+[2026-10-12 07:51:26.904] [info] [brute_force_solver.cpp:212] BruteForce: cost=1092.124813623 total=25 t=0.0000s
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:255] MinMax: no improvement at t_max, stopping
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 3 intervals
+[2026-10-12 07:51:26.904] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:26.904] [info] [minmax.cpp:467] MinMax: done. peak=1092.124814, certified_LB=1092.124814, gap=0.0000, iters=3, t=0.000s
+[2026-10-12 07:51:26.904] [info] [trace.cpp:93] TraceWriter: wrote 3 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/brute-force/minmax/trace.csv
+[2026-10-12 07:51:26.904] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 2849 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042126Z__brute-force__minmax__sbgdb-20200507-fpg-poly_0000000030-749__r00__a6e92b701121/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/brute-force/minmax/solution.json
+[2026-10-12 07:51:26.904] [info] [batch_runner.cpp:1352] BatchRunner: sbgdb-20200507-fpg-poly_0000000030 / brute-force / minmax cost=1092.124814 t=0.001s verified=true
+[2026-10-12 07:51:26.905] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

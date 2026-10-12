@@ -1,0 +1,33 @@
+{
+  "experiment_id": "kdc-certification-20261012T030522Z-91a337463b23",
+  "timestamp": "2026-10-12T03:05:23.092598+00:00",
+  "experiment_label": "kinetic differential certification",
+  "repository": "AmirHPartovi/KineticDiskCover",
+  "git_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "git_dirty": true,
+  "host": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64"
+  },
+  "python_version": "3.9.6",
+  "compiler": "/usr/bin/c++",
+  "build_type": "Release",
+  "certification": {
+    "seed_count": 1,
+    "repetitions": 1,
+    "start_index": 1
+  },
+  "reproduction_command": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/kdc-kinetic-certification 1 1 1 ",
+  "status": "COMPLETE",
+  "stages": {
+    "certification": {
+      "status": "COMPLETED",
+      "command": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/kdc-kinetic-certification 1 1 1 ",
+      "exit_code": 0,
+      "completed_at": "2026-10-12T03:05:23.154469+00:00"
+    }
+  },
+  "required_stages": [
+    "certification"
+  ]
+}

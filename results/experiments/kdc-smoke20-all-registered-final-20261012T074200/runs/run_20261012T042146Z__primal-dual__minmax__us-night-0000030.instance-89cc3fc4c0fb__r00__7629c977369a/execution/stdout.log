@@ -1,0 +1,42 @@
+[2026-10-12 07:51:46.126] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a/input for instances
+2026-10-12 07:51:46 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:51:46 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:51:46 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:51:46.132] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:51:46.132] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:51:46.132] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a/execution/solver/experiment_manifest.json)
+[2026-10-12 07:51:46.133] [info] [io.cpp:137] read_json: loaded 1 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a/input/instance.json
+[2026-10-12 07:51:46.134] [info] [minmax.cpp:110] MinMax: start n=1, m=25, T=1
+[2026-10-12 07:51:46.134] [info] [candidate.cpp:199] InstancePrecompute: built 25 candidates
+[2026-10-12 07:51:46.134] [info] [candidate.cpp:345] build_coverage: nnz=25
+[2026-10-12 07:51:46.134] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=127.794373526 LB=5.111774941 ratio=25.0000 |D|=1
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:46.134] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=5633.372564, LB=0.000000, gap=5633.3726
+[2026-10-12 07:51:46.134] [info] [candidate.cpp:345] build_coverage: nnz=25
+[2026-10-12 07:51:46.134] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=1072.004365279 LB=42.880174611 ratio=25.0000 |D|=1
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1097] combine: 2 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:46.134] [info] [minmax.cpp:202] MinMax iter 2: t_max=1.000000, peak=1072.004365, LB=0.000000, gap=1072.0044
+[2026-10-12 07:51:46.134] [info] [candidate.cpp:345] build_coverage: nnz=25
+[2026-10-12 07:51:46.134] [info] [primal_dual_solver.cpp:230] PrimalDual: cost=1072.004365279 LB=42.880174611 ratio=25.0000 |D|=1
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1026] extend: 0 intervals over [1, 1]
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:46.134] [info] [solution.cpp:1097] combine: 2 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:46.134] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-10-12 07:51:46.134] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:51:46.134] [info] [minmax.cpp:467] MinMax: done. peak=1072.004365, certified_LB=0.000000, gap=1072.0044, iters=2, t=0.000s
+[2026-10-12 07:51:46.134] [info] [trace.cpp:93] TraceWriter: wrote 2 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a/execution/solver/runs/us-night-0000030.instance/primal-dual/minmax/trace.csv
+[2026-10-12 07:51:46.134] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 1996 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042146Z__primal-dual__minmax__us-night-0000030.instance-89cc3fc4c0fb__r00__7629c977369a/execution/solver/runs/us-night-0000030.instance/primal-dual/minmax/solution.json
+[2026-10-12 07:51:46.134] [info] [batch_runner.cpp:1352] BatchRunner: us-night-0000030.instance / primal-dual / minmax cost=1072.004365 t=0.001s verified=true
+[2026-10-12 07:51:46.135] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

@@ -1,0 +1,42 @@
+{
+  "actual_backend": "genetic",
+  "algorithm": "genetic",
+  "animation_path": "kroD100_minmaxsum__run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c.gif",
+  "animation_sha256": "314618439deabd275a622694d97e391b34e0a45a5dd18ab5e03aa0519849d6e6",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "kroD100-100b54b48d61-5062f763b8",
+  "instance_name": "kroD100",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": false,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": null,
+    "minmax_component_optimality": "FAILED",
+    "minmax_component_peak": null,
+    "minmax_component_status": "FAILED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c/execution/solver/runs/kroD100/genetic/minmaxsum/component-minmax",
+    "minsum_component_integral": 4149.950911854103,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 5400.157468314816,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c/execution/solver/runs/kroD100/genetic/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 4149.950911854103,
+    "peak_cost": 5400.157468314816
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c/result/result.json",
+  "source_solution_path": "runs/run_20261012T042021Z__genetic__minmaxsum__kroD100-100b54b48d61-5062f763b8__r00__1dea553a0e2c/result/solution.json",
+  "source_solution_sha256": "16c1b728ee5b7610d8061adf323c240003048e71475c218733255b2aef483717",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}

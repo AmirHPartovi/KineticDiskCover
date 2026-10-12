@@ -1,0 +1,43 @@
+[2026-10-12 07:50:16.308] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af/input for instances
+2026-10-12 07:50:16 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:50:16 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:50:16 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:50:16.314] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:50:16.314] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:50:16.314] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af/execution/solver/experiment_manifest.json)
+[2026-10-12 07:50:16.315] [info] [io.cpp:137] read_json: loaded 35 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af/input/instance.json
+[2026-10-12 07:50:16.315] [info] [minsum.cpp:512] MinSum: start n=35, m=25
+[2026-10-12 07:50:16.315] [info] [candidate.cpp:199] InstancePrecompute: built 875 candidates
+[2026-10-12 07:50:16.315] [info] [stationary.cpp:264] NN: cost=4967.863580, feasible=true, active_stations=12
+[2026-10-12 07:50:16.346] [info] [solution.cpp:1026] extend: 48 intervals over [0, 1]
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=4967.863580, feasible=true, active_stations=12
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=3846.505554, feasible=true, active_stations=13
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=2140.437427, feasible=true, active_stations=8
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=2976.024821, feasible=true, active_stations=12
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=3588.435569, feasible=true, active_stations=15
+[2026-10-12 07:50:16.346] [info] [minsum.cpp:633] MinSum iter 1: [t_a,t_b]=[0.8500,0.9322], t_mid=0.8911, int=6985.078453, LB=0.000000, gap=6985.0785
+[2026-10-12 07:50:16.346] [info] [stationary.cpp:264] NN: cost=3445.658996, feasible=true, active_stations=13
+[2026-10-12 07:50:16.349] [info] [solution.cpp:1026] extend: 5 intervals over [0.8910797368150407, 1]
+[2026-10-12 07:50:16.374] [info] [solution.cpp:1026] extend: 35 intervals over [0, 0.8910797368150407]
+[2026-10-12 07:50:16.374] [info] [solution.cpp:1097] combine: 57 intervals
+[2026-10-12 07:50:16.452] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 1 (1/3)
+[2026-10-12 07:50:16.452] [info] [minsum.cpp:633] MinSum iter 2: [t_a,t_b]=[0.8500,0.9322], t_mid=0.8911, int=6985.078453, LB=0.000000, gap=6985.0785
+[2026-10-12 07:50:16.452] [info] [stationary.cpp:264] NN: cost=3445.658996, feasible=true, active_stations=13
+[2026-10-12 07:50:16.455] [info] [solution.cpp:1026] extend: 5 intervals over [0.8910797368150407, 1]
+[2026-10-12 07:50:16.481] [info] [solution.cpp:1026] extend: 35 intervals over [0, 0.8910797368150407]
+[2026-10-12 07:50:16.481] [info] [solution.cpp:1097] combine: 57 intervals
+[2026-10-12 07:50:16.555] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 2 (2/3)
+[2026-10-12 07:50:16.555] [info] [minsum.cpp:633] MinSum iter 3: [t_a,t_b]=[0.8500,0.9322], t_mid=0.8911, int=6985.078453, LB=0.000000, gap=6985.0785
+[2026-10-12 07:50:16.555] [info] [stationary.cpp:264] NN: cost=3445.658996, feasible=true, active_stations=13
+[2026-10-12 07:50:16.558] [info] [solution.cpp:1026] extend: 5 intervals over [0.8910797368150407, 1]
+[2026-10-12 07:50:16.583] [info] [solution.cpp:1026] extend: 35 intervals over [0, 0.8910797368150407]
+[2026-10-12 07:50:16.583] [info] [solution.cpp:1097] combine: 57 intervals
+[2026-10-12 07:50:16.662] [warning] [minsum.cpp:753] MinSum: rejected an unverified refinement at iter 3 (3/3)
+[2026-10-12 07:50:16.662] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 48 intervals
+[2026-10-12 07:50:16.675] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:50:16.675] [info] [minsum.cpp:881] MinSum: done. int=6985.078453, LB=0.000000, gap=6985.0785, iters=3, t=0.275s
+[2026-10-12 07:50:16.675] [info] [trace.cpp:93] TraceWriter: wrote 1 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af/execution/solver/runs/gr96/nn/minsum/trace.csv
+[2026-10-12 07:50:16.675] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 71752 bytes to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042016Z__nn__minsum__gr96-a23a7ba30c4c-e195dfa06d__r00__e6570d2e19af/execution/solver/runs/gr96/nn/minsum/solution.json
+[2026-10-12 07:50:16.676] [info] [batch_runner.cpp:1352] BatchRunner: gr96 / nn / minsum cost=6985.078453 t=0.361s verified=true
+[2026-10-12 07:50:16.676] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

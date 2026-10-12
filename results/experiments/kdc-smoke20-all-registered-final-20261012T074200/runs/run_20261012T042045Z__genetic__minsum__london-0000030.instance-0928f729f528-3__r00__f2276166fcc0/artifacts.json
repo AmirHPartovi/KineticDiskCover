@@ -1,0 +1,125 @@
+{
+  "artifacts": [
+    {
+      "media_type": "text/plain",
+      "path": "execution/command.txt",
+      "sha256": "d6bffae5ee95be3b2c7ba016c4fa4da6c88d44e5cdb506bc5c376295f556d451",
+      "size_bytes": 883
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/solver/batch_summary.md",
+      "sha256": "9a8a00d247cf3311b6e0e3624e8e5b1b3a8074089d51863b687a066789d50d01",
+      "size_bytes": 451
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/experiment_manifest.json",
+      "sha256": "e94aee4f0002943c775cbadbeeb6068de119f351de3e2800de5e19019bae29e7",
+      "size_bytes": 3121
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/master_results.csv",
+      "sha256": "0e3c410353dec80545cf41e7e78998f068faf58ae063a42059b4832069757edf",
+      "size_bytes": 2452
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/master_results.json",
+      "sha256": "a0cc1c000b1d88ba66e8facc6beed6ec4f711b2423351c3e61356c7045407e8b",
+      "size_bytes": 4433
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/result.json",
+      "sha256": "2930b06affdfd17e9ee2846779abc7813582ed828b64f024389d927b06b6d211",
+      "size_bytes": 4213
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/solution.json",
+      "sha256": "7dd2762fe15b0ffe0ab448b8106d86a1afb7d2c9a744d515fe7cde3c1c44cde7",
+      "size_bytes": 4574
+    },
+    {
+      "media_type": "text/csv",
+      "path": "execution/solver/runs/london-0000030.instance/genetic/minsum/trace.csv",
+      "sha256": "affbca671b82da507adc1db2abd5193a7dcaf17ad500cdd3c5ad5095e29b2673",
+      "size_bytes": 1200
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "media_type": "text/plain",
+      "path": "execution/stdout.log",
+      "sha256": "4e712d87872afa7f11a2734da887abf62e80162abcbed126f53169603f400623",
+      "size_bytes": 8643
+    },
+    {
+      "media_type": "application/json",
+      "path": "execution/timing.json",
+      "sha256": "37ca989d33be6e28a679ca5339afd79fdcf987e00d508f9548873e6cfe3acac3",
+      "size_bytes": 234
+    },
+    {
+      "media_type": "application/json",
+      "path": "input/instance.json",
+      "sha256": "3bd5c0ea095c165c3aff2743345e99ee23a6bb9de68c4c65eaf936b6faca0e93",
+      "size_bytes": 2854
+    },
+    {
+      "media_type": "application/json",
+      "path": "input_ref.json",
+      "sha256": "1587d76bfe7e6f811c7eba3346bc0a617c1961474e55941e9a092005352b94b2",
+      "size_bytes": 563
+    },
+    {
+      "media_type": "application/json",
+      "path": "request.json",
+      "sha256": "049f7cced5227ef3310bd3365f9af10b9f6b90082fae2550ed71e5254bfc192b",
+      "size_bytes": 1505
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/result.json",
+      "sha256": "39d550ff29c856422b189c7f90df58a216d940e9dcd2874529dfb36806543fa8",
+      "size_bytes": 4481
+    },
+    {
+      "media_type": "application/json",
+      "path": "result/solution.json",
+      "sha256": "7dd2762fe15b0ffe0ab448b8106d86a1afb7d2c9a744d515fe7cde3c1c44cde7",
+      "size_bytes": 4574
+    },
+    {
+      "media_type": "text/csv",
+      "path": "result/trace.csv",
+      "sha256": "affbca671b82da507adc1db2abd5193a7dcaf17ad500cdd3c5ad5095e29b2673",
+      "size_bytes": 1200
+    },
+    {
+      "media_type": "application/jsonl",
+      "path": "result/trace.jsonl",
+      "sha256": "109d7863af8cb6c7f34d83d1fdb9b37bfa1383d95705069c1f2a673ecb08e59d",
+      "size_bytes": 4875
+    },
+    {
+      "media_type": "application/json",
+      "path": "run.json",
+      "sha256": "f7f5915a885ae2606c33484fb8fdc5c0f0c176b63d89405baaf58620a9985769",
+      "size_bytes": 11430
+    },
+    {
+      "media_type": "application/json",
+      "path": "verification/verification.json",
+      "sha256": "a255221198f0f75693890c1106ceb4b47f331c600abefd7d65b64c05d7a3b961",
+      "size_bytes": 495
+    }
+  ],
+  "schema_version": 1
+}

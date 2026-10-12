@@ -1,0 +1,32 @@
+[2026-10-12 07:49:17.802] [info] [batch_runner.cpp:678] BatchRunner: scanning /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041917Z__nn__minmax__C-lower-90fec4bb6118-801fe3006e__r00__1db918337296/input for instances
+2026-10-12 07:49:17 [INFO] checks license for KONT v7.2.4 20250314
+2026-10-12 07:49:17 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-10-12 07:49:17 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+[2026-10-12 07:49:17.808] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-10-12 07:49:17.808] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-10-12 07:49:17.809] [info] [batch_runner.cpp:716] BatchRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, requested=branch-and-bound, manifest=/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041917Z__nn__minmax__C-lower-90fec4bb6118-801fe3006e__r00__1db918337296/execution/solver/experiment_manifest.json)
+[2026-10-12 07:49:17.810] [info] [io.cpp:137] read_json: loaded 34 points, 25 stations from /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041917Z__nn__minmax__C-lower-90fec4bb6118-801fe3006e__r00__1db918337296/input/instance.json
+[2026-10-12 07:49:17.810] [info] [minmax.cpp:110] MinMax: start n=34, m=25, T=1
+[2026-10-12 07:49:17.810] [info] [candidate.cpp:199] InstancePrecompute: built 850 candidates
+[2026-10-12 07:49:17.810] [info] [stationary.cpp:264] NN: cost=1268.566300, feasible=true, active_stations=12
+[2026-10-12 07:49:17.878] [info] [solution.cpp:1026] extend: 113 intervals over [0, 1]
+[2026-10-12 07:49:17.878] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.622681, peak=5144.305346, LB=0.000000, gap=5144.3053
+[2026-10-12 07:49:17.878] [info] [stationary.cpp:264] NN: cost=1132.743469, feasible=true, active_stations=8
+[2026-10-12 07:49:17.898] [info] [solution.cpp:1026] extend: 42 intervals over [0.6226811642320058, 1]
+[2026-10-12 07:49:17.939] [info] [solution.cpp:1026] extend: 69 intervals over [0, 0.6226811642320058]
+[2026-10-12 07:49:17.940] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 110 intervals
+[2026-10-12 07:49:17.961] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:17.961] [info] [solution.cpp:1097] combine: 115 intervals
+[2026-10-12 07:49:17.961] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 115 intervals
+[2026-10-12 07:49:17.989] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-10-12 07:49:17.989] [info] [minmax.cpp:202] MinMax iter 2: t_max=0.930625, peak=2556.839749, LB=0.000000, gap=2556.8397
+[2026-10-12 07:49:17.989] [info] [stationary.cpp:264] NN: cost=1101.378142, feasible=true, active_stations=12
+[2026-10-12 07:49:17.995] [info] [solution.cpp:1026] extend: 14 intervals over [0.9306245813554344, 1]
+[2026-10-12 07:49:18.059] [info] [solution.cpp:1026] extend: 112 intervals over [0, 0.9306245813554344]
+[2026-10-12 07:49:18.059] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 125 intervals
+[2026-10-12 07:49:18.077] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=false, supporting_points_ok=false, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=false
+[2026-10-12 07:49:18.078] [error] [batch_runner.cpp:1305] BatchRunner: C-lower / nn / minmax failed: MinMax candidate verification failed: coverage continuous verification failed
+[2026-10-12 07:49:18.078] [info] [trace.cpp:93] TraceWriter: wrote 0 rows to /Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T041917Z__nn__minmax__C-lower-90fec4bb6118-801fe3006e__r00__1db918337296/execution/solver/runs/C-lower/nn/minmax/trace.csv
+[2026-10-12 07:49:18.078] [info] [batch_runner.cpp:1352] BatchRunner: C-lower / nn / minmax cost=0.000000 t=0.268s verified=false
+[2026-10-12 07:49:18.079] [info] [batch_runner.cpp:987] BatchRunner: 1 runs completed

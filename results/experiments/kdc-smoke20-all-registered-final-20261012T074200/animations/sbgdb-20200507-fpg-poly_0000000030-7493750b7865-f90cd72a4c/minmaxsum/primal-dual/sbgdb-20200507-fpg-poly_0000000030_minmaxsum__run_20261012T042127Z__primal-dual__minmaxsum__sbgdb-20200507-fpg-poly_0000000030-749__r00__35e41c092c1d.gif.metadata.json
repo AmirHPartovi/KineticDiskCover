@@ -1,0 +1,42 @@
+{
+  "actual_backend": "primal-dual",
+  "algorithm": "primal-dual",
+  "animation_path": "sbgdb-20200507-fpg-poly_0000000030_minmaxsum__run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d.gif",
+  "animation_sha256": "a6d1e31e1562c1da5be42ef7fa0eac0283c7ca696aeb8b5cdfb8e2742cdfe533",
+  "experiment_id": "kdc-smoke20-all-registered-final-20261012T074200",
+  "generator": "scripts/animate_best.py",
+  "instance_id": "sbgdb-20200507-fpg-poly_0000000030-7493750b7865-f90cd72a4c",
+  "instance_name": "sbgdb-20200507-fpg-poly_0000000030",
+  "joint": {
+    "dominance_invariants_ok": true,
+    "dominates_minmax": true,
+    "dominates_minsum": true,
+    "joint_optimality_status": "FEASIBLE",
+    "minmax_component_integral": 317.0544819893408,
+    "minmax_component_optimality": "FEASIBLE",
+    "minmax_component_peak": 1092.124813622804,
+    "minmax_component_status": "COMPLETED",
+    "minmax_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/primal-dual/minmaxsum/component-minmax",
+    "minsum_component_integral": 385.48355263763096,
+    "minsum_component_optimality": "FEASIBLE",
+    "minsum_component_peak": 1092.124813622804,
+    "minsum_component_status": "COMPLETED",
+    "minsum_source_run": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/experiments/kdc-smoke20-all-registered-final-20261012T074200/runs/run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d/execution/solver/runs/sbgdb-20200507-fpg-poly_0000000030/primal-dual/minmaxsum/component-minsum"
+  },
+  "objective": "minmaxsum",
+  "objective_vector": {
+    "integral_cost": 317.0544819893408,
+    "peak_cost": 1092.124813622804
+  },
+  "optimality_status": "FEASIBLE",
+  "run_id": "run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d",
+  "run_status": "COMPLETED",
+  "schema_version": 1,
+  "selection_rule": "fastest verified feasible run; no scalar objective ranking",
+  "source_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "source_result_path": "runs/run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d/result/result.json",
+  "source_solution_path": "runs/run_20261012T042127Z__primal-dual__minmaxsum__sbgdb-20200507-fpg-poly_0000000030-749__r00__35e41c092c1d/result/solution.json",
+  "source_solution_sha256": "f2a320977d67cc33906952ca076611e2a5a986d09f97d805a78e2e60eb88e35d",
+  "verification_kind": "CERTIFIED_CONTINUOUS",
+  "verification_status": "PASSED"
+}
