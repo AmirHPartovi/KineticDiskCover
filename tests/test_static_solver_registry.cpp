@@ -14,8 +14,10 @@
 
 TEST_CASE("Registry: builtins present and sorted") {
   const auto names = kdc::StaticSolverRegistry::list();
-  REQUIRE(std::find(names.begin(), names.end(), "nn") != names.end());
-  REQUIRE(std::find(names.begin(), names.end(), "ip-kont") != names.end());
+  const std::vector<std::string> expected{
+      "branch-and-bound", "brute-force", "genetic", "greedy", "ip-kont",
+      "local-search", "lp-rounding", "nn", "primal-dual", "sa", "shifting"};
+  REQUIRE(names == expected);
   REQUIRE(std::is_sorted(names.begin(), names.end()));
 }
 

@@ -909,7 +909,7 @@ def write_report(df: pd.DataFrame, output: str | Path,
     ) if not df.empty else pd.DataFrame()
     smoke_profile = (
         "dataset_profile" in df.columns
-        and (df["dataset_profile"].astype(str) == "smoke10").any()
+        and (df["dataset_profile"].astype(str) == "smoke20").any()
     )
     lines = [
         ("# Smoke / development validation charts"
@@ -1280,8 +1280,10 @@ def generate_figures(df: pd.DataFrame, output: str | Path,
 def main(argv: list[str] | None = None) -> int:
     global FIGURE_DPI
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="results/batch/master_results.json")
-    parser.add_argument("--output", default="results/figures")
+    parser.add_argument("--input", required=True,
+                        help="validated result JSON input")
+    parser.add_argument("--output", required=True,
+                        help="experiment-scoped figure output directory")
     parser.add_argument("--fixed-m", type=int, default=25)
     parser.add_argument("--fixed-n", type=int, default=500)
     parser.add_argument("--dpi", type=int, default=300)

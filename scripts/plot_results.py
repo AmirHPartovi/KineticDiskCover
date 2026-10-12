@@ -496,12 +496,12 @@ def create_plots(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--input", type=Path, default=Path("results/json/benchmark.json"),
-        help="benchmark JSON input (default: results/json/benchmark.json)",
+        "--input", type=Path, required=True,
+        help="benchmark JSON input",
     )
     parser.add_argument(
-        "--output-dir", type=Path, default=Path("results/figures"),
-        help="figure and report directory (default: results/figures)",
+        "--output-dir", type=Path, required=True,
+        help="experiment-scoped figure and report directory",
     )
     parser.add_argument("--fixed-m", type=int, default=None,
                         help="use this station count for plots versus n")

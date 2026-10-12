@@ -50,8 +50,13 @@ while IFS=$'\t' read -r key value; do
     ANIMATION_DPI) ANIMATION_DPI="$value" ;;
     ARTIFACT_RETENTION_DAYS) ARTIFACT_RETENTION_DAYS="$value" ;;
     SMOKE_COUNT) SMOKE_COUNT="$value" ;;
+    SMOKE_SEED) SMOKE_SEED="$value" ;;
     SMOKE_MAX_N) SMOKE_MAX_N="$value" ;;
     SMOKE_MAX_M) SMOKE_MAX_M="$value" ;;
+    BRUTE_FORCE_MAX_ASSIGNMENTS) BRUTE_FORCE_MAX_ASSIGNMENTS="$value" ;;
+    BRUTE_FORCE_TIME_LIMIT) BRUTE_FORCE_TIME_LIMIT="$value" ;;
+    CERTIFICATION_SEEDS) CERTIFICATION_SEEDS="$value" ;;
+    CERTIFICATION_REPETITIONS) CERTIFICATION_REPETITIONS="$value" ;;
     *) echo "run_experiment.sh: unexpected config key: $key" >&2; exit 2 ;;
   esac
 done <<< "$CONFIG_OUTPUT"
@@ -59,6 +64,7 @@ done <<< "$CONFIG_OUTPUT"
 DATASET_EXPLICIT=0
 DATASET_PROFILE_EXPLICIT=0
 OUTPUT=""
+BUILD_DIR="$ROOT/build"
 ALGORITHMS_EXPLICIT=0
 ANIMATION_MODE="${ANIMATION_MODE_DEFAULT:-both}"
 ANIMATION_INSTANCES=""
@@ -86,9 +92,10 @@ Usage: bash scripts/run_experiment.sh [OPTIONS]
 Options:
   --pipeline smoke|reference|full
   --dataset PATH                   Dataset directory or canonical JSON file
-  --dataset-profile full|smoke10   Built-in dataset profile (default: full)
+  --dataset-profile full|smoke20   Built-in dataset profile (default: full)
   --output PATH                    Experiment directory (default: unique results/experiments/<ID>)
-  --algorithms all-fast|all-comparison|LIST
+  --build-dir PATH                 Local CMake build directory (default: build)
+  --algorithms all-fast|all-comparison|all-registered|LIST
   --modes minmax|minsum|minmaxsum|both|all
   --seed N
   --repeats N
@@ -100,7 +107,7 @@ Options:
   --animation-top-n N
   --animation-mode minmax|minsum|minmaxsum|both|all
   --animation-instances LIST       Comma-separated instance names or JSON basenames
-  --animation-policy best|all-algorithms
+  --animation-policy best|all-algorithms|all-solutions
   --all-algorithms                 Animate every algorithm for selected instances
   --smoke-max-n N                  Smoke instance trajectory limit
   --smoke-max-m N                  Smoke station limit
@@ -123,7 +130,7 @@ fail_usage() {
 
 while (($#)); do
   case "$1" in
-    --pipeline|--dataset|--dataset-profile|--output|--algorithms|--modes|--seed|--repeats|--threads|\
+    --pipeline|--dataset|--dataset-profile|--output|--build-dir|--algorithms|--modes|--seed|--repeats|--threads|\
     --fast-time-limit|--exact-time-limit|--time-limit|--exact-reference|\
     --animation-top-n|--animation-mode|--animation-instances|--animation-policy|\
     --smoke-max-n|--smoke-max-m)
@@ -136,6 +143,7 @@ while (($#)); do
         --dataset) DATASET="$value"; DATASET_EXPLICIT=1 ;;
         --dataset-profile) DATASET_PROFILE="$value"; DATASET_PROFILE_EXPLICIT=1 ;;
         --output) OUTPUT="$value" ;;
+        --build-dir) BUILD_DIR="$value" ;;
         --algorithms) ALGORITHMS="$value"; ALGORITHMS_EXPLICIT=1 ;;
         --modes) MODES="$value" ;;
         --seed) SEED="$value"; SEED_EXPLICIT=1 ;;
@@ -180,17 +188,17 @@ import json, sys
 from pathlib import Path
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 raise SystemExit(0 if isinstance(payload, dict)
-                 and payload.get("name") == "smoke10" else 1)
+                 and payload.get("name") == "smoke20" else 1)
 PY
   then
-    DATASET_PROFILE="smoke10"
+    DATASET_PROFILE="smoke20"
   fi
 fi
-case "$DATASET_PROFILE" in full|smoke10) ;; *) fail_usage "invalid --dataset-profile value" ;; esac
+case "$DATASET_PROFILE" in full|smoke20) ;; *) fail_usage "invalid --dataset-profile value" ;; esac
 case "$PIPELINE_PROFILE" in smoke|reference|full) ;; *) fail_usage "invalid --pipeline value" ;; esac
 case "$PIPELINE_PROFILE:$DATASET_PROFILE" in
-  smoke:smoke10|reference:full|full:full) ;;
-  smoke:*) fail_usage "smoke pipeline requires dataset profile smoke10" ;;
+  smoke:smoke20|reference:full|full:full) ;;
+  smoke:*) fail_usage "smoke pipeline requires dataset profile smoke20" ;;
   *) fail_usage "$PIPELINE_PROFILE pipeline requires dataset profile full" ;;
 esac
 if [[ "$PIPELINE_PROFILE" == reference ]]; then
@@ -201,7 +209,7 @@ if [[ "$PIPELINE_PROFILE" == reference ]]; then
 fi
 case "$MODES" in minmax|minsum|minmaxsum|both|all) ;; *) fail_usage "invalid --modes value" ;; esac
 case "$ANIMATION_MODE" in minmax|minsum|minmaxsum|both|all) ;; *) fail_usage "invalid --animation-mode value" ;; esac
-case "$ANIMATION_POLICY" in best|all-algorithms) ;; *) fail_usage "invalid --animation-policy value" ;; esac
+case "$ANIMATION_POLICY" in best|all-algorithms|all-solutions) ;; *) fail_usage "invalid --animation-policy value" ;; esac
 case "$EXACT_REFERENCE" in auto|ip-kont|branch-and-bound) ;; *) fail_usage "invalid --exact-reference value" ;; esac
 [[ "$SEED" =~ ^[0-9]+$ ]] || fail_usage "--seed must be a nonnegative integer"
 [[ "$REPEATS" =~ ^[1-9][0-9]*$ ]] || fail_usage "--repeats must be positive"
@@ -222,12 +230,29 @@ resolve_from_root() {
 }
 
 DATASET_PATH="$(resolve_from_root "$DATASET")"
+BUILD_DIR="$(resolve_from_root "$BUILD_DIR")"
 [[ -e "$DATASET_PATH" ]] || fail_usage "dataset not found: $DATASET_PATH"
 SELECTION_MANIFEST=""
 SOURCE_DATASET_PATH="$DATASET_PATH"
 TEMP_SELECTION_DIR=""
-if [[ "$DATASET_PROFILE" == "smoke10" ]]; then
-  if [[ -d "$DATASET_PATH" && -s "$DATASET_PATH/manifest.json" && \
+cleanup_temp_selection() {
+  if [[ -n "$TEMP_SELECTION_DIR" && -d "$TEMP_SELECTION_DIR" ]]; then
+    rm -rf -- "$TEMP_SELECTION_DIR"
+  fi
+}
+trap cleanup_temp_selection EXIT
+if [[ "$DATASET_PROFILE" == "smoke20" ]]; then
+  if ((RESUME)) && [[ -n "$OUTPUT" ]]; then
+    resume_experiment="$OUTPUT"
+    [[ "$resume_experiment" = /* ]] || resume_experiment="$ROOT/$resume_experiment"
+    if [[ -s "$resume_experiment/dataset/selection_manifest" ]]; then
+      SELECTION_MANIFEST="$resume_experiment/dataset/selection_manifest"
+      DATASET_PATH="$SELECTION_MANIFEST"
+    fi
+  fi
+  if [[ -n "$SELECTION_MANIFEST" ]]; then
+    :
+  elif [[ -d "$DATASET_PATH" && -s "$DATASET_PATH/manifest.json" && \
         -d "$DATASET_PATH/instances" ]]; then
     SELECTION_MANIFEST="$DATASET_PATH/manifest.json"
   elif [[ -f "$DATASET_PATH" ]]; then
@@ -240,12 +265,13 @@ if [[ "$DATASET_PROFILE" == "smoke10" ]]; then
     python3 "$ROOT/scripts/select_test_instances.py" \
       --source "$DATASET_PATH" --output "$TEMP_SELECTION_DIR/materialized" \
       --count "$SMOKE_COUNT" --max-n "$SMOKE_MAX_N" --max-m "$SMOKE_MAX_M" \
+      --seed "$SMOKE_SEED" \
       --manifest-output "$TEMP_SELECTION_DIR/selection.json" \
-      || fail_usage "unable to select smoke instances from $DATASET_PATH"
+      || fail_usage "unable to select smoke20 instances from $DATASET_PATH"
     SELECTION_MANIFEST="$TEMP_SELECTION_DIR/selection.json"
     DATASET_PATH="$SELECTION_MANIFEST"
   else
-    fail_usage "smoke10 requires a dataset directory, selection manifest, or materialized smoke dataset"
+    fail_usage "smoke20 requires a dataset directory, selection manifest, or materialized smoke dataset"
   fi
   if [[ -z "$TEMP_SELECTION_DIR" ]]; then
     SOURCE_DATASET_PATH="$(python3 - "$SELECTION_MANIFEST" "$ROOT" <<'PY'
@@ -263,16 +289,13 @@ elif not source_root.is_absolute():
     source_root = root / source_root
 print(source_root.resolve())
 PY
-)" || fail_usage "unable to read smoke10 selection manifest"
+)" || fail_usage "unable to read smoke20 selection manifest"
   fi
 fi
 EXP_ROOT="$ROOT/results/experiments"
 mkdir -p "$EXP_ROOT"
 SOURCE_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$SOURCE_DATASET_PATH")"
 SELECTION_FINGERPRINT=""
-if [[ -n "$SELECTION_MANIFEST" ]]; then
-  SELECTION_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$SELECTION_MANIFEST")"
-fi
 
 if ((RESUME)); then
   if [[ -n "$OUTPUT" ]]; then
@@ -283,30 +306,41 @@ if ((RESUME)); then
   fi
   [[ -n "$EXPERIMENT_DIR" && -d "$EXPERIMENT_DIR" ]] \
     || fail_usage "no incomplete matching experiment to resume"
+  if [[ -s "$EXPERIMENT_DIR/experiment_manifest.json" ]]; then
+    SELECTION_FINGERPRINT="$(python3 - "$EXPERIMENT_DIR/experiment_manifest.json" <<'PY'
+import json, sys
+from pathlib import Path
+manifest = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+print(manifest.get("selection_manifest_fingerprint") or "")
+PY
+)"
+  fi
 else
   if [[ -n "$OUTPUT" ]]; then
     EXPERIMENT_DIR="$(resolve_from_root "$OUTPUT")"
     [[ ! -e "$EXPERIMENT_DIR" ]] || fail_usage "output already exists; use --resume or choose another path"
   else
-    EXPERIMENT_ID="kdc-${PIPELINE_PROFILE}-$(date '+%Y-%m-%d_%H%M%S')_$$"
+    EXPERIMENT_ID="$(python3 "$PIPELINE" new-id --profile "$PIPELINE_PROFILE")"
     EXPERIMENT_DIR="$EXP_ROOT/$EXPERIMENT_ID"
-    collision=0
     while :; do
       if mkdir "$EXPERIMENT_DIR" 2>/dev/null; then
         break
       fi
       [[ -e "$EXPERIMENT_DIR" ]] || fail_usage "unable to create experiment output: $EXPERIMENT_DIR"
-      collision=$((collision + 1))
-      EXPERIMENT_DIR="$EXP_ROOT/${EXPERIMENT_ID}_$collision"
+      EXPERIMENT_ID="$(python3 "$PIPELINE" new-id --profile "$PIPELINE_PROFILE")"
+      EXPERIMENT_DIR="$EXP_ROOT/$EXPERIMENT_ID"
     done
   fi
+fi
+if [[ -n "$SELECTION_MANIFEST" && -z "$SELECTION_FINGERPRINT" ]]; then
+  SELECTION_FINGERPRINT="$(python3 "$PIPELINE" fingerprint --path "$SELECTION_MANIFEST")"
 fi
 
 if ((!RESUME)) && [[ -n "$OUTPUT" ]]; then
   mkdir -p "$(dirname "$EXPERIMENT_DIR")"
   mkdir "$EXPERIMENT_DIR" || fail_usage "unable to create experiment output: $EXPERIMENT_DIR"
 fi
-mkdir -p "$EXPERIMENT_DIR"/{dataset,preflight,calibration,batch,tables,figures,animations,logs,reports}
+mkdir -p "$EXPERIMENT_DIR/logs"
 PIPELINE_LOG="$EXPERIMENT_DIR/logs/pipeline.log"
 touch "$PIPELINE_LOG"
 REPRO_COMMAND="bash scripts/run_experiment.sh"
@@ -314,6 +348,10 @@ for argument in "${ORIGINAL_ARGS[@]}"; do
   printf -v quoted_argument '%q' "$argument"
   REPRO_COMMAND+=" $quoted_argument"
 done
+if [[ " ${ORIGINAL_ARGS[*]} " != *" --build-dir "* ]]; then
+  printf -v quoted_build_dir '%q' "${BUILD_DIR#"$ROOT/"}"
+  REPRO_COMMAND+=" --build-dir $quoted_build_dir"
+fi
 python3 "$PIPELINE" init --experiment "$EXPERIMENT_DIR" \
   --pipeline "$PIPELINE_PROFILE" \
   --dataset "$DATASET_PATH" --dataset-label "$DATASET" \
@@ -322,6 +360,8 @@ python3 "$PIPELINE" init --experiment "$EXPERIMENT_DIR" \
   --source-dataset-fingerprint "$SOURCE_FINGERPRINT" \
   --selection-fingerprint "$SELECTION_FINGERPRINT" \
   --selection-manifest "$SELECTION_MANIFEST" \
+  --selection-count "$SMOKE_COUNT" --selection-seed "$SMOKE_SEED" \
+  --selection-max-n "$SMOKE_MAX_N" --selection-max-m "$SMOKE_MAX_M" \
   --algorithms "$ALGORITHMS" --modes "$MODES" --seed "$SEED" \
   --repeats "$REPEATS" --threads "$THREADS" --fast-limit "$FAST_LIMIT" \
   --exact-limit "$EXACT_LIMIT" --static-limit "$STATIC_LIMIT" \
@@ -333,9 +373,13 @@ python3 "$PIPELINE" init --experiment "$EXPERIMENT_DIR" \
   --save-traces "$SAVE_TRACES" --save-solutions "$SAVE_SOLUTIONS" \
   --reproduction-command "$REPRO_COMMAND" \
   $([[ $RESUME -eq 1 ]] && printf '%s' '--resume')
+if [[ -s "$EXPERIMENT_DIR/dataset/selection_manifest" ]]; then
+  SELECTION_MANIFEST="$EXPERIMENT_DIR/dataset/selection_manifest"
+fi
 
 on_exit() {
   local rc=$?
+  cleanup_temp_selection
   if ((rc != 0)) && [[ -s "$EXPERIMENT_DIR/experiment_manifest.json" ]]; then
     printf '[%s] PIPELINE EXIT exit_status=%d; writing partial-run report\n' \
       "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$rc" >> "$PIPELINE_LOG"
@@ -362,7 +406,17 @@ stage_done() {
 import json, sys
 from pathlib import Path
 manifest = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-sys.exit(0 if manifest.get("stages", {}).get(sys.argv[2], {}).get("status") == "COMPLETED" else 1)
+stage = manifest.get("stages", {}).get(sys.argv[2], {})
+if stage.get("status") != "COMPLETED":
+    raise SystemExit(1)
+required_command_fragments = {
+    "build": ("-DBUILD_TESTS=ON", "-DBUILD_BENCHMARK=ON"),
+    "tests": ("pytest -q tests/python",),
+}
+command = str(stage.get("command", ""))
+if not all(fragment in command
+           for fragment in required_command_fragments.get(sys.argv[2], ())):
+    raise SystemExit(1)
 PY
 }
 
@@ -424,30 +478,124 @@ else
     --source "$DATASET_PATH" --resume \
     --canonical-fingerprint "$CANONICAL_FINGERPRINT"
 fi
-if [[ -s "$EXPERIMENT_DIR/dataset_selection_manifest.json" ]]; then
-  SELECTION_MANIFEST="$EXPERIMENT_DIR/dataset_selection_manifest.json"
+if [[ -s "$EXPERIMENT_DIR/dataset/selection_manifest.json" ]]; then
+  SELECTION_MANIFEST="$EXPERIMENT_DIR/dataset/selection_manifest.json"
 fi
-if [[ -n "$TEMP_SELECTION_DIR" ]]; then
-  rm -rf -- "$TEMP_SELECTION_DIR"
-  TEMP_SELECTION_DIR=""
+if ! stage_done build; then
+  run_stage build build.log bash -c \
+    'cmake -S "$1" -B "$3" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARK=ON && cmake --build "$3" --parallel "$2"' \
+    _ "$ROOT" "$THREADS" "$BUILD_DIR"
 fi
+if ! stage_done tests; then
+  run_stage tests tests.log bash -c \
+    'cd "$1" && ctest --test-dir "$2" --output-on-failure && python3 -m pytest -q tests/python' \
+    _ "$ROOT" "$BUILD_DIR"
+fi
+if [[ "$PIPELINE_PROFILE" == smoke ]] && {
+  ! stage_done certification ||
+  [[ ! -s "$EXPERIMENT_DIR/certification/differential.md" ]] ||
+  [[ ! -s "$EXPERIMENT_DIR/certification/exit_status.txt" ]] ||
+  [[ "$(cat "$EXPERIMENT_DIR/certification/exit_status.txt")" != 0 ]]
+}; then
+  mkdir -p "$EXPERIMENT_DIR/certification"
+  certification_rc=0
+  if run_stage certification certification.log bash -c \
+    'set -o pipefail; "$1" "$2" "$3" | tee "$4/certification/differential.csv"; rc=${PIPESTATUS[0]}; printf "%s\n" "$rc" > "$4/certification/exit_status.txt"; exit "$rc"' \
+    _ "$BUILD_DIR/kdc-kinetic-certification" \
+    "$CERTIFICATION_SEEDS" "$CERTIFICATION_REPETITIONS" "$EXPERIMENT_DIR"; then
+    :
+  else
+    certification_rc=$?
+  fi
+  python3 - "$EXPERIMENT_DIR/certification/differential.csv" \
+    "$EXPERIMENT_DIR" "$CERTIFICATION_SEEDS" "$CERTIFICATION_REPETITIONS" \
+    "$BUILD_DIR" "$ROOT" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(sys.argv[6]) / "scripts"))
+from kdc_tools.reporting import write_companion
 
+path = Path(sys.argv[1])
+if path.is_file():
+    with path.open(encoding="utf-8") as source:
+        header = source.readline().rstrip("\r\n").split(",")
+    definitions = {
+        "git_commit": "Source commit embedded in the certification executable.",
+        "git_dirty": "Whether the source tree was dirty when the executable was built.",
+        "compiler": "C++ compiler version string.",
+        "build_type": "CMake build type.",
+        "logical_cpus": "Host logical CPU count.",
+        "threads": "Threads used by the certification algorithm.",
+        "seed": "Deterministic generated-instance seed.",
+        "family": "Generated certification instance family.",
+        "n": "Number of moving trajectories.",
+        "m": "Number of stations.",
+        "total_segments": "Total piecewise trajectory segments.",
+        "objective": "Objective used to construct the kinetic solution.",
+        "interval_count": "Number of emitted solution intervals.",
+        "support_events": "Detected support-change events.",
+        "handover_events": "Detected station handover events.",
+        "peak": "Peak covering cost.",
+        "peak_time": "Time at which peak covering cost occurs.",
+        "integral": "Integrated covering cost.",
+        "correctness_status": "Whether differential traces, states, and continuous verification agree.",
+        "event_trace": "Serialized event groups and their transition metadata.",
+    }
+    timing_columns = {
+        "extension_ns": "Kinetic extension elapsed time, nanoseconds.",
+        "verification_ns": "Continuous verification elapsed time, nanoseconds.",
+        "end_to_end_ns": "Extension plus verification elapsed time, nanoseconds.",
+        "support_event_ns": "Support-event detection elapsed time, nanoseconds.",
+        "handover_event_ns": "Handover-event detection elapsed time, nanoseconds.",
+        "interval_construction_ns": "Solution interval construction elapsed time, nanoseconds.",
+    }
+    count_columns = {
+        "point_support_comparisons", "quadratic_solves",
+        "segment_pair_exams", "support_certificate_creations",
+        "support_certificate_failures", "support_queue_pushes",
+        "support_queue_pops", "stale_support_events",
+        "tournament_tree_updates", "external_challenge_certificates",
+        "external_challenge_updates", "handover_queue_pushes",
+        "handover_queue_pops", "stale_handover_events",
+        "local_support_queries", "second_support_queries",
+        "global_fallbacks", "global_points_scanned", "memory_bytes",
+    }
+    for column in header:
+        if column not in definitions:
+            if column in timing_columns:
+                definitions[column] = timing_columns[column]
+            elif column in count_columns:
+                definitions[column] = f"Certification diagnostic count for {column.replace('_', ' ')}; NA means unavailable."
+            else:
+                definitions[column] = f"Certification provenance or diagnostic field `{column}` as emitted by the executable."
+    write_companion(
+        path,
+        title="Kinetic Differential Certification",
+        purpose="Capture the local deterministic differential-certification campaign.",
+        experiment_id=Path(sys.argv[2]).name,
+        source="active experiment certification output and required pipeline configuration",
+        generation_command=(
+            f"{Path(sys.argv[5]).relative_to(Path(sys.argv[6]))}/kdc-kinetic-certification "
+            f"{sys.argv[3]} {sys.argv[4]}"
+        ),
+        file_scope="All generated certification seeds, algorithm engines, and emitted diagnostic rows.",
+        sort_order="seed order, then reference_global, tournament_global, tournament_local",
+        filters="No rows are filtered; failed campaign output is preserved.",
+        column_definitions=definitions,
+        limitations="This is a deterministic differential certification workload, not evidence that the smoke20 solver matrix completed.",
+    )
+PY
+  if ((certification_rc != 0)); then
+    exit "$certification_rc"
+  fi
+fi
 if ((SKIP_PREFLIGHT)); then
+  mkdir -p "$EXPERIMENT_DIR/preflight"
   printf '# Preflight\n\nSkipped by `--skip-preflight`.\n' > "$EXPERIMENT_DIR/preflight/preflight_report.md"
-  skip_stage build "requested by --skip-preflight"
-  skip_stage tests "requested by --skip-preflight"
   skip_stage preflight "requested by --skip-preflight"
 else
-  if ! stage_done build; then
-    run_stage build build.log bash -c \
-      'cmake -S "$1" -B "$1/build" -DCMAKE_BUILD_TYPE=Release && cmake --build "$1/build" --parallel "$2"' \
-      _ "$ROOT" "$THREADS"
-  fi
-  if ! stage_done tests; then
-    run_stage tests tests.log ctest --test-dir "$ROOT/build" --output-on-failure
-  fi
   if ! stage_done preflight; then
-    if run_stage preflight preflight.log "$ROOT/build/kdc-solver" preflight \
+    if run_stage preflight preflight.log "$BUILD_DIR/kdc-solver" preflight \
       --output "$EXPERIMENT_DIR/preflight/preflight_report.md"; then
       :
     else
@@ -463,9 +611,12 @@ fi
 
 mkdir -p "$EXPERIMENT_DIR/batch"
 if ! stage_done backend_selection; then
-  run_stage backend_selection backend_selection.log bash -c \
-    '"$1/build/kdc-solver" calibrate --dataset "$2/dataset" --output "$2/calibration" --exact-reference "$3" && cp "$2/calibration/experiment_manifest.json" "$2/batch/experiment_manifest.json"' \
-    _ "$ROOT" "$EXPERIMENT_DIR" "$EXACT_REFERENCE"
+  calibration_dir="$EXPERIMENT_DIR/calibration/attempts/$(python3 "$PIPELINE" \
+  new-id --profile calibration)"
+  mkdir -p "$calibration_dir"
+  run_stage backend_selection backend_selection.log "$BUILD_DIR/kdc-solver" \
+  calibrate --dataset "$EXPERIMENT_DIR/dataset" --output "$calibration_dir" \
+  --exact-reference "$EXACT_REFERENCE"
 fi
 
 batch_artifacts_exist=1
@@ -477,7 +628,17 @@ if [[ ! -s "$EXPERIMENT_DIR/aggregates/aggregate_manifest.json" ]] || \
 import json, sys
 from pathlib import Path
 manifest = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-sys.exit(0 if manifest.get("complete") is True else 1)
+classifications = manifest.get("classifications", {})
+structurally_complete = (
+    bool(classifications.get("expected_runs"))
+    and classifications.get("missing_runs") == 0
+    and classifications.get("unexpected_runs") == 0
+    and classifications.get("invalid_runs") == 0
+    and not manifest.get("missing_run_keys")
+    and not manifest.get("unexpected_run_keys")
+    and not manifest.get("invalid_runs")
+)
+sys.exit(0 if structurally_complete else 1)
 PY
 then
   batch_artifacts_exist=0
@@ -496,12 +657,17 @@ if ! stage_done benchmark || ((batch_artifacts_exist == 0)); then
     --time-limit "$STATIC_LIMIT"
     --fast-time-limit "$FAST_LIMIT"
     --exact-time-limit "$EXACT_LIMIT"
+    --brute-force-max-assignments "$BRUTE_FORCE_MAX_ASSIGNMENTS"
+    --brute-force-time-limit-sec "$BRUTE_FORCE_TIME_LIMIT"
+    --preflight-report "$EXPERIMENT_DIR/preflight/preflight_report.md"
     --force
     --dataset-profile "$DATASET_PROFILE"
   )
   ((SAVE_SOLUTIONS)) && batch_args+=(--save-solutions)
   ((SAVE_TRACES)) && batch_args+=(--save-traces)
-  ((RESUME)) && batch_args+=(--resume)
+  if ((RESUME)) && [[ -s "$EXPERIMENT_DIR/experiment.json" ]]; then
+    batch_args+=(--resume)
+  fi
   if [[ -n "$SELECTION_MANIFEST" ]]; then
     batch_args+=(--dataset-manifest "$SELECTION_MANIFEST")
   fi
@@ -529,6 +695,10 @@ manifest["selected_exact_backend"] = (
     batch.get("selected_backend") or batch.get("selected_exact_reference")
 )
 manifest["actual_exact_backend"] = batch.get("actual_backend")
+plan = experiment / "runs" / "plan.jsonl"
+if plan.is_file():
+    import hashlib
+    manifest["run_plan_sha256"] = hashlib.sha256(plan.read_bytes()).hexdigest()
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n",
                          encoding="utf-8")
 PY
@@ -541,28 +711,19 @@ if ((SKIP_TABLES || !TABLES_ENABLED)); then
   skip_stage tables "disabled by pipeline configuration or command-line option"
 else
   if ! stage_done tables || [[ ! -s "$EXPERIMENT_DIR/tables/00_index.md" ]] || \
-    [[ ! -s "$EXPERIMENT_DIR/tables/master.md" ]] || \
-    [[ ! -s "$EXPERIMENT_DIR/tables/master.csv" ]] || \
+    [[ ! -s "$EXPERIMENT_DIR/tables/complete_run_coverage.csv" ]] || \
     ! python3 "$PIPELINE" check-tables --experiment "$EXPERIMENT_DIR"; then
-    run_stage tables tables.log python3 "$ROOT/scripts/build_tables.py" \
-      --input "$EXPERIMENT_DIR/batch/master_results.json" --output "$EXPERIMENT_DIR/tables"
-    run_stage research_summary tables.log python3 "$PIPELINE" summary \
-      --experiment "$EXPERIMENT_DIR"
-  elif [[ ! -s "$EXPERIMENT_DIR/reports/benchmark_summary.md" ]]; then
-    run_stage research_summary tables.log python3 "$PIPELINE" summary \
-      --experiment "$EXPERIMENT_DIR"
+    run_stage tables tables.log python3 "$ROOT/scripts/report_experiment.py" \
+      --experiment "$EXPERIMENT_DIR" --stage tables
   fi
 fi
 if ((SKIP_FIGURES || !FIGURES_ENABLED)); then
   skip_stage figures "disabled by pipeline configuration or command-line option"
 else
-  figure_png_count="$(find "$EXPERIMENT_DIR/figures" -type f -name '*.png' | wc -l | tr -d ' ')"
-  figure_pdf_count="$(find "$EXPERIMENT_DIR/figures" -type f -name '*.pdf' | wc -l | tr -d ' ')"
-  if ! stage_done figures || ((figure_png_count == 0 || figure_pdf_count == 0)) || \
+  if ! stage_done figures || [[ ! -s "$EXPERIMENT_DIR/figures/REPORT.md" ]] || \
     ! python3 "$PIPELINE" check-figures --experiment "$EXPERIMENT_DIR"; then
-    run_stage figures figures.log python3 "$ROOT/scripts/plot_comparisons.py" \
-      --input "$EXPERIMENT_DIR/batch/master_results.json" \
-      --output "$EXPERIMENT_DIR/figures" --dpi 300
+    run_stage figures figures.log python3 "$ROOT/scripts/report_experiment.py" \
+      --experiment "$EXPERIMENT_DIR" --stage figures --dpi 300
   fi
 fi
 
@@ -580,11 +741,15 @@ else
   fi
 fi
 
+run_stage final_report pipeline.log python3 "$ROOT/scripts/report_experiment.py" \
+  --experiment "$EXPERIMENT_DIR" --stage final
 run_stage final_report pipeline.log python3 "$PIPELINE" finalize \
   --experiment "$EXPERIMENT_DIR"
 run_stage summary summary.log python3 "$PIPELINE" emit-summary \
   --experiment "$EXPERIMENT_DIR"
 python3 "$PIPELINE" finalize --experiment "$EXPERIMENT_DIR"
+python3 "$ROOT/scripts/report_experiment.py" \
+  --experiment "$EXPERIMENT_DIR" --stage final
 
 printf '\nExperiment status: ' | tee -a "$PIPELINE_LOG"
 python3 - "$EXPERIMENT_DIR/experiment_manifest.json" <<'PY' | tee -a "$PIPELINE_LOG"
@@ -608,9 +773,16 @@ print("Time limits (static/fast/exact): "
       f"{manifest.get('per_static_time_limit_sec')} / "
       f"{manifest.get('fast_time_limit_sec')} / "
       f"{manifest.get('exact_time_limit_sec')} seconds")
-if manifest.get("dataset_profile") == "smoke10":
+if manifest.get("dataset_profile") == "smoke20":
     print("Selected families: " + ", ".join(sorted({
         str(row.get("family")) for row in manifest.get("selected_files", [])
     })))
 PY
 printf 'Experiment artifacts: %s\n' "$EXPERIMENT_DIR"
+python3 - "$ROOT" "$EXPERIMENT_DIR" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(sys.argv[1]) / "scripts"))
+from kdc_tools.storage import index_experiment_artifacts
+index_experiment_artifacts(sys.argv[2])
+PY

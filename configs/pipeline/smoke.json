@@ -1,12 +1,13 @@
 {
   "pipeline": "smoke",
   "label": "development / smoke validation",
-  "dataset_profile": "smoke10",
+  "dataset_profile": "smoke20",
   "dataset": "data/instances/public_instance_set",
-  "smoke_count": 10,
+  "smoke_count": 20,
+  "smoke_seed": 0,
   "smoke_max_n": 50,
   "smoke_max_m": 25,
-  "algorithms": "all",
+  "algorithms": "all-registered",
   "exact_backend": "auto",
   "objectives": "all",
   "repeats": 1,
@@ -15,6 +16,12 @@
   "fast_time_limit_sec": 5,
   "exact_time_limit_sec": 10,
   "static_time_limit_sec": 2,
+  "brute_force_max_assignments": 100000,
+  "brute_force_time_limit_sec": 0.5,
+  "certification": {
+    "seed_count": 200,
+    "repetitions": 1
+  },
   "benchmark_profile": "debug",
   "verify_after": true,
   "verify_each_iteration": true,
@@ -25,15 +32,21 @@
   "animation": {
     "enabled": true,
     "mode": "all",
-    "policy": "all-algorithms",
+    "policy": "all-solutions",
     "top_n": 0,
     "fps": 12,
     "frames": 48,
     "dpi": 90
   },
+  "snapshots": {
+    "enabled": true,
+    "layout": "three-panel",
+    "normalized_times": [0, 0.5, 1],
+    "comparison_sheet": "per-instance-objective"
+  },
   "artifact_retention_days": 14,
   "required_stages": [
-    "init", "dataset", "build", "tests", "preflight", "backend_selection",
+    "init", "dataset", "build", "tests", "certification", "preflight", "backend_selection",
     "benchmark", "result_validation", "tables", "figures", "animations",
     "final_report", "summary"
   ]

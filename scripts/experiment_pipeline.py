@@ -21,7 +21,11 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from kdc_tools.storage import validate_joint_result  # noqa: E402
+from kdc_tools.storage import (  # noqa: E402
+    index_experiment_artifacts,
+    make_experiment_id,
+    validate_joint_result,
+)
 
 EXACT_STATUSES = {"OPTIMAL"}
 PIPELINE_NAMES = {"smoke", "reference", "full"}
@@ -29,6 +33,11 @@ REQUIRED_PIPELINE_STAGES = [
     "init", "dataset", "build", "tests", "preflight", "backend_selection",
     "benchmark", "result_validation", "tables", "figures", "animations",
     "final_report", "summary",
+]
+SMOKE_REQUIRED_PIPELINE_STAGES = [
+    "init", "dataset", "build", "tests", "certification", "preflight",
+    "backend_selection", "benchmark", "result_validation", "tables",
+    "figures", "animations", "final_report", "summary",
 ]
 
 
@@ -52,8 +61,34 @@ def load_pipeline_config(name: str) -> dict[str, Any]:
     missing = sorted(required - config.keys())
     if missing:
         raise ValueError(f"pipeline {name} config missing: {', '.join(missing)}")
-    if config["required_stages"] != REQUIRED_PIPELINE_STAGES:
+    expected_stages = (
+        SMOKE_REQUIRED_PIPELINE_STAGES if name == "smoke"
+        else REQUIRED_PIPELINE_STAGES
+    )
+    if config["required_stages"] != expected_stages:
         raise ValueError(f"pipeline {name} has an invalid stage sequence")
+    if name == "smoke":
+        certification = config.get("certification", {})
+        if (config["dataset_profile"] != "smoke20"
+                or config.get("algorithms") != "all-registered"
+                or config.get("smoke_count") != 20
+                or config.get("smoke_seed") != 0
+                or config.get("smoke_max_n") != 50
+                or config.get("smoke_max_m") != 25
+                or config.get("brute_force_max_assignments") != 100000
+                or config.get("brute_force_time_limit_sec") != 0.5
+                or certification.get("seed_count") != 200
+                or certification.get("repetitions") != 1
+                or config.get("animation", {}).get("policy") != "all-solutions"
+                or config.get("snapshots") != {
+                    "enabled": True,
+                    "layout": "three-panel",
+                    "normalized_times": [0, 0.5, 1],
+                    "comparison_sheet": "per-instance-objective",
+                }):
+            raise ValueError("smoke config must define the smoke20 selection policy")
+    elif config["dataset_profile"] != "full":
+        raise ValueError(f"pipeline {name} must use the full dataset profile")
     if (name == "reference" and config["algorithms"] != "greedy") or (
         name == "full" and config["algorithms"] != "all"
     ):
@@ -97,12 +132,29 @@ def command_config(args: argparse.Namespace) -> None:
         "ANIMATION_FRAMES": config["animation"]["frames"],
         "ANIMATION_DPI": config["animation"]["dpi"],
         "ARTIFACT_RETENTION_DAYS": config["artifact_retention_days"],
-        "SMOKE_COUNT": config.get("smoke_count", 10),
+        "SMOKE_COUNT": config.get("smoke_count", 20),
+        "SMOKE_SEED": config.get("smoke_seed", 0),
         "SMOKE_MAX_N": config.get("smoke_max_n", 50),
         "SMOKE_MAX_M": config.get("smoke_max_m", 25),
+        "BRUTE_FORCE_MAX_ASSIGNMENTS": config.get(
+            "brute_force_max_assignments", 100_000
+        ),
+        "BRUTE_FORCE_TIME_LIMIT": config.get(
+            "brute_force_time_limit_sec", 0.5
+        ),
+        "CERTIFICATION_SEEDS": config.get("certification", {}).get(
+            "seed_count", 0
+        ),
+        "CERTIFICATION_REPETITIONS": config.get("certification", {}).get(
+            "repetitions", 0
+        ),
     }
     for key, value in values.items():
         print(f"{key}\t{value}")
+
+
+def command_new_id(args: argparse.Namespace) -> None:
+    print(make_experiment_id(args.profile))
 
 
 def sha256_files(directory: Path, suffixes: set[str]) -> str:
@@ -160,15 +212,25 @@ def command_init(args: argparse.Namespace) -> None:
             raise ValueError("selection manifest must contain an instances array")
     selected_files = [
         {
+            "instance_id": row.get("instance_id"),
             "family": row.get("family"),
+            "family_classification_rule": row.get(
+                "family_classification_rule"
+            ),
             "source": row.get("source"),
+            "relative_source": row.get("relative_source"),
+            "source_sha256": row.get(
+                "source_sha256", row.get("sha256")
+            ),
+            "canonical_path": row.get("canonical_path"),
+            "canonical_sha256": row.get("canonical_sha256"),
             "n": row.get("n"),
             "m": row.get("m"),
+            "T_end": row.get("T_end"),
             "file_size_bytes": row.get("file_size_bytes"),
-            "sha256": row.get("sha256"),
             "selection_reason": row.get("selection_reason"),
             "selection_rank": row.get("selection_rank"),
-            "exceeds_smoke_limits": row.get("exceeds_smoke_limits", False),
+            "size_limit_exception": row.get("size_limit_exception"),
         }
         for row in (selection_manifest or {}).get("instances", [])
     ]
@@ -211,6 +273,13 @@ def command_init(args: argparse.Namespace) -> None:
         return
 
     pipeline_config = load_pipeline_config(args.pipeline)
+    if args.dataset_profile == "smoke20":
+        pipeline_config.update({
+            "smoke_count": args.selection_count,
+            "smoke_seed": args.selection_seed,
+            "smoke_max_n": args.selection_max_n,
+            "smoke_max_m": args.selection_max_m,
+        })
     config_payload = json.dumps(
         pipeline_config, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
@@ -289,9 +358,9 @@ def command_init(args: argparse.Namespace) -> None:
         "reproduction_command": args.reproduction_command,
     }
     if selection_manifest is not None:
-        write_json(experiment / "dataset_selection_manifest.json",
-                   selection_manifest)
-        manifest["selection_manifest"] = "dataset_selection_manifest.json"
+        selection_path = experiment / "dataset" / "selection_manifest"
+        write_json(selection_path, selection_manifest)
+        manifest["selection_manifest"] = "dataset/selection_manifest"
         manifest["selection_manifest_fingerprint"] = args.selection_fingerprint
         manifest["selected_files"] = selected_files
     write_json(manifest_path, manifest)
@@ -342,6 +411,8 @@ def command_dataset(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
     source = Path(args.source).resolve()
     canonical = exp / "dataset"
+    experiment_manifest = load_json(exp / "experiment_manifest.json")
+    smoke20 = experiment_manifest.get("dataset_profile") == "smoke20"
     converted_legacy = False
     if args.resume and canonical.is_dir():
         if sha256_files(canonical, {".json"}) == args.canonical_fingerprint:
@@ -357,6 +428,26 @@ def command_dataset(args: argparse.Namespace) -> None:
         if isinstance(payload, dict) and isinstance(
             payload.get("instances"), list
         ):
+            if payload.get("name", payload.get("profile")) == "smoke10":
+                raise ValueError(
+                    "legacy smoke10 manifests cannot be materialized as new data; "
+                    "regenerate smoke20 selection evidence"
+                )
+            if smoke20:
+                selector = _selection_module()
+                selection_config = experiment_manifest["pipeline_config"]
+                selector._validate_selection_identity(
+                    payload, selection_config["smoke_count"],
+                    selection_config["smoke_max_n"],
+                    selection_config["smoke_max_m"],
+                )
+                expected_seed = int(
+                    selection_config["smoke_seed"]
+                )
+                if payload.get("policy_parameters", {}).get("seed") != expected_seed:
+                    raise ValueError(
+                        "smoke20 selection manifest seed differs from experiment configuration"
+                    )
             converted_legacy = any(
                 Path(str(row.get("relative_source", row.get("source", ""))))
                 .suffix.lower() == ".mdc"
@@ -373,6 +464,26 @@ def command_dataset(args: argparse.Namespace) -> None:
                 selection.get("instances"), list
             ):
                 raise ValueError("dataset manifest must contain an instances array")
+            if selection.get("name", selection.get("profile")) == "smoke10":
+                raise ValueError(
+                    "legacy smoke10 manifests cannot be materialized as new data; "
+                    "regenerate smoke20 selection evidence"
+                )
+            if smoke20:
+                selector = _selection_module()
+                selection_config = experiment_manifest["pipeline_config"]
+                selector._validate_selection_identity(
+                    selection, selection_config["smoke_count"],
+                    selection_config["smoke_max_n"],
+                    selection_config["smoke_max_m"],
+                )
+                expected_seed = int(
+                    selection_config["smoke_seed"]
+                )
+                if selection.get("policy_parameters", {}).get("seed") != expected_seed:
+                    raise ValueError(
+                        "smoke20 selection manifest seed differs from experiment configuration"
+                    )
             _copy_materialized_selection(source, selection, canonical)
             source = source / "instances"
         mdc = sorted(source.rglob("*.mdc"))
@@ -398,6 +509,11 @@ def command_dataset(args: argparse.Namespace) -> None:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(original, target)
     files = json_files(canonical)
+    if smoke20 and len(files) != 20:
+        raise ValueError(
+            f"smoke20 canonical dataset must contain exactly 20 JSON inputs; "
+            f"found {len(files)}"
+        )
     if not files:
         raise ValueError("canonical dataset contains no JSON instances")
     fingerprint = sha256_files(canonical, {".json"})
@@ -444,7 +560,11 @@ def _materialize_selection_manifest(manifest_path: Path,
                                     selection: dict[str, Any],
                                     canonical: Path) -> None:
     selector = _selection_module()
+    selector.read_manifest(manifest_path)
     source_root = selector._manifest_source_root(selection, manifest_path)
+    if selector._dataset_fingerprint(source_root) != selection.get(
+            "source_dataset_fingerprint"):
+        raise ValueError("selection source dataset fingerprint mismatch")
     rows = selection["instances"]
     expected = selection.get("selected_instance_count", len(rows))
     if len(rows) != expected:
@@ -452,6 +572,7 @@ def _materialize_selection_manifest(manifest_path: Path,
             f"selection manifest expects {expected} instances, has {len(rows)}"
         )
     seen_sources: set[str] = set()
+    seen_instances: set[str] = set()
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError("selection manifest instances must be objects")
@@ -459,22 +580,37 @@ def _materialize_selection_manifest(manifest_path: Path,
         if not source_name or source_name in seen_sources:
             raise ValueError("selection manifest has a missing or duplicate source")
         seen_sources.add(source_name)
+        instance_id = row.get("instance_id")
+        if not isinstance(instance_id, str) or instance_id in seen_instances:
+            raise ValueError("selection manifest has a missing or duplicate logical instance")
+        seen_instances.add(instance_id)
         source = selector._resolve_manifest_entry(
             row, source_root, manifest_path
         )
-        expected_sha = row.get("sha256")
+        expected_sha = row.get("source_sha256", row.get("sha256"))
         actual_sha = hashlib.sha256(source.read_bytes()).hexdigest()
-        materialized_sha = row.get("materialized_sha256")
-        if (expected_sha and actual_sha != expected_sha
-                and actual_sha != materialized_sha):
+        if expected_sha and actual_sha != expected_sha:
             raise ValueError(f"selection source checksum mismatch: {row.get('source')}")
         payload = selector._canonical_payload(source)
         n, m = selector.validate_instance(payload)
-        if n != row.get("n") or m != row.get("m"):
+        if selector._logical_instance_id(payload) != instance_id:
+            raise ValueError(f"selection logical identity mismatch: {source_name}")
+        canonical_hash = hashlib.sha256(
+            selector._json_bytes(payload)
+        ).hexdigest()
+        if (n != row.get("n") or m != row.get("m")
+                or not math.isclose(
+                    float(payload["T_end"]), float(row["T_end"]),
+                    rel_tol=1e-9, abs_tol=1e-9,
+                )
+                or canonical_hash != row.get("canonical_sha256")):
             raise ValueError(f"selection manifest metadata mismatch: {row.get('source')}")
-        relative = Path(str(row.get("relative_source") or source.name))
-        family = str(row.get("family", "instances"))
-        destination = canonical / family / f"{relative.stem}.json"
+        relative = Path(str(row["canonical_path"]))
+        if not relative.is_relative_to("instances"):
+            raise ValueError(f"selection canonical path is invalid: {relative}")
+        destination = canonical / relative
+        if not destination.resolve().is_relative_to(canonical.resolve()):
+            raise ValueError(f"selection canonical path escapes dataset: {relative}")
         _write_canonical_payload(payload, destination)
 
 
@@ -483,12 +619,19 @@ def _copy_materialized_selection(source: Path,
                                  canonical: Path) -> None:
     selector = _selection_module()
     rows = selection["instances"]
+    source_root = selector._manifest_source_root(
+        selection, source / "manifest.json"
+    )
+    if selector._dataset_fingerprint(source_root) != selection.get(
+            "source_dataset_fingerprint"):
+        raise ValueError("selection source dataset fingerprint mismatch")
     expected = selection.get("selected_instance_count", len(rows))
     if len(rows) != expected:
         raise ValueError(
             f"materialized manifest expects {expected} instances, has {len(rows)}"
         )
     seen_sources: set[str] = set()
+    seen_instances: set[str] = set()
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError("selection manifest instances must be objects")
@@ -496,6 +639,10 @@ def _copy_materialized_selection(source: Path,
         if not source_name or source_name in seen_sources:
             raise ValueError("materialized manifest has a missing or duplicate source")
         seen_sources.add(source_name)
+        instance_id = row.get("instance_id")
+        if not isinstance(instance_id, str) or instance_id in seen_instances:
+            raise ValueError("materialized manifest has a missing or duplicate logical instance")
+        seen_instances.add(instance_id)
         materialized = row.get("materialized_file")
         if not isinstance(materialized, str):
             raise ValueError("materialized smoke manifest lacks materialized_file")
@@ -507,9 +654,28 @@ def _copy_materialized_selection(source: Path,
         if expected_sha and hashlib.sha256(path.read_bytes()).hexdigest() != expected_sha:
             raise ValueError(f"materialized instance checksum mismatch: {materialized}")
         n, m = selector.validate_instance(payload)
-        if n != row.get("n") or m != row.get("m"):
+        if selector._logical_instance_id(payload) != instance_id:
+            raise ValueError(f"materialized logical identity mismatch: {source_name}")
+        canonical_hash = hashlib.sha256(
+            selector._json_bytes(payload)
+        ).hexdigest()
+        if (n != row.get("n") or m != row.get("m")
+                or canonical_hash != row.get("canonical_sha256")
+                or not math.isclose(
+                    float(payload["T_end"]), float(row["T_end"]),
+                    rel_tol=1e-9, abs_tol=1e-9,
+                )):
             raise ValueError(f"materialized instance metadata mismatch: {materialized}")
-        relative = Path(materialized).relative_to("instances")
+        original = source_root / str(row.get("relative_source", ""))
+        expected_source_sha = row.get("source_sha256")
+        if expected_source_sha:
+            if not original.is_file() or hashlib.sha256(
+                    original.read_bytes()
+            ).hexdigest() != expected_source_sha:
+                raise ValueError(f"selection source checksum mismatch: {source_name}")
+        relative = Path(str(row.get("canonical_path", "")))
+        if not relative.is_relative_to("instances"):
+            raise ValueError(f"selection canonical path is invalid: {relative}")
         destination = canonical / relative
         _write_canonical_payload(payload, destination)
 
@@ -517,14 +683,10 @@ def _copy_materialized_selection(source: Path,
 def command_preflight_snapshot(args: argparse.Namespace) -> None:
     destination = Path(args.experiment).resolve() / "preflight"
     destination.mkdir(parents=True, exist_ok=True)
-    source_dir = ROOT / "results" / "preflight"
-    report = source_dir / "preflight_report.md"
+    report = Path(args.report).resolve()
     if not report.is_file():
-        raise ValueError("preflight did not produce results/preflight/preflight_report.md")
+        raise ValueError(f"preflight report does not exist: {report}")
     shutil.copy2(report, destination / report.name)
-    summary = source_dir / "00_preflight_summary.md"
-    if summary.is_file():
-        shutil.copy2(summary, destination / summary.name)
 
 
 def command_fingerprint(args: argparse.Namespace) -> None:
@@ -561,6 +723,18 @@ def status_value(record: dict[str, Any]) -> str:
     return "FEASIBLE" if bool_value(record.get("feasible", False)) else "FAILED"
 
 
+def _planned_run_count(experiment: Path) -> int | None:
+    path = experiment / "runs" / "plan.jsonl"
+    if not path.is_file():
+        return None
+    count = sum(bool(line.strip()) for line in path.read_text(
+        encoding="utf-8"
+    ).splitlines())
+    if count == 0:
+        raise ValueError("immutable run plan contains no slots")
+    return count
+
+
 def command_validate(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
     aggregate_manifest_path = exp / "aggregates" / "aggregate_manifest.json"
@@ -580,11 +754,11 @@ def command_validate(args: argparse.Namespace) -> None:
     algorithms = manifest.get("algorithm_set", [])
     objectives = load_json(exp / "experiment_manifest.json").get("objectives", [])
     repeats = int(manifest.get("seed_policy", {}).get("repeats", 1))
-    exact_algorithms = [str(row.get("algorithm_name", "")) for row in records
-                        if row.get("algorithm_category") == "exact_reference"]
     nonexact_count = len([name for name in algorithms
                           if name not in {"ip-kont", "branch-and-bound"}])
-    expected = instances * len(objectives) * (nonexact_count * repeats + 1)
+    expected = _planned_run_count(exp)
+    if expected is None:
+        expected = instances * len(objectives) * (nonexact_count * repeats + 1)
     counts = {
         "total": len(records),
         "successful": sum(not bool_value(r.get("failed")) for r in records),
@@ -600,6 +774,9 @@ def command_validate(args: argparse.Namespace) -> None:
     by_objective: dict[str, dict[str, Any]] = {}
     joint_errors: list[str] = []
     for index, row in enumerate(records):
+        if (str(row.get("objective", "")).lower() == "minmaxsum"
+                and not bool_value(row.get("feasible", False))):
+            continue
         try:
             validate_joint_result(row)
         except ValueError as error:
@@ -713,10 +890,26 @@ def command_validate(args: argparse.Namespace) -> None:
         "instance_count": instances,
         "canonical_aggregate": aggregate_manifest,
     })
-    if aggregate_manifest is not None and aggregate_manifest.get("complete") is not True:
+    if aggregate_manifest is not None:
+        aggregate_counts = aggregate_manifest.get("classifications", {})
+        structurally_incomplete = (
+            aggregate_counts.get("missing_runs", 0) != 0
+            or aggregate_counts.get("unexpected_runs", 0) != 0
+            or aggregate_counts.get("invalid_runs", 0) != 0
+            or aggregate_manifest.get("missing_run_keys")
+            or aggregate_manifest.get("unexpected_run_keys")
+            or aggregate_manifest.get("invalid_runs")
+        )
+        if structurally_incomplete:
+            raise ValueError(
+                "canonical aggregate has missing, invalid, unexpected, or "
+                "duplicate run records; see aggregate_manifest.json and "
+                "result_integrity_report.md"
+            )
+    if len(records) != expected or duplicates:
         raise ValueError(
-            "canonical aggregate is incomplete; see aggregate_manifest.json "
-            "and result_integrity_report.md"
+            "master results do not match the expected unique logical run count; "
+            "see result_integrity_report.md"
         )
     if joint_errors:
         raise ValueError(
@@ -746,10 +939,10 @@ def command_summary(args: argparse.Namespace) -> None:
     profile = str(load_json(exp / "experiment_manifest.json").get(
         "dataset_profile", "full"
     ))
-    heading = ("# Smoke / development validation summary" if profile == "smoke10"
+    heading = ("# Smoke / development validation summary" if profile == "smoke20"
                else "# Benchmark research summary")
     report = [heading, ""]
-    if profile == "smoke10":
+    if profile == "smoke20":
         report.extend([
             "This is a smoke / development validation dataset, not the full "
             "scientific benchmark.", "",
@@ -921,51 +1114,108 @@ def exact_proven(row: dict[str, Any]) -> bool:
 
 def command_animations(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
-    if args.policy not in {"best", "all-algorithms"}:
-        raise ValueError("animation policy must be best or all-algorithms")
-    try:
-        from animate_best import run as run_animations
-    except ImportError:
-        from scripts.animate_best import run as run_animations
+    if args.policy not in {"best", "all-algorithms", "all-solutions"}:
+        raise ValueError(
+            "animation policy must be best, all-algorithms, or all-solutions"
+        )
     selected = [part.strip() for part in args.instances.split(",") if part.strip()]
-    generated = run_animations(
-        exp / "batch", exp / "dataset", exp / "animations",
-        mode=args.modes, fps=args.fps, frames=args.frames, dpi=args.dpi,
-        top_n=args.top_n, all_algorithms=args.policy == "all-algorithms",
-        selected_instances=selected or None,
-    )
-    report = [
-        "# Animation report", "",
-        f"- Policy: `{args.policy}`",
-        f"- Objectives: `{args.modes}`",
-        f"- Instance selection: "
-        f"{', '.join(selected) if selected else 'all benchmark instances'}",
-        f"- Generated animations: {len(generated)}",
-        "- Heuristic animations require feasible, continuously verified results.",
-        "- Exact animations require feasibility, continuous verification, and OPTIMAL status.",
-        "",
-    ]
-    report.extend(
-        f"- Animation path: {path.relative_to(exp).as_posix()}"
-        for path in generated
-    )
-    if not generated:
-        report.append("- Animation path: N/A")
+    if args.policy == "all-solutions":
+        if selected or args.top_n:
+            raise ValueError(
+                "all-solutions visualization cannot restrict planned instances"
+            )
+        try:
+            from visualize_experiment import generate as generate_visualizations
+        except ImportError:
+            from scripts.visualize_experiment import generate as generate_visualizations
+        result = generate_visualizations(
+            exp, fps=args.fps, frames=args.frames, dpi=args.dpi
+        )
+        report = [
+            "# Animation and snapshot report", "",
+            f"- Policy: `{args.policy}`",
+            f"- Objectives: `{args.modes}`",
+            f"- Planned solver slots: {result['planned_slots']}",
+            f"- Comparison sheets: {result['expected_comparison_sheets']}",
+            f"- Renderable solutions with snapshots: "
+            f"{result['generated_solution_snapshots']}",
+            f"- Per-solution animations: {result['generated_animations']}",
+            f"- Ineligible slots: {result['ineligible_slots']}",
+            f"- Rendering failures: {result['failed_slots']}",
+            "- Feasibility, verification, and optimality are displayed from each "
+            "run record; rendering does not imply certification.",
+            "",
+            "## Comparison sheets", "",
+        ]
+        report.extend(
+            f"- `{sheet['path']}`" for sheet in result["comparison_sheets"]
+        )
+        report.extend(["", "## Per-solution animations", ""])
+        report.extend(
+            f"- `{slot['animation']['path']}`"
+            for slot in result["slots"] if slot.get("animation")
+        )
+        if result["generated_animations"] == 0:
+            report.append("- None: no planned run currently has a renderable solution.")
+        manifest = load_json(exp / "experiment_manifest.json")
+        selected = sorted({
+            str(slot["instance_id"]) for slot in result["slots"]
+        })
+        manifest["visualization_manifest"] = (
+            "reports/visualization_manifest.json"
+        )
+    else:
+        try:
+            from animate_best import run as run_animations
+        except ImportError:
+            from scripts.animate_best import run as run_animations
+        generated = run_animations(
+            exp / "batch", exp / "dataset", exp / "animations",
+            mode=args.modes, fps=args.fps, frames=args.frames, dpi=args.dpi,
+            top_n=args.top_n, all_algorithms=args.policy == "all-algorithms",
+            selected_instances=selected or None,
+        )
+        report = [
+            "# Animation report", "",
+            f"- Policy: `{args.policy}`",
+            f"- Objectives: `{args.modes}`",
+            f"- Instance selection: "
+            f"{', '.join(selected) if selected else 'all benchmark instances'}",
+            f"- Generated animations: {len(generated)}",
+            "- Each animation's metadata preserves its recorded verification and "
+            "optimality status.",
+            "",
+        ]
+        report.extend(
+            f"- Animation path: {path.relative_to(exp).as_posix()}"
+            for path in generated
+        )
+        if not generated:
+            report.append("- Animation path: N/A")
+        manifest = load_json(exp / "experiment_manifest.json")
     (exp / "reports" / "exact_animation_report.md").write_text(
         "\n".join(report) + "\n", encoding="utf-8"
     )
-    manifest_path = exp / "experiment_manifest.json"
-    manifest = load_json(manifest_path)
     manifest["animation_policy"] = args.policy
     manifest["animation_instance_selection"] = selected
-    write_json(manifest_path, manifest)
-    print(f"Generated {len(generated)} verified animation(s)")
+    write_json(exp / "experiment_manifest.json", manifest)
+    index_experiment_artifacts(exp)
+    print(
+        f"Generated {result['generated_animations']} per-solution animation(s) "
+        f"and {result['expected_comparison_sheets']} comparison sheet(s)"
+        if args.policy == "all-solutions"
+        else f"Generated {len(generated)} animation(s)"
+    )
 
 
 def command_finalize(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
     main_manifest_path = exp / "experiment_manifest.json"
     manifest = load_json(main_manifest_path)
+    storage_manifest_path = exp / "experiment.json"
+    if storage_manifest_path.is_file():
+        storage_manifest = load_json(storage_manifest_path)
+        manifest["run_plan_sha256"] = storage_manifest.get("run_plan_sha256")
     batch_manifest_path = exp / "batch" / "experiment_manifest.json"
     if batch_manifest_path.is_file():
         batch_manifest = load_json(batch_manifest_path)
@@ -1009,6 +1259,19 @@ def command_finalize(args: argparse.Namespace) -> None:
     )
     manifest["status"] = "PARTIAL" if failures else "COMPLETE"
     manifest["failed_or_skipped_stages"] = failures
+    aggregate_path = exp / "aggregates" / "aggregate_manifest.json"
+    if aggregate_path.is_file():
+        aggregate_manifest = load_json(aggregate_path)
+        manifest["aggregate_complete"] = aggregate_manifest.get("complete") is True
+        manifest["aggregate_run_classifications"] = aggregate_manifest.get(
+            "classifications", {}
+        )
+        if aggregate_manifest.get("complete") is not True:
+            manifest["status"] = "PARTIAL"
+            manifest["aggregate_incomplete_reason"] = (
+                "One or more planned solver slots ended in a non-COMPLETED "
+                "terminal state; see aggregate and per-run status records."
+            )
     write_json(main_manifest_path, manifest)
     reports = exp / "reports" / "final_experiment_report.md"
     integrity = (exp / "reports" / "result_integrity_report.md").read_text(
@@ -1076,6 +1339,8 @@ def command_finalize(args: argparse.Namespace) -> None:
         f"- Selected: {manifest.get('selected_exact_backend')}",
         f"- Actual: {manifest.get('actual_exact_backend')}",
         "", "## 5-11. FAST benchmark, per-objective results, runtime, quality, and reliability", "",
+        f"See the [data-correct comparative report](experiment_report.md) for the complete coverage, result, timing, bound, MinMaxSum, failure, family and artifact tables, figure generation statuses, and companion audit.",
+        "",
         summary, "", "### Raw integrity", "", integrity,
         "", "## 12. Bound semantics", "",
         "`certified_gap` is only meaningful for certified lower bounds and feasible upper bounds. "
@@ -1099,12 +1364,15 @@ def command_finalize(args: argparse.Namespace) -> None:
         f"Native KONT/COPT availability: "
         f"{'available' if manifest.get('solver_manifest', {}).get('kont_runtime_available') else 'unavailable or not used'}.",
         "A visualization is not a feasibility or optimality proof. Exact animation is emitted only "
-        "for results marked exact-reference, feasible, continuously verified, and OPTIMAL. "
-        "Review `result_integrity_report.md` and per-run metadata for failed and timed-out cases.",
+        "from serialized solver output. Visualization artifacts show feasibility, verification, "
+        "and optimality exactly as recorded; failed, skipped, invalid, and time-limited slots "
+        "remain visible in comparison sheets. Review `visualization_manifest.json` and "
+        "`result_integrity_report.md`.",
         "",
     ]
     reports.parent.mkdir(parents=True, exist_ok=True)
     reports.write_text("\n".join(sections), encoding="utf-8")
+    index_experiment_artifacts(exp)
 
 
 def command_check_figures(args: argparse.Namespace) -> None:
@@ -1112,22 +1380,49 @@ def command_check_figures(args: argparse.Namespace) -> None:
     report_path = directory / "REPORT.md"
     if not report_path.is_file():
         raise ValueError("missing figures/REPORT.md")
-    import re
-    names = re.findall(r"!\[[^\]]*\]\(([^)]+\.png)\)", report_path.read_text(encoding="utf-8"))
-    if not names:
-        raise ValueError("figure report contains no PNG references")
-    missing = []
-    for relative in names:
-        png = directory / relative
-        pdf = directory / (Path(relative).stem + ".pdf")
-        if not png.is_file() or not pdf.is_file():
-            missing.append(f"{relative} and/or its PDF")
-    if missing:
-        raise ValueError("missing figure artifact(s): " + ", ".join(missing))
+    status_path = directory / "figure_status.json"
+    if not status_path.is_file():
+        raise ValueError("missing figures/figure_status.json")
+    status = load_json(status_path)
+    if status.get("experiment_id") != Path(args.experiment).resolve().name:
+        raise ValueError("figure status belongs to a different experiment")
+    requested = status.get("requested")
+    figures = status.get("figures")
+    if not isinstance(requested, list) or not isinstance(figures, list):
+        raise ValueError("figure status has an invalid catalog")
+    by_name = {row.get("figure"): row for row in figures if isinstance(row, dict)}
+    missing_names = sorted(set(requested) - set(by_name))
+    if missing_names:
+        raise ValueError("figure status omits requested figure(s): " + ", ".join(missing_names))
+    missing_artifacts = []
+    for name in requested:
+        item = by_name[name]
+        state = item.get("generation_status")
+        if state not in {"GENERATED", "NOT_GENERATED"}:
+            missing_artifacts.append(f"{name}: invalid generation status {state!r}")
+            continue
+        if state == "GENERATED" and item.get("path_png"):
+            target = (directory / item["path_png"]).resolve()
+            try:
+                target.relative_to(Path(args.experiment).resolve())
+            except ValueError:
+                missing_artifacts.append(f"{name}: artifact escapes experiment")
+                continue
+            if not target.is_file() or target.stat().st_size == 0:
+                missing_artifacts.append(str(target))
+        if state == "GENERATED" and item.get("path_pdf"):
+            target = (directory / item["path_pdf"]).resolve()
+            if not target.is_file() or target.stat().st_size == 0:
+                missing_artifacts.append(str(target))
+        if state == "NOT_GENERATED" and not item.get("reason"):
+            missing_artifacts.append(f"{name}: missing grounded not-generated reason")
+    if missing_artifacts:
+        raise ValueError("figure artifact audit failed: " + ", ".join(missing_artifacts))
 
 
 def command_check_tables(args: argparse.Namespace) -> None:
-    directory = Path(args.experiment).resolve() / "tables"
+    experiment = Path(args.experiment).resolve()
+    directory = experiment / "tables"
     index_path = directory / "00_index.md"
     if not index_path.is_file():
         raise ValueError("missing tables/00_index.md")
@@ -1138,10 +1433,26 @@ def command_check_tables(args: argparse.Namespace) -> None:
     if not links or missing:
         raise ValueError("table index has missing artifacts: " +
                          (", ".join(missing) if missing else "no table links"))
+    try:
+        from kdc_tools.reporting import audit_companions
+    except ImportError:
+        from scripts.kdc_tools.reporting import audit_companions
+    errors = audit_companions(experiment, create_missing=False,
+                              experiment_id=experiment.name)
+    if errors:
+        raise ValueError("recursive CSV/TSV companion audit failed: "
+                         + "; ".join(errors))
 
 
 def command_check_animations(args: argparse.Namespace) -> None:
     exp = Path(args.experiment).resolve()
+    visualization_manifest = exp / "reports" / "visualization_manifest.json"
+    if visualization_manifest.is_file():
+        try:
+            from visualize_experiment import audit as audit_visualizations
+        except ImportError:
+            from scripts.visualize_experiment import audit as audit_visualizations
+        audit_visualizations(exp)
     report = exp / "reports" / "exact_animation_report.md"
     if not report.is_file():
         raise ValueError("missing exact animation report")
@@ -1179,6 +1490,9 @@ def command_resume(args: argparse.Namespace) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
+    new_id = subparsers.add_parser("new-id")
+    new_id.add_argument("--profile", required=True)
+    new_id.set_defaults(func=command_new_id)
     config = subparsers.add_parser("config")
     config.add_argument("--pipeline", choices=sorted(PIPELINE_NAMES), required=True)
     config.add_argument("--format", choices=("json", "shell"), default="json")
@@ -1190,7 +1504,7 @@ def main() -> int:
     init.add_argument("--dataset", required=True)
     init.add_argument("--dataset-label", required=True)
     init.add_argument("--dataset-fingerprint", required=True)
-    init.add_argument("--dataset-profile", choices=("full", "smoke10"),
+    init.add_argument("--dataset-profile", choices=("full", "smoke20"),
                       default="full")
     init.add_argument("--benchmark-profile",
                       choices=("fast", "exact-reference", "debug"),
@@ -1198,6 +1512,10 @@ def main() -> int:
     init.add_argument("--source-dataset-fingerprint", default="")
     init.add_argument("--selection-fingerprint", default="")
     init.add_argument("--selection-manifest", default="")
+    init.add_argument("--selection-count", type=int, default=20)
+    init.add_argument("--selection-seed", type=int, default=0)
+    init.add_argument("--selection-max-n", type=int, default=50)
+    init.add_argument("--selection-max-m", type=int, default=25)
     init.add_argument("--algorithms", required=True)
     init.add_argument("--modes", required=True)
     init.add_argument("--seed", type=int, required=True)
@@ -1210,7 +1528,8 @@ def main() -> int:
     init.add_argument("--animation-top-n", type=int, required=True)
     init.add_argument("--animation-mode", required=True)
     init.add_argument("--animation-policy",
-                      choices=("best", "all-algorithms"), default="best")
+                      choices=("best", "all-algorithms", "all-solutions"),
+                      default="best")
     init.add_argument("--animation-instances", default="")
     init.add_argument("--verify-after", type=int, choices=(0, 1), default=1)
     init.add_argument("--verify-each-iteration", type=int,
@@ -1237,6 +1556,7 @@ def main() -> int:
     dataset_parser.set_defaults(func=command_dataset)
     preflight_snapshot = subparsers.add_parser("preflight-snapshot")
     preflight_snapshot.add_argument("--experiment", required=True)
+    preflight_snapshot.add_argument("--report", required=True)
     preflight_snapshot.set_defaults(func=command_preflight_snapshot)
     validate = subparsers.add_parser("validate")
     validate.add_argument("--experiment", required=True)
@@ -1256,7 +1576,8 @@ def main() -> int:
     animations = subparsers.add_parser("animations")
     animations.add_argument("--experiment", required=True)
     animations.add_argument("--modes", required=True)
-    animations.add_argument("--policy", choices=("best", "all-algorithms"),
+    animations.add_argument("--policy",
+                            choices=("best", "all-algorithms", "all-solutions"),
                             default="best")
     animations.add_argument("--instances", default="")
     animations.add_argument("--top-n", type=int, default=0)

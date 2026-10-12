@@ -25,6 +25,14 @@ void BruteForceSolver::set_time_limit(double time_limit_sec) {
   config_.time_limit_sec = time_limit_sec;
 }
 
+void BruteForceSolver::set_max_assignments(std::uint64_t max_assignments) {
+  if (max_assignments == 0U) {
+    throw std::invalid_argument(
+        "brute-force assignment budget must be positive");
+  }
+  config_.max_assignments = max_assignments;
+}
+
 void BruteForceSolver::decode_assignment(std::uint64_t code,
                                          int station_count,
                                          int point_count,

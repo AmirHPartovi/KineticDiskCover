@@ -137,6 +137,7 @@ struct BatchRunConfig {
   double per_ip_time_limit_sec{60.0};
   double fast_time_limit_sec{30.0};
   double exact_time_limit_sec{600.0};
+  std::uint64_t brute_force_max_assignments{100'000ULL};
   double gap_target{0.01};
   MinSumRefinementPolicy minsum_refinement_policy{
       MinSumRefinementPolicy::HEURISTIC_ADAPTIVE};

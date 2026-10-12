@@ -5,12 +5,14 @@ models. Its optimization backend is KONT, which uses the COPT-compatible API.
 
 ## Reproducible experiment pipeline
 
-Run one of three reproducible pipelines from any current working directory:
+Run one of three reproducible pipelines from any current working directory.
+Set `KDC_REPO` to the absolute path of your clone:
 
 ```bash
-bash scripts/run_experiment.sh --pipeline smoke
-bash scripts/run_experiment.sh --pipeline reference
-bash scripts/run_experiment.sh --pipeline full
+KDC_REPO=/path/to/KineticDiskCover
+bash "$KDC_REPO/scripts/local_validation.sh" experiment smoke
+bash "$KDC_REPO/scripts/local_validation.sh" experiment reference
+bash "$KDC_REPO/scripts/local_validation.sh" experiment full
 ```
 
 The profiles are defined in `configs/pipeline/` and share the same staged
@@ -18,31 +20,38 @@ runner: dataset snapshot, build, tests, preflight, exact-backend resolution,
 benchmark, result validation, tables, figures, animations, and final report.
 Each run has a unique output under `results/experiments/` with its resolved
 configuration, stage statuses/timings, dataset and selection fingerprints,
-logs, result integrity report, and generated artifacts. Workflow dispatches
-are available separately as **KDC Smoke Validation**, **KDC Full Dataset
-Reference Validation**, and **KDC Full Scientific Benchmark**. Use
-`bash scripts/run_experiment.sh --help` for profile overrides and resume
-options; resume requires matching dataset and benchmark configuration.
+logs, result integrity report, and generated artifacts. The experiment
+pipeline runs CMake configure/build, CTest, Python tests, preflight, and
+benchmark/reporting stages locally. Use
+`bash "$KDC_REPO/scripts/run_experiment.sh" --help` for profile overrides
+and resume options; resume requires matching dataset and benchmark
+configuration.
+See [`docs/local_validation.md`](docs/local_validation.md) for the complete
+local command reference and dependency notes.
 
 ### Smoke validation
 
-The smoke profile deterministically selects 10 valid, family-diverse instances
-from the source dataset, preferring instances within `n <= 50` trajectories
-and `m <= 25` stations. The manifest records dimensions, source file size and
-SHA-256, rank, selection rationale, and any size-limit exception. A larger
-instance is included only when there are too few eligible candidates to meet
-the requested count; this is recorded rather than hidden. For development:
+The smoke profile deterministically selects exactly 20 distinct, valid,
+family-diverse instances from the source dataset, subject to `n <= 50`
+trajectories and `m <= 25` stations. It selects across eligible families
+before balancing additional picks; if fewer than 20 candidates satisfy the
+limits, selection fails with the shortage and rejection reasons rather than
+silently relaxing the bounds. The manifest records source and canonical
+SHA-256 hashes, dimensions, family coverage, selection rank, and rationale.
+Each new smoke experiment also writes its canonical 20 inputs and a
+`selection_report.md` under its experiment-specific `dataset/` directory.
+For development:
 
 ```bash
-bash scripts/run_experiment.sh --pipeline smoke
+bash "$KDC_REPO/scripts/local_validation.sh" experiment smoke
 ```
 
 Smoke uses all registered algorithms, all three objectives, one repeat, two
 workers, per-static-solve / heuristic / exact deadlines of 2 / 5 / 10 seconds,
-and the debug verification profile. It generates verified animations for all
-eligible algorithms and selected instances. Override the size bounds with
-`--smoke-max-n` and `--smoke-max-m`; outputs are labeled as development
-validation, not as the full scientific benchmark.
+and the debug verification profile. Animation is configured for all eligible
+algorithms; outputs are labeled as development validation, not as the full
+scientific benchmark. Selection limits are configured in
+`configs/pipeline/smoke.json`.
 
 ### Full-dataset reference validation
 
@@ -59,16 +68,19 @@ The full profile runs all registered algorithms across the complete dataset,
 both original objectives, and three repeats for stochastic algorithms by
 default. `--modes minmaxsum` or `--modes all` adds the joint vector objective.
 Exact-reference results are produced by one resolved backend, never by
-silently substituting an unreported solver. The CLI and workflow inputs allow
-repeat, worker-count, and time-limit overrides.
+silently substituting an unreported solver. The CLI allows repeat,
+worker-count, and time-limit overrides.
 
 To create a separate materialized smoke dataset for another tool:
 
 ```bash
 python3 scripts/select_test_instances.py \
   --source data/instances/public_instance_set \
-  --output /tmp/kdc-smoke10 --count 10 --max-n 50 --max-m 25
+  --output /tmp/kdc-smoke20 --count 20 --max-n 50 --max-m 25 --seed 0
 ```
+
+The tracked `data/test_sets/smoke10.json` remains preserved as legacy
+selection evidence and is not accepted as smoke20 input.
 
 Exact-result animations are generated only for feasible, continuously
 verified `OPTIMAL` solutions; feasible or timed-out exact results remain in
@@ -81,29 +93,40 @@ approximation guarantees.
 
 * CMake 3.20 or newer.
 * A compiler with C++17 support.
+* Python 3 and the packages in `requirements.txt` for Python tests and reports.
 * KONT/COPT is optional. A usable vendor installation and valid runtime
   license are required for the explicit `ip-kont` algorithm. The built-in
   `branch-and-bound` backend is available without KONT/COPT.
 
-## Build
+## Build and tests
 
 ```sh
-mkdir build && cd build && cmake .. && make -j
+KDC_REPO=/path/to/KineticDiskCover
+bash "$KDC_REPO/scripts/local_validation.sh" configure-build
+bash "$KDC_REPO/scripts/local_validation.sh" ctest
+bash "$KDC_REPO/scripts/local_validation.sh" python-tests
+bash "$KDC_REPO/scripts/local_validation.sh" certification
 ```
 
-If KONT/COPT is installed in a non-standard location, set the CMake
-`KONT_ROOT` option or the `KONT_ROOT`, `COPT_HOME`, or `KONT_HOME` environment
-variable:
+These commands resolve repository and build paths from the script location.
+The certification CSV is saved under `build/local-validation/`; its command
+accepts optional seed count, repetitions, and start-index arguments.
+Dependencies fetched by CMake may need network access on a fresh, uncached
+build. This project does not claim a fully offline build.
+
+If KONT/COPT is installed in a non-standard location, set `KONT_ROOT`,
+`COPT_HOME`, or `KONT_HOME` before configuring:
 
 ```sh
-cmake -S . -B build -DKONT_ROOT=/path/to/kont
-cmake --build build --parallel
+KDC_REPO=/path/to/KineticDiskCover
+KONT_ROOT=/path/to/kont \
+  bash "$KDC_REPO/scripts/local_validation.sh" configure-build
 ```
 
 Check both compile-time discovery and runtime/license availability with:
 
 ```sh
-build/kdc-solver backend-info
+"$KDC_REPO/build/kdc-solver" backend-info
 ```
 
 An installed SDK can pass the API compile check but still be unavailable at
@@ -112,33 +135,26 @@ reports this separately. `--exact-reference auto` chooses only a runtime-ready
 native backend; an explicit `--algorithm ip-kont` or
 `--exact-reference ip-kont` fails with the diagnostic rather than switching
 algorithms. Use `branch-and-bound` explicitly when native KONT/COPT is
-unavailable. When KONT/COPT is not found, omit `KONT_ROOT`:
+unavailable. When KONT/COPT is not found, omit those environment variables:
 
 ```sh
-cmake -S . -B build
-cmake --build build --parallel
+KDC_REPO=/path/to/KineticDiskCover
+env -u KONT_ROOT -u COPT_HOME -u KONT_HOME \
+  bash "$KDC_REPO/scripts/local_validation.sh" configure-build
 ```
 
-## Tests
+Catch2 tests cover the C++ implementation. Run preflight independently when
+needed to check the registered algorithms and pipeline configuration:
 
 ```sh
-ctest --output-on-failure
-```
-
-Catch2 tests cover the data model, dataset I/O, candidate disks, and coverage
-matrix.
-
-Run the complete pre-flight workflow to configure, build, test, check the
-registered algorithms and pipelines, and write Markdown reports:
-
-```sh
-python3 scripts/preflight_check.py [--clean] [--kont-root /path/to/kont]
+bash "$KDC_REPO/build/kdc-solver" preflight \
+  --output "$KDC_REPO/build/preflight_report.md"
 ```
 
 The CLI check can also be run directly with
-`kdc-solver preflight [--output FILE]`. Its report and the workflow summary are
-written under `results/preflight/`; without a usable KONT backend, optional
-native-IP checks report unavailable and pipeline sanity checks use
+`kdc-solver preflight --output FILE`. It requires an explicit report path;
+without a usable KONT backend,
+optional native-IP checks report unavailable and pipeline sanity checks use
 branch-and-bound or `MockILPSolver`.
 
 Run the FAST profile (the eight non-exact algorithms plus one exact reference)
@@ -147,8 +163,13 @@ against every JSON instance in both objectives with:
 ```sh
 python3 scripts/run_batch.py [--parallel --threads N] [--algorithms all] \
     [--profile fast --seed 42 --repeats 1] \
-    [--exact-reference auto|ip-kont|branch-and-bound]
+    [--exact-reference auto|ip-kont|branch-and-bound] --force
 ```
+
+For a managed end-to-end experiment with a scoped preflight stage, prefer
+`bash scripts/run_experiment.sh`. The standalone compatibility wrapper checks
+a caller-supplied `--preflight-report`; `--force` bypasses that gate but does
+not mark preflight as passed.
 
 The supported profiles are `fast`, `exact-reference`, and `debug`.
 `--algorithms all-fast` selects the eight fast algorithms plus the selected
@@ -168,8 +189,10 @@ results with the best feasible result in the experiment. Solve, verification,
 and serialization times are recorded separately; `solve_time_sec` is the
 primary runtime metric.
 
-For optional phase-level profiling, set `KDC_PROFILE_PHASES` to an output
-filename (or `1` to write `profile_phases.json`) when running a solver command.
+For optional phase-level profiling, set `KDC_PROFILE_PHASES` when running a
+solver command. Managed batch execution routes it to a run-local
+`runs/<run-id>/execution/profile_phases.json`; direct solver commands should
+set it to an explicit experiment-scoped filename.
 The JSON report includes call counts and cumulative seconds for candidate
 construction, trajectory positions, geometry/coverage matrices, model and
 LP/ILP construction/solve, kinetic events/extensions, combination, local
@@ -178,7 +201,8 @@ default; reported phase times are inclusive where operations are nested and
 must not be summed as disjoint wall time. `candidate_build` includes scoped
 precompute-cache lookups as well as cold builds.
 
-The wrapper requires a passing pre-flight report unless `--force` is supplied.
+The wrapper requires a caller-supplied passing `--preflight-report` unless
+`--force` is supplied.
 Parallel runs use all available CPU cores by default. Each static/IP subsolve
 is limited to 60 seconds by default; override this with `--time-limit SEC`.
 Each instance/algorithm/objective run also has a cooperative global deadline:
@@ -188,12 +212,14 @@ Nested static solves are capped by both their per-solve limit and the remaining
 global budget. On expiration, the solver returns its best complete feasible
 kinetic solution when one is available and records `time_limited`; it does not
 claim optimality because of a timeout.
-Batch artifacts are written beneath `results/batch/`, including per-run
-solutions, result metadata, convergence traces, master JSON/CSV, and a summary.
+Standalone batch artifacts are written beneath a unique managed
+`results/experiments/<experiment-id>/` directory, including immutable run
+records, compatibility master JSON/CSV, and a summary.
 The reference and full pipelines default to the 302-instance public dataset
 in `data/instances/public_instance_set/`. They convert the repository's MDC
-files into the solver's canonical JSON format before solving and publish
-results, tables, figures, animations, and stage reports as workflow artifacts.
+files into the solver's canonical JSON format before solving and write
+results, tables, figures, animations, and stage reports to the local
+experiment directory.
 
 `--exact-reference auto` runtime-probes the KONT/COPT API, then calibrates
 KONT/COPT and branch-and-bound as static solvers on the same deterministic
@@ -215,44 +241,72 @@ only when the dataset path and content fingerprint match. The calibration
 command can be run separately with
 `kdc-solver calibrate --dataset DIR --output DIR
 [--exact-reference auto|ip-kont|branch-and-bound]`. Strict benchmark profiles
-include exactly one exact backend; explicitly selecting both is rejected.
+designate exactly one exact reference backend. The `all-registered` policy
+retains every algorithm in the static C++ registry, including both
+`ip-kont` and `branch-and-bound` as distinct candidates; only the calibrated
+backend is designated as the reference. The policy also includes
+`brute-force` as a validation diagnostic, bounded by its assignment and
+time budgets. Registered backends unavailable on the local machine remain in
+the run plan and are recorded as skipped with a structured reason.
 `run_batch_limited.py` performs calibration once at the experiment level and
 passes its selected backend into each isolated per-run process.
 
-To run each individual
-instance/algorithm/objective combination in a separate process, use
-`python3 scripts/run_batch_limited.py --instances DIR --output results/batch
---algorithms all --modes both`. Use `--modes all` to include MinMaxSum. It defaults to
-using all available CPU cores and forwards the cooperative global and
+To plan every registered algorithm for each instance and objective without
+executing solver slots, use `--algorithms all-registered --modes all
+--plan-only`. To execute each individual instance/algorithm/objective
+combination in a separate process, use
+`python3 scripts/run_batch_limited.py --instances DIR
+--algorithms all-registered --modes all`. It creates a unique managed experiment under
+`results/experiments/` unless `--output` names a new experiment or its
+`batch/` compatibility-export directory. Use `--modes all` to include
+MinMaxSum. It defaults to using all available CPU cores and forwards the cooperative global and
 per-static-solve limits to the solver. An optional `--safety-timeout SEC`
 provides an external hard subprocess timeout; any such interruption is recorded
 as wrapper metadata and does not manufacture a solver optimality or feasibility
 status. Faster, semi-exact, and exact algorithms run in successive phases;
-previous batch-owned result files are cleared before each run.
+canonical run records are create-only, and retries receive new run IDs.
 
-Generate Markdown and CSV master, per-algorithm, per-instance, and per-family
-tables from the batch master JSON with:
-
-```sh
-python3 -m pip install -r requirements.txt
-python3 scripts/build_tables.py
-```
-
-The generated index, tables, and failed-run report are written under
-`results/tables/`. Use `--format markdown` or `--format csv` to select a single
-output format.
-
-Create runtime, memory, quality, Pareto, and convergence charts (PNG and PDF)
-from the batch results with:
+The experiment pipeline uses the canonical reporting layer below. The older
+`build_tables.py` and `plot_comparisons.py` commands remain compatibility tools
+for explicit legacy inputs; use `report_experiment.py` for experiment reports
+because it joins the immutable run plan to validated canonical run records and
+never reads a shared historical results directory.
 
 ```sh
-python scripts/plot_comparisons.py
+python3 scripts/report_experiment.py \
+  --experiment results/experiments/EXPERIMENT_ID --stage all
+python3 scripts/report_experiment.py \
+  --experiment results/experiments/EXPERIMENT_ID --stage audit
 ```
 
-The script writes figures and `REPORT.md` under `results/figures/`. Use
-`--sections A1,C2` to generate selected chart sections, `--dpi N` to choose
-figure resolution, and `--fixed-m N` / `--fixed-n N` to set scaling-chart
-subsets.
+The report creates complete plan-slot coverage, per-run results, runtime and
+quality summaries, MinMaxSum component/dominance rows, feasibility and
+verification counts, unsuccessful slots, per-instance and per-family
+comparisons, exact-reference comparisons, separate bound/gap fields, and
+completeness/artifact inventory under `tables/`. Tables retain nulls and
+unsuccessful rows; runtime quantiles use only completed runs with an explicit
+`solve_time_sec`. Figures are emitted as PNG and PDF only when the required
+validated observations exist. Missing-data reasons are listed in
+`figures/REPORT.md`, not represented by empty charts. The final
+`reports/experiment_report.md` links the tables and companions, generated
+figures, Prompt 6 visualizations, manifests, and integrity reports.
+
+Every `.csv` and `.tsv` anywhere under an experiment has an adjacent Markdown
+companion with the source population, command, row count, filters, column
+definitions, null treatment, status counts, formulas where applicable, and a
+bounded preview. The recursive `--stage audit` command verifies that these
+companions exist and match the actual delimited-file row counts.
+
+For smoke20, the `all-solutions` animation policy writes a three-time snapshot
+for every feasible run with a valid serialized solution, per-solution MP4
+animations (GIF when FFmpeg is unavailable), and one HTML comparison sheet for
+each selected instance/objective. Snapshot times are `τ = 0, 0.5, 1`, converted
+to actual simulation times with the instance's `T_end`. The
+`reports/visualization_manifest.json` indexes source-solution checksums, run
+status, verification and optimality labels, rendering parameters, and artifact
+checksums. The visualization audit leaves failed, skipped, time-limited, and
+solution-less slots visible in comparison sheets rather than treating them as
+successful renders.
 
 ## Commands
 
@@ -264,7 +318,7 @@ kdc-solver solve --instance FILE [--mode minmax|minsum|minmaxsum] [--algorithm N
 kdc-solver verify --instance FILE --solution FILE
 kdc-solver benchmark --dataset DIR --output DIR --mode both|minmax|minsum|minmaxsum \
                     [--profile fast|exact-reference|debug]
-                    [--algorithms all-fast|all-comparison]
+                    [--algorithms all-fast|all-comparison|all-registered]
                     [--seed N] [--repeats N]
                     [--exact-reference auto|ip-kont|branch-and-bound]
 ```
@@ -280,6 +334,21 @@ the component statuses, dominance checks, and source identifiers. See
 [`docs/minmaxsum.md`](docs/minmaxsum.md) for result and certification semantics.
 The development smoke pipeline runs all three modes and produces a dedicated
 peak-versus-integral vector report and plot for MinMaxSum.
+
+## Experiment result layout
+
+New experiments default to unique directories under
+`results/experiments/<experiment-id>/`. `experiment_manifest.json` records
+pipeline provenance and stage state; `experiment.json` is the storage
+envelope. The canonical result for each attempt is
+`runs/<run-id>/run.json`; `aggregates/` contains derived canonical exports and
+integrity metadata, while `batch/` contains compatibility exports. Dataset
+selection evidence and canonical inputs live under `dataset/` and `input/`.
+Calibration, preflight, logs, tables, figures, animations, and reports are
+experiment-scoped and created only when used. The root `artifacts.json` indexes
+experiment files by relative path, SHA-256, and size (excluding the index
+itself). Existing experiment directories are never reused unless `--resume`
+validates their configuration and immutable run plan.
 
 ## Dataset I/O
 
@@ -369,9 +438,11 @@ verification of every accepted iteration.
 
 `kdc::BenchmarkRunner` runs either or both objectives over JSON datasets and
 writes timestamped JSON and CSV summaries under the requested output directory.
-For example: `kdc-solver benchmark --dataset data --output results --mode both`.
+For example: `kdc-solver benchmark --dataset data/instances --output
+results/experiments/EXPERIMENT_ID/benchmark --mode both`.
 
-`kdc-solver compare --algorithms greedy,ip-kont --dataset data --output results/comparison --mode static`
+`kdc-solver compare --algorithms greedy,ip-kont --dataset data/instances
+--output results/experiments/EXPERIMENT_ID/comparison --mode static`
 compares static solvers at configured sample times and writes JSON/CSV records
 plus verification and statistical-analysis Markdown reports.
 
@@ -388,10 +459,14 @@ for each instance and renders a scene-and-cost animation for the requested
 objective. For example:
 
 ```sh
-python scripts/animate_best.py --mode both
+python scripts/animate_best.py \
+  --batch results/experiments/EXPERIMENT_ID/batch \
+  --instances results/experiments/EXPERIMENT_ID/dataset \
+  --output results/experiments/EXPERIMENT_ID/animations \
+  --mode both
 ```
 
-It writes one animation per instance/objective under `results/animations/`,
+It writes one animation per instance/objective under the selected experiment,
 choosing MP4 when ffmpeg is available and otherwise falling back to GIF. Use
 `--frames`, `--fps`, `--top-n`, and `--output` to control rendering.
 
@@ -405,7 +480,9 @@ relaxation for small test models.
 ## Directory structure
 
 Public headers are in `include/kdc`, implementations in `src`, and tests in
-`tests`. Input data belongs in `data`; helper scripts are in `scripts`;
-generated JSON, CSV, figures, and logs go in `results/json`, `results/csv`,
-`results/figures`, and `results/logs`. Optional third-party sources belong in
+`tests`. Input data belongs in `data`; helper scripts are in `scripts`.
+Generated experiment artifacts are isolated in
+`results/experiments/<experiment-id>/`; see
+[`docs/refactor/immutable_run_validation.md`](docs/refactor/immutable_run_validation.md)
+for the canonical run layout. Optional third-party sources belong in
 `third_party`.

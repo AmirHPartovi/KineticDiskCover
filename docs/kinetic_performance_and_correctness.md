@@ -111,7 +111,7 @@ randomized handover comparisons.
 The raw per-engine, per-instance results are stored in
 [`benchmarks/kinetic_certification_results.csv`](../benchmarks/kinetic_certification_results.csv).
 The harness takes seed count, repetition count, and optional starting seed
-index. The CI command runs `kdc-kinetic-certification 200 1`; the saved local
+index. The local command runs `kdc-kinetic-certification 200 1`; the saved local
 campaign uses 200 consecutive seeds starting at `20261007`, three repetitions
 per engine and instance, and reports the median extension-time run for each
 engine. There was no outlier removal.
@@ -196,18 +196,20 @@ fields are `NA`. Certificate creation/failure, support queue operations,
 stale support events, tree updates, and handover queue pops are also not yet
 instrumented and are reported as `NA`.
 
-## CI and promotion decision
+## Local certification and promotion decision
 
-`.github/workflows/kinetic-certification.yml` runs on pushes, pull requests,
-and manual dispatch. It builds the complete C++ test executable and
-certification harness, runs the full C++ suite, then runs a seeded 200-case
-three-engine differential campaign and uploads the CSV.
+Run the local C++ tests and seeded differential campaign with
+`scripts/local_validation.sh ctest` and
+`scripts/local_validation.sh certification 200 1`. The certification command
+retains its CSV under `build/local-validation/`. No remote workflow or
+artifact download is part of the current development procedure.
 
 Locally, all 228 C++ test cases (37,229 assertions) passed after a direct
 Clang build against the installed dependencies. The normal CMake-generated
 build could not be regenerated in this checkout because its cached
-FetchContent state did not provide the Eigen and Catch2 targets; CI exercises
-the repository's standard clean CMake path.
+FetchContent state did not provide the Eigen and Catch2 targets. CMake
+FetchContent can download missing dependencies when configured locally with
+network access; no clean CMake build was evidenced in that prior campaign.
 
 The promotion gate is **not met**. Differential correctness and continuous
 verification passed in the recorded campaign, but a fully certificate-driven

@@ -21,7 +21,7 @@ _RUN_STATE_TRANSITIONS = {
     "PLANNED": {"RUNNING", "FAILED", "CANCELLED", "SKIPPED"},
     "RUNNING": {
         "COMPLETED", "FAILED", "TIME_LIMIT", "TIMED_OUT", "CANCELLED",
-        "INVALID", "ABANDONED",
+        "INVALID", "ABANDONED", "SKIPPED",
     },
     "COMPLETED": set(),
     "FAILED": set(),
@@ -208,6 +208,18 @@ def safe_id(value: str, *, fallback: str = "unnamed") -> str:
     return cleaned[:80] or fallback
 
 
+def make_experiment_id(
+    profile: str,
+    *,
+    now: dt.datetime | None = None,
+) -> str:
+    """Return a readable, collision-resistant ID for a new experiment."""
+    timestamp = (now or dt.datetime.now(dt.timezone.utc)).strftime(
+        "%Y%m%dT%H%M%SZ"
+    )
+    return f"kdc-{safe_id(profile)}-{timestamp}-{uuid.uuid4().hex[:12]}"
+
+
 def make_run_id(
     algorithm: str,
     objective: str,
@@ -318,6 +330,7 @@ def create_experiment(
     dataset_sha256: str,
     source_commit: str | None,
     pipeline_managed: bool = False,
+    resume: bool = False,
 ) -> Path:
     """Create or register one managed experiment without reusing another."""
     root = Path(experiment_dir).resolve()
@@ -330,6 +343,10 @@ def create_experiment(
     path = root / "experiment.json"
     config_hash = hashlib.sha256(dumps_json(config).encode("utf-8")).hexdigest()
     if path.exists():
+        if not resume:
+            raise FileExistsError(
+                f"experiment already exists; use explicit validated resume: {root}"
+            )
         existing = read_json(path, schema_name="experiment")
         if (
             existing["experiment_id"] != root.name
@@ -446,6 +463,36 @@ def _artifact_records(run_dir: Path) -> list[dict[str, Any]]:
             ),
         })
     return artifacts
+
+
+def index_experiment_artifacts(experiment_dir: str | Path) -> Path:
+    """Write a checksummed index of experiment artifacts, excluding the index."""
+    root = Path(experiment_dir).resolve()
+    if not root.is_dir():
+        raise ValueError(f"experiment directory does not exist: {root}")
+    artifacts = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path == root / "artifacts.json":
+            continue
+        resolved = path.resolve()
+        try:
+            relative = resolved.relative_to(root).as_posix()
+        except ValueError as error:
+            raise ValueError(f"artifact escapes experiment directory: {path}") from error
+        artifacts.append({
+            "path": relative,
+            "sha256": sha256_file(resolved),
+            "size_bytes": resolved.stat().st_size,
+            "media_type": (
+                "application/json" if resolved.suffix == ".json"
+                else "text/csv" if resolved.suffix == ".csv"
+                else "application/jsonl" if resolved.suffix == ".jsonl"
+                else "text/plain"
+            ),
+        })
+    payload = {"schema_version": 1, "artifacts": artifacts}
+    validate_document(payload, "artifact_manifest")
+    return write_derived_json(root / "artifacts.json", payload)
 
 
 def finalize_run(
@@ -836,6 +883,7 @@ def aggregate_experiment(experiment_dir: str | Path) -> dict[str, Any]:
         "valid_runs": len(records),
         "completed_runs": sum(row["status"] == "COMPLETED" for row in records),
         "failed_runs": sum(row["status"] == "FAILED" for row in records),
+        "skipped_runs": sum(row["status"] == "SKIPPED" for row in records),
         "time_limit_runs": sum(row["status"] in {"TIME_LIMIT", "TIMED_OUT"} for row in records),
         "invalid_runs": len(invalid),
         "missing_runs": len(missing),
@@ -847,6 +895,9 @@ def aggregate_experiment(experiment_dir: str | Path) -> dict[str, Any]:
         ),
         "latest_failed_runs": sum(
             row["status"] == "FAILED" for row in latest_by_key.values()
+        ),
+        "latest_skipped_runs": sum(
+            row["status"] == "SKIPPED" for row in latest_by_key.values()
         ),
         "latest_time_limit_runs": sum(
             row["status"] in {"TIME_LIMIT", "TIMED_OUT"}
@@ -901,14 +952,19 @@ def aggregate_experiment(experiment_dir: str | Path) -> dict[str, Any]:
             row["status"] == "COMPLETED" for row in latest_by_key.values()
         ) and set(latest_by_key) == plan_keys,
     }
+    logical_records = sorted(latest_by_key.values(), key=lambda record: (
+        record["instance_id"], record["objective"], record["algorithm"],
+        record["repeat"], record["run_id"],
+    ))
     # Legacy consumers receive exports derived exclusively from validated run
-    # records; these are compatibility views, never solver destinations.
+    # records, one latest attempt per logical slot. Full attempt history stays
+    # in aggregates/results.* and runs/index.jsonl.
     _atomic_replace_json(experiment / "batch" / "master_results.json", [
-        _legacy_result(record) for record in records
+        _legacy_result(record) for record in logical_records
     ])
     _write_results_csv(
         experiment / "batch" / "master_results.csv",
-        [_legacy_result(record) for record in records],
+        [_legacy_result(record) for record in logical_records],
     )
     export_paths = (
         "aggregates/results.jsonl",

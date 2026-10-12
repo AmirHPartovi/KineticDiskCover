@@ -9,7 +9,7 @@ namespace kdc {
 class BruteForceSolver final : public IStaticSolver {
  public:
   struct Config {
-    std::uint64_t max_assignments{100'000'000ULL};
+    std::uint64_t max_assignments{100'000ULL};
     double time_limit_sec{60.0};
   };
 
@@ -20,6 +20,7 @@ class BruteForceSolver final : public IStaticSolver {
   bool is_exact() const override { return true; }
   bool provides_lower_bound() const override { return true; }
   void set_time_limit(double time_limit_sec) override;
+  void set_max_assignments(std::uint64_t max_assignments);
 
  private:
   Config config_;

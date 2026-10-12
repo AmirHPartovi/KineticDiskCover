@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/dataset_selection.schema.json",
+  "title": "KineticDiskCover deterministic dataset selection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "created_at",
+    "name",
+    "profile",
+    "policy_version",
+    "selector_version",
+    "selection_policy",
+    "policy_parameters",
+    "size_limits",
+    "count",
+    "source_root",
+    "source_dataset_fingerprint",
+    "selected_instance_count",
+    "family_coverage",
+    "classification_rule",
+    "instances",
+    "rejected_candidates"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "name": {"const": "smoke20"},
+    "profile": {"const": "smoke20"},
+    "policy_version": {"type": "string", "minLength": 1},
+    "selector_version": {"type": "string", "minLength": 1},
+    "selection_policy": {"type": "string", "minLength": 1},
+    "policy_parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seed", "ordering", "family_fill"],
+      "properties": {
+        "seed": {"type": "integer", "minimum": 0},
+        "ordering": {"type": "string"},
+        "family_fill": {"const": "round_robin"}
+      }
+    },
+    "size_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_n", "max_m"],
+      "properties": {
+        "max_n": {"type": "integer", "minimum": 1},
+        "max_m": {"type": "integer", "minimum": 1}
+      }
+    },
+    "count": {"const": 20},
+    "source_root": {"type": "string", "minLength": 1},
+    "source_dataset_fingerprint": {"$ref": "#/$defs/sha256"},
+    "selected_instance_count": {"const": 20},
+    "family_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available_eligible_families", "represented_families", "selected_counts"],
+      "properties": {
+        "available_eligible_families": {"type": "integer", "minimum": 1},
+        "represented_families": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "selected_counts": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "classification_rule": {"type": "string", "minLength": 1},
+    "instances": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {"$ref": "#/$defs/instance"}
+    },
+    "rejected_candidates": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/rejected"}
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instance_id",
+        "family",
+        "family_classification_rule",
+        "source",
+        "relative_source",
+        "source_sha256",
+        "canonical_path",
+        "canonical_sha256",
+        "n",
+        "m",
+        "T_end",
+        "file_size_bytes",
+        "selection_rank",
+        "selection_reason",
+        "size_limit_exception"
+      ],
+      "properties": {
+        "instance_id": {"$ref": "#/$defs/sha256"},
+        "family": {"type": "string", "minLength": 1},
+        "family_classification_rule": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1},
+        "relative_source": {"type": "string", "minLength": 1},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "canonical_path": {
+          "type": "string",
+          "pattern": "^instances/[A-Za-z0-9._/-]+\\.json$"
+        },
+        "canonical_sha256": {"$ref": "#/$defs/sha256"},
+        "n": {"type": "integer", "minimum": 1, "maximum": 50},
+        "m": {"type": "integer", "minimum": 1, "maximum": 25},
+        "T_end": {"type": "number", "exclusiveMinimum": 0},
+        "file_size_bytes": {"type": "integer", "minimum": 0},
+        "selection_rank": {"type": "integer", "minimum": 1, "maximum": 20},
+        "selection_reason": {"type": "string", "minLength": 1},
+        "size_limit_exception": {"type": "null"},
+        "materialized_file": {"type": "string", "minLength": 1},
+        "materialized_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "rejected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "relative_source", "reason_code", "reason"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "relative_source": {"type": "string", "minLength": 1},
+        "reason_code": {
+          "enum": [
+            "invalid_input",
+            "duplicate_logical_instance",
+            "size_limit_exceeded",
+            "valid_candidate_not_selected"
+          ]
+        },
+        "reason": {"type": "object"},
+        "instance_id": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

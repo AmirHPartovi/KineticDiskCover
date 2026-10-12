@@ -11,9 +11,11 @@ results, produces summaries, selects animation inputs, and finalizes status.
 The shell invokes CMake, CTest, preflight, calibration, `run_batch.py`,
 `build_tables.py`, `plot_comparisons.py`, and `animate_best.py`.
 
-The three workflows are thin wrappers around the same runner and upload
-separate experiment paths. The local profile and Action inputs are not yet
-backed by one typed schema; CLI validation lives in Bash/Python/C++.
+At the time of this pipeline audit, three workflows were thin wrappers around
+the shared runner and uploaded separate experiment paths. Those workflow
+definitions have since been removed from the local tree; experiment profiles
+are run through the local shell runner. The local profile and CLI inputs are
+not yet backed by one typed schema; validation lives in Bash/Python/C++.
 
 ## Stage-model gaps against the requested contract
 
@@ -49,9 +51,10 @@ protect complete individual runs.
 ## Resource and backend notes
 
 Profile values provide reasonable defaults, but are supplemented by
-`BatchRunConfig`, Python wrappers, Bash parsing, and workflow input defaults.
+`BatchRunConfig`, Python wrappers, and Bash parsing.
 KONT/COPT detection/calibration is correctly separate from exact backend
 execution in the existing backend model, though every per-run result does not
 yet carry complete structured backend-detection and calibration lineage.
-GitHub Actions allows AUTO and explicit backend choices; it does not provision
-native KONT by default.
+At the time of this audit, GitHub Actions accepted AUTO and explicit backend
+choices but did not provision native KONT by default. The workflow definitions
+have since been removed from the local working tree.

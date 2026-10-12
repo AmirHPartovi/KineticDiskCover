@@ -2,12 +2,21 @@
 
 ## Canonical layout
 
-An experiment contains `experiment.json`, an immutable `runs/plan.jsonl`, and
-one reserved directory per attempt:
+New experiments are isolated under `results/experiments/<experiment-id>/`.
+The pipeline's `experiment_manifest.json` records configuration, provenance,
+reproduction commands, and stage states. `experiment.json` is the validated
+storage envelope; it is not a second run-record store. `runs/<run_id>/run.json`
+is the single canonical result record for each physical attempt. The layout
+includes only output directories created by active stages:
 
 ```text
 experiment/
+  experiment_manifest.json
   experiment.json
+  artifacts.json
+  dataset/
+    selection_manifest.json
+  input/
   runs/
     plan.jsonl
     <run_id>/
@@ -21,7 +30,22 @@ experiment/
       artifacts.json
   aggregates/
   batch/
+  calibration/
+  preflight/
+  tables/
+  figures/
+  animations/
+  reports/
+  logs/
 ```
+
+`dataset/selection_manifest.json` is present when selection evidence applies;
+`input/` contains immutable experiment-scoped input snapshots, while each
+run's `input/instance.json` remains the checksum-validated execution input.
+Calibration and preflight evidence are recorded only when those stages run.
+`artifacts.json` indexes experiment files by safe relative path, SHA-256,
+size, and media type; it excludes itself and is refreshed after pipeline
+finalization. Per-run `artifacts.json` remains create-only and immutable.
 
 `scripts/kdc_tools/storage.py` is the authority for run IDs, safe paths,
 create-only writes, lifecycle transitions, finalization, checksum validation,
@@ -53,6 +77,12 @@ current immutable plan digest, and matching checksums and sizes for all listed
 exports. `experiment_pipeline.py validate-integrity` additionally validates
 the canonical run packages and their artifact checksums.
 
+Standalone table, plot, and animation commands require explicit output paths;
+they do not write to shared `results/tables`, `results/figures`, or
+`results/animations` defaults. `run_batch.py` checks only a caller-supplied
+preflight report; `--force` bypasses the gate without recording preflight as
+passed.
+
 ## Recovery and retry rules
 
 On resume, the runner requires the existing plan to match the requested
@@ -74,11 +104,10 @@ export integrity, and isolated parallel solver workers. The broader project
 validation sequence is:
 
 ```sh
-pytest -q tests/python
-cmake --build build --config Release
-ctest --test-dir build --output-on-failure
-bash scripts/run_experiment.sh --pipeline smoke10
-git diff --check
+bash scripts/local_validation.sh python-tests
+bash scripts/local_validation.sh configure-build
+bash scripts/local_validation.sh ctest
+bash scripts/local_validation.sh experiment smoke
 ```
 
 Historical ignored `results/` archives are not automatically migrated,

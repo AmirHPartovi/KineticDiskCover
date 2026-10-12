@@ -14,6 +14,8 @@ from kdc_tools.storage import (  # noqa: E402
     create_experiment,
     create_run_directory,
     finalize_run,
+    index_experiment_artifacts,
+    make_experiment_id,
     read_json,
     reserve_run,
     sha256_file,
@@ -34,6 +36,73 @@ def test_run_directory_is_created_once(tmp_path):
     assert run.is_dir()
     with pytest.raises(FileExistsError):
         create_run_directory(tmp_path / "experiment", "run-001")
+
+
+def test_experiment_ids_are_unique_and_collision_safe(tmp_path):
+    first = make_experiment_id("smoke")
+    second = make_experiment_id("smoke")
+    assert first != second
+    assert first.startswith("kdc-smoke-")
+
+    create_experiment(
+        tmp_path / first,
+        profile="smoke",
+        config={"seed": 1},
+        dataset_sha256="a" * 64,
+        source_commit=None,
+    )
+    with pytest.raises(FileExistsError, match="explicit validated resume"):
+        create_experiment(
+            tmp_path / first,
+            profile="smoke",
+            config={"seed": 1},
+            dataset_sha256="a" * 64,
+            source_commit=None,
+        )
+    with pytest.raises(ValueError, match="resume refused"):
+        create_experiment(
+            tmp_path / first,
+            profile="smoke",
+            config={"seed": 2},
+            dataset_sha256="a" * 64,
+            source_commit=None,
+            resume=True,
+        )
+    create_experiment(
+        tmp_path / first,
+        profile="smoke",
+        config={"seed": 1},
+        dataset_sha256="a" * 64,
+        source_commit=None,
+        resume=True,
+    )
+
+
+def test_experiment_artifact_index_checksums_files_and_excludes_itself(tmp_path):
+    experiment = tmp_path / "experiment"
+    experiment.mkdir()
+    artifact = experiment / "reports" / "summary.md"
+    artifact.parent.mkdir()
+    artifact.write_text("summary\n", encoding="utf-8")
+
+    index_path = index_experiment_artifacts(experiment)
+    index = read_json(index_path, schema_name="artifact_manifest")
+    assert index["artifacts"] == [{
+        "path": "reports/summary.md",
+        "sha256": sha256_file(artifact),
+        "size_bytes": artifact.stat().st_size,
+        "media_type": "text/plain",
+    }]
+
+
+def test_experiment_artifact_index_rejects_paths_that_escape_root(tmp_path):
+    experiment = tmp_path / "experiment"
+    experiment.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("not part of the experiment\n", encoding="utf-8")
+    (experiment / "external.txt").symlink_to(outside)
+    with pytest.raises(ValueError, match="escapes experiment directory"):
+        index_experiment_artifacts(experiment)
 
 
 @pytest.mark.parametrize("run_id", ["../escape", "", ".hidden", "with/slash"])
@@ -109,6 +178,7 @@ def test_concurrent_create_only_artifact_write_has_one_winner(tmp_path):
         ("RUNNING", "COMPLETED"),
         ("RUNNING", "FAILED"),
         ("RUNNING", "TIMED_OUT"),
+        ("RUNNING", "SKIPPED"),
     ],
 )
 def test_allowed_state_transitions(current, requested):
@@ -311,6 +381,36 @@ def test_aggregate_is_derived_from_run_packages_and_reports_plan_gaps(tmp_path):
     compatibility = read_json(experiment / "batch" / "master_results.json")
     assert compatibility[0]["run_id"] == "run-001"
     assert compatibility[0]["objective_value"] == 1.0
+
+
+def test_aggregate_master_export_uses_latest_attempt_per_logical_slot(tmp_path):
+    experiment = tmp_path / "exp-rerun"
+    experiment.mkdir()
+    _reserve_and_finalize(experiment, "run-001", "key-001")
+    _reserve_and_finalize(
+        experiment, "run-002", "key-001", rerun_of="run-001"
+    )
+    write_run_plan(experiment, [{
+        "schema_version": 1,
+        "run_key": "key-001",
+        "instance_id": "tiny",
+        "algorithm": "greedy",
+        "objective": "minmax",
+        "repeat": 0,
+        "seed": 42,
+        "configuration_sha256": "a" * 64,
+        "requested_backend": "auto",
+        "resolved_configuration": {},
+    }])
+
+    report = aggregate_experiment(experiment)
+    compatibility = read_json(experiment / "batch" / "master_results.json")
+    all_attempts = read_json(experiment / "aggregates" / "results.json")
+    assert report["classifications"]["valid_runs"] == 2
+    assert report["classifications"]["extra_attempts"] == 1
+    assert len(compatibility) == 1
+    assert compatibility[0]["run_id"] == "run-002"
+    assert len(all_attempts) == 2
 
 
 def test_reporting_requires_complete_checksummed_aggregate(tmp_path):

@@ -3,13 +3,13 @@
   "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
   "calibration_decision_version": 4,
   "calibration_instances": [
-    "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data/instances/preflight_sample.json"
+    "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data/instances/preflight_sample.json"
   ],
   "calibration_objectives": [
     "minmax",
     "minsum"
   ],
-  "dataset_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data",
+  "dataset_dir": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data",
   "dataset_fingerprint": "a7649cb865668336",
   "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
   "fallback_used": false,
@@ -17,12 +17,12 @@
   "kont_version": "7.2.4",
   "native_kont_available": false,
   "native_kont_used": false,
-  "output_dir": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/results",
+  "output_dir": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results",
   "rejected_runs": [
     {
       "accepted": false,
       "backend": "ip-kont",
-      "instance": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data/instances/preflight_sample.json",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data/instances/preflight_sample.json",
       "m": 2,
       "n": 2,
       "objective": "minmax",
@@ -31,7 +31,7 @@
     {
       "accepted": false,
       "backend": "ip-kont",
-      "instance": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data/instances/preflight_sample.json",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data/instances/preflight_sample.json",
       "m": 2,
       "n": 2,
       "objective": "minsum",
@@ -65,7 +65,7 @@
       "backend": "branch-and-bound",
       "calibration_kind": "static_solver_performance",
       "feasible": true,
-      "instance": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data/instances/preflight_sample.json",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data/instances/preflight_sample.json",
       "kinetic_optimality_proven": null,
       "lower_bound": 31.415926535897935,
       "m": 2,
@@ -73,8 +73,8 @@
       "objective": "minmax",
       "objective_value": 31.415926535897935,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.8917e-05,
-      "solver_runtime_sec": 1.5125e-05,
+      "runtime_sec": 1.8833e-05,
+      "solver_runtime_sec": 1.525e-05,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 31.415926535897935
@@ -84,7 +84,7 @@
       "backend": "branch-and-bound",
       "calibration_kind": "static_solver_performance",
       "feasible": true,
-      "instance": "/Users/amirpartovi/.copilot/repos/copilot-worktrees/KineticDiskCover/amirhpartovi-psychic-spoon/data/instances/preflight_sample.json",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/data/instances/preflight_sample.json",
       "kinetic_optimality_proven": null,
       "lower_bound": 31.415926535897935,
       "m": 2,
@@ -92,8 +92,8 @@
       "objective": "minsum",
       "objective_value": 31.415926535897935,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 5.125e-06,
-      "solver_runtime_sec": 3.75e-06,
+      "runtime_sec": 5.333e-06,
+      "solver_runtime_sec": 3.958e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 31.415926535897935

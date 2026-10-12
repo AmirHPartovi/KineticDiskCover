@@ -15,6 +15,7 @@ SCHEMA_DIR = Path(__file__).resolve().parents[2] / "docs" / "schemas"
 SCHEMA_FILES = {
     "artifact_manifest": "artifact_manifest.schema.json",
     "dataset_instance": "dataset_instance.schema.json",
+    "dataset_selection": "dataset_selection.schema.json",
     "experiment": "experiment.schema.json",
     "input_ref": "input_ref.schema.json",
     "request": "request.schema.json",

@@ -14,9 +14,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
-RESULTS = ROOT / "results" / "preflight"
-REPORT = RESULTS / "preflight_report.md"
-SUMMARY = RESULTS / "00_preflight_summary.md"
 
 
 def run(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -39,10 +36,14 @@ def test_counts(output: str) -> tuple[int, int]:
 
 
 def write_summary(status: dict[str, str], passed: int, failed: int,
-                  instance_paths: list[Path], preflight_status: str) -> None:
-    RESULTS.mkdir(parents=True, exist_ok=True)
-    relative_report = REPORT.relative_to(ROOT)
-    with SUMMARY.open("w", encoding="utf-8") as output:
+                  instance_paths: list[Path], preflight_status: str,
+                  report: Path, summary: Path) -> None:
+    summary.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        relative_report = report.relative_to(ROOT)
+    except ValueError:
+        relative_report = report
+    with summary.open("w", encoding="utf-8") as output:
         output.write("# Pre-flight Workflow Summary\n\n")
         output.write(f"- **Configure:** {status['configure']}\n")
         output.write(f"- **Build:** {status['build']}\n")
@@ -64,6 +65,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--clean", action="store_true",
                         help="remove the project's build/ directory first")
+    parser.add_argument("--output-dir", type=Path, required=True,
+                        help="directory for the preflight report and summary")
     parser.add_argument("--kont-root", default=os.environ.get("KONT_ROOT", ""),
                         help="KONT installation root (defaults to KONT_ROOT)")
     parser.add_argument("--build-jobs", type=int,
@@ -76,8 +79,11 @@ def main() -> int:
     if args.clean and BUILD.exists():
         shutil.rmtree(BUILD)
     BUILD.mkdir(parents=True, exist_ok=True)
-    RESULTS.mkdir(parents=True, exist_ok=True)
-    REPORT.write_text(
+    results = args.output_dir.resolve()
+    report = results / "preflight_report.md"
+    summary = results / "00_preflight_summary.md"
+    results.mkdir(parents=True, exist_ok=True)
+    report.write_text(
         "# Pre-flight report\n\n"
         "The current pre-flight attempt did not finish. See `00_preflight_summary.md` "
         "and the pipeline log for stage details.\n",
@@ -113,13 +119,13 @@ def main() -> int:
 
             preflight = run(
                 [str(BUILD / "kdc-solver"), "preflight", "--output",
-                 "../results/preflight/preflight_report.md"],
+                 str(report)],
                 BUILD)
             preflight_status = "PASS" if preflight.returncode == 0 else "FAIL"
 
     instance_paths = sorted((ROOT / "data" / "instances").glob("*.json"))
     write_summary(status, passed_tests, failed_tests, instance_paths,
-                  preflight_status)
+                  preflight_status, report, summary)
 
     success = (
         status["configure"] == "PASS"
@@ -129,7 +135,7 @@ def main() -> int:
         and bool(instance_paths)
     )
     print(f"Pre-flight workflow: {'PASS' if success else 'FAIL'}")
-    print(f"Summary: {SUMMARY}")
+    print(f"Summary: {summary}")
     return 0 if success else 1
 
 

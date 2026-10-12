@@ -7,6 +7,7 @@ CMakeUserPresets.json
 /cmake_install.cmake
 /CTestTestfile.cmake
 /Makefile
+/Testing/
 
 # Compiled artifacts
 *.o
@@ -16,13 +17,28 @@ CMakeUserPresets.json
 /kdc-solver
 /kdc-tests
 
-# Generated reports and solver results
+# Local experiment results and generated reports
+/results/
 
+# Generated benchmark data; benchmark implementation sources remain tracked.
+/benchmarks/kinetic_certification_results.csv
+/benchmarks/kinetic_handover_results.csv
+/benchmarks/kinetic_interval_emission_results.csv
+
+# Profiling output
+/profile_phases.json
+*.prof
+*.profraw
+*.profdata
 
 # Python caches and virtual environments
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
 .venv/
 venv/
 

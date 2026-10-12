@@ -161,7 +161,7 @@ def test_png_generation_is_reproducible(tmp_path):
 def test_smoke_figure_report_is_labeled_as_development_validation(tmp_path):
     plot_comparisons.configure_style(50)
     frame = plot_comparisons.prepare_frame(sample_frame())
-    frame["dataset_profile"] = "smoke10"
+    frame["dataset_profile"] = "smoke20"
 
     report = plot_comparisons.write_report(frame, tmp_path, [])
 

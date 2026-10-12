@@ -103,15 +103,17 @@ can be overwritten and invalid state transitions fail.
 - Profile representative workloads before optimizing geometry, kinetic
   events, verifier, memory, or serialization; report comparable metrics only.
 
-### Phases O–R — tests, docs, CI and legacy compatibility
+### Phases O–R — tests, docs, local validation and legacy compatibility
 
 - Add storage, failure-recovery, schema, concurrency, pipeline and
   scientific-invariant tests; reorganize tests only where it improves
   navigation.
 - Update README and add architecture/protocol/schema/artifact/backend/
   reproducibility guides as behavior becomes available.
-- Keep three thin Actions workflows on the shared engine; verify artifact
-  uploads include full experiment packages and make backend policy explicit.
+- Keep build, test, certification, and experiment entry points locally
+  executable; retain stage status, exit codes, logs, and backend policy in
+  local experiment records. Remote workflow execution is outside the project
+  development path.
 - Preserve current legacy result locations. Add a separate copy-only legacy
   importer with provenance-completeness flags; do not run it automatically.
 

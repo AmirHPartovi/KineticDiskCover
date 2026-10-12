@@ -9,6 +9,7 @@ import logging
 import math
 from pathlib import Path
 import re
+import shutil
 import sys
 from typing import Any
 
@@ -232,6 +233,23 @@ def integral_at(time: float, times: np.ndarray, costs: np.ndarray,
     return float(cumulative[index] + partial)
 
 
+def _validate_animation_file(path: Path) -> None:
+    if not path.is_file() or path.stat().st_size == 0:
+        raise ValueError(f"animation writer produced an empty artifact: {path}")
+    if path.suffix.lower() == ".gif":
+        from PIL import Image
+
+        with Image.open(path) as image:
+            if image.format != "GIF" or getattr(image, "n_frames", 1) < 1:
+                raise ValueError(f"animation is not a valid GIF: {path}")
+            image.verify()
+    elif path.suffix.lower() == ".mp4":
+        with path.open("rb") as source:
+            header = source.read(64)
+        if len(header) < 12 or b"ftyp" not in header:
+            raise ValueError(f"animation is not a valid MP4 container: {path}")
+
+
 def _find_instance_file(directory: Path, name: str) -> Path | None:
     for path in sorted(directory.rglob("*.json")):
         try:
@@ -427,7 +445,11 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     )
     figure.suptitle(
         f"Instance {instance_name} | n={len(trajectories)}, m={len(stations)}\n"
-        f"Algorithm: {algorithm} | Objective: {mode}",
+        f"Algorithm: {algorithm} | Objective: {mode} | "
+        f"Run: {record.get('run_id', 'unknown')} | "
+        f"Status: {record.get('run_status', 'unknown')} | "
+        f"Verification: {record.get('verification_kind', 'unknown')} | "
+        f"Optimality: {record.get('optimality_status', 'unknown')}",
         fontsize=13,
     )
     figure.legend(handles=station_legend_handles, loc="center",
@@ -480,7 +502,8 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
                     support_labels[station_index].set_text("")
         time_indicator.set_xdata([time, time])
         left_text.set_text(
-            f"t = {time:.3f}\n"
+            f"τ = {time / float(instance['T_end']):.3f}  t = {time:.3f} / "
+            f"{float(instance['T_end']):.3f}\n"
             f"cost = {costs[frame_index]:.3f}\n"
             f"integral up to now = "
             f"{integral_at(time, times, costs, integrals):.3f}"
@@ -497,12 +520,14 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
     output.mkdir(parents=True, exist_ok=True)
     run_id = str(record.get("run_id", ""))
     suffix = f"__{_safe_filename(run_id)}" if run_id else ""
-    if animation.writers.is_available("ffmpeg"):
+    use_ffmpeg = bool(shutil.which("ffmpeg")) and animation.writers.is_available(
+        "ffmpeg"
+    )
+    if use_ffmpeg:
         destination = output / (
             f"{_safe_filename(instance_name)}_{mode}{suffix}.mp4"
         )
         writer = animation.FFMpegWriter(fps=fps, metadata={"artist": "kdc-solver"})
-        movie.save(destination, writer=writer, dpi=dpi)
     else:
         LOGGER.warning(
             "ffmpeg is not available; saving GIF instead. Install ffmpeg "
@@ -512,11 +537,26 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         destination = output / (
             f"{_safe_filename(instance_name)}_{mode}{suffix}.gif"
         )
-        movie.save(destination, writer=animation.PillowWriter(fps=fps), dpi=dpi)
+        writer = animation.PillowWriter(fps=fps)
+    metadata_path = destination.with_suffix(destination.suffix + ".metadata.json")
+    if destination.exists():
+        plt.close(figure)
+        raise FileExistsError(f"refusing to overwrite animation: {destination}")
+    if metadata_path.exists():
+        plt.close(figure)
+        raise FileExistsError(
+            f"refusing to overwrite animation metadata: {metadata_path}"
+        )
+    try:
+        movie.save(destination, writer=writer, dpi=dpi)
+        _validate_animation_file(destination)
+    except Exception:
+        if destination.is_file():
+            destination.unlink()
+        plt.close(figure)
+        raise
     plt.close(figure)
-    write_derived_json(destination.with_suffix(
-        destination.suffix + ".metadata.json"
-    ), {
+    metadata = {
         "schema_version": 1,
         "experiment_id": record.get("experiment_id"),
         "run_id": record.get("run_id"),
@@ -535,13 +575,17 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
             "PASSED" if bool(record.get("verified")) else "NOT_PASSED"
         ),
         "verification_kind": record.get("verification_kind"),
+        "run_status": record.get("run_status"),
+        "optimality_status": record.get("optimality_status"),
         "source_result_path": record.get("result_json_path"),
         "source_solution_path": record.get("solution_json_path"),
+        "source_solution_sha256": record.get("source_solution_sha256"),
         "source_commit": record.get("git_commit"),
         "animation_path": destination.name,
         "animation_sha256": sha256_file(destination),
         "generator": "scripts/animate_best.py",
-    })
+    }
+    write_derived_json(metadata_path, metadata)
     return destination
 
 
@@ -651,9 +695,11 @@ def run(batch_dir: str | Path, instances_dir: str | Path,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--batch", default="results/batch")
+    parser.add_argument("--batch", required=True,
+                        help="experiment batch compatibility directory")
     parser.add_argument("--instances", default="data/instances")
-    parser.add_argument("--output", default="results/animations")
+    parser.add_argument("--output", required=True,
+                        help="experiment-scoped animation output directory")
     parser.add_argument("--mode", choices=("minmax", "minsum", "minmaxsum", "both", "all"),
                         default="minmax")
     parser.add_argument("--fps", type=int, default=30)

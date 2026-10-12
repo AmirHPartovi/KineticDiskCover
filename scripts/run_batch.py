@@ -13,19 +13,19 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREFLIGHT_REPORT = ROOT / "results" / "preflight" / "preflight_report.md"
 SOLVER = ROOT / "build" / "kdc-solver"
 sys.path.insert(0, str(ROOT / "scripts"))
 from select_test_instances import (
+    _validate_selection_identity,
     apply_execution_defaults,
     resolve_instance_directory,
 )
 
 
-def preflight_passed() -> bool:
-    if not PREFLIGHT_REPORT.is_file():
+def preflight_passed(report: Path | None) -> bool:
+    if report is None or not report.is_file():
         return False
-    contents = PREFLIGHT_REPORT.read_text(encoding="utf-8")
+    contents = report.read_text(encoding="utf-8")
     match = re.search(
         r"\*\*Summary:\*\* (\d+) / (\d+) checks passed \(0 failed\)", contents
     )
@@ -34,9 +34,9 @@ def preflight_passed() -> bool:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--instances", default="data/instances",
+    parser.add_argument("--instances", default=str(ROOT / "data" / "instances"),
                         help="instance directory")
-    parser.add_argument("--dataset-profile", choices=("full", "smoke10"),
+    parser.add_argument("--dataset-profile", choices=("full", "smoke20"),
                         default="full")
     parser.add_argument("--dataset-manifest",
                         help="selection manifest describing a smoke dataset")
@@ -44,8 +44,14 @@ def main() -> int:
         "--output", default=None,
         help="batch compatibility-export directory (defaults to a unique experiment)",
     )
+    parser.add_argument(
+        "--preflight-report", type=Path,
+        help="experiment-scoped preflight report to validate",
+    )
     parser.add_argument("--algorithms", default="",
-                        help="solver names or all-fast/all-comparison")
+                        help="solver names or all-fast/all-comparison/all-registered")
+    parser.add_argument("--plan-only", action="store_true",
+                        help="write the run plan without executing solver slots")
     parser.add_argument("--profile", choices=("fast", "exact-reference", "debug"),
                         default="fast")
     parser.add_argument("--seed", type=int, default=42)
@@ -75,6 +81,8 @@ def main() -> int:
     )
     parser.add_argument("--minmax-budget-fraction", type=float, default=0.5)
     parser.add_argument("--minsum-budget-fraction", type=float, default=0.5)
+    parser.add_argument("--brute-force-max-assignments", type=int, default=100_000)
+    parser.add_argument("--brute-force-time-limit-sec", type=float, default=0.5)
     parser.add_argument("--force", action="store_true",
                         help="run even if the preflight report is missing or failed")
     parser.add_argument("--save-solutions", action="store_true")
@@ -91,7 +99,28 @@ def main() -> int:
             args.dataset_manifest = str(instance_root / "manifest.json")
         args.instances = str(resolved_instance_root)
         if args.dataset_profile == "full":
-            args.dataset_profile = "smoke10"
+            args.dataset_profile = "smoke20"
+    if args.dataset_manifest:
+        try:
+            selection = json.loads(Path(args.dataset_manifest).read_text(
+                encoding="utf-8"
+            ))
+        except (OSError, json.JSONDecodeError) as error:
+            parser.error(f"invalid selection manifest: {error}")
+        if not isinstance(selection, dict) or not isinstance(
+                selection.get("instances"), list):
+            parser.error("selection manifest must contain an instances array")
+        selection_name = selection.get("name", selection.get("profile"))
+        if selection_name == "smoke10":
+            parser.error(
+                "legacy smoke10 manifests cannot be relabeled; regenerate "
+                "selection evidence for smoke20"
+            )
+        if args.dataset_profile == "smoke20":
+            try:
+                _validate_selection_identity(selection, 20, 50, 25)
+            except ValueError as error:
+                parser.error(f"invalid smoke20 selection manifest: {error}")
     elif (args.dataset_manifest is None
           and instance_root.name == "instances"
           and (instance_root.parent / "manifest.json").is_file()):
@@ -103,18 +132,25 @@ def main() -> int:
             or not math.isfinite(args.minmax_budget_fraction)
             or not math.isfinite(args.minsum_budget_fraction)
             or args.minmax_budget_fraction <= 0
-            or args.minsum_budget_fraction <= 0):
+            or args.minsum_budget_fraction <= 0
+            or args.brute_force_max_assignments <= 0
+            or not math.isfinite(args.brute_force_time_limit_sec)
+            or args.brute_force_time_limit_sec <= 0):
         parser.error("threads, time limits, and repeats must be positive; seed must be nonnegative")
     if (args.modes in {"minmaxsum", "all"}
             and abs(args.minmax_budget_fraction
                     + args.minsum_budget_fraction - 1.0) > 1e-9):
         parser.error("MinMaxSum budget fractions must sum to one")
 
-    if not preflight_passed():
+    preflight_report = args.preflight_report
+    if preflight_report is not None and not preflight_report.is_absolute():
+        preflight_report = ROOT / preflight_report
+    if not preflight_passed(preflight_report):
         print(f"warning: preflight is missing or did not pass: "
-              f"{PREFLIGHT_REPORT}", file=sys.stderr)
+              f"{preflight_report or '<no --preflight-report provided>'}",
+              file=sys.stderr)
         if not args.force:
-            print("Run scripts/preflight_check.py first, or pass --force.",
+            print("Provide a passing experiment-scoped --preflight-report, or pass --force.",
                   file=sys.stderr)
             return 1
 
@@ -138,6 +174,9 @@ def main() -> int:
         "--minsum-refinement-policy", args.minsum_refinement_policy,
         "--minmax-budget-fraction", str(args.minmax_budget_fraction),
         "--minsum-budget-fraction", str(args.minsum_budget_fraction),
+        "--brute-force-max-assignments",
+        str(args.brute_force_max_assignments),
+        "--brute-force-time-limit-sec", str(args.brute_force_time_limit_sec),
     ]
     if args.output:
         batch_args.extend(["--output", args.output])
@@ -149,6 +188,8 @@ def main() -> int:
         batch_args.append("--save-traces")
     if args.resume:
         batch_args.append("--resume")
+    if args.plan_only:
+        batch_args.append("--plan-only")
     sys.path.insert(0, str(ROOT / "scripts"))
     from run_batch_limited import main as run_immutable_batch
 

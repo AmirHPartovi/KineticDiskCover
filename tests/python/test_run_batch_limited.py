@@ -23,11 +23,88 @@ SPEC.loader.exec_module(run_batch_limited)
 
 
 def test_algorithms_are_ordered_by_execution_phase():
-    selected = {"branch-and-bound", "nn", "ip-kont", "greedy", "sa"}
+    selected = {
+        "branch-and-bound", "nn", "ip-kont", "greedy", "sa", "brute-force",
+    }
 
     assert run_batch_limited.order_algorithms(selected) == [
-        "nn", "greedy", "sa", "ip-kont", "branch-and-bound"
+        "ip-kont", "branch-and-bound", "nn", "greedy", "brute-force", "sa"
     ]
+
+
+def test_all_registered_plan_covers_every_algorithm_objective_and_marks_limits(
+    tmp_path,
+):
+    registered = run_batch_limited.registered_algorithms()
+    expected_registry = {
+        "nn", "ip-kont", "brute-force", "branch-and-bound", "greedy",
+        "lp-rounding", "primal-dual", "local-search", "sa", "genetic",
+        "shifting",
+    }
+    assert set(registered) == expected_registry
+    input_path = tmp_path / "instance.json"
+    input_path.write_text(json.dumps({
+        "name": "tiny", "T_end": 1.0,
+        "stations": [{"x": 0.0, "y": 0.0}],
+        "trajectories": [{
+            "t_breaks": [0.0, 1.0],
+            "waypoints": [{"x": 0.0, "y": 0.0}, {"x": 1.0, "y": 1.0}],
+        }],
+    }))
+    args = SimpleNamespace(
+        profile="debug", time_limit=2.0, fast_time_limit=5.0,
+        exact_time_limit=10.0, minsum_refinement_policy="adaptive",
+        threads=2, dataset_profile="smoke20", exact_reference="auto",
+        repeats=1, seed=42, minmax_budget_fraction=0.5,
+        minsum_budget_fraction=0.5, brute_force_max_assignments=100_000,
+        brute_force_time_limit_sec=0.5,
+    )
+    plan, data = run_batch_limited._build_plan(
+        tmp_path / "experiment", [input_path], list(registered),
+        run_batch_limited.ALL_OBJECTIVES, "branch-and-bound", args,
+        {
+            "actual_backend": "built-in-branch-and-bound-fallback",
+            "native_kont_available": False,
+            "backend_capabilities": {"native_kont_available": False},
+        },
+        {"instances": []},
+    )
+    assert len(plan) == len(registered) * 3
+    assert len({entry["run_key"] for entry in plan}) == len(plan)
+    assert {(entry["algorithm"], entry["objective"]) for entry in plan} == {
+        (algorithm, objective)
+        for algorithm in registered
+        for objective in run_batch_limited.ALL_OBJECTIVES
+    }
+    for entry in plan:
+        config = data[entry["run_key"]]["config"]
+        if entry["algorithm"] in {"ip-kont", "branch-and-bound"}:
+            assert config["algorithm_category"] in {
+                "exact_reference", "exact_candidate"
+            }
+            assert config["reference_designated"] == (
+                entry["algorithm"] == "branch-and-bound"
+            )
+            assert config["selected_backend"] == "branch-and-bound"
+    brute = next(entry for entry in plan if entry["algorithm"] == "brute-force")
+    brute_config = data[brute["run_key"]]["config"]
+    assert brute_config["algorithm_category"] == "diagnostic"
+    assert brute_config["diagnostic_max_assignments"] == 100_000
+    assert brute_config["actual_time_limit_sec"] == 0.5
+    ip = next(entry for entry in plan if entry["algorithm"] == "ip-kont")
+    assert data[ip["run_key"]]["skip_reason"]["reason_code"] == "BACKEND_UNAVAILABLE"
+
+    args.repeats = 2
+    repeated_plan, _ = run_batch_limited._build_plan(
+        tmp_path / "experiment", [input_path], list(registered),
+        run_batch_limited.ALL_OBJECTIVES, "branch-and-bound", args,
+        {
+            "actual_backend": "built-in-branch-and-bound-fallback",
+            "native_kont_available": False,
+        },
+        {"instances": []},
+    )
+    assert len(repeated_plan) == len(registered) * 3 * 2
 
 
 def test_run_id_and_run_key_are_distinct_and_stable():
@@ -83,6 +160,16 @@ def test_main_creates_an_immutable_plan_and_reserves_no_empty_runs(
 
     commands = []
     def fake_calibration(command, **_kwargs):
+        if command[0] == "git":
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+        if command[1:] == ["list-algorithms"]:
+            return SimpleNamespace(
+                returncode=0,
+                stdout="branch-and-bound\nbrute-force\ngenetic\ngreedy\n"
+                "ip-kont\nlocal-search\nlp-rounding\nnn\nprimal-dual\nsa\n"
+                "shifting\n",
+                stderr="",
+            )
         commands.append(command)
         calibration_dir = Path(command[command.index("--output") + 1])
         calibration_dir.mkdir(parents=True, exist_ok=True)
@@ -129,6 +216,70 @@ def test_resume_requires_the_original_plan(tmp_path, monkeypatch):
             "--output", str(tmp_path / "experiment" / "batch"),
             "--resume",
         ])
+
+
+def test_unavailable_registered_backend_gets_terminal_skipped_record(tmp_path):
+    experiment = tmp_path / "experiment"
+    run_batch_limited.create_experiment(
+        experiment,
+        profile="debug",
+        config={},
+        dataset_sha256="a" * 64,
+        source_commit=None,
+    )
+    input_path = experiment / "input" / "tiny.json"
+    input_path.parent.mkdir(exist_ok=True)
+    input_bytes = json.dumps({
+        "name": "tiny", "T_end": 1,
+        "stations": [{"x": 0, "y": 0}],
+        "trajectories": [{
+            "t_breaks": [0, 1],
+            "waypoints": [{"x": 0, "y": 0}, {"x": 1, "y": 1}],
+        }],
+    }).encode()
+    input_path.write_bytes(input_bytes)
+    digest = hashlib.sha256(input_bytes).hexdigest()
+    result = run_batch_limited.run_one(
+        experiment=experiment,
+        input_path=input_path,
+        instance_id="tiny",
+        instance_name="tiny",
+        family="test",
+        n=1,
+        m=1,
+        input_sha256=digest,
+        source_sha256=digest,
+        source_path=str(input_path),
+        algorithm="ip-kont",
+        objective="minmax",
+        repeat=0,
+        seed=42,
+        exact_backend="branch-and-bound",
+        config={
+            "requested_backend": "auto",
+            "per_static_time_limit_sec": 1.0,
+            "fast_time_limit_sec": 1.0,
+            "exact_time_limit_sec": 1.0,
+            "backend_detection": {},
+            "backend_capabilities": {"native_kont_available": False},
+        },
+        profile="debug",
+        minsum_refinement_policy="adaptive",
+        safety_timeout=None,
+        rerun_of=None,
+        save_solutions=False,
+        save_traces=False,
+        skip_reason={
+            "status": "SKIPPED",
+            "reason_code": "BACKEND_UNAVAILABLE",
+            "message": "native KONT/COPT backend is unavailable",
+        },
+    )
+    assert result["status"] == "SKIPPED"
+    record = validate_run_directory(
+        Path(result["record_path"]).parent, experiment_id=experiment.name
+    )
+    assert record["status"] == "SKIPPED"
 
 
 def test_parallel_solver_workers_write_isolated_valid_run_packages(

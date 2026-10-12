@@ -119,7 +119,7 @@ def test_index_links_exist(tmp_path):
 
 def test_smoke_tables_are_labeled_as_development_validation(tmp_path):
     frame = sample_frame()
-    frame["dataset_profile"] = "smoke10"
+    frame["dataset_profile"] = "smoke20"
     raw, good, failed = _prepare(frame)
 
     build_tables.write_tables(raw, good, failed, tmp_path,

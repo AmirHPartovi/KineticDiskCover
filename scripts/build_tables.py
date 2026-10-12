@@ -511,7 +511,7 @@ def write_tables(df: pd.DataFrame, successful: pd.DataFrame,
             links.append((label, relative))
     smoke_profile = (
         "dataset_profile" in df.columns
-        and (df["dataset_profile"].astype(str) == "smoke10").any()
+        and (df["dataset_profile"].astype(str) == "smoke20").any()
     )
     index_lines = [
         ("# Smoke / development validation tables"
@@ -556,8 +556,10 @@ def parse_formats(value: str) -> set[str]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="results/batch/master_results.json")
-    parser.add_argument("--output", default="results/tables")
+    parser.add_argument("--input", required=True,
+                        help="validated result JSON input")
+    parser.add_argument("--output", required=True,
+                        help="experiment-scoped table output directory")
     parser.add_argument("--format", type=parse_formats, default=parse_formats("both"))
     args = parser.parse_args(argv)
     try:

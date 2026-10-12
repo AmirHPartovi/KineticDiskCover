@@ -2,6 +2,7 @@
 
 #include "kdc/benchmark_protocol.hpp"
 #include "kdc/benchmark.hpp"
+#include "kdc/algorithms/brute_force_solver.hpp"
 #include "kdc/candidate.hpp"
 #include "kdc/exact_reference_selector.hpp"
 #include "kdc/io.hpp"
@@ -517,14 +518,15 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
   record.instance_name = path.stem().string();
   record.algorithm_name = algorithm;
   record.algorithm_category =
-      algorithm == "ip-kont" || algorithm == "branch-and-bound"
-          ? "exact_reference"
-          : "heuristic";
+      algorithm == "brute-force"
+          ? "diagnostic"
+          : (algorithm == "ip-kont" || algorithm == "branch-and-bound")
+                ? (algorithm == config.selected_backend
+                       ? "exact_reference"
+                       : "exact_candidate")
+                : "heuristic";
   record.requested_backend = config.exact_reference;
-  record.selected_backend =
-      record.algorithm_category == "exact_reference"
-          ? config.selected_backend
-          : algorithm;
+  record.selected_backend = config.selected_backend;
   record.actual_backend =
       algorithm == "ip-kont"
           ? "native-backend-not-executed"
@@ -636,6 +638,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       config.fast_time_limit_sec <= 0.0 ||
       !std::isfinite(config.exact_time_limit_sec) ||
       config.exact_time_limit_sec <= 0.0 ||
+      config.brute_force_max_assignments == 0U ||
       !std::isfinite(config.gap_target) || config.gap_target < 0.0 ||
       config.gap_target >= 1.0 || config.num_threads <= 0) {
     throw std::invalid_argument("batch runner configuration is invalid");
@@ -663,7 +666,10 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                 "ip-kont") != config.algorithm_names.end() &&
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
                 "branch-and-bound") != config.algorithm_names.end();
-  if (explicitly_selects_both_exact_backends) {
+  const bool wants_all_registered =
+      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
+                "all-registered") != config.algorithm_names.end();
+  if (explicitly_selects_both_exact_backends && !wants_all_registered) {
     throw std::invalid_argument(
         "strict benchmark mode cannot select both ip-kont and "
         "branch-and-bound");
@@ -711,9 +717,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
 
   const auto registered = StaticSolverRegistry::list();
   std::vector<std::string> algorithms;
-  const bool wants_all_registered =
-      std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
-                "all-registered") != config.algorithm_names.end() ||
+  const bool wants_all_legacy =
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
                 "all") != config.algorithm_names.end() ||
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
@@ -728,9 +732,10 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                 "all-comparison") != config.algorithm_names.end();
   if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     algorithms = {exact_reference_decision.selected_backend};
-  } else if (wants_all_registered) {
+  } else if (wants_all_registered || wants_all_legacy) {
     for (const auto& name : registered) {
-      if ((name == "ip-kont" || name == "branch-and-bound") &&
+      if (!wants_all_registered &&
+          (name == "ip-kont" || name == "branch-and-bound") &&
           name != exact_reference_decision.selected_backend) {
         continue;
       }
@@ -759,7 +764,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       algorithms.begin(), algorithms.end(), [](const std::string& name) {
         return name == "ip-kont" || name == "branch-and-bound";
       }));
-  if (exact_count > 1) {
+  if (exact_count > 1 && !wants_all_registered) {
     throw std::invalid_argument(
         "strict benchmark mode accepts exactly one exact backend; remove "
         "either ip-kont or branch-and-bound");
@@ -768,7 +773,8 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       algorithms.begin(), algorithms.end(), [](const std::string& name) {
         return name == "ip-kont" || name == "branch-and-bound";
       });
-  if (exact_position != algorithms.end() &&
+  if (!wants_all_registered && config.strict_exact_reference &&
+      exact_position != algorithms.end() &&
       *exact_position != exact_reference_decision.selected_backend) {
     if (config.exact_reference == "ip-kont" &&
         exact_reference_decision.selected_backend == "branch-and-bound") {
@@ -859,9 +865,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   for (const auto& path : instance_paths) {
     for (const auto& algorithm : algorithms) {
       for (const auto objective : config.objectives) {
-        const bool exact = algorithm == "ip-kont" ||
-                           algorithm == "branch-and-bound";
-        const int repeat_count = exact ? 1 : config.repeats;
+        const int repeat_count = config.repeats;
         for (int repeat = 0; repeat < repeat_count; ++repeat) {
           phases[algorithm_phase(algorithm)].push_back(
               {path, algorithm, objective, repeat});
@@ -993,22 +997,22 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
                                                 : instance.name;
   record.algorithm_name = algorithm_name;
   record.algorithm_category =
-      algorithm_name == "ip-kont" || algorithm_name == "branch-and-bound"
-          ? "exact_reference"
-          : "heuristic";
+      algorithm_name == "brute-force"
+          ? "diagnostic"
+          : (algorithm_name == "ip-kont" ||
+                     algorithm_name == "branch-and-bound"
+                 ? (algorithm_name == config.selected_backend
+                        ? "exact_reference"
+                        : "exact_candidate")
+                 : "heuristic");
   record.requested_backend = config.exact_reference;
-  record.selected_backend =
-      record.algorithm_category == "exact_reference"
-          ? config.selected_backend
-          : algorithm_name;
+  record.selected_backend = config.selected_backend;
   record.actual_backend =
-      record.algorithm_category == "exact_reference"
-          ? config.actual_backend
-          : algorithm_name;
-  record.native_kont = record.algorithm_category == "exact_reference" &&
-                       config.native_kont;
-  record.fallback_used = record.algorithm_category == "exact_reference" &&
-                         config.fallback_used;
+      algorithm_name == "ip-kont" ? "KONT/COPT"
+      : algorithm_name == "branch-and-bound" ? "branch-and-bound"
+                                             : algorithm_name;
+  record.native_kont = algorithm_name == "ip-kont";
+  record.fallback_used = false;
   record.solver_version = record.native_kont ? config.solver_version
                                               : "not-applicable";
   record.solver_name = algorithm_name;
@@ -1020,9 +1024,13 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
   record.n = instance.n;
   record.m = instance.m;
   record.time_limit_per_ip_sec = config.per_ip_time_limit_sec;
-  const bool exact = record.algorithm_category == "exact_reference";
+  const bool exact = algorithm_name == "ip-kont" ||
+                     algorithm_name == "branch-and-bound";
+  const bool diagnostic = algorithm_name == "brute-force";
   record.global_time_limit_sec =
-      exact ? config.exact_time_limit_sec : config.fast_time_limit_sec;
+      exact ? config.exact_time_limit_sec
+            : diagnostic ? std::min(config.fast_time_limit_sec, 0.5)
+                         : config.fast_time_limit_sec;
   record.seed = run_seed(config.seed, record.instance_name, algorithm_name,
                          record.objective, repeat);
   record.verify_each_iteration = config.verify_each_iteration;
@@ -1051,6 +1059,11 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
        config.minmaxsum_config.minsum_budget_fraction},
       {"handovers_enabled", record.handovers_enabled},
       {"cache_policy", "auto"}};
+  if (diagnostic) {
+    record.configuration["diagnostic_category"] = "validation_diagnostic";
+    record.configuration["max_assignments"] =
+        config.brute_force_max_assignments;
+  }
 
   const std::filesystem::path run_dir(
       make_run_dir(config.output_dir + "/runs", record.instance_name,
@@ -1074,7 +1087,16 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
     if (!solver) {
       throw std::runtime_error("unknown algorithm: " + algorithm_name);
     }
-    solver->set_time_limit(config.per_ip_time_limit_sec);
+    if (auto* brute = dynamic_cast<BruteForceSolver*>(solver.get())) {
+      brute->set_max_assignments(config.brute_force_max_assignments);
+    }
+    const double static_time_limit = diagnostic
+        ? std::min(config.per_ip_time_limit_sec, 0.5)
+        : config.per_ip_time_limit_sec;
+    solver->set_time_limit(static_time_limit);
+    if (diagnostic) {
+      solver->set_time_limit(std::min(config.per_ip_time_limit_sec, 0.5));
+    }
     solver->set_seed(record.seed);
     const double global_limit = record.global_time_limit_sec;
     SolverBudget budget(global_limit);

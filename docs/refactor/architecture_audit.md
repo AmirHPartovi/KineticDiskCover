@@ -28,11 +28,14 @@ below remain current until those integrations are completed.
 - Kinetic geometry, interval construction, event detection, and verification
   are primarily in `candidate.cpp`, `kinetic.cpp`, `solution.cpp`, and
   `verify.cpp`. MinMax and MinSum have separate solver modules.
-- `scripts/` contains 11 Python entry points and one Bash pipeline runner.
-  Dataset selection/conversion, execution wrappers, stage orchestration,
-  tables, plots, and animations are not yet split into shared packages.
+- At the time of this audit, `scripts/` contained 11 Python entry points and
+  one Bash pipeline runner. A root-aware local validation wrapper has since
+  been added; dataset selection/conversion, execution wrappers, stage
+  orchestration, tables, plots, and animations are not yet split into shared
+  packages.
 - `configs/pipeline/` contains the three JSON pipeline profiles. `.github/
-  workflows/` contains the corresponding three dispatch workflows.
+  workflows/` contained the corresponding three dispatch workflows at the
+  time of that audit; the local definitions have since been removed.
 - `tests/` has a flat C++ unit/integration suite and `tests/python/`; C++
   fixtures are largely generated in code, while Python tests use temporary
   files and small inline datasets.

@@ -33,8 +33,12 @@ POINT_COLORS = (
     "#1f77b4", "#ff7f0e", "#d62728", "#9467bd", "#8c564b",
     "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
 )
-MODE_COLORS = {"minmax": "#d62728", "minsum": "#d62728"}
-MODE_LABELS = {"minmax": "Min-Max", "minsum": "Min-Sum"}
+MODE_COLORS = {
+    "minmax": "#d62728", "minsum": "#2ca02c", "minmaxsum": "#9467bd",
+}
+MODE_LABELS = {
+    "minmax": "Min-Max", "minsum": "Min-Sum", "minmaxsum": "MinMaxSum vector",
+}
 
 
 @dataclass
@@ -69,6 +73,7 @@ class SolutionData:
     mode: str
     intervals: list[Interval]
     lower_bound: float | list[tuple[float, float]] | None
+    summary: dict[str, Any]
 
     @property
     def start(self) -> float:
@@ -163,6 +168,8 @@ def _mode_name(value: Any) -> str | None:
         return "minmax"
     if normalized in {"minsum", "sum"}:
         return "minsum"
+    if normalized in {"minmaxsum", "joint"}:
+        return "minmaxsum"
     return None
 
 
@@ -267,7 +274,11 @@ def load_solution(path: Path, mode: str, end_time: float) -> SolutionData:
         intervals[-1].end, end_time, abs_tol=1e-8
     ):
         raise ValueError("solution intervals must cover [0, T_end]")
-    return SolutionData(mode, intervals, _lower_bound(data, mode))
+    summary = data.get("summary", {})
+    return SolutionData(
+        mode, intervals, _lower_bound(data, mode),
+        summary if isinstance(summary, dict) else {},
+    )
 
 
 def animate_mode(
@@ -406,8 +417,15 @@ def animate_mode(
             f"t = {time:.4f}    cost = {value:.6g}\n"
             f"supports: {support_ids}"
         )
+        if mode == "minmaxsum":
+            vector = (
+                f"peak={solution.summary.get('peak_cost', 'n/a')} | "
+                f"integral={solution.summary.get('total_integral', 'n/a')}"
+            )
+        else:
+            vector = f"cost={value:.6g} | integral-to-time={integral:.6g}"
         annotation.set_text(
-            f"Mode: {MODE_LABELS[mode]}    Integral to t: {integral:.6g}"
+            f"Objective: {MODE_LABELS[mode]} ({vector})"
         )
         current_time_line.set_xdata([time, time])
         return [*disks, *point_artists, time_text, annotation,
@@ -424,7 +442,29 @@ def animate_mode(
     else:
         output_path = output_dir / f"{stem}.gif"
         writer = animation.PillowWriter(fps=fps)
-    movie.save(output_path, writer=writer)
+    if output_path.exists():
+        plt.close(figure)
+        raise FileExistsError(f"refusing to overwrite animation: {output_path}")
+    try:
+        movie.save(output_path, writer=writer)
+        if not output_path.is_file() or output_path.stat().st_size == 0:
+            raise ValueError(f"animation writer produced an empty file: {output_path}")
+        if output_path.suffix == ".gif":
+            from PIL import Image
+
+            with Image.open(output_path) as rendered:
+                if rendered.format != "GIF" or rendered.n_frames < 1:
+                    raise ValueError(f"animation is not a valid GIF: {output_path}")
+                rendered.verify()
+        else:
+            with output_path.open("rb") as rendered:
+                if b"ftyp" not in rendered.read(64):
+                    raise ValueError(f"animation is not a valid MP4: {output_path}")
+    except Exception:
+        if output_path.is_file():
+            output_path.unlink()
+        plt.close(figure)
+        raise
     plt.close(figure)
     return output_path
 
@@ -437,13 +477,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--solution", type=Path, default=None,
-        help="solution JSON (default: results/json/<instance>_solution.json)",
+        help="solution JSON (default: <input-dir>/<instance>_solution.json)",
     )
     parser.add_argument(
-        "--mode", choices=("minmax", "minsum", "both"), default="minmax",
+        "--mode",
+        choices=("minmax", "minsum", "minmaxsum", "both", "all"),
+        default="minmax",
     )
-    parser.add_argument("--input-dir", type=Path, default=Path("results/json"))
-    parser.add_argument("--output-dir", type=Path, default=Path("results/figures"))
+    parser.add_argument("--input-dir", type=Path, default=Path("data/instances"))
+    parser.add_argument("--output-dir", type=Path, required=True,
+                        help="experiment-scoped animation output directory")
     parser.add_argument("--frames", type=int, default=200)
     parser.add_argument("--fps", type=int, default=20)
     return parser.parse_args(argv)
@@ -470,16 +513,28 @@ def main(argv: list[str] | None = None) -> int:
               file=sys.stderr)
         return 1
 
-    modes = ("minmax", "minsum") if args.mode == "both" else (args.mode,)
+    modes = (
+        ("minmax", "minsum") if args.mode == "both"
+        else ("minmax", "minsum", "minmaxsum") if args.mode == "all"
+        else (args.mode,)
+    )
     try:
         if args.mode == "both":
             with solution_path.open("r", encoding="utf-8") as source:
                 payload = json.load(source)
             if not isinstance(payload, dict):
                 raise ValueError("solution JSON root must be an object")
-            has_mode_solutions = any(
+            required_modes = (
+                ("minmax", "minsum") if args.mode == "both"
+                else ("minmax", "minsum", "minmaxsum")
+            )
+            container_found = any(
                 isinstance(payload.get(key), dict)
-                for key in ("solutions", "results", "by_mode", "minmax", "minsum")
+                or isinstance(payload.get(key), list)
+                for key in ("solutions", "results", "by_mode")
+            )
+            has_mode_solutions = container_found or all(
+                isinstance(payload.get(key), dict) for key in required_modes
             )
             if not has_mode_solutions:
                 raise ValueError(

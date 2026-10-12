@@ -47,18 +47,21 @@ void usage() {
          "branch-and-bound|auto] [--fast-time-limit SEC] "
          "[--exact-time-limit SEC] "
          "[--profile fast|exact-reference|debug] [--seed N] [--repeats N] "
-         "[--algorithms all-fast|all-comparison] "
+         "[--algorithms all-fast|all-comparison|all-registered] "
          "[--minsum-refinement-policy adaptive|sampled] "
          "[--verify-each-iteration] [--no-verify]\n"
       << "  compare   --algorithms a,b --dataset DIR --output DIR "
          "[--mode static|minmax|minsum]\n"
-      << "  preflight [--output FILE]\n"
+      << "  preflight --output FILE\n"
       << "  backend-info  Diagnose configured KONT/COPT compilation and runtime\n"
+      << "  list-algorithms  Print registered static solver identifiers\n"
       << "  calibrate --dataset DIR --output DIR "
          "[--exact-reference auto|ip-kont|branch-and-bound]\n"
-      << "  batch     [--instances DIR] [--output DIR] [--algorithms LIST] "
+      << "  batch     --output DIR [--instances DIR] "
          "[--profile fast|exact-reference|debug] [--seed N] [--repeats N] "
-         "[--modes minmax|minsum|minmaxsum|both] [--parallel] [--threads N] "
+         "[--algorithms all-fast|all-comparison|all-registered|LIST] "
+         "[--modes minmax|minsum|minmaxsum|both|all] "
+         "[--parallel] [--threads N] "
          "[--exact-reference ip-kont|branch-and-bound|auto] "
          "[--verify-each-iteration] [--no-verify]\n"
       << "            [--fast-time-limit SEC] [--exact-time-limit SEC]\n"
@@ -86,8 +89,7 @@ void command_help(const std::string& command) {
     std::cout << "Usage: kdc-solver compare --algorithms a,b --dataset DIR "
                  "--output DIR [--mode static|minmax|minsum]\n";
   } else if (command == "preflight") {
-    std::cout << "Usage: kdc-solver preflight "
-                 "[--output results/preflight/preflight_report.md]\n";
+    std::cout << "Usage: kdc-solver preflight --output FILE\n";
   } else if (command == "backend-info") {
     std::cout << "Usage: kdc-solver backend-info\n";
   } else if (command == "batch") {
@@ -95,10 +97,11 @@ void command_help(const std::string& command) {
         << "Usage: kdc-solver batch [OPTIONS]\n"
         << "  --instances DIR      Instance directory (default: "
            "data/instances)\n"
-        << "  --output DIR         Output directory (default: results/batch)\n"
+        << "  --output DIR         Required output directory\n"
         << "  --algorithms LIST    Comma-separated algorithm names (default: "
            "main benchmark set)\n"
-        << "  --modes MODE         minmax|minsum|minmaxsum|both (default: both)\n"
+        << "  --modes MODE         minmax|minsum|minmaxsum|both|all "
+           "(default: both)\n"
         << "  --parallel           Run instances concurrently\n"
         << "  --threads N          Worker threads (default: available CPU cores)\n"
         << "  --time-limit SEC     Per static/IP solve timeout (default: 60)\n"
@@ -108,6 +111,8 @@ void command_help(const std::string& command) {
         << "  --minsum-refinement-policy adaptive|sampled (default: adaptive)\n"
         << "  --minmax-budget-fraction F (default: 0.5)\n"
         << "  --minsum-budget-fraction F (default: 0.5)\n"
+        << "  --brute-force-max-assignments N (default: 100000)\n"
+        << "  --brute-force-time-limit-sec SEC (default: 0.5)\n"
         << "  --no-verify          Skip solution verification\n"
         << "  --verify-each-iteration  Verify every accepted iteration\n"
         << "  --save-solutions     Retain solutions (opt-in for FAST profile)\n"
@@ -564,8 +569,10 @@ int handle_solve(int argc, char** argv) {
 
 int handle_preflight(int argc, char** argv) {
   const kdc::CliArgs args = kdc::CliArgs::parse(argc, argv);
-  const std::string output =
-      args.get("output", "results/preflight/preflight_report.md");
+  const std::string output = args.get("output");
+  if (output.empty()) {
+    throw std::invalid_argument("preflight requires --output FILE");
+  }
 
   std::unique_ptr<kdc::ILPSolver> kont;
   kdc::ILPSolver* ilp = nullptr;
@@ -650,9 +657,12 @@ int handle_backend_info() {
 
 int handle_batch(int argc, char** argv) {
   const kdc::CliArgs args = kdc::CliArgs::parse(argc, argv);
+  if (!args.has("output") || args.get("output").empty()) {
+    throw std::invalid_argument("batch requires --output DIR");
+  }
   kdc::BatchRunConfig config;
   config.instances_dir = args.get("instances", "data/instances");
-  config.output_dir = args.get("output", "results/batch");
+  config.output_dir = args.get("output");
   config.profile = kdc::benchmark_profile_from_string(
       args.get("profile", "fast"));
   config.seed = static_cast<unsigned>(std::stoul(args.get("seed", "42")));
@@ -677,6 +687,8 @@ int handle_batch(int argc, char** argv) {
   config.per_ip_time_limit_sec = args.get_double("time-limit", 60.0);
   config.fast_time_limit_sec = args.get_double("fast-time-limit", 30.0);
   config.exact_time_limit_sec = args.get_double("exact-time-limit", 600.0);
+  config.brute_force_max_assignments = static_cast<std::uint64_t>(
+      std::stoull(args.get("brute-force-max-assignments", "100000")));
   const std::string minsum_policy =
       args.get("minsum-refinement-policy", "adaptive");
   if (minsum_policy == "adaptive") {
@@ -705,18 +717,18 @@ int handle_batch(int argc, char** argv) {
 
   const std::string modes = args.get("modes", "both");
   config.objectives.clear();
-  if (modes == "minmax" || modes == "both") {
+  if (modes == "minmax" || modes == "both" || modes == "all") {
     config.objectives.push_back(kdc::ObjectiveType::MIN_MAX);
   }
-  if (modes == "minsum" || modes == "both") {
+  if (modes == "minsum" || modes == "both" || modes == "all") {
     config.objectives.push_back(kdc::ObjectiveType::MIN_SUM);
   }
-  if (modes == "minmaxsum") {
+  if (modes == "minmaxsum" || modes == "all") {
     config.objectives.push_back(kdc::ObjectiveType::MIN_MAX_SUM);
   }
   if (config.objectives.empty()) {
     throw std::invalid_argument(
-        "--modes must be minmax, minsum, minmaxsum, or both");
+        "--modes must be minmax, minsum, minmaxsum, both, or all");
   }
   if (config.exact_reference != "auto" &&
       config.exact_reference != "ip-kont" &&
@@ -809,7 +821,8 @@ int main(int argc, char** argv) {
   if (command != "solve" && command != "verify" &&
       command != "benchmark" && command != "compare" &&
       command != "preflight" && command != "batch" &&
-      command != "calibrate" && command != "backend-info") {
+      command != "calibrate" && command != "backend-info" &&
+      command != "list-algorithms") {
     usage();
     return 1;
   }
@@ -852,6 +865,12 @@ int main(int argc, char** argv) {
       LOG_ERROR("backend-info failed: {}", error.what());
       return 1;
     }
+  }
+  if (command == "list-algorithms") {
+    for (const auto& name : kdc::StaticSolverRegistry::list()) {
+      std::cout << name << '\n';
+    }
+    return 0;
   }
   if (command == "batch") {
     try {

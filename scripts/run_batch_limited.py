@@ -6,13 +6,14 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
-import datetime as dt
 import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import platform
+import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -26,6 +27,8 @@ from kdc_tools.storage import (
     aggregate_experiment,
     create_experiment,
     finalize_run,
+    index_experiment_artifacts,
+    make_experiment_id,
     make_run_id,
     make_run_key,
     read_json,
@@ -44,17 +47,17 @@ from kdc_tools.storage import (
     write_run_plan,
 )
 from select_test_instances import (
+    _validate_selection_identity,
     apply_execution_defaults,
     resolve_instance_directory,
 )
 
 ALGORITHM_PHASES = (
-    ("nn", "greedy"),
+    ("ip-kont", "branch-and-bound"),
+    ("nn", "greedy", "brute-force"),
     ("primal-dual", "local-search", "sa", "genetic",
      "lp-rounding", "shifting"),
-    ("ip-kont", "branch-and-bound"),
 )
-ALGORITHMS = tuple(name for phase in ALGORITHM_PHASES for name in phase)
 OBJECTIVES = ("minmax", "minsum")
 ALL_OBJECTIVES = ("minmax", "minsum", "minmaxsum")
 TERMINAL_STATES = {
@@ -64,8 +67,26 @@ TERMINAL_STATES = {
 
 
 def order_algorithms(selected: set[str]) -> list[str]:
-    return [algorithm for phase in ALGORITHM_PHASES
-            for algorithm in phase if algorithm in selected]
+    ordered = [algorithm for phase in ALGORITHM_PHASES
+               for algorithm in phase if algorithm in selected]
+    return ordered + sorted(selected - set(ordered))
+
+
+def registered_algorithms() -> tuple[str, ...]:
+    result = subprocess.run(
+        [str(SOLVER), "list-algorithms"], cwd=ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False,
+    )
+    if result.returncode != 0:
+        raise ValueError(
+            "unable to query static solver registry: "
+            + (result.stderr or result.stdout).strip()[-2000:]
+        )
+    names = tuple(line.strip() for line in result.stdout.splitlines()
+                  if line.strip())
+    if not names or len(names) != len(set(names)):
+        raise ValueError("static solver registry returned no names or duplicates")
+    return names
 
 
 def _load_selection(path: str | None) -> dict[str, Any]:
@@ -201,6 +222,7 @@ def run_one(
     rerun_of: str | None,
     save_solutions: bool,
     save_traces: bool,
+    skip_reason: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Reserve, execute, validate and finalize exactly one solver invocation."""
     backend_identity = (
@@ -282,10 +304,75 @@ def run_one(
         command.append("--save-solutions")
     if save_traces:
         command.append("--save-traces")
+    if algorithm == "brute-force":
+        command.extend([
+            "--brute-force-max-assignments",
+            str(config["diagnostic_max_assignments"]),
+        ])
+    if skip_reason is not None:
+        write_json_create_only(
+            run_dir, "execution/skip_reason.json", skip_reason
+        )
+        write_bytes_create_only(run_dir, "execution/stdout.log", b"")
+        write_bytes_create_only(
+            run_dir, "execution/stderr.log",
+            (skip_reason["message"] + "\n").encode("utf-8"),
+        )
+        disposition = json.dumps(skip_reason, sort_keys=True)
+        result_document = {
+            "schema_version": 1,
+            "run_id": run_id,
+            "experiment_id": experiment.name,
+            "run_key": run_key,
+            "execution_status": "SKIPPED",
+            "solver_result": None,
+            "error_message": disposition,
+        }
+        finalize_run(
+            run_dir,
+            state="SKIPPED",
+            result_document=result_document,
+            verification_document={
+                "verification_mode": "not-run",
+                "status": "NOT_RUN",
+                "kind": "NONE",
+                "passed": False,
+                "continuous": False,
+                "message": skip_reason["message"],
+            },
+            backend={
+                "selected": exact_backend,
+                "actual": None,
+                "native": False,
+                "version": "unknown",
+                "detection": config.get("backend_detection", {}),
+                "capabilities": config.get("backend_capabilities", {}),
+            },
+            provenance={"solver_version": "unknown", "platform": platform.platform()},
+            source_commit=None,
+        )
+        return {
+            "run_id": run_id,
+            "run_key": run_key,
+            "status": "SKIPPED",
+            "record_path": str(run_dir / "run.json"),
+            "error": disposition,
+        }
     write_bytes_create_only(
         run_dir, "execution/command.txt",
         ("\n".join(command) + "\n").encode("utf-8"),
     )
+
+    execution_env = None
+    profile_request = os.environ.get("KDC_PROFILE_PHASES")
+    if profile_request:
+        profile_output = run_dir / "execution" / "profile_phases.json"
+        write_json_create_only(run_dir, "execution/profile_configuration.json", {
+            "requested": profile_request,
+            "output": "execution/profile_phases.json",
+        })
+        execution_env = os.environ.copy()
+        execution_env["KDC_PROFILE_PHASES"] = str(profile_output)
 
     stdout_path = run_dir / "execution" / "stdout.log"
     stderr_path = run_dir / "execution" / "stderr.log"
@@ -296,7 +383,8 @@ def run_one(
     try:
         with stdout_path.open("xb") as stdout_file, stderr_path.open("xb") as stderr_file:
             process = subprocess.Popen(
-                command, cwd=ROOT, stdout=stdout_file, stderr=stderr_file
+                command, cwd=ROOT, stdout=stdout_file, stderr=stderr_file,
+                env=execution_env,
             )
             transition_run(run_dir, "RUNNING", process_id=process.pid)
             try:
@@ -513,7 +601,7 @@ def _build_plan(
         "dataset_profile": args.dataset_profile,
         "experiment_label": (
             "smoke / development validation"
-            if args.dataset_profile == "smoke10"
+            if args.dataset_profile == "smoke20"
             else "scientific benchmark dataset"
         ),
         "backend_detection": {
@@ -523,6 +611,12 @@ def _build_plan(
         },
         "backend_capabilities": backend_manifest.get(
             "backend_capabilities", {}
+        ),
+        "brute_force_max_assignments": getattr(
+            args, "brute_force_max_assignments", 100_000
+        ),
+        "brute_force_time_limit_sec": getattr(
+            args, "brute_force_time_limit_sec", 0.5
         ),
     }
     source_provenance = {}
@@ -542,8 +636,8 @@ def _build_plan(
         input_sha = hashlib.sha256(canonical).hexdigest()
         provenance_row = source_provenance.get((source_path.parent.name, source_path.stem))
         source_sha = (
-            str(provenance_row["sha256"])
-            if provenance_row and provenance_row.get("sha256")
+            str(provenance_row["source_sha256"])
+            if provenance_row and provenance_row.get("source_sha256")
             else sha256_file(source_path)
         )
         instance_name = str(original.get("name") or source_path.stem)
@@ -562,9 +656,8 @@ def _build_plan(
         n = len(original.get("trajectories", []))
         m = len(original.get("stations", []))
         for algorithm in algorithms:
-            repeats = 1 if algorithm == exact_backend else args.repeats
             for objective in objectives:
-                for repeat in range(repeats):
+                for repeat in range(args.repeats):
                     seed = args.seed + repeat
                     config = {
                         **config_base,
@@ -573,14 +666,64 @@ def _build_plan(
                         "requested_backend": args.exact_reference,
                         "selected_backend": exact_backend,
                         "requested_time_limit_sec": (
-                            args.exact_time_limit if algorithm == exact_backend
+                            args.brute_force_time_limit_sec
+                            if algorithm == "brute-force"
+                            else args.exact_time_limit if algorithm in {
+                                "ip-kont", "branch-and-bound"
+                            }
                             else args.fast_time_limit
                         ),
                         "actual_time_limit_sec": (
-                            args.exact_time_limit if algorithm == exact_backend
+                            args.brute_force_time_limit_sec if algorithm == "brute-force"
+                            else args.exact_time_limit if algorithm in {
+                                "ip-kont", "branch-and-bound"
+                            }
                             else args.fast_time_limit
                         ),
+                        "algorithm_category": (
+                            "diagnostic" if algorithm == "brute-force"
+                            else "exact_reference" if algorithm == exact_backend
+                            else "exact_candidate" if algorithm in {
+                                "ip-kont", "branch-and-bound"
+                            }
+                            else "heuristic"
+                        ),
+                        "reference_designated": algorithm == exact_backend,
+                        "diagnostic_max_assignments": (
+                            args.brute_force_max_assignments
+                            if algorithm == "brute-force" else None
+                        ),
                     }
+                    if algorithm == "brute-force":
+                        config["diagnostic_time_limit_sec"] = (
+                            args.brute_force_time_limit_sec
+                        )
+                        config["per_static_time_limit_sec"] = min(
+                            args.time_limit, args.brute_force_time_limit_sec
+                        )
+                        config["fast_time_limit_sec"] = min(
+                            args.fast_time_limit, args.brute_force_time_limit_sec
+                        )
+                        config["exact_time_limit_sec"] = min(
+                            args.exact_time_limit, args.brute_force_time_limit_sec
+                        )
+                    skip_reason = None
+                    if (algorithm == "ip-kont"
+                            and not backend_manifest.get(
+                                "native_kont_available",
+                                backend_manifest.get(
+                                    "backend_capabilities", {}
+                                ).get("native_kont_available", False),
+                            )):
+                        skip_reason = {
+                            "status": "SKIPPED",
+                            "reason_code": "BACKEND_UNAVAILABLE",
+                            "message": (
+                                "ip-kont is registered but the native KONT/COPT "
+                                "backend is unavailable"
+                            ),
+                        }
+                        config["execution_disposition"] = skip_reason
                     backend_identity = (
                         exact_backend if algorithm in {
                             "ip-kont", "branch-and-bound"
@@ -630,6 +773,7 @@ def _build_plan(
                         "repeat": repeat,
                         "seed": seed,
                         "config": config,
+                        "skip_reason": skip_reason,
                     }
     plan.sort(key=lambda entry: (
         entry["instance_id"], entry["objective"], entry["algorithm"],
@@ -646,6 +790,7 @@ def _write_batch_summary(experiment: Path, manifest: dict[str, Any]) -> None:
         f"- **Valid run attempts:** {counts['valid_runs']}",
         f"- **Completed attempts:** {counts['completed_runs']}",
         f"- **Failed attempts:** {counts['failed_runs']}",
+        f"- **Skipped attempts:** {counts['skipped_runs']}",
         f"- **Time-limited attempts:** {counts['time_limit_runs']}",
         f"- **Missing expected runs:** {counts['missing_runs']}",
         f"- **Invalid run directories:** {counts['invalid_runs']}",
@@ -661,12 +806,17 @@ def _write_batch_summary(experiment: Path, manifest: dict[str, Any]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--instances", default="/tmp/kdc-mdc-json")
-    parser.add_argument("--dataset-profile", choices=("full", "smoke10"),
+    parser.add_argument("--instances", required=True,
+                        help="canonical JSON instances or a selection manifest directory")
+    parser.add_argument("--dataset-profile", choices=("full", "smoke20"),
                         default="full")
     parser.add_argument("--dataset-manifest")
     parser.add_argument("--output", default=None)
     parser.add_argument("--algorithms", default="all")
+    parser.add_argument(
+        "--plan-only", action="store_true",
+        help="write and report an immutable run plan without executing solver slots",
+    )
     parser.add_argument("--profile", choices=("fast", "exact-reference", "debug"),
                         default="fast")
     parser.add_argument("--seed", type=int, default=42)
@@ -686,6 +836,8 @@ def main(argv: list[str] | None = None) -> int:
                         choices=("adaptive", "sampled"), default="adaptive")
     parser.add_argument("--minmax-budget-fraction", type=float, default=0.5)
     parser.add_argument("--minsum-budget-fraction", type=float, default=0.5)
+    parser.add_argument("--brute-force-max-assignments", type=int, default=100_000)
+    parser.add_argument("--brute-force-time-limit-sec", type=float, default=0.5)
     parser.add_argument("--save-solutions", action="store_true")
     parser.add_argument("--save-traces", action="store_true")
     args = parser.parse_args(argv)
@@ -714,17 +866,22 @@ def main(argv: list[str] | None = None) -> int:
             args.dataset_manifest = str(source_instances / "manifest.json")
         source_instances = resolved
         if args.dataset_profile == "full":
-            args.dataset_profile = "smoke10"
+            args.dataset_profile = "smoke20"
     elif (args.dataset_manifest is None
           and source_instances.name == "instances"
           and (source_instances.parent / "manifest.json").is_file()):
         args.dataset_manifest = str(source_instances.parent / "manifest.json")
-    if args.dataset_profile == "smoke10" and not args.dataset_manifest:
-        parser.error("smoke10 requires the selection manifest for provenance")
+    if args.dataset_profile == "smoke20" and not args.dataset_manifest:
+        parser.error("smoke20 requires the selection manifest for provenance")
     try:
         selection = _load_selection(args.dataset_manifest)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         parser.error(f"invalid dataset selection manifest: {error}")
+    if args.dataset_profile == "smoke20":
+        try:
+            _validate_selection_identity(selection, 20, 50, 25)
+        except ValueError as error:
+            parser.error(f"invalid smoke20 selection manifest: {error}")
     if selection:
         selected_count = int(selection.get(
             "selected_instance_count", len(selection["instances"])
@@ -745,6 +902,9 @@ def main(argv: list[str] | None = None) -> int:
     apply_execution_defaults(args)
     if (args.threads <= 0 or args.time_limit <= 0
             or args.fast_time_limit <= 0 or args.exact_time_limit <= 0
+            or args.brute_force_max_assignments <= 0
+            or not math.isfinite(args.brute_force_time_limit_sec)
+            or args.brute_force_time_limit_sec <= 0
             or args.repeats <= 0 or args.seed < 0
             or (args.safety_timeout is not None and args.safety_timeout <= 0)):
         parser.error("threads, repeats, and time limits must be positive; seed nonnegative")
@@ -759,9 +919,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.output is None:
         output = ROOT / "results" / "experiments" / (
-            "kdc-batch-" + dt.datetime.now(dt.timezone.utc).strftime(
-                "%Y%m%dT%H%M%SZ"
-            ) + "-" + os.urandom(4).hex()
+            make_experiment_id(args.profile)
         ) / "batch"
     else:
         output = Path(args.output)
@@ -799,21 +957,25 @@ def main(argv: list[str] | None = None) -> int:
         "save_solutions": args.save_solutions,
         "save_traces": args.save_traces,
         "safety_timeout_sec": args.safety_timeout,
+        "brute_force_max_assignments": args.brute_force_max_assignments,
+        "brute_force_time_limit_sec": args.brute_force_time_limit_sec,
     }
+    pipeline_managed = (experiment / "experiment_manifest.json").is_file()
     create_experiment(
         experiment,
         profile=args.profile,
         config=requested_config,
         dataset_sha256=dataset_fingerprint,
         source_commit=None,
-        pipeline_managed=(experiment / "experiment_manifest.json").is_file(),
+        pipeline_managed=pipeline_managed,
+        resume=args.resume,
     )
     batch_output.mkdir(parents=True, exist_ok=True)
     plan_path = experiment / "runs" / "plan.jsonl"
     existing_plan = _read_plan(plan_path)
     if existing_plan and not args.resume:
         parser.error("run plan already exists; use --resume or choose a new experiment")
-    if not existing_plan and args.resume:
+    if not existing_plan and args.resume and not pipeline_managed:
         parser.error("cannot resume: experiment has no immutable run plan")
 
     # Reuse the experiment's existing calibration evidence; otherwise write a
@@ -821,13 +983,25 @@ def main(argv: list[str] | None = None) -> int:
     calibration_candidates = [
         experiment / "calibration" / "experiment_manifest.json",
         batch_output / "experiment_manifest.json",
+        *(
+            sorted(
+                (experiment / "calibration" / "attempts").glob(
+                    "*/experiment_manifest.json"
+                ),
+                key=lambda path: path.stat().st_mtime,
+                reverse=True,
+            )
+            if (experiment / "calibration" / "attempts").is_dir()
+            else []
+        ),
     ]
     calibration_manifest_path = next(
         (path for path in calibration_candidates if path.is_file()), None
     )
     if calibration_manifest_path is None:
-        calibration_dir = experiment / "metadata" / (
-            "calibration-" + os.urandom(6).hex()
+        calibration_dir = (
+            experiment / "calibration" / "attempts"
+            / make_experiment_id("calibration")
         )
         calibration = subprocess.run(
             [
@@ -855,21 +1029,32 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     requested = [name.strip() for name in args.algorithms.split(",") if name.strip()]
-    if "ip-kont" in requested and "branch-and-bound" in requested:
+    wants_all_registered = "all-registered" in {
+        name.lower() for name in requested
+    }
+    try:
+        registered = registered_algorithms()
+    except ValueError as error:
+        parser.error(str(error))
+    if ("ip-kont" in requested and "branch-and-bound" in requested
+            and not wants_all_registered):
         parser.error("strict benchmark mode cannot select both exact backends")
     all_requested = not requested or any(
         name.lower() in {"all", "all-fast", "all-comparison"} for name in requested
     )
-    selected = set(ALGORITHMS) if all_requested else set(requested)
+    selected = set(registered) if wants_all_registered else (
+        set(registered) - {"brute-force"} if all_requested else set(requested)
+    )
     if args.profile == "exact-reference":
         selected = {exact_backend}
-    if exact_backend == "ip-kont":
-        selected.discard("branch-and-bound")
-    else:
-        selected.discard("ip-kont")
-    selected.discard("brute-force")
-    selected.add(exact_backend)
-    unknown = selected - set(ALGORITHMS)
+    if not wants_all_registered:
+        if exact_backend == "ip-kont":
+            selected.discard("branch-and-bound")
+        else:
+            selected.discard("ip-kont")
+        selected.discard("brute-force")
+        selected.add(exact_backend)
+    unknown = selected - set(registered)
     if unknown:
         parser.error("unknown algorithms: " + ", ".join(sorted(unknown)))
     algorithms = order_algorithms(selected)
@@ -904,8 +1089,103 @@ def main(argv: list[str] | None = None) -> int:
         },
         source_commit=backend_manifest.get("git_commit"),
     )
+    manifest_path = experiment / "experiment_manifest.json"
+    pipeline_manifest = (
+        read_json(manifest_path) if manifest_path.is_file() else {}
+    )
+    git_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    )
+    git_status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True,
+        capture_output=True, check=False,
+    )
+    cache_values = {}
+    cache_path = ROOT / "build" / "CMakeCache.txt"
+    if cache_path.is_file():
+        for line in cache_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith(("CMAKE_CXX_COMPILER:FILEPATH=",
+                                "CMAKE_BUILD_TYPE:STRING=")):
+                key, value = line.split("=", 1)
+                cache_values[key.split(":", 1)[0]] = value
+    selection_path = None
+    selection_fingerprint = None
+    if args.dataset_manifest:
+        source_selection = Path(args.dataset_manifest).resolve()
+        selection_path = experiment / "dataset" / "selection_manifest.json"
+        selection_fingerprint = sha256_file(source_selection)
+        if selection_path.is_file():
+            if sha256_file(selection_path) != selection_fingerprint:
+                parser.error("resume refused: selected-instance manifest differs")
+        else:
+            selection_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_selection, selection_path)
+    pipeline_manifest.update({
+        "experiment_id": experiment.name,
+        "timestamp": pipeline_manifest.get("timestamp", utc_now()),
+        "git_commit": (
+            git_commit.stdout.strip() if git_commit.returncode == 0 else None
+        ),
+        "git_dirty": bool(git_status.stdout.strip())
+        if git_status.returncode == 0 else None,
+        "host": {
+            "platform": f"{platform.system()} {platform.release()}",
+            "machine": platform.machine(),
+            "logical_cpu_count": os.cpu_count(),
+        },
+        "python_version": platform.python_version(),
+        "source_dataset_fingerprint": pipeline_manifest.get(
+            "source_dataset_fingerprint", dataset_fingerprint
+        ),
+        "selection_manifest": (
+            pipeline_manifest.get("selection_manifest")
+            or ("dataset/selection_manifest.json" if selection_path else None)
+        ),
+        "selection_manifest_fingerprint": pipeline_manifest.get(
+            "selection_manifest_fingerprint", selection_fingerprint
+        ),
+        "selected_instance_count": pipeline_manifest.get(
+            "selected_instance_count"
+        ) or len(instance_paths),
+        "dataset_canonical_path": pipeline_manifest.get(
+            "dataset_canonical_path", "input"
+        ),
+        "dataset_fingerprint": pipeline_manifest.get(
+            "dataset_fingerprint"
+        ) or dataset_fingerprint,
+        "algorithm_set": algorithms,
+        "objectives": list(objectives),
+        "seed": args.seed,
+        "repeats": args.repeats,
+        "thread_count": args.threads,
+        "fast_time_limit_sec": args.fast_time_limit,
+        "exact_time_limit_sec": args.exact_time_limit,
+        "per_static_time_limit_sec": args.time_limit,
+        "requested_exact_backend": args.exact_reference,
+        "selected_exact_backend": exact_backend,
+        "actual_exact_backend": backend_manifest.get("actual_backend"),
+        "verification_policy": {
+            "verify_after": True,
+            "verify_each_iteration": False,
+        },
+        "run_plan_sha256": sha256_file(plan_path),
+        "reproduction_command": shlex.join(sys.argv),
+        "compiler": backend_manifest.get("compiler")
+        or cache_values.get("CMAKE_CXX_COMPILER"),
+        "build_type": backend_manifest.get("build_type")
+        or cache_values.get("CMAKE_BUILD_TYPE"),
+        "stages": pipeline_manifest.get("stages", {}),
+        "required_stages": pipeline_manifest.get("required_stages", []),
+        "status": pipeline_manifest.get("status", "RUNNING"),
+    })
+    write_derived_json(manifest_path, pipeline_manifest)
     write_derived_json(batch_output / "experiment_manifest.json", {
         **backend_manifest,
+        "compiler": backend_manifest.get("compiler")
+        or cache_values.get("CMAKE_CXX_COMPILER"),
+        "build_type": backend_manifest.get("build_type")
+        or cache_values.get("CMAKE_BUILD_TYPE"),
         "experiment_id": experiment.name,
         "selected_backend": exact_backend,
         "algorithm_set": algorithms,
@@ -919,6 +1199,40 @@ def main(argv: list[str] | None = None) -> int:
         },
         "seed_policy": {"base_seed": args.seed, "repeats": args.repeats},
     })
+
+    if args.plan_only:
+        report_path = experiment / "reports" / "run_plan_report.md"
+        report_lines = [
+            "# Run plan (not executed)", "",
+            f"- Experiment: `{experiment.name}`",
+            f"- Registered algorithms: {len(registered)}",
+            f"- Selected algorithms: {len(algorithms)}",
+            f"- Objectives: {', '.join(objectives)}",
+            f"- Instances: {len(instance_paths)}",
+            f"- Repeats configured: {args.repeats}",
+            f"- Planned logical slots: {len(plan)}",
+            f"- Selected exact reference: `{exact_backend}`",
+            f"- Actual exact backend: `{backend_manifest.get('actual_backend')}`",
+            f"- Native KONT/COPT available: `{backend_manifest.get('native_kont_available', False)}`",
+            f"- Brute-force budget: `{args.brute_force_max_assignments}` assignments, "
+            f"`{args.brute_force_time_limit_sec:g}` seconds per run",
+            "",
+            "## Registered algorithm inventory",
+            "",
+            *[f"- `{name}`" for name in registered],
+            "",
+            "## Planned objective inventory",
+            "",
+            *[f"- `{objective}`" for objective in objectives],
+            "",
+            "No planned solver slots were executed by this plan-only invocation.",
+        ]
+        write_derived_bytes(
+            report_path, ("\n".join(report_lines) + "\n").encode("utf-8")
+        )
+        index_experiment_artifacts(experiment)
+        print("\n".join(report_lines))
+        return 0
 
     pending = []
     for entry in plan:
@@ -939,6 +1253,7 @@ def main(argv: list[str] | None = None) -> int:
         data["safety_timeout"] = args.safety_timeout
         data["save_solutions"] = args.save_solutions
         data["save_traces"] = args.save_traces
+        data["skip_reason"] = data.get("skip_reason")
         pending.append(data)
     if experiment_state["status"] == "COMPLETE" and pending:
         parser.error(
@@ -977,6 +1292,7 @@ def main(argv: list[str] | None = None) -> int:
             rerun_of=item["rerun_of"],
             save_solutions=item["save_solutions"],
             save_traces=item["save_traces"],
+            skip_reason=item["skip_reason"],
         ) for item in pending]
         for completed, future in enumerate(as_completed(futures), start=1):
             try:
@@ -993,7 +1309,18 @@ def main(argv: list[str] | None = None) -> int:
             experiment,
             status="COMPLETE" if aggregate["complete"] else "PARTIAL",
         )
+    if not pipeline_managed:
+        pipeline_manifest = read_json(manifest_path)
+        pipeline_manifest["status"] = (
+            "COMPLETE" if aggregate["complete"] else "PARTIAL"
+        )
+        pipeline_manifest.setdefault("stages", {})["benchmark"] = {
+            "status": "COMPLETED" if aggregate["complete"] else "PARTIAL",
+            "exit_code": 0,
+        }
+        write_derived_json(manifest_path, pipeline_manifest)
     _write_batch_summary(experiment, aggregate)
+    index_experiment_artifacts(experiment)
     print(f"Aggregate: {experiment / 'aggregates' / 'results.json'}")
     print(f"Aggregate complete: {aggregate['complete']}")
     return 0

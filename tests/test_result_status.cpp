@@ -182,6 +182,7 @@ TEST_CASE("Static statuses distinguish infeasible, timed out, and failed") {
 
   kdc::BruteForceSolver::Config brute_config;
   brute_config.time_limit_sec = 1e-12;
+  brute_config.max_assignments = 100'000'000ULL;
   const auto brute_instance = kdc::test::make_dummy_instance(8, 5, 23U);
   const auto brute_timed =
       kdc::BruteForceSolver(brute_config).solve(brute_instance, 0.0);

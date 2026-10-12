@@ -40,8 +40,21 @@ def test_smoke_pipeline_includes_joint_objective():
     config = pipeline.load_pipeline_config("smoke")
     assert config["objectives"] == "all"
     assert config["animation"]["mode"] == "all"
+    assert config["certification"] == {"seed_count": 200, "repetitions": 1}
+    assert config["required_stages"].index("certification") == (
+        config["required_stages"].index("tests") + 1
+    )
     assert pipeline.load_pipeline_config("reference")["objectives"] == "both"
     assert pipeline.load_pipeline_config("full")["objectives"] == "both"
+
+
+def test_expected_run_count_comes_from_immutable_plan(tmp_path):
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    (runs / "plan.jsonl").write_text(
+        "".join(json.dumps({"slot": index}) + "\n" for index in range(660))
+    )
+    assert pipeline._planned_run_count(tmp_path) == 660
 
 
 def test_integrity_report_keeps_timeouts_and_counts_exact_once(tmp_path):
@@ -186,13 +199,13 @@ def test_dataset_stage_copies_only_materialized_smoke_instances(tmp_path):
         family_dir = source / family
         family_dir.mkdir(parents=True)
         (family_dir / "instance.json").write_text(json.dumps(payload))
-    selected = tmp_path / "smoke10"
+    selected = tmp_path / "selection2"
     selector.materialize(source, selected, 2)
 
     experiment = tmp_path / "experiment"
     (experiment / "dataset").mkdir(parents=True)
     (experiment / "experiment_manifest.json").write_text(json.dumps({
-        "dataset_profile": "smoke10",
+        "dataset_profile": "full",
     }))
     pipeline.command_dataset(SimpleNamespace(
         experiment=str(experiment),
@@ -237,13 +250,13 @@ def test_dataset_stage_materializes_static_selection_manifest(tmp_path):
     selection = selector.make_manifest(
         source, selector.select_candidates(candidates, 2), 2
     )
-    selection_path = source / "smoke10.json"
+    selection_path = tmp_path / "selection2.json"
     selection_path.write_text(json.dumps(selection))
 
     experiment = tmp_path / "experiment"
     (experiment / "dataset").mkdir(parents=True)
     (experiment / "experiment_manifest.json").write_text(json.dumps({
-        "dataset_profile": "smoke10",
+        "dataset_profile": "full",
     }))
     pipeline.command_dataset(SimpleNamespace(
         experiment=str(experiment),

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import json
 import math
@@ -13,15 +14,36 @@ import re
 import shutil
 import sys
 from typing import Any
+from collections import Counter, defaultdict
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+from kdc_tools.schemas import dumps_json, loads_json, validate_document
+
 SUPPORTED_SUFFIXES = {".mdc", ".json"}
-SELECTION_POLICY = (
-    "select eligible small candidates first, maximizing family coverage, "
-    "then fill by size; use oversized family representatives only when fewer "
-    "than the requested count of valid in-limit instances exist"
+SELECTOR_VERSION = "2.0"
+POLICY_VERSION = "smoke-family-balanced-v1"
+FAMILY_CLASSIFICATION_RULE = (
+    "top-level directory name when files are grouped by directory; otherwise "
+    "known public filename prefixes (us-night, euro-night, london, paris, "
+    "stars, uniform, sbgdb date/type, many_holes), then normalized filename stem"
 )
+SELECTION_POLICY = (
+    "eligible valid unique instances only; choose one smallest candidate per "
+    "family first, then round-robin across represented families in deterministic "
+    "size/path order; reject the selection if the requested count cannot be met"
+)
+SMOKE_PROFILE = "smoke20"
+
+
+class SelectionShortageError(ValueError):
+    """Requested selection cannot be met without violating configured limits."""
+
+
+def _json_bytes(payload: dict[str, Any]) -> bytes:
+    return (json.dumps(
+        payload, indent=2, ensure_ascii=False, allow_nan=False
+    ) + "\n").encode("utf-8")
 
 
 def _number(value: Any, context: str) -> float:
@@ -34,8 +56,7 @@ def _number(value: Any, context: str) -> float:
 
 
 def _canonical_payload(source: Path) -> dict[str, Any]:
-    with source.open(encoding="utf-8") as stream:
-        payload = json.load(stream)
+    payload = loads_json(source.read_bytes())
     if not isinstance(payload, dict):
         raise ValueError("instance root must be a JSON object")
     if "stations" in payload and "trajectories" in payload:
@@ -118,7 +139,7 @@ def _root_label(source: Path) -> str:
     try:
         return source.resolve().relative_to(ROOT).as_posix()
     except ValueError:
-        return "."
+        return str(source.resolve())
 
 
 def _source_path(source_root: Path, source_label: str, relative: str) -> str:
@@ -145,11 +166,47 @@ def _flat_family(path: Path) -> str:
     return re.sub(r"[-_]\d+(?:[-_].*)?$", "", stem).lower() or stem
 
 
-def discover_candidates(source: Path) -> tuple[list[dict[str, Any]], list[str]]:
+def family_classification(path: Path, directory_family: str | None) -> str:
+    return directory_family or _flat_family(path)
+
+
+def _logical_instance_id(payload: dict[str, Any]) -> str:
+    identity = {
+        "T_end": float(payload["T_end"]),
+        "stations": [
+            [float(station["x"]), float(station["y"])]
+            for station in payload["stations"]
+        ],
+        "trajectories": [
+            {
+                "t_breaks": [float(value) for value in trajectory["t_breaks"]],
+                "waypoints": [
+                    [float(point["x"]), float(point["y"])]
+                    for point in trajectory["waypoints"]
+                ],
+            }
+            for trajectory in payload["trajectories"]
+        ],
+    }
+    return hashlib.sha256(dumps_json(identity).encode("utf-8")).hexdigest()
+
+
+def _canonical_relative_path(family: str, source: Path,
+                             source_sha256: str) -> str:
+    safe_family = re.sub(r"[^A-Za-z0-9._-]+", "_", family).strip("._-")
+    safe_stem = re.sub(r"[^A-Za-z0-9._-]+", "_", source.stem).strip("._-")
+    return (
+        Path("instances") / (safe_family or "unknown")
+        / f"{safe_stem or 'instance'}-{source_sha256[:12]}.json"
+    ).as_posix()
+
+
+def discover_candidates(source: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     if not source.is_dir():
         raise ValueError(f"source dataset directory not found: {source}")
     candidates: list[dict[str, Any]] = []
-    errors: list[str] = []
+    rejected: list[dict[str, Any]] = []
+    seen_logical: dict[str, str] = {}
     source_label = _root_label(source)
     family_dirs = sorted(path for path in source.iterdir() if path.is_dir())
     scopes: list[tuple[str | None, list[Path]]] = []
@@ -179,26 +236,58 @@ def discover_candidates(source: Path) -> tuple[list[dict[str, Any]], list[str]]:
             files
         )
         for path in files:
-            family = directory_family or _flat_family(path)
+            family = family_classification(path, directory_family)
             relative_path = path.relative_to(source).as_posix()
             try:
                 payload = _canonical_payload(path)
                 n, m = validate_instance(payload)
             except (OSError, ValueError, json.JSONDecodeError) as error:
-                errors.append(f"{relative_path}: {error}")
+                rejected.append({
+                    "source": _source_path(source, source_label, relative_path),
+                    "relative_source": relative_path,
+                    "reason_code": "invalid_input",
+                    "reason": {"message": str(error)},
+                })
                 continue
+            source_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+            logical_id = _logical_instance_id(payload)
+            if logical_id in seen_logical:
+                rejected.append({
+                    "source": _source_path(source, source_label, relative_path),
+                    "relative_source": relative_path,
+                    "reason_code": "duplicate_logical_instance",
+                    "reason": {"duplicate_of": seen_logical[logical_id]},
+                    "instance_id": logical_id,
+                })
+                continue
+            seen_logical[logical_id] = relative_path
+            t_end = float(payload["T_end"])
+            canonical_path = _canonical_relative_path(
+                family, path, source_sha256
+            )
             candidates.append({
+                "instance_id": logical_id,
                 "family": family,
+                "family_classification_rule": (
+                    "top_level_directory" if directory_family
+                    else "filename_prefix_or_normalized_stem"
+                ),
                 "source": _source_path(source, source_label, relative_path),
                 "relative_source": relative_path,
+                "source_sha256": source_sha256,
                 "n": n,
                 "m": m,
+                "T_end": t_end,
                 "file_size_bytes": path.stat().st_size,
+                "canonical_path": canonical_path,
+                "canonical_sha256": hashlib.sha256(
+                    _json_bytes(payload)
+                ).hexdigest(),
                 "_absolute_source": path,
                 "_payload": payload,
             })
     candidates.sort(key=selection_key)
-    return candidates, errors
+    return candidates, rejected
 
 
 def selection_key(candidate: dict[str, Any]) -> tuple[Any, ...]:
@@ -211,84 +300,115 @@ def selection_key(candidate: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def _seeded_selection_key(candidate: dict[str, Any],
+                          seed: int) -> tuple[Any, ...]:
+    return (
+        candidate["n"],
+        candidate["m"],
+        candidate["n"] * candidate["m"],
+        candidate["file_size_bytes"],
+        hashlib.sha256(
+            f"{seed}:{candidate['relative_source']}".encode("utf-8")
+        ).hexdigest(),
+        candidate["relative_source"],
+    )
+
+
 def select_candidates(candidates: list[dict[str, Any]], count: int,
-                      max_n: int = 50, max_m: int = 25
+                      max_n: int = 50, max_m: int = 25,
+                      seed: int = 0,
+                      rejected: list[dict[str, Any]] | None = None,
                       ) -> list[dict[str, Any]]:
     if count <= 0 or max_n <= 0 or max_m <= 0:
         raise ValueError("count and smoke limits must be positive")
-    if len(candidates) < count:
-        raise ValueError(
-            f"requested {count} instances, but only {len(candidates)} valid "
-            "instances were found"
-        )
     eligible = [
         row for row in candidates
         if row["n"] <= max_n and row["m"] <= max_m
     ]
-    by_family: dict[str, list[dict[str, Any]]] = {}
+    oversized = [
+        row for row in candidates
+        if row["n"] > max_n or row["m"] > max_m
+    ]
+    for candidate in oversized:
+        if rejected is not None:
+            rejected.append({
+                "source": candidate.get(
+                    "source", candidate["relative_source"]
+                ),
+                "relative_source": candidate["relative_source"],
+                "reason_code": "size_limit_exceeded",
+                "reason": {
+                    "n": candidate["n"], "m": candidate["m"],
+                    "max_n": max_n, "max_m": max_m,
+                },
+            })
+    if len(eligible) < count:
+        shortage = count - len(eligible)
+        counts = Counter(
+            item["reason_code"] for item in (rejected or [])
+        )
+        details = ", ".join(
+            f"{reason}={amount}" for reason, amount in sorted(counts.items())
+        ) or "no rejected candidates"
+        raise SelectionShortageError(
+            f"requested {count} smoke instances with n<={max_n}, m<={max_m}; "
+            f"only {len(eligible)} valid distinct in-limit instances are available "
+            f"(shortage {shortage}; rejected: {details})"
+        )
+    by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for candidate in eligible:
-        by_family.setdefault(candidate["family"], []).append(candidate)
+        by_family[candidate["family"]].append(candidate)
+    for family_candidates in by_family.values():
+        family_candidates.sort(
+            key=lambda candidate: _seeded_selection_key(candidate, seed)
+        )
 
     selected: list[dict[str, Any]] = []
-    selected_sources: set[str] = set()
-    family_representatives = sorted(
-        (rows[0] for rows in by_family.values()), key=selection_key
+    families = sorted(
+        by_family,
+        key=lambda family: (
+            _seeded_selection_key(by_family[family][0], seed), family
+        ),
     )
-    for candidate in family_representatives[:count]:
-        selected.append(candidate)
-        selected_sources.add(candidate["relative_source"])
-        candidate["selection_reason"] = (
-            "smallest in-limit valid candidate selected for family coverage"
-        )
-    for candidate in eligible:
-        if len(selected) >= count:
+    for family in families:
+        if len(selected) == count:
             break
-        if candidate["relative_source"] not in selected_sources:
-            candidate["selection_reason"] = (
-                "small valid candidate used to fill the smoke set"
-            )
-            selected.append(candidate)
-            selected_sources.add(candidate["relative_source"])
-
-    if len(selected) < count:
-        selected_families = {row["family"] for row in selected}
-        oversized_representatives: list[dict[str, Any]] = []
-        by_oversized_family: dict[str, list[dict[str, Any]]] = {}
-        for candidate in candidates:
-            if candidate["family"] not in selected_families:
-                by_oversized_family.setdefault(
-                    candidate["family"], []
-                ).append(candidate)
-        oversized_representatives = sorted(
-            (rows[0] for rows in by_oversized_family.values()),
-            key=selection_key,
+        candidate = by_family[family][0]
+        candidate["selection_reason"] = (
+            "first eligible candidate from family, selected for broad family coverage"
         )
-        for candidate in oversized_representatives:
-            if len(selected) >= count:
+        selected.append(candidate)
+
+    rank_by_family = Counter(row["family"] for row in selected)
+    while len(selected) < count:
+        for family in families:
+            if len(selected) == count:
                 break
+            candidates_for_family = by_family[family]
+            if rank_by_family[family] >= len(candidates_for_family):
+                continue
+            candidate = candidates_for_family[rank_by_family[family]]
             candidate["selection_reason"] = (
-                "oversized family fallback: no valid in-limit candidate; "
-                "included only to preserve family coverage"
+                "deterministic round-robin fill to balance family representation"
             )
             selected.append(candidate)
-            selected_sources.add(candidate["relative_source"])
-            selected_families.add(candidate["family"])
-        for candidate in candidates:
-            if len(selected) >= count:
-                break
+            rank_by_family[family] += 1
+    selected_sources = {row["relative_source"] for row in selected}
+    for rank, candidate in enumerate(selected, 1):
+        candidate["selection_rank"] = rank
+        candidate["exceeds_size_limits"] = False
+        candidate["selection_limits"] = {"max_n": max_n, "max_m": max_m}
+    if rejected is not None:
+        for candidate in eligible:
             if candidate["relative_source"] not in selected_sources:
-                candidate["selection_reason"] = (
-                    "smallest remaining valid candidate; smoke limits exceeded "
-                    "because fewer in-limit candidates exist than requested"
-                )
-                selected.append(candidate)
-                selected_sources.add(candidate["relative_source"])
-
-    for candidate in selected:
-        candidate["exceeds_smoke_limits"] = (
-            candidate["n"] > max_n or candidate["m"] > max_m
-        )
-        candidate["smoke_limits"] = {"max_n": max_n, "max_m": max_m}
+                rejected.append({
+                    "source": candidate["source"],
+                    "relative_source": candidate["relative_source"],
+                    "reason_code": "valid_candidate_not_selected",
+                    "reason": {
+                        "message": "selection count reached after deterministic family-balanced ordering",
+                    },
+                })
     return selected
 
 
@@ -328,35 +448,79 @@ def _resolve_manifest_entry(entry: dict[str, Any], source_root: Path,
 
 
 def read_manifest(path: Path) -> dict[str, Any]:
-    with path.open(encoding="utf-8") as stream:
-        manifest = json.load(stream)
+    manifest = loads_json(path.read_bytes())
     if not isinstance(manifest, dict) or not isinstance(
         manifest.get("instances"), list
     ):
         raise ValueError("selection manifest must contain an instances array")
+    name = manifest.get("name", manifest.get("profile"))
+    if name == "smoke10":
+        return manifest
+    if name == SMOKE_PROFILE:
+        validate_document(manifest, "dataset_selection")
     return manifest
+
+
+def _validate_selection_identity(manifest: dict[str, Any], count: int,
+                                 max_n: int, max_m: int) -> None:
+    name = manifest.get("name", manifest.get("profile"))
+    if name == "smoke10":
+        raise ValueError(
+            "legacy smoke10 manifests are readable for compatibility but "
+            "cannot be used to create a smoke20 experiment; regenerate selection evidence"
+        )
+    if name != SMOKE_PROFILE or manifest.get("selected_instance_count") != count:
+        raise ValueError(
+            f"selection manifest must identify {SMOKE_PROFILE} with exactly "
+            f"{count} instances"
+        )
+    validate_document(manifest, "dataset_selection")
+    limits = manifest.get("size_limits", {})
+    if limits != {"max_n": max_n, "max_m": max_m}:
+        raise ValueError("selection manifest size limits differ from requested profile")
+    rows = manifest.get("instances")
+    if not isinstance(rows, list) or len(rows) != count:
+        raise ValueError("selection manifest has an invalid instance array")
+    for key in ("instance_id", "source", "canonical_path"):
+        values = [row.get(key) for row in rows if isinstance(row, dict)]
+        if len(values) != count or any(not isinstance(value, str) for value in values):
+            raise ValueError(f"selection manifest has missing {key} values")
+        if len(set(values)) != count:
+            raise ValueError(f"selection manifest has duplicate {key} values")
 
 
 def resolve_instance_directory(path: Path) -> Path:
     if ((path / "manifest.json").is_file()
             and (path / "instances").is_dir()):
         manifest = read_manifest(path / "manifest.json")
+        expected_name = manifest.get("name", manifest.get("profile"))
+        if expected_name == "smoke10":
+            raise ValueError(
+                "legacy smoke10 materializations are not valid smoke20 inputs"
+            )
         rows = manifest["instances"]
         expected = manifest.get("selected_instance_count", len(rows))
+        if expected_name == SMOKE_PROFILE and expected != 20:
+            raise ValueError(
+                f"smoke20 materialization must contain exactly 20 instances, got {expected}"
+            )
         if len(rows) != expected:
             raise ValueError(
                 f"dataset manifest expects {expected} instances, has {len(rows)}"
             )
         seen_sources: set[str] = set()
+        seen_instances: set[str] = set()
         instance_root = (path / "instances").resolve()
         for row in rows:
             if not isinstance(row, dict):
                 raise ValueError("dataset manifest instances must be objects")
             source = str(row.get("source", ""))
-            materialized = row.get("materialized_file")
-            if not source or source in seen_sources:
+            instance_id = str(row.get("instance_id", source))
+            materialized = row.get("materialized_file", row.get("canonical_path"))
+            if not source or source in seen_sources or instance_id in seen_instances:
                 raise ValueError("dataset manifest has a missing or duplicate source")
             seen_sources.add(source)
+            seen_instances.add(instance_id)
             if not isinstance(materialized, str):
                 raise ValueError("dataset manifest lacks materialized_file")
             instance_path = (path / materialized).resolve()
@@ -366,18 +530,38 @@ def resolve_instance_directory(path: Path) -> Path:
                 )
             if not instance_path.is_file():
                 raise ValueError(f"materialized instance not found: {materialized}")
-            expected_sha = row.get("materialized_sha256")
+            expected_sha = row.get(
+                "canonical_sha256", row.get("materialized_sha256")
+            )
             if (expected_sha and hashlib.sha256(
                     instance_path.read_bytes()
             ).hexdigest() != expected_sha):
                 raise ValueError(
                     f"materialized instance checksum mismatch: {materialized}"
                 )
-            n, m = validate_instance(_canonical_payload(instance_path))
-            if n != row.get("n") or m != row.get("m"):
+            payload = _canonical_payload(instance_path)
+            n, m = validate_instance(payload)
+            if _logical_instance_id(payload) != instance_id:
+                raise ValueError(
+                    f"materialized logical identity mismatch: {materialized}"
+                )
+            if (n != row.get("n") or m != row.get("m")
+                    or not math.isclose(
+                        float(payload["T_end"]), float(row.get("T_end", 1.0)),
+                        rel_tol=1e-9, abs_tol=1e-9,
+                    )):
                 raise ValueError(
                     f"materialized instance metadata mismatch: {materialized}"
                 )
+            source_root = _manifest_source_root(manifest, path / "manifest.json")
+            source_path = source_root / str(row.get("relative_source", ""))
+            expected_source_sha = row.get("source_sha256", row.get("sha256"))
+            if (expected_source_sha and not source_path.is_file()):
+                raise ValueError(f"original source file not found: {source}")
+            if (expected_source_sha and hashlib.sha256(
+                    source_path.read_bytes()
+            ).hexdigest() != expected_source_sha):
+                raise ValueError(f"source checksum mismatch: {source}")
         actual = list(instance_root.rglob("*.json"))
         if len(actual) != expected:
             raise ValueError(
@@ -390,7 +574,7 @@ def resolve_instance_directory(path: Path) -> Path:
 
 def apply_execution_defaults(args: Any) -> None:
     """Set conservative smoke defaults while preserving full-run defaults."""
-    smoke = args.dataset_profile == "smoke10"
+    smoke = args.dataset_profile == SMOKE_PROFILE
     defaults = {
         "threads": 2 if smoke else max(1, os.cpu_count() or 1),
         "time_limit": 2.0 if smoke else 60.0,
@@ -404,42 +588,110 @@ def apply_execution_defaults(args: Any) -> None:
 
 def make_manifest(source: Path, selected: list[dict[str, Any]],
                   count: int, max_n: int = 50,
-                  max_m: int = 25) -> dict[str, Any]:
+                  max_m: int = 25,
+                  rejected: list[dict[str, Any]] | None = None,
+                  seed: int = 0,
+                  available_eligible_families: int | None = None,
+                  ) -> dict[str, Any]:
     source_label = _root_label(source)
     rows = []
     for rank, candidate in enumerate(selected, 1):
         path = candidate["_absolute_source"]
+        payload = candidate["_payload"]
+        source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        canonical_bytes = _json_bytes(payload)
+        canonical_path = candidate.get(
+            "canonical_path",
+            _canonical_relative_path(candidate["family"], path, source_sha),
+        )
         rows.append({
+            "instance_id": candidate.get(
+                "instance_id", _logical_instance_id(payload)
+            ),
             "family": candidate["family"],
+            "family_classification_rule": candidate.get(
+                "family_classification_rule",
+                "top_level_directory_or_normalized_filename",
+            ),
             "source": candidate["source"],
             "relative_source": candidate["relative_source"],
+            "source_sha256": source_sha,
+            "canonical_path": canonical_path,
+            "canonical_sha256": hashlib.sha256(canonical_bytes).hexdigest(),
             "n": candidate["n"],
             "m": candidate["m"],
+            "T_end": float(payload["T_end"]),
             "file_size_bytes": candidate["file_size_bytes"],
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "selection_rank": rank,
             "selection_reason": candidate.get(
-                "selection_reason", "provided selection manifest"
+                "selection_reason", "deterministic eligible family-balanced selection"
             ),
-            "exceeds_smoke_limits": bool(candidate.get(
-                "exceeds_smoke_limits",
-                candidate["n"] > max_n or candidate["m"] > max_m,
-            )),
-            "smoke_limits": {"max_n": max_n, "max_m": max_m},
+            "size_limit_exception": None,
         })
-    return {
-        "name": f"smoke{count}",
+    family_counts = Counter(row["family"] for row in rows)
+    manifest_name = SMOKE_PROFILE if count == 20 else f"selection{count}"
+    manifest = {
+        "schema_version": 1,
+        "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "name": manifest_name,
+        "profile": manifest_name,
+        "policy_version": POLICY_VERSION,
+        "selector_version": SELECTOR_VERSION,
         "selection_policy": SELECTION_POLICY,
-        "smoke_limits": {"max_n": max_n, "max_m": max_m},
+        "policy_parameters": {
+            "seed": seed,
+            "ordering": "n,m,n*m,file_size_bytes,relative_source",
+            "family_fill": "round_robin",
+        },
+        "size_limits": {"max_n": max_n, "max_m": max_m},
+        "count": count,
         "source_root": source_label,
         "source_dataset_fingerprint": _dataset_fingerprint(source),
         "selected_instance_count": len(rows),
+        "family_coverage": {
+            "available_eligible_families": (
+                available_eligible_families
+                if available_eligible_families is not None
+                else len({candidate["family"] for candidate in selected})
+            ),
+            "represented_families": sorted(family_counts),
+            "selected_counts": dict(sorted(family_counts.items())),
+        },
+        "classification_rule": FAMILY_CLASSIFICATION_RULE,
         "instances": rows,
+        "rejected_candidates": rejected or [],
     }
+    if count == 20:
+        validate_document(manifest, "dataset_selection")
+    return manifest
+
+
+def _write_selection_report(manifest: dict[str, Any], output: Path) -> Path:
+    rows = manifest["instances"]
+    report = [
+        "# Deterministic smoke20 selection", "",
+        f"- Policy: `{manifest['policy_version']}`",
+        f"- Source fingerprint: `{manifest['source_dataset_fingerprint']}`",
+        f"- Selected: {len(rows)} distinct logical instances",
+        f"- Represented families: {len(manifest['family_coverage']['represented_families'])}",
+        f"- Rejected candidates: {len(manifest['rejected_candidates'])}",
+        "",
+        "| Rank | Instance ID | Source | Family | n | m | T_end | Selection reason |",
+        "|---:|---|---|---|---:|---:|---:|---|",
+    ]
+    for row in rows:
+        report.append(
+            f"| {row['selection_rank']} | `{row['instance_id']}` "
+            f"| `{row['source']}` | {row['family']} | {row['n']} | {row['m']} | {row['T_end']:g} "
+            f"| {row['selection_reason']} |"
+        )
+    path = output / "selection_report.md"
+    path.write_text("\n".join(report) + "\n", encoding="utf-8")
+    return path
 
 
 def _print_selection(rows: list[dict[str, Any]], count: int) -> None:
-    print(f"Smoke dataset: {count} instances")
+    print(f"{SMOKE_PROFILE} dataset: {count} instances")
     print()
     print(f"{'Family':<31} {'Instance':<44} {'n':>5} {'m':>5}")
     print("-" * 89)
@@ -448,30 +700,34 @@ def _print_selection(rows: list[dict[str, Any]], count: int) -> None:
               f"{row['n']:>5} {row['m']:>5}")
 
 
-def materialize(source: Path, output: Path, count: int,
+def materialize(source: Path, output: Path, count: int = 20,
                 manifest_path: Path | None = None,
-                max_n: int = 50, max_m: int = 25) -> dict[str, Any]:
+                max_n: int = 50, max_m: int = 25,
+                seed: int = 0) -> dict[str, Any]:
     source = source.resolve()
     output = output.resolve()
-    previous_manifest = output / "manifest.json"
-    if previous_manifest.is_file():
-        try:
-            previous = read_manifest(previous_manifest)
-        except (OSError, ValueError, json.JSONDecodeError):
-            previous = {}
-        for row in previous.get("instances", []):
-            relative = row.get("materialized_file") if isinstance(row, dict) else None
-            if isinstance(relative, str):
-                prior_file = (output / relative).resolve()
-                if prior_file.is_relative_to((output / "instances").resolve()):
-                    prior_file.unlink(missing_ok=True)
+    if output.exists() and any(output.iterdir()):
+        raise ValueError(
+            f"refusing to overwrite non-empty selection output directory: {output}"
+        )
     if manifest_path is None:
-        candidates, _errors = discover_candidates(source)
-        selected = select_candidates(candidates, count, max_n, max_m)
-        manifest = make_manifest(source, selected, count, max_n, max_m)
+        candidates, rejected = discover_candidates(source)
+        selected = select_candidates(
+            candidates, count, max_n, max_m, seed=seed, rejected=rejected
+        )
+        manifest = make_manifest(
+            source, selected, count, max_n, max_m, rejected, seed,
+            len({row["family"] for row in candidates
+                 if row["n"] <= max_n and row["m"] <= max_m}),
+        )
         payloads = [candidate["_payload"] for candidate in selected]
     else:
         manifest = read_manifest(manifest_path)
+        _validate_selection_identity(manifest, count, max_n, max_m)
+        if manifest["policy_parameters"]["seed"] != seed:
+            raise ValueError("selection manifest seed differs from requested profile")
+        if manifest["source_dataset_fingerprint"] != _dataset_fingerprint(source):
+            raise ValueError("selection manifest source dataset fingerprint mismatch")
         rows = manifest["instances"]
         if len(rows) != count:
             raise ValueError(
@@ -480,6 +736,7 @@ def materialize(source: Path, output: Path, count: int,
         payloads = []
         selected = []
         seen_sources: set[str] = set()
+        seen_instances: set[str] = set()
         for row in rows:
             if not isinstance(row, dict):
                 raise ValueError("manifest instances must be objects")
@@ -487,11 +744,16 @@ def materialize(source: Path, output: Path, count: int,
             if not source_key or source_key in seen_sources:
                 raise ValueError("manifest contains a missing or duplicate source")
             seen_sources.add(source_key)
+            instance_id = row.get("instance_id")
+            if not isinstance(instance_id, str) or instance_id in seen_instances:
+                raise ValueError("manifest contains a missing or duplicate logical instance")
+            seen_instances.add(instance_id)
             path = _resolve_manifest_entry(
                 row, _manifest_source_root(manifest, manifest_path),
                 manifest_path,
             )
             expected_sha = row.get("sha256")
+            expected_sha = row.get("source_sha256", expected_sha)
             if expected_sha and hashlib.sha256(path.read_bytes()).hexdigest() != expected_sha:
                 materialized_sha = row.get("materialized_sha256")
                 if (not materialized_sha or hashlib.sha256(
@@ -500,7 +762,17 @@ def materialize(source: Path, output: Path, count: int,
                     raise ValueError(f"source checksum mismatch for {source_key}")
             payload = _canonical_payload(path)
             n, m = validate_instance(payload)
-            if n != row.get("n") or m != row.get("m"):
+            if _logical_instance_id(payload) != instance_id:
+                raise ValueError(
+                    f"materialized logical identity mismatch: {materialized}"
+                )
+            canonical_hash = hashlib.sha256(_json_bytes(payload)).hexdigest()
+            if (n != row.get("n") or m != row.get("m")
+                    or not math.isclose(
+                        float(payload["T_end"]), float(row["T_end"]),
+                        rel_tol=1e-9, abs_tol=1e-9,
+                    )
+                    or canonical_hash != row.get("canonical_sha256")):
                 raise ValueError(f"manifest metadata mismatch for {source_key}")
             payloads.append(payload)
             selected.append({
@@ -511,27 +783,38 @@ def materialize(source: Path, output: Path, count: int,
     instance_dir = output / "instances"
     instance_dir.mkdir(parents=True, exist_ok=True)
     for row, payload in zip(manifest["instances"], payloads):
-        family = str(row["family"])
-        source_name = Path(str(row.get("relative_source")
-                               or row["source"])).stem
-        safe_family = re.sub(r"[^A-Za-z0-9._-]+", "_", family)
-        destination_dir = instance_dir / safe_family
-        destination_dir.mkdir(parents=True, exist_ok=True)
-        destination = destination_dir / f"{source_name}.json"
+        destination = output / str(row["canonical_path"])
+        if not destination.resolve().is_relative_to(instance_dir.resolve()):
+            raise ValueError(f"canonical path escapes instances directory: {destination}")
         if destination.exists():
-            rank = int(row.get("selection_rank", 0))
-            destination = destination_dir / f"{source_name}_{rank}.json"
-        destination.write_text(
-            json.dumps(payload, indent=2) + "\n", encoding="utf-8"
-        )
+            raise ValueError(f"refusing to overwrite canonical input: {destination}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        canonical_bytes = _json_bytes(payload)
+        destination.write_bytes(canonical_bytes)
+        canonical_payload = loads_json(destination.read_bytes())
+        n, m = validate_instance(canonical_payload)
+        if (n != row["n"] or m != row["m"]
+                or not math.isclose(
+                    float(canonical_payload["T_end"]), float(row["T_end"]),
+                    rel_tol=1e-9, abs_tol=1e-9,
+                )):
+            raise ValueError(f"canonical metadata mismatch: {destination}")
+        actual_hash = hashlib.sha256(destination.read_bytes()).hexdigest()
+        if actual_hash != row["canonical_sha256"]:
+            raise ValueError(f"canonical checksum mismatch: {destination}")
         row["materialized_file"] = destination.relative_to(output).as_posix()
-        row["materialized_sha256"] = hashlib.sha256(
-            destination.read_bytes()
-        ).hexdigest()
+        row["materialized_sha256"] = actual_hash
     manifest_path_out = output / "manifest.json"
     manifest_path_out.write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
+    if count == 20:
+        validate_document(manifest, "dataset_selection")
+    if (len(manifest["instances"]) != count
+            or len(list(instance_dir.rglob("*.json"))) != count
+            or len({row["instance_id"] for row in manifest["instances"]}) != count):
+        raise ValueError("materialized smoke20 manifest and canonical input counts differ")
+    _write_selection_report(manifest, output)
     if manifest_path is None:
         manifest["_selected"] = selected
     _print_selection(manifest["instances"], count)
@@ -544,29 +827,34 @@ def main(argv: list[str] | None = None) -> int:
                         help="dataset root with one subdirectory per family")
     parser.add_argument("--output", required=True,
                         help="output directory for selected canonical JSON")
-    parser.add_argument("--count", type=int, default=10)
+    parser.add_argument("--count", type=int, default=20)
     parser.add_argument("--max-n", type=int, default=50)
     parser.add_argument("--max-m", type=int, default=25)
+    parser.add_argument("--seed", type=int, default=0,
+                        help="deterministic selector tie-break seed")
     parser.add_argument("--manifest",
                         help="reuse a checked-in selection manifest")
     parser.add_argument("--manifest-output",
                         help="also write the generated manifest to this path")
+    parser.add_argument("--profile", choices=(SMOKE_PROFILE,),
+                        default=SMOKE_PROFILE)
     args = parser.parse_args(argv)
     try:
         manifest = materialize(
             Path(args.source), Path(args.output), args.count,
             Path(args.manifest) if args.manifest else None,
-            args.max_n, args.max_m,
+            args.max_n, args.max_m, args.seed,
         )
         if args.manifest_output:
             destination = Path(args.manifest_output)
             destination.parent.mkdir(parents=True, exist_ok=True)
-            manifest.pop("_selected", None)
-            for row in manifest["instances"]:
-                row.pop("materialized_file", None)
-                row.pop("materialized_sha256", None)
             destination.write_text(
-                json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+                json.dumps(
+                    {key: value for key, value in manifest.items()
+                     if not key.startswith("_")},
+                    indent=2,
+                ) + "\n",
+                encoding="utf-8",
             )
     except (OSError, ValueError, json.JSONDecodeError) as error:
         print(f"error: {error}", file=sys.stderr)
