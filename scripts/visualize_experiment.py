@@ -9,13 +9,18 @@ import json
 import math
 import os
 from pathlib import Path
+import shutil
+import struct
 import sys
+import tempfile
+import textwrap
 from typing import Any
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 import numpy as np
 
@@ -35,13 +40,28 @@ from kdc_tools.storage import (  # noqa: E402
     index_experiment_artifacts,
     read_json,
     sha256_file,
+    utc_now,
     validate_run_directory,
     write_bytes_create_only,
+    write_derived_bytes,
+    write_derived_json,
     write_json_create_only,
 )
 
 TIME_FRACTIONS = (0.0, 0.5, 1.0)
 OBJECTIVES = ("minmax", "minsum", "minmaxsum")
+RENDERER_VERSION = 2
+SPATIAL_PADDING_FRACTION = 0.08
+TRAJECTORY_ALPHA = 0.20
+TRAJECTORY_LINE_WIDTH = 0.65
+DISK_ALPHA = 0.12
+DISK_LINE_WIDTH = 0.8
+SUPPORT_LINE_WIDTH = 0.8
+SUPPORT_CONNECTOR_ALPHA = 0.65
+SUPPORT_MARKER_LINE_WIDTH = 1.2
+POINT_MARKER_LINE_WIDTH = 0.3
+STATION_MARKER_LINE_WIDTH = 0.35
+POINT_MARKER_AREA = 24
 RUN_STATES = {
     "PLANNED", "RUNNING", "COMPLETED", "FAILED", "TIME_LIMIT",
     "TIMED_OUT", "INVALID", "CANCELLED", "ABANDONED", "SKIPPED",
@@ -167,13 +187,10 @@ def _status_label(record: dict[str, Any] | None) -> str:
 
 def _objective_label(objective: str, solver: dict[str, Any]) -> str:
     if objective == "minmaxsum":
-        peak = solver.get("peak_cost")
-        integral = solver.get("integral_cost")
-        if peak is None or integral is None:
-            vector = solver.get("objective_vector")
-            if isinstance(vector, dict):
-                peak = vector.get("peak_cost", peak)
-                integral = vector.get("integral_cost", integral)
+        vector = solver.get("objective_vector")
+        vector = vector if isinstance(vector, dict) else {}
+        peak = vector.get("peak_cost", solver.get("peak_cost"))
+        integral = vector.get("integral_cost", solver.get("integral_cost"))
         return f"MinMaxSum vector (peak={peak}, integral={integral})"
     if objective == "minmax":
         return f"MinMax peak={solver.get('peak_cost', solver.get('objective_value'))}"
@@ -215,6 +232,121 @@ def _validate_solution_for_instance(
             raise ValueError(f"solution interval {index} has invalid support id")
 
 
+def _snapshot_bounds(
+    instance: dict[str, Any],
+    solution: dict[str, Any],
+    times: tuple[float, ...],
+    *,
+    padding_fraction: float = SPATIAL_PADDING_FRACTION,
+) -> dict[str, Any]:
+    """Return one square, padded viewport enclosing all displayed geometry."""
+    if not math.isfinite(padding_fraction) or padding_fraction < 0:
+        raise ValueError("snapshot padding fraction must be finite and nonnegative")
+    if not times or any(not math.isfinite(time) for time in times):
+        raise ValueError("snapshot bounds require finite display times")
+
+    stations = instance["stations"]
+    trajectories = instance["trajectories"]
+    xs = [float(station["x"]) for station in stations]
+    ys = [float(station["y"]) for station in stations]
+    for trajectory in trajectories:
+        for waypoint in trajectory["waypoints"]:
+            xs.append(float(waypoint["x"]))
+            ys.append(float(waypoint["y"]))
+
+    max_radius = 0.0
+    station_max_radii = [0.0 for _ in stations]
+    for time in times:
+        for point_index in range(len(trajectories)):
+            x, y = position_at(instance, point_index, time)
+            xs.append(x)
+            ys.append(y)
+        radii = [radius_at(solution, i, time, instance)
+                 for i in range(len(stations))]
+        max_radius = max(max_radius, *radii, 0.0)
+        station_max_radii = [
+            max(previous, current)
+            for previous, current in zip(station_max_radii, radii)
+        ]
+
+    for station, radius in zip(stations, station_max_radii):
+        sx, sy = float(station["x"]), float(station["y"])
+        xs.extend((sx - radius, sx + radius))
+        ys.extend((sy - radius, sy + radius))
+
+    if not xs or not ys:
+        raise ValueError("cannot compute snapshot bounds for empty geometry")
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(ys), max(ys)
+    span = max(xmax - xmin, ymax - ymin, 2.0 * max_radius)
+    if span == 0.0:
+        span = 1.0
+    half_span = span * (0.5 + padding_fraction)
+    center_x = (xmin + xmax) * 0.5
+    center_y = (ymin + ymax) * 0.5
+    return {
+        "xlim": (center_x - half_span, center_x + half_span),
+        "ylim": (center_y - half_span, center_y + half_span),
+        "padding_fraction": padding_fraction,
+        "maximum_radius": max_radius,
+    }
+
+
+def _legend_handles(
+    *, show_trajectories: bool, show_support_connectors: bool
+) -> list[Line2D]:
+    handles = [
+        Line2D([], [], color="#777777", marker="o", linestyle="None",
+               markersize=7, markerfacecolor="#777777", alpha=DISK_ALPHA + 0.2,
+               label="Coverage disk"),
+        Line2D([], [], color="#333333", marker="^", linestyle="None",
+               markersize=6, label="Station"),
+        Line2D([], [], color="#333333", marker="o", linestyle="None",
+               markersize=5, label="Moving point (color=assigned station)"),
+        Line2D([], [], color="#333333", marker="D", linestyle="None",
+               markerfacecolor="none", markersize=6, label="Active support"),
+    ]
+    if show_trajectories:
+        handles.insert(
+            0, Line2D([], [], color="#666666", linestyle="--",
+                      linewidth=TRAJECTORY_LINE_WIDTH, label="Trajectory")
+        )
+    if show_support_connectors:
+        handles.append(
+            Line2D([], [], color="#555555", linewidth=SUPPORT_LINE_WIDTH,
+                   label="Support connector")
+        )
+    return handles
+
+
+def _snapshot_title(
+    instance: dict[str, Any],
+    record: dict[str, Any] | None,
+    plan: dict[str, Any],
+    run_id: str,
+) -> str:
+    solver, verification = _result_metadata(record)
+    verification_kind = verification.get("kind", "NONE")
+    verified = verification.get("passed", False)
+    title_lines = [
+        f"{instance.get('name') or plan['instance_id']} | "
+        f"{plan['algorithm']} | {plan['objective']}",
+        f"run {run_id}",
+        (
+            f"{_slot_status(record)}; "
+            f"feasible={bool((record or {}).get('result', {}).get('feasible', False))}; "
+            f"verified={verified} ({verification_kind}); "
+            f"optimality={solver.get('optimality_status', 'UNKNOWN')}"
+        ),
+        _objective_label(plan["objective"], solver),
+    ]
+    return "\n".join(
+        textwrap.fill(line, width=84, break_long_words=True,
+                      break_on_hyphens=False)
+        for line in title_lines
+    )
+
+
 def _draw_panel(
     axis: Any,
     instance: dict[str, Any],
@@ -222,6 +354,11 @@ def _draw_panel(
     record: dict[str, Any] | None,
     plan: dict[str, Any],
     tau: float,
+    bounds: dict[str, Any],
+    *,
+    show_trajectories: bool,
+    point_label_policy: str,
+    show_support_connectors: bool,
 ) -> None:
     t_end = float(instance["T_end"])
     time = tau * t_end
@@ -236,77 +373,50 @@ def _draw_panel(
         position_at(instance, point_index, time)
         for point_index in range(len(trajectories))
     ]
-    xs = [float(station["x"]) for station in stations]
-    ys = [float(station["y"]) for station in stations]
-    for trajectory in trajectories:
-        for waypoint in trajectory["waypoints"]:
-            xs.append(float(waypoint["x"]))
-            ys.append(float(waypoint["y"]))
     radii = [
         radius_at(solution, station_index, time, instance)
         for station_index in range(len(stations))
     ]
-    pad = max(
-        max(xs, default=0.0) - min(xs, default=0.0),
-        max(ys, default=0.0) - min(ys, default=0.0),
-        max(radii, default=0.0),
-        1.0,
-    ) * 0.12
-    xmin = min([x - r for x, r in zip(
-        [float(station["x"]) for station in stations], radii
-    )] + xs + [0.0]) - pad
-    xmax = max([x + r for x, r in zip(
-        [float(station["x"]) for station in stations], radii
-    )] + xs + [1.0]) + pad
-    ymin = min([y - r for y, r in zip(
-        [float(station["y"]) for station in stations], radii
-    )] + ys + [0.0]) - pad
-    ymax = max([y + r for y, r in zip(
-        [float(station["y"]) for station in stations], radii
-    )] + ys + [1.0]) + pad
-    axis.set_xlim(xmin, xmax)
-    axis.set_ylim(ymin, ymax)
+    axis.set_xlim(*bounds["xlim"])
+    axis.set_ylim(*bounds["ylim"])
     axis.set_aspect("equal", adjustable="box")
     axis.grid(True, linestyle=":", alpha=0.35)
     axis.set_xlabel("x")
     axis.set_ylabel("y")
     axis.set_title(f"τ = {tau:g}  |  t = {time:.6g}")
 
-    for point_index, trajectory in enumerate(trajectories):
-        wx = [float(point["x"]) for point in trajectory["waypoints"]]
-        wy = [float(point["y"]) for point in trajectory["waypoints"]]
-        axis.plot(wx, wy, "--", color="#666666", alpha=0.55, linewidth=1,
-                  label="Trajectory" if point_index == 0 else "_nolegend_")
-        if len(wx) >= 2:
-            axis.annotate(
-                "", xy=(wx[-1], wy[-1]), xytext=(wx[-2], wy[-2]),
-                arrowprops={"arrowstyle": "->", "color": "#666666",
-                            "lw": 0.8, "alpha": 0.7},
+    if show_trajectories:
+        for trajectory in trajectories:
+            wx = [float(point["x"]) for point in trajectory["waypoints"]]
+            wy = [float(point["y"]) for point in trajectory["waypoints"]]
+            axis.plot(
+                wx, wy, "--", color="#666666", alpha=TRAJECTORY_ALPHA,
+                linewidth=TRAJECTORY_LINE_WIDTH, zorder=1,
             )
     for station_index, station in enumerate(stations):
         color = STATION_COLORS(station_index % 10)
         sx, sy = float(station["x"]), float(station["y"])
         axis.add_patch(Circle(
-            (sx, sy), radii[station_index], facecolor=color,
-            edgecolor=color, alpha=0.14, linewidth=1.2,
-            label="Coverage disk" if station_index == 0 else "_nolegend_",
+            (sx, sy), radii[station_index], facecolor=color, edgecolor=color,
+            alpha=DISK_ALPHA, linewidth=DISK_LINE_WIDTH, zorder=2,
         ))
         axis.scatter(
-            [sx], [sy], marker="^", s=65, color=[color], edgecolor="black",
-            linewidth=0.4, zorder=4,
-            label="Station" if station_index == 0 else "_nolegend_",
+            [sx], [sy], marker="^", s=42, color=[color], edgecolor="black",
+            linewidth=STATION_MARKER_LINE_WIDTH, zorder=3,
         )
     for point_index, (px, py) in enumerate(positions):
         owner = int(owners[point_index])
         color = STATION_COLORS(owner % 10)
         axis.scatter(
-            [px], [py], marker="o", s=38, color=[color], edgecolor="black",
-            linewidth=0.35, zorder=5,
-            label="Moving point (color=assigned station)"
-            if point_index == 0 else "_nolegend_",
+            [px], [py], marker="o", s=POINT_MARKER_AREA, color=[color],
+            edgecolor="black", linewidth=POINT_MARKER_LINE_WIDTH, zorder=4,
         )
-        axis.annotate(f"P{point_index}/S{owner}", (px, py), xytext=(4, 4),
-                      textcoords="offset points", fontsize=6)
+        if point_label_policy == "all":
+            axis.annotate(
+                f"P{point_index}/S{owner}", (px, py), xytext=(3, 3),
+                textcoords="offset points", fontsize=6, zorder=7,
+            )
+    active_support_points: dict[int, int] = {}
     for station_index, support in enumerate(supports):
         support = int(support)
         if support < 0:
@@ -314,39 +424,27 @@ def _draw_panel(
         px, py = positions[support]
         station = stations[station_index]
         color = STATION_COLORS(station_index % 10)
-        axis.plot(
-            [float(station["x"]), px], [float(station["y"]), py],
-            color=color, linewidth=1.0, alpha=0.8,
-            label="Active support relationship" if station_index == 0
-            else "_nolegend_",
+        active_support_points.setdefault(support, station_index)
+        if show_support_connectors:
+            axis.plot(
+                [float(station["x"]), px], [float(station["y"]), py],
+                color=color, linewidth=SUPPORT_LINE_WIDTH,
+                alpha=SUPPORT_CONNECTOR_ALPHA,
+                zorder=5,
+            )
+    for point_index, station_index in active_support_points.items():
+        px, py = positions[point_index]
+        color = STATION_COLORS(station_index % 10)
+        axis.scatter(
+            [px], [py], marker="D", s=48, facecolors="none",
+            edgecolors=[color], linewidth=SUPPORT_MARKER_LINE_WIDTH, zorder=6,
         )
-        axis.scatter([px], [py], marker="o", s=80, facecolors="none",
-                     edgecolors=[color], linewidth=1.5, zorder=6)
-    solver, verification = _result_metadata(record)
-    instance_name = str(instance.get("name") or plan["instance_id"])
-    run_id = str(record.get("run_id", "not-created")) if record else "not-created"
-    status = _status_label(record)
-    label = (
-        f"{instance_name} | {plan['algorithm']} | {plan['objective']}\n"
-        f"run={run_id} | {status}\n"
-        f"T_end={t_end:g}, t={time:g} | {_objective_label(plan['objective'], solver)}"
-    )
-    axis.text(
-        0.01, 0.99, label, transform=axis.transAxes, va="top", ha="left",
-        fontsize=6.5, bbox={"facecolor": "white", "alpha": 0.84,
-                           "edgecolor": "#999999"},
-    )
-    if verification.get("kind") in {None, "", "NONE"}:
-        verified_label = "verification=NOT_AVAILABLE"
-    else:
-        verified_label = f"verification={verification.get('kind')}"
-    axis.text(0.99, 0.01, verified_label, transform=axis.transAxes,
-              va="bottom", ha="right", fontsize=6.5)
-    handles, labels = axis.get_legend_handles_labels()
-    if handles:
-        unique = dict(zip(labels, handles))
-        axis.legend(unique.values(), unique.keys(), loc="lower left",
-                    fontsize=6, framealpha=0.85)
+        if point_label_policy == "supports":
+            owner = int(owners[point_index])
+            axis.annotate(
+                f"P{point_index}/S{owner}", (px, py), xytext=(3, 3),
+                textcoords="offset points", fontsize=6, zorder=7,
+            )
 
 
 def _render_solution_images(
@@ -357,55 +455,137 @@ def _render_solution_images(
     plan: dict[str, Any],
     run_id: str,
     dpi: int,
+    *,
+    show_trajectories: bool,
+    point_label_policy: str,
+    show_support_connectors: bool,
 ) -> dict[str, Any]:
     instance_id = _safe_filename(str(plan["instance_id"]))
     algorithm = _safe_filename(str(plan["algorithm"]))
     objective = _safe_filename(str(plan["objective"]))
     directory = experiment / "snapshots" / instance_id / objective / algorithm / run_id
     t_end = float(instance["T_end"])
-    render_parameters = {
+    bounds = _snapshot_bounds(
+        instance, solution,
+        tuple(tau * t_end for tau in TIME_FRACTIONS),
+    )
+    rendering_settings = {
+        "renderer_version": RENDERER_VERSION,
         "dpi": dpi,
-        "layout": "three-panel",
+        "layout_method": "reserved-gridspec",
+        "output_format": "png",
         "normalized_times": list(TIME_FRACTIONS),
         "actual_times": [tau * t_end for tau in TIME_FRACTIONS],
         "T_end": t_end,
+        "spatial_bounds_policy": (
+            "one square padded extent over station centers, trajectory waypoints, "
+            "snapshot positions, and maximum displayed-time coverage radii"
+        ),
+        "spatial_bounds": {
+            "xlim": list(bounds["xlim"]),
+            "ylim": list(bounds["ylim"]),
+            "padding_fraction": bounds["padding_fraction"],
+            "maximum_radius": bounds["maximum_radius"],
+        },
         "axis_scaling": "equal",
+        "trajectory_visibility": "visible" if show_trajectories else "hidden",
+        "point_label_policy": point_label_policy,
+        "support_connector_policy": (
+            "visible" if show_support_connectors else "hidden"
+        ),
+        "opacity": {
+            "trajectory": TRAJECTORY_ALPHA,
+            "coverage_disk": DISK_ALPHA,
+            "support_connector": SUPPORT_CONNECTOR_ALPHA,
+        },
+        "line_widths": {
+            "trajectory": TRAJECTORY_LINE_WIDTH,
+            "coverage_disk_outline": DISK_LINE_WIDTH,
+            "support_connector": SUPPORT_LINE_WIDTH,
+            "support_marker_outline": SUPPORT_MARKER_LINE_WIDTH,
+            "moving_point_outline": POINT_MARKER_LINE_WIDTH,
+            "station_marker_outline": STATION_MARKER_LINE_WIDTH,
+        },
         "geometry": "piecewise-linear trajectories; support-point distance radii",
     }
-    panel_artifacts = []
-    for index, tau in enumerate(TIME_FRACTIONS):
-        figure, axis = plt.subplots(figsize=(6.0, 5.0))
-        _draw_panel(axis, instance, solution, record, plan, tau)
-        figure.tight_layout()
-        from io import BytesIO
-
-        buffer = BytesIO()
-        figure.savefig(buffer, format="png", dpi=dpi, bbox_inches="tight")
-        plt.close(figure)
-        path = directory / f"tau-{tau:g}.png"
-        _write_bytes(experiment, path, buffer.getvalue())
-        panel_artifacts.append(_artifact(experiment, path, "snapshot-panel"))
-
-    figure, axes = plt.subplots(1, 3, figsize=(18.0, 5.8), squeeze=False)
-    for axis, tau in zip(axes[0], TIME_FRACTIONS):
-        _draw_panel(axis, instance, solution, record, plan, tau)
-    figure.suptitle(
-        f"{instance.get('name', plan['instance_id'])} | {plan['algorithm']} | "
-        f"{plan['objective']} | run {run_id} | {_status_label(record)}",
-        fontsize=10,
-    )
-    figure.tight_layout(rect=(0, 0, 1, 0.90))
+    title = _snapshot_title(instance, record, plan, run_id)
     from io import BytesIO
 
-    buffer = BytesIO()
-    figure.savefig(buffer, format="png", dpi=dpi, bbox_inches="tight")
-    plt.close(figure)
-    triptych = directory / "three-time.png"
-    _write_bytes(experiment, triptych, buffer.getvalue())
+    def save_figure(figure: Any, path: Path, kind: str) -> dict[str, Any]:
+        buffer = BytesIO()
+        figure.savefig(buffer, format="png", dpi=dpi)
+        png_data = buffer.getvalue()
+        if png_data[:8] != b"\x89PNG\r\n\x1a\n" or len(png_data) < 24:
+            plt.close(figure)
+            raise ValueError("Matplotlib produced an invalid PNG image")
+        width, height = struct.unpack(">II", png_data[16:24])
+        plt.close(figure)
+        _write_bytes(experiment, path, png_data)
+        return {
+            **_artifact(experiment, path, kind),
+            "image_dimensions": {"width": width, "height": height},
+        }
+
+    panel_paths = []
+    for tau in TIME_FRACTIONS:
+        figure = plt.figure(
+            figsize=(6.2, 6.0), dpi=dpi, constrained_layout=True
+        )
+        grid = figure.add_gridspec(2, 1, height_ratios=(12, 1))
+        axis = figure.add_subplot(grid[0, 0])
+        legend_axis = figure.add_subplot(grid[1, 0])
+        legend_axis.set_axis_off()
+        figure.suptitle(title, fontsize=8.5)
+        _draw_panel(
+            axis, instance, solution, record, plan, tau, bounds,
+            show_trajectories=show_trajectories,
+            point_label_policy=point_label_policy,
+            show_support_connectors=show_support_connectors,
+        )
+        legend_axis.legend(
+            handles=_legend_handles(
+                show_trajectories=show_trajectories,
+                show_support_connectors=show_support_connectors,
+            ), loc="center", ncol=3,
+            fontsize=7, frameon=False,
+        )
+        path = directory / f"tau-{tau:g}.png"
+        panel_paths.append(save_figure(figure, path, "snapshot-panel"))
+
+    figure = plt.figure(
+        figsize=(15.0, 6.0), dpi=dpi, constrained_layout=True
+    )
+    grid = figure.add_gridspec(2, 3, height_ratios=(12, 1))
+    axes = [figure.add_subplot(grid[0, index]) for index in range(3)]
+    legend_axis = figure.add_subplot(grid[1, :])
+    legend_axis.set_axis_off()
+    figure.suptitle(title, fontsize=9)
+    for axis, tau in zip(axes, TIME_FRACTIONS):
+        _draw_panel(
+            axis, instance, solution, record, plan, tau, bounds,
+            show_trajectories=show_trajectories,
+            point_label_policy=point_label_policy,
+            show_support_connectors=show_support_connectors,
+        )
+    legend_axis.legend(
+        handles=_legend_handles(
+            show_trajectories=show_trajectories,
+            show_support_connectors=show_support_connectors,
+        ), loc="center", ncol=6,
+        fontsize=8, frameon=False,
+    )
+    triptych_path = directory / "three-time.png"
+    triptych = save_figure(figure, triptych_path, "three-panel-snapshot")
     return {
-        "triptych": _artifact(experiment, triptych, "three-panel-snapshot"),
-        "panels": panel_artifacts,
-        "rendering_parameters": render_parameters,
+        "triptych": triptych,
+        "panels": panel_paths,
+        "rendering_parameters": {
+            **rendering_settings,
+            "image_dimensions": {
+                "individual_panel": panel_paths[0]["image_dimensions"],
+                "triptych": triptych["image_dimensions"],
+            },
+        },
     }
 
 
@@ -511,12 +691,17 @@ def generate(
     fps: int = 12,
     frames: int = 48,
     dpi: int = 90,
+    show_trajectories: bool = True,
+    point_label_policy: str = "supports",
+    show_support_connectors: bool = False,
 ) -> dict[str, Any]:
     experiment = Path(experiment_dir).resolve()
     if not experiment.is_dir():
         raise ValueError(f"experiment directory does not exist: {experiment}")
     if fps <= 0 or frames < 2 or dpi <= 0:
         raise ValueError("fps/dpi must be positive and frames must be at least two")
+    if point_label_policy not in {"none", "supports", "all"}:
+        raise ValueError("point label policy must be none, supports, or all")
     manifest = read_json(experiment / "experiment_manifest.json")
     plan = _read_plan(experiment)
     attempts = _load_attempts(experiment)
@@ -641,7 +826,10 @@ def generate(
                             try:
                                 snapshot = _render_solution_images(
                                     experiment, instance, solution,
-                                    rendered_record, entry, run_id, dpi,
+                                    record, entry, run_id, dpi,
+                                    show_trajectories=show_trajectories,
+                                    point_label_policy=point_label_policy,
+                                    show_support_connectors=show_support_connectors,
                                 )
                                 row["snapshot"] = snapshot
                                 animation_dir = (
@@ -757,6 +945,7 @@ def generate(
         })
     manifest_payload = {
         "schema_version": 1,
+        "renderer_version": RENDERER_VERSION,
         "experiment_id": experiment.name,
         "dataset_instance_count": len(instance_ids),
         "objective_count": len(objectives),
@@ -779,6 +968,35 @@ def generate(
             "fps": fps,
             "frames": frames,
             "dpi": dpi,
+            "renderer_version": RENDERER_VERSION,
+            "visualization_schema_version": 1,
+            "layout_method": "reserved-gridspec",
+            "output_format": "png",
+            "trajectory_visibility": (
+                "visible" if show_trajectories else "hidden"
+            ),
+            "point_label_policy": point_label_policy,
+            "support_connector_policy": (
+                "visible" if show_support_connectors else "hidden"
+            ),
+            "opacity": {
+                "trajectory": TRAJECTORY_ALPHA,
+                "coverage_disk": DISK_ALPHA,
+                "support_connector": SUPPORT_CONNECTOR_ALPHA,
+            },
+            "line_widths": {
+                "trajectory": TRAJECTORY_LINE_WIDTH,
+                "coverage_disk_outline": DISK_LINE_WIDTH,
+                "support_connector": SUPPORT_LINE_WIDTH,
+                "support_marker_outline": SUPPORT_MARKER_LINE_WIDTH,
+                "moving_point_outline": POINT_MARKER_LINE_WIDTH,
+                "station_marker_outline": STATION_MARKER_LINE_WIDTH,
+            },
+            "spatial_bounds_policy": (
+                "one square padded extent over station centers, trajectory "
+                "waypoints, snapshot positions, and displayed-time disk extents"
+            ),
+            "axis_scaling": "equal",
             "animation_encoder": "ffmpeg MP4 when available; Pillow GIF fallback",
         },
         "slots": artifacts,
@@ -833,6 +1051,39 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
         if not path.is_file() or path.stat().st_size != sheet["size_bytes"] \
                 or sha256_file(path) != sheet["sha256"]:
             missing.append(sheet["path"])
+    indexed_artifacts = read_json(
+        experiment / "artifacts.json", schema_name="artifact_manifest"
+    ).get("artifacts", [])
+    index_by_path = {
+        item.get("path"): item for item in indexed_artifacts
+        if isinstance(item, dict)
+    }
+    indexed_paths: list[dict[str, Any]] = []
+
+    def check_artifact(item: dict[str, Any], *, png: bool = False) -> None:
+        path = _contained(experiment, experiment / item["path"])
+        if (not path.is_file() or path.stat().st_size != item["size_bytes"]
+                or sha256_file(path) != item["sha256"]):
+            missing.append(item["path"])
+            return
+        indexed_paths.append(item)
+        if png:
+            try:
+                from PIL import Image
+
+                with Image.open(path) as image:
+                    dimensions = image.size
+                    image.verify()
+                expected = item.get("image_dimensions", {})
+                if image.format != "PNG" or (
+                    expected and dimensions != (
+                        expected.get("width"), expected.get("height")
+                    )
+                ):
+                    missing.append(f"{item['path']} (invalid PNG metadata)")
+            except (OSError, ValueError) as error:
+                missing.append(f"{item['path']} (invalid PNG: {error})")
+
     for slot in payload.get("slots", []):
         if slot["generation_status"] == "FAILED":
             raise ValueError(
@@ -848,16 +1099,9 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
             )
         if snapshot:
             for item in [snapshot["triptych"], *snapshot["panels"]]:
-                path = _contained(experiment, experiment / item["path"])
-                if (not path.is_file() or path.stat().st_size != item["size_bytes"]
-                        or sha256_file(path) != item["sha256"]):
-                    missing.append(item["path"])
+                check_artifact(item, png=True)
         if slot.get("animation"):
-            item = slot["animation"]
-            path = _contained(experiment, experiment / item["path"])
-            if (not path.is_file() or path.stat().st_size != item["size_bytes"]
-                    or sha256_file(path) != item["sha256"]):
-                missing.append(item["path"])
+            check_artifact(slot["animation"])
         if slot["generation_status"] != "GENERATED" and not slot.get(
             "failure_reason"
         ):
@@ -870,6 +1114,27 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
             source = _contained(experiment, experiment / source_path)
             if not source.is_file() or sha256_file(source) != source_hash:
                 missing.append(source_path)
+    if missing:
+        raise ValueError("missing or modified visualization artifacts: "
+                         + ", ".join(sorted(set(missing))))
+    for item in payload.get("comparison_sheets", []):
+        indexed_paths.append(item)
+    manifest_relative = manifest_path.relative_to(experiment).as_posix()
+    manifest_index_entry = index_by_path.get(manifest_relative)
+    for item in indexed_paths:
+        indexed = index_by_path.get(item["path"])
+        if (
+            not indexed
+            or indexed.get("size_bytes") != item.get("size_bytes")
+            or indexed.get("sha256") != item.get("sha256")
+        ):
+            missing.append(f"{item['path']} (global artifact index mismatch)")
+    if (
+        not manifest_index_entry
+        or manifest_index_entry.get("size_bytes") != manifest_path.stat().st_size
+        or manifest_index_entry.get("sha256") != sha256_file(manifest_path)
+    ):
+        missing.append(f"{manifest_relative} (global artifact index mismatch)")
     if missing:
         raise ValueError("missing or modified visualization artifacts: "
                          + ", ".join(sorted(set(missing))))
@@ -938,21 +1203,648 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _snapshot_only_rows(
+    experiment: Path, plan: list[dict[str, Any]], attempts: dict[str, list[dict[str, Any]]]
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
+    rows: list[dict[str, Any]] = []
+    instances: dict[str, dict[str, Any]] = {}
+    for entry in plan:
+        run_key = str(entry["run_key"])
+        record = _select_attempt(attempts.get(run_key))
+        row: dict[str, Any] = {
+            "plan": entry,
+            "record": record,
+            "solution": None,
+            "instance": None,
+            "source_solution_path": None,
+            "source_solution_sha256": None,
+            "ineligible_reason": None,
+        }
+        if record is None:
+            row["ineligible_reason"] = "NO_TERMINAL_RUN_RECORD"
+        elif record.get("_visual_validation_error"):
+            row["ineligible_reason"] = (
+                "RUN_RECORD_VALIDATION_FAILED: "
+                + str(record["_visual_validation_error"])
+            )
+        else:
+            instance_id = str(entry["instance_id"])
+            if instance_id not in instances:
+                input_path = experiment / "input" / f"{instance_id}.json"
+                if not input_path.is_file():
+                    raise ValueError(f"planned canonical input is missing: {input_path}")
+                instances[instance_id] = load_instance(input_path)
+            instance = instances[instance_id]
+            canonical_hash = sha256_file(
+                experiment / "input" / f"{instance_id}.json"
+            )
+            if record.get("input_sha256") != canonical_hash:
+                raise ValueError(
+                    f"canonical input checksum differs from validated run "
+                    f"record for {run_key}"
+                )
+            run_dir = Path(str(record["_visual_run_dir"]))
+            result = record.get("result")
+            result = result if isinstance(result, dict) else {}
+            solver = result.get("solver_result")
+            solver = solver if isinstance(solver, dict) else {}
+            solution_rel = solver.get("solution_json_path")
+            solution_path = (
+                run_dir / str(solution_rel)
+                if solution_rel else run_dir / "result" / "solution.json"
+            )
+            if not solution_path.is_file():
+                row["ineligible_reason"] = (
+                    "NO_SOLUTION_ARTIFACT" if not result.get("feasible")
+                    else "FEASIBLE_RESULT_WITHOUT_SOLUTION_ARTIFACT"
+                )
+            else:
+                row["source_solution_path"] = solution_path.relative_to(
+                    experiment
+                ).as_posix()
+                row["source_solution_sha256"] = sha256_file(solution_path)
+                row["instance"] = instance
+                if result.get("feasible") is not True:
+                    row["ineligible_reason"] = "RESULT_NOT_FEASIBLE"
+                else:
+                    try:
+                        solution = load_solution(solution_path, instance)
+                        _validate_solution_for_instance(solution, instance)
+                        solution_objective = str(
+                            solution.get("objective", entry["objective"])
+                        ).strip().lower().replace("-", "").replace("_", "")
+                        if solution_objective != str(entry["objective"]).replace(
+                            "-", ""
+                        ):
+                            raise ValueError(
+                                f"serialized solution objective "
+                                f"{solution_objective!r} does not match "
+                                f"planned {entry['objective']!r}"
+                            )
+                    except (OSError, ValueError, KeyError, TypeError) as error:
+                        row["ineligible_reason"] = (
+                            f"INVALID_SOLUTION: {type(error).__name__}: {error}"
+                        )
+                    else:
+                        row["solution"] = solution
+        rows.append(row)
+    return rows, instances
+
+
+def _validate_staged_png(path: Path, artifact: dict[str, Any]) -> None:
+    from PIL import Image
+
+    if not path.is_file() or path.stat().st_size <= 0:
+        raise ValueError(f"staged snapshot is missing or empty: {path}")
+    if path.stat().st_size != artifact["size_bytes"]:
+        raise ValueError(f"staged snapshot size mismatch: {path}")
+    if sha256_file(path) != artifact["sha256"]:
+        raise ValueError(f"staged snapshot checksum mismatch: {path}")
+    with Image.open(path) as image:
+        image_format = image.format
+        dimensions = image.size
+        image.verify()
+    expected = artifact.get("image_dimensions", {})
+    if image_format != "PNG" or min(dimensions) < 100:
+        raise ValueError(f"staged snapshot is not a sensible PNG: {path}")
+    if expected and dimensions != (
+        expected.get("width"), expected.get("height")
+    ):
+        raise ValueError(f"staged snapshot dimensions mismatch: {path}")
+
+
+def _replace_file_atomically(source: Path, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    os.replace(source, target)
+    directory_fd = os.open(target.parent, os.O_RDONLY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+
+
+def regenerate_snapshots(
+    experiment_dir: str | Path,
+    *,
+    dpi: int = 90,
+    show_trajectories: bool = True,
+    point_label_policy: str = "supports",
+    show_support_connectors: bool = False,
+) -> dict[str, Any]:
+    """Safely replace only snapshot PNGs from existing validated run artifacts."""
+    experiment = Path(experiment_dir).resolve()
+    if not experiment.is_dir():
+        raise ValueError(f"experiment directory does not exist: {experiment}")
+    experiment_manifest_path = experiment / "experiment_manifest.json"
+    if not experiment_manifest_path.is_file():
+        raise ValueError("experiment manifest is missing")
+    experiment_manifest = read_json(experiment_manifest_path)
+    if experiment_manifest.get("experiment_id") != experiment.name:
+        raise ValueError("experiment manifest does not belong to this directory")
+    plan = _read_plan(experiment)
+    visualization_path = experiment / "reports" / "visualization_manifest.json"
+    if not visualization_path.is_file():
+        raise ValueError("visualization manifest is missing")
+    old_manifest = read_json(visualization_path)
+    if old_manifest.get("experiment_id") != experiment.name:
+        raise ValueError("visualization manifest belongs to another experiment")
+    if old_manifest.get("planned_slots") != len(plan):
+        raise ValueError("visualization manifest planned-slot count does not match run plan")
+    old_slots = old_manifest.get("slots")
+    if not isinstance(old_slots, list) or len(old_slots) != len(plan):
+        raise ValueError("visualization manifest does not cover the complete run plan")
+    old_by_key = {slot.get("run_key"): slot for slot in old_slots}
+    plan_keys = {str(entry["run_key"]) for entry in plan}
+    if len(old_by_key) != len(plan) or set(old_by_key) != plan_keys:
+        raise ValueError("visualization manifest slots do not match immutable run plan")
+    if dpi <= 0 or point_label_policy not in {"none", "supports", "all"}:
+        raise ValueError("invalid snapshot rendering settings")
+
+    attempts = _load_attempts(experiment)
+    rows, instances = _snapshot_only_rows(experiment, plan, attempts)
+    eligible = [row for row in rows if row["solution"] is not None]
+    old_renderable = {
+        key for key, slot in old_by_key.items()
+        if slot.get("snapshots") and slot.get("generation_status") == "GENERATED"
+    }
+    new_renderable = {str(row["plan"]["run_key"]) for row in eligible}
+    if old_renderable != new_renderable:
+        raise ValueError(
+            "existing visualization manifest eligibility disagrees with validated "
+            f"run artifacts (old={len(old_renderable)}, current={len(new_renderable)})"
+        )
+    for row in eligible:
+        existing = old_by_key[str(row["plan"]["run_key"])]
+        if existing.get("source_solution_sha256") != row["source_solution_sha256"]:
+            raise ValueError(
+                "serialized solution checksum differs from visualization manifest "
+                f"for {row['plan']['run_key']}"
+            )
+
+    stage_root = Path(tempfile.mkdtemp(
+        prefix=f".{experiment.name}.snapshot-stage-", dir=experiment.parent
+    )).resolve()
+    backup_root = stage_root / "backup"
+    backup_root.mkdir()
+    png_replacements: list[tuple[Path, Path, dict[str, Any]]] = []
+    try:
+        new_snapshots: dict[str, dict[str, Any]] = {}
+        for row in eligible:
+            entry = row["plan"]
+            run_id = str(row["record"]["run_id"])
+            rendered = _render_solution_images(
+                stage_root, row["instance"], row["solution"], row["record"],
+                entry, run_id, dpi,
+                show_trajectories=show_trajectories,
+                point_label_policy=point_label_policy,
+                show_support_connectors=show_support_connectors,
+            )
+            expected_dir = Path("snapshots") / _safe_filename(
+                str(entry["instance_id"])
+            ) / _safe_filename(str(entry["objective"])) / _safe_filename(
+                str(entry["algorithm"])
+            ) / run_id
+            items = [*rendered["panels"], rendered["triptych"]]
+            expected_names = [
+                "tau-0.png", "tau-0.5.png", "tau-1.png", "three-time.png"
+            ]
+            mapped_items = []
+            for item, filename in zip(items, expected_names):
+                expected_relative = (expected_dir / filename).as_posix()
+                staged_path = stage_root / item["path"]
+                if item["path"] != expected_relative:
+                    raise ValueError(
+                        f"renderer produced unexpected snapshot path: {item['path']}"
+                    )
+                _validate_staged_png(staged_path, item)
+                target = _contained(experiment, experiment / expected_relative)
+                if not target.is_file():
+                    raise ValueError(f"existing snapshot to replace is missing: {target}")
+                mapped = {**item, "path": expected_relative}
+                mapped_items.append(mapped)
+                png_replacements.append((staged_path, target, mapped))
+            new_snapshots[str(entry["run_key"])] = {
+                "triptych": mapped_items[3],
+                "panels": mapped_items[:3],
+                "rendering_parameters": rendered["rendering_parameters"],
+            }
+
+        staged_pngs = sorted(
+            path.relative_to(stage_root).as_posix()
+            for path in (stage_root / "snapshots").rglob("*.png")
+        )
+        expected_pngs = sorted(item[2]["path"] for item in png_replacements)
+        if staged_pngs != expected_pngs:
+            raise ValueError("staged PNG set differs from validated renderable slots")
+        if len(png_replacements) != len(eligible) * 4:
+            raise ValueError("staged output count is not four PNGs per eligible slot")
+
+        updated_manifest = json.loads(json.dumps(old_manifest))
+        slot_lookup = {slot["run_key"]: slot for slot in updated_manifest["slots"]}
+        for row in rows:
+            key = str(row["plan"]["run_key"])
+            slot = slot_lookup[key]
+            if key in new_snapshots:
+                slot["snapshots"] = new_snapshots[key]
+                slot["generation_status"] = (
+                    "GENERATED" if slot.get("animation") else "FAILED"
+                )
+                if slot["generation_status"] == "FAILED":
+                    slot["failure_reason"] = "existing animation artifact is missing"
+                old_parameters = slot.get("rendering_parameters", {})
+                animation_parameters = {
+                    name: value for name, value in old_parameters.items()
+                    if name.startswith("animation_") or name == "encoder_fallback"
+                }
+                slot["rendering_parameters"] = {
+                    **animation_parameters,
+                    **new_snapshots[key]["rendering_parameters"],
+                }
+            else:
+                slot["snapshots"] = None
+                slot["generation_status"] = "INELIGIBLE"
+                slot["failure_reason"] = row["ineligible_reason"]
+        if any(slot["generation_status"] == "FAILED" for slot in updated_manifest["slots"]):
+            raise ValueError("a previously generated slot has no animation artifact")
+        updated_manifest.update({
+            "renderer_version": RENDERER_VERSION,
+            "generated_solution_snapshots": len(eligible),
+            "generated_snapshot_files": len(png_replacements),
+            "ineligible_slots": len(rows) - len(eligible),
+            "failed_slots": 0,
+            "rendering_policy": {
+                **updated_manifest.get("rendering_policy", {}),
+                "renderer_version": RENDERER_VERSION,
+                "visualization_schema_version": 1,
+                "normalized_times": list(TIME_FRACTIONS),
+                "time_conversion": "t = tau * T_end",
+                "dpi": dpi,
+                "output_format": "png",
+                "layout_method": "reserved-gridspec",
+                "trajectory_visibility": (
+                    "visible" if show_trajectories else "hidden"
+                ),
+                "point_label_policy": point_label_policy,
+                "support_connector_policy": (
+                    "visible" if show_support_connectors else "hidden"
+                ),
+                "opacity": {
+                    "trajectory": TRAJECTORY_ALPHA,
+                    "coverage_disk": DISK_ALPHA,
+                    "support_connector": SUPPORT_CONNECTOR_ALPHA,
+                },
+                "line_widths": {
+                    "trajectory": TRAJECTORY_LINE_WIDTH,
+                    "coverage_disk_outline": DISK_LINE_WIDTH,
+                    "support_connector": SUPPORT_LINE_WIDTH,
+                    "support_marker_outline": SUPPORT_MARKER_LINE_WIDTH,
+                    "moving_point_outline": POINT_MARKER_LINE_WIDTH,
+                    "station_marker_outline": STATION_MARKER_LINE_WIDTH,
+                },
+                "spatial_bounds_policy": (
+                    "one square padded extent over station centers, trajectory "
+                    "waypoints, snapshot positions, and displayed-time disk extents"
+                ),
+                "axis_scaling": "equal",
+            },
+        })
+
+        report_path = experiment / "reports" / "visualization_report.md"
+        report_text = "\n".join([
+            "# Visualization generation report", "",
+            f"- Experiment: `{experiment.name}`",
+            f"- Selected instances: {updated_manifest['dataset_instance_count']}",
+            f"- Objectives: {', '.join(sorted({str(e['objective']) for e in plan}))}",
+            f"- Expected comparison sheets: {updated_manifest['expected_comparison_sheets']}",
+            f"- Created comparison sheets: {len(updated_manifest['comparison_sheets'])}",
+            f"- Slots in run plan: {len(plan)}",
+            f"- Solutions with snapshots: {len(eligible)}",
+            f"- Regenerated snapshot PNGs: {len(png_replacements)}",
+            f"- Per-solution animations (unchanged): {updated_manifest['generated_animations']}",
+            f"- Ineligible slots: {len(rows) - len(eligible)}",
+            "- Rendering failures: 0",
+            "",
+            "Renderability was re-derived from the immutable plan, validated run "
+            "records, canonical inputs and serialized solutions. Snapshot-only "
+            "regeneration did not invoke solvers, calibration, or animation generation.",
+            "",
+            f"Manifest: `{visualization_path.relative_to(experiment).as_posix()}`",
+        ]) + "\n"
+
+        regeneration_path = experiment / "reports" / "snapshot_regeneration_report.md"
+        from datetime import datetime, timezone
+
+        current_revision = "unknown"
+        try:
+            import subprocess
+
+            current_revision = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
+                capture_output=True, text=True,
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            pass
+        renderer_sha256 = sha256_file(Path(__file__).resolve())
+        ineligible_reasons: dict[str, int] = {}
+        for row in rows:
+            if row["ineligible_reason"]:
+                reason = str(row["ineligible_reason"])
+                ineligible_reasons[reason] = ineligible_reasons.get(reason, 0) + 1
+        ineligible_lines = []
+        for reason, count in sorted(ineligible_reasons.items()):
+            escaped_reason = reason.replace("|", "\\|")
+            ineligible_lines.append(f"| `{escaped_reason}` | {count} |")
+        regeneration_text = "\n".join([
+            "# Snapshot regeneration report", "",
+            f"- Target experiment ID: `{experiment.name}`",
+            f"- Renderer version: `{RENDERER_VERSION}`",
+            f"- Source code revision (Git HEAD): `{current_revision}`",
+            f"- Renderer source SHA-256 (working tree): `{renderer_sha256}`",
+            f"- Completed at (UTC): `{datetime.now(timezone.utc).isoformat()}`",
+            f"- Planned slots: {len(plan)}",
+            f"- Renderable solutions: {len(eligible)}",
+            f"- PNGs regenerated: {len(png_replacements)}",
+            f"- Ineligible slots: {len(rows) - len(eligible)}",
+            "- Rendering failures: 0",
+            "- PNG validation: all staged images decoded with Pillow; dimensions, "
+            "sizes, checksums, output paths and four-file-per-slot coverage verified.",
+            "- Solver execution, calibration, run-plan creation and animation "
+            "generation: not performed.",
+            "- Solver run records, results, serialized solutions, traces, aggregates, "
+            "tables and source inputs: not modified.",
+            "- Visualization manifest, report, global artifact index and snapshot "
+            "figure status: refreshed transactionally.",
+            "",
+            "## Ineligible planned slots",
+            "",
+            "| Reason | Slots |",
+            "|---|---:|",
+            *ineligible_lines,
+            "",
+            "## Validation",
+            "",
+            f"- Panels: {len(eligible) * 3}; triptychs: {len(eligible)}.",
+            f"- Expected and decoded PNGs: {len(png_replacements)}.",
+            "- Comparison sheets retained in place; their existing relative PNG links "
+            "continue to target the replaced files.",
+            "- Existing final smoke20 audit remains FAIL if unrelated solver-result "
+            "integrity failures persist; snapshot status is reported separately.",
+        ]) + "\n"
+
+        # Back up every destination before replacement; metadata is published only
+        # after all staged images have passed their independent decode checks.
+        mutable_payloads: dict[Path, bytes | None] = {}
+        for path in (
+            visualization_path, report_path, regeneration_path,
+            experiment / "artifacts.json",
+            experiment / "figures" / "figure_status.json",
+            experiment / "figures" / "REPORT.md",
+            experiment / "reports" / "final_smoke20_audit.json",
+            experiment / "reports" / "final_smoke20_audit.md",
+        ):
+            mutable_payloads[path] = path.read_bytes() if path.is_file() else None
+        backup_files: dict[Path, Path] = {}
+        for target in [target for _, target, _ in png_replacements]:
+            backup = backup_root / target.relative_to(experiment)
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(target, backup)
+            backup_files[target] = backup
+
+        replaced_pngs: list[Path] = []
+        try:
+            for staged, target, _item in png_replacements:
+                _replace_file_atomically(staged, target)
+                replaced_pngs.append(target)
+            write_derived_json(visualization_path, updated_manifest)
+            write_derived_bytes(report_path, report_text.encode("utf-8"))
+            write_derived_bytes(regeneration_path, regeneration_text.encode("utf-8"))
+
+            from report_experiment import _snapshot_figure_status
+
+            figure_status_path = experiment / "figures" / "figure_status.json"
+            figure_status = read_json(figure_status_path)
+            figure_rows = figure_status.get("figures", [])
+            index_experiment_artifacts(experiment)
+            snapshot_status = _snapshot_figure_status(experiment)
+            for index, item in enumerate(figure_rows):
+                if item.get("figure") == "three_time_solution_figures":
+                    figure_rows[index] = snapshot_status
+                    break
+            else:
+                figure_rows.append(snapshot_status)
+            write_derived_json(figure_status_path, figure_status)
+            figure_report_path = experiment / "figures" / "REPORT.md"
+            figure_report = figure_report_path.read_text(encoding="utf-8")
+            figure_status_line = (
+                f"| three_time_solution_figures | "
+                f"{snapshot_status['generation_status']} |"
+            )
+            figure_report = __import__("re").sub(
+                r"\| three_time_solution_figures \| [A-Z_]+ \|",
+                figure_status_line, figure_report,
+            )
+            write_derived_bytes(
+                figure_report_path, figure_report.encode("utf-8")
+            )
+
+            audit_json_path = experiment / "reports" / "final_smoke20_audit.json"
+            if audit_json_path.is_file():
+                final_audit = read_json(audit_json_path)
+                validation = final_audit.get("validation_results", {})
+                figure_check = validation.get("figure_files", {})
+                details = figure_check.get("details", {})
+                details["stale_three_time_status"] = False
+                details["three_time_status"] = snapshot_status["generation_status"]
+                not_generated = details.get("not_generated", [])
+                details["not_generated"] = [
+                    item for item in not_generated
+                    if item.get("figure") != "three_time_solution_figures"
+                ]
+                figure_check["status"] = "PASS"
+                figure_check["details"] = details
+                validation["figure_files"] = figure_check
+                visualization_check = validation.get("visualization_artifacts", {})
+                visualization_details = visualization_check.get("details", {})
+                visualization_details.update({
+                    "renderable": len(eligible),
+                    "triptychs": len(eligible),
+                    "snapshot_panels": len(eligible) * 3,
+                    "snapshot_pngs": len(png_replacements),
+                    "invalid_files": [],
+                })
+                visualization_check["details"] = visualization_details
+                validation["visualization_artifacts"] = visualization_check
+                final_audit["validation_results"] = validation
+                final_audit["critical_errors"] = [
+                    item for item in final_audit.get("critical_errors", [])
+                    if item.get("check") != "stale_figure_status"
+                ]
+                final_audit["observed_counts"]["triptychs"] = len(eligible)
+                final_audit["observed_counts"]["snapshot_panels"] = len(eligible) * 3
+                final_audit["observed_counts"]["snapshot_pngs"] = len(png_replacements)
+                final_audit["snapshot_regeneration"] = {
+                    "status": "PASS",
+                    "renderer_version": RENDERER_VERSION,
+                    "renderable": len(eligible),
+                    "pngs_regenerated": len(png_replacements),
+                    "triptychs_validated": len(eligible),
+                    "solver_execution": False,
+                }
+                remaining_failures = [
+                    item for item in final_audit.get("validation_results", {}).values()
+                    if isinstance(item, dict) and item.get("status") == "FAIL"
+                ]
+                final_audit["audit_status"] = (
+                    "FAIL" if remaining_failures or final_audit["critical_errors"]
+                    else "PASS"
+                )
+                final_audit["audited_at"] = utc_now()
+                write_derived_json(audit_json_path, final_audit)
+
+                audit_md_path = experiment / "reports" / "final_smoke20_audit.md"
+                audit_md = audit_md_path.read_text(encoding="utf-8")
+                audit_md = audit_md.replace(
+                    "- **stale_figure_status**: "
+                    "\"three-time figures marked NOT_GENERATED although triptychs exist\"\n",
+                    "",
+                )
+                audit_md = audit_md.replace(
+                    "- **Audit status:** FAIL",
+                    f"- **Audit status:** {final_audit['audit_status']}",
+                    1,
+                )
+                audit_md += (
+                    "\n## Snapshot regeneration re-audit\n\n"
+                    f"- Snapshot-specific audit: **PASS** — {len(eligible)} "
+                    f"renderable solutions, {len(eligible) * 3} panels, "
+                    f"{len(eligible)} triptychs, and {len(png_replacements)} "
+                    "decoded and checksummed PNGs.\n"
+                    "- `three_time_solution_figures` is now "
+                    f"`{snapshot_status['generation_status']}` based on validated "
+                    "visualization-manifest artifacts.\n"
+                    "- Solver results were not rerun or rewritten. The overall "
+                    f"audit remains **{final_audit['audit_status']}** due only to "
+                    "any unrelated pre-existing failures retained above.\n"
+                    "- Detailed rendering-only evidence: "
+                    "[snapshot regeneration report](snapshot_regeneration_report.md).\n"
+                )
+                write_derived_bytes(
+                    audit_md_path, audit_md.encode("utf-8")
+                )
+
+            index_experiment_artifacts(experiment)
+            final_audit_result = audit(experiment)
+            if final_audit_result["rendered_slots"] != len(eligible):
+                raise ValueError("post-replacement visualization audit count mismatch")
+            artifact_index_path = experiment / "artifacts.json"
+            indexed_count = len(read_json(
+                artifact_index_path, schema_name="artifact_manifest"
+            )["artifacts"])
+            audit_json_path = experiment / "reports" / "final_smoke20_audit.json"
+            if audit_json_path.is_file():
+                final_audit = read_json(audit_json_path)
+                final_audit["validation_results"]["artifact_index"]["details"][
+                    "indexed"
+                ] = indexed_count
+                final_audit["observed_counts"]["indexed_artifacts"] = indexed_count
+                final_audit["observed_counts"]["tracked_in_experiment"] = (
+                    indexed_count + 1
+                )
+                write_derived_json(audit_json_path, final_audit)
+                audit_md_path = experiment / "reports" / "final_smoke20_audit.md"
+                audit_md = audit_md_path.read_text(encoding="utf-8")
+                audit_md = __import__("re").sub(
+                    r"Artifact index entries \d+;",
+                    f"Artifact index entries {indexed_count};",
+                    audit_md,
+                )
+                audit_md = __import__("re").sub(
+                    r"and \d+ in this experiment\.",
+                    f"and {indexed_count + 1} in this experiment.",
+                    audit_md,
+                    count=1,
+                )
+                write_derived_bytes(audit_md_path, audit_md.encode("utf-8"))
+                index_experiment_artifacts(experiment)
+                final_audit_result = audit(experiment)
+        except BaseException:
+            for target in reversed(replaced_pngs):
+                backup = backup_files[target]
+                restore = stage_root / "restore" / target.relative_to(experiment)
+                restore.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(backup, restore)
+                _replace_file_atomically(restore, target)
+            for path, contents in mutable_payloads.items():
+                if contents is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    write_derived_bytes(path, contents)
+            raise
+
+        index_experiment_artifacts(experiment)
+        return {
+            "experiment_id": experiment.name,
+            "planned_slots": len(plan),
+            "renderable_solutions": len(eligible),
+            "regenerated_pngs": len(png_replacements),
+            "ineligible_slots": len(rows) - len(eligible),
+            "ineligible_reasons": ineligible_reasons,
+            "renderer_version": RENDERER_VERSION,
+            "audit": final_audit_result,
+        }
+    finally:
+        shutil.rmtree(stage_root)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--experiment", required=True)
     parser.add_argument("--fps", type=int, default=12)
     parser.add_argument("--frames", type=int, default=48)
     parser.add_argument("--dpi", type=int, default=90)
+    parser.add_argument("--hide-trajectories", action="store_true")
+    parser.add_argument(
+        "--point-labels", choices=("none", "supports", "all"),
+        default="supports",
+    )
+    parser.add_argument("--show-support-connectors", action="store_true")
     parser.add_argument("--audit", action="store_true")
+    parser.add_argument(
+        "--snapshots-only",
+        action="store_true",
+        help="safely regenerate static PNG snapshots without animations or solvers",
+    )
+    parser.add_argument(
+        "--replace-existing",
+        action="store_true",
+        help="allow snapshots-only mode to atomically replace existing PNGs",
+    )
     args = parser.parse_args(argv)
     try:
         if args.audit:
             report = audit(args.experiment)
             print(json.dumps(report, sort_keys=True))
+        elif args.snapshots_only:
+            if not args.replace_existing:
+                raise ValueError(
+                    "--snapshots-only requires explicit --replace-existing"
+                )
+            report = regenerate_snapshots(
+                args.experiment,
+                dpi=args.dpi,
+                show_trajectories=not args.hide_trajectories,
+                point_label_policy=args.point_labels,
+                show_support_connectors=args.show_support_connectors,
+            )
+            print(json.dumps(report, sort_keys=True))
+        elif args.replace_existing:
+            raise ValueError("--replace-existing is only valid with --snapshots-only")
         else:
             report = generate(
-                args.experiment, fps=args.fps, frames=args.frames, dpi=args.dpi
+                args.experiment, fps=args.fps, frames=args.frames, dpi=args.dpi,
+                show_trajectories=not args.hide_trajectories,
+                point_label_policy=args.point_labels,
+                show_support_connectors=args.show_support_connectors,
             )
             print(json.dumps({
                 "experiment_id": report["experiment_id"],

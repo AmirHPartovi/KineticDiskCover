@@ -2,6 +2,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -371,3 +372,29 @@ def test_figure_generation_only_emits_plots_for_valid_observations(tmp_path):
             assert artifact.stat().st_size > 0
     assert by_name["convergence_curves"]["generation_status"] == "NOT_GENERATED"
     assert "trace" in by_name["convergence_curves"]["reason"].lower()
+
+
+def test_snapshot_figure_status_counts_only_valid_snapshot_records(
+    tmp_path, monkeypatch
+):
+    experiment = tmp_path / "snapshot-status"
+    reports = experiment / "reports"
+    reports.mkdir(parents=True)
+    (reports / "visualization_manifest.json").write_text(json.dumps({
+        "slots": [
+            {"run_key": "ineligible", "snapshots": None},
+            {
+                "run_key": "rendered",
+                "snapshots": {"triptych": {"path": "snapshots/run/three-time.png"}},
+            },
+        ],
+    }), encoding="utf-8")
+    monkeypatch.setitem(
+        sys.modules, "visualize_experiment",
+        SimpleNamespace(audit=lambda _path: {"rendered_slots": 1}),
+    )
+
+    status = report._snapshot_figure_status(experiment)
+
+    assert status["generation_status"] == "GENERATED"
+    assert status["snapshot_count"] == 1

@@ -1376,7 +1376,8 @@ def command_finalize(args: argparse.Namespace) -> None:
 
 
 def command_check_figures(args: argparse.Namespace) -> None:
-    directory = Path(args.experiment).resolve() / "figures"
+    experiment = Path(args.experiment).resolve()
+    directory = experiment / "figures"
     report_path = directory / "REPORT.md"
     if not report_path.is_file():
         raise ValueError("missing figures/REPORT.md")
@@ -1418,6 +1419,30 @@ def command_check_figures(args: argparse.Namespace) -> None:
             missing_artifacts.append(f"{name}: missing grounded not-generated reason")
     if missing_artifacts:
         raise ValueError("figure artifact audit failed: " + ", ".join(missing_artifacts))
+    try:
+        from report_experiment import _snapshot_figure_status
+    except ImportError:
+        from scripts.report_experiment import _snapshot_figure_status
+    expected = _snapshot_figure_status(experiment)
+    actual = by_name.get("three_time_solution_figures")
+    if actual is None or any(
+        actual.get(field) != expected.get(field)
+        for field in (
+            "generation_status", "path_manifest", "artifact_class",
+            "snapshot_count", "reason",
+        )
+    ):
+        raise ValueError(
+            "figure status is stale for three_time_solution_figures; "
+            "regenerate the figure report from the visualization manifest"
+        )
+    expected_status_line = (
+        f"| three_time_solution_figures | {expected['generation_status']} |"
+    )
+    if expected_status_line not in report_path.read_text(encoding="utf-8"):
+        raise ValueError(
+            "figures/REPORT.md disagrees with the validated snapshot status"
+        )
 
 
 def command_check_tables(args: argparse.Namespace) -> None:

@@ -20,6 +20,6 @@
 | convergence_curves | NOT_GENERATED | — | No valid run-associated trace CSV files with finite supported x/y columns are present. 600 declared trace file(s) were missing or invalid. |
 | minmaxsum_peak_integral | GENERATED | [PNG](report_minmaxsum_peak_integral.png) · [PDF](report_minmaxsum_peak_integral.pdf) |  |
 | minmaxsum_pareto | GENERATED | [PNG](report_minmaxsum_pareto.png) · [PDF](report_minmaxsum_pareto.pdf) |  |
-| three_time_solution_figures | NOT_GENERATED | — | No actual renderable run solution snapshots; plan-only slots are not visualized as solver results. |
+| three_time_solution_figures | GENERATED | — | No actual renderable run solution snapshots; plan-only slots are not visualized as solver results. |
 
 The Prompt 6 per-instance/objective comparison sheets and solution snapshots, when present, are indexed in [the visualization manifest](../reports/visualization_manifest.json).

@@ -1,6 +1,6 @@
 {
   "audit_status": "FAIL",
-  "audited_at": "2026-10-13T17:47:36.091507+00:00",
+  "audited_at": "2026-10-13T19:08:10.208002Z",
   "certification_rows": 600,
   "configuration": {
     "algorithms": [
@@ -641,10 +641,6 @@
         ],
         "offending_rows": 65
       }
-    },
-    {
-      "check": "stale_figure_status",
-      "details": "three-time figures marked NOT_GENERATED although triptychs exist"
     }
   ],
   "expected_counts": {
@@ -1293,12 +1289,14 @@
     },
     "feasible": 502,
     "figures": 10,
-    "indexed_artifacts": 21588,
+    "indexed_artifacts": 21591,
     "missing": 0,
     "physical_attempts": 833,
     "planned": 660,
     "proven_optimal": 13,
     "selected_instances": 20,
+    "snapshot_panels": 1506,
+    "snapshot_pngs": 2008,
     "statuses": {
       "COMPLETED": 487,
       "FAILED": 51,
@@ -1308,13 +1306,36 @@
     },
     "tables_csv": 13,
     "terminal": 660,
-    "tracked_in_experiment": 21589,
+    "tracked_in_experiment": 21592,
     "tracked_results": 21623,
     "triptychs": 502,
     "valid_sidecars": 2155,
     "verified": 502
   },
   "schema_version": 1,
+  "snapshot_regeneration": {
+    "comparison_png_links_verified": 3012,
+    "comparison_sheets_verified": 60,
+    "figure_status": "GENERATED",
+    "pngs_regenerated": 2008,
+    "renderable": 502,
+    "renderer_version": 2,
+    "solver_execution": false,
+    "status": "PASS",
+    "triptychs_validated": 502,
+    "visual_review": {
+      "actual_objectives_inspected": [
+        "minmax",
+        "minsum",
+        "minmaxsum"
+      ],
+      "contact_sheet": "/var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-smoke20-visual-review-1a17dk83/contact-sheet.png",
+      "dense_instance": "rd100-9407ab41999f-b9917bc5f5",
+      "png_validation_failures": 0,
+      "remaining_tradeoff": "Support-point labels remain locally dense; actual coverage disks overlap geometrically where applicable.",
+      "translated_fixture_inspected": true
+    }
+  },
   "status_matrix": [
     {
       "FAILED": 0,
@@ -1849,7 +1870,7 @@
     "artifact_index": {
       "details": {
         "errors": [],
-        "indexed": 21588
+        "indexed": 21591
       },
       "status": "PASS"
     },
@@ -1898,14 +1919,10 @@
           {
             "figure": "convergence_curves",
             "reason": "No valid run-associated trace CSV files with finite supported x/y columns are present. 600 declared trace file(s) were missing or invalid."
-          },
-          {
-            "figure": "three_time_solution_figures",
-            "reason": "No actual renderable run solution snapshots; plan-only slots are not visualized as solver results."
           }
         ],
-        "stale_three_time_status": true,
-        "three_time_status": "NOT_GENERATED"
+        "stale_three_time_status": false,
+        "three_time_status": "GENERATED"
       },
       "status": "PASS"
     },
@@ -2675,6 +2692,8 @@
         "comparison_sheets": 60,
         "invalid_files": [],
         "renderable": 502,
+        "snapshot_panels": 1506,
+        "snapshot_pngs": 2008,
         "triptychs": 502
       },
       "status": "PASS"

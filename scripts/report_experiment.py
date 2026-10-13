@@ -1114,6 +1114,70 @@ FIGURE_DEFINITIONS = [
 ]
 
 
+def _snapshot_figure_status(experiment: Path) -> dict[str, Any]:
+    manifest_path = experiment / "reports" / "visualization_manifest.json"
+    if not manifest_path.is_file():
+        return {
+            "figure": "three_time_solution_figures",
+            "generation_status": "NOT_GENERATED",
+            "path_png": None,
+            "path_pdf": None,
+            "path_manifest": None,
+            "artifact_class": "solution_snapshots",
+            "snapshot_count": 0,
+            "reason": "No visualization manifest exists; snapshot artifacts are not generated.",
+        }
+
+    try:
+        from visualize_experiment import audit as audit_visualizations
+    except ImportError:
+        from scripts.visualize_experiment import audit as audit_visualizations
+
+    audit_result = audit_visualizations(experiment)
+    manifest = read_json(manifest_path)
+    snapshot_count = sum(
+        1 for slot in manifest.get("slots", [])
+        if isinstance(slot, dict)
+        and isinstance(slot.get("snapshots"), dict)
+        and isinstance(slot["snapshots"].get("triptych"), dict)
+    )
+    if snapshot_count != audit_result.get("rendered_slots"):
+        raise ValueError(
+            "visualization manifest snapshot count disagrees with validated slots"
+        )
+    state = "GENERATED" if snapshot_count else "NOT_GENERATED"
+    return {
+        "figure": "three_time_solution_figures",
+        "generation_status": state,
+        "path_png": None,
+        "path_pdf": None,
+        "path_manifest": "../reports/visualization_manifest.json",
+        "artifact_class": "solution_snapshots",
+        "snapshot_count": snapshot_count,
+        "reason": (
+            f"{snapshot_count} verified run triptychs are indexed in the "
+            "authoritative visualization manifest; snapshots are separate from "
+            "report figures owned by this pipeline."
+            if snapshot_count else
+            "The validated visualization manifest contains no generated triptych snapshots."
+        ),
+    }
+
+
+def _replace_snapshot_figure_status(
+    experiment: Path, statuses: Sequence[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    updated = [dict(item) for item in statuses]
+    snapshot_status = _snapshot_figure_status(experiment)
+    for index, item in enumerate(updated):
+        if item.get("figure") == "three_time_solution_figures":
+            updated[index] = snapshot_status
+            break
+    else:
+        updated.append(snapshot_status)
+    return updated
+
+
 def _save_plot(figure: Any, folder: Path, name: str, dpi: int) -> tuple[str, str]:
     folder.mkdir(parents=True, exist_ok=True)
     png = folder / f"{name}.png"
@@ -1571,25 +1635,7 @@ def _plot_figures(data: dict[str, Any], dpi: int) -> list[dict[str, Any]]:
         emit("minmaxsum_peak_integral", lambda: None, reason)
         emit("minmaxsum_pareto", lambda: None, reason)
 
-    visual_path = exp / "reports" / "visualization_manifest.json"
-    visual = read_json(visual_path) if visual_path.is_file() else {}
-    snapshots = int(visual.get("generated_solution_snapshots", 0) or 0)
-    if snapshots:
-        statuses.append({
-            "figure": "three_time_solution_figures",
-            "generation_status": "GENERATED",
-            "path_png": "../reports/visualization_manifest.json",
-            "path_pdf": None,
-            "reason": f"{snapshots} actual-run snapshots are indexed in the visualization manifest.",
-        })
-    else:
-        statuses.append({
-            "figure": "three_time_solution_figures",
-            "generation_status": "NOT_GENERATED",
-            "path_png": None, "path_pdf": None,
-            "reason": "No actual renderable run solution snapshots; plan-only slots are not visualized as solver results.",
-        })
-    return statuses
+    return _replace_snapshot_figure_status(exp, statuses)
 
 
 def _write_figure_report(data: dict[str, Any], statuses: Sequence[Mapping[str, Any]]) -> None:
@@ -1604,16 +1650,20 @@ def _write_figure_report(data: dict[str, Any], statuses: Sequence[Mapping[str, A
         "- Censored TIME_LIMIT/TIMED_OUT durations are not plotted as uncensored runtime observations.",
         "- MinMaxSum is shown only as the `(peak_cost, integral_cost)` vector.",
         "- Missing data are recorded as NOT_GENERATED; no empty placeholder chart is represented as a result.",
+        "- Solution snapshots are a separate artifact class owned by the visualization manifest, not by this report-figure generator.",
         "",
         "| Requested figure | Status | Artifact | Explanation |",
         "|---|---|---|---|",
     ]
     for item in statuses:
         artifact = (
+            f"[Manifest]({item['path_manifest']})"
+            if item.get("path_manifest") else
             f"[PNG]({item['path_png']}) · [PDF]({item['path_pdf']})"
             if item.get("path_png") and item.get("path_pdf") else
-            f"[Manifest]({item['path_png']})"
-            if item.get("path_png") else "—"
+            f"[PNG]({item['path_png']})"
+            if item.get("path_png") else
+            "—"
         )
         lines.append(
             f"| {item['figure']} | {item['generation_status']} | {artifact} | "
@@ -1858,6 +1908,10 @@ def run(experiment_dir: str | Path, stage: str, dpi: int = 300) -> None:
                 }
                 for name, _ in FIGURE_DEFINITIONS
             ]
+        figures = _replace_snapshot_figure_status(
+            data["experiment"], figures
+        )
+        _write_figure_report(data, figures)
     _write_experiment_report(data, figures)
     _write_table_status_json(data, companion_audit="pending")
     _refresh_completeness_artifact_counts(data)

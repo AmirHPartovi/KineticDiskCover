@@ -159,6 +159,81 @@ def test_non_unit_horizon_boundary_and_changing_support_geometry():
     assert visualize.radius_at(solution, 1, 1.0, instance) == 2.0
 
 
+def test_snapshot_bounds_are_shared_square_and_translation_invariant():
+    instance = _instance()
+    solution = _solution("minmax")
+    translated = json.loads(json.dumps(instance))
+    for station in translated["stations"]:
+        station["x"] += 1000.0
+        station["y"] -= 250.0
+    for trajectory in translated["trajectories"]:
+        for waypoint in trajectory["waypoints"]:
+            waypoint["x"] += 1000.0
+            waypoint["y"] -= 250.0
+
+    bounds = visualize._snapshot_bounds(
+        translated, solution, (0.0, 1.0, 2.0)
+    )
+    xlim, ylim = bounds["xlim"], bounds["ylim"]
+
+    assert xlim[1] - xlim[0] == pytest.approx(ylim[1] - ylim[0])
+    assert xlim[0] > 900.0
+    assert ylim[1] < 0.0
+    for time in (0.0, 1.0, 2.0):
+        for station_index, station in enumerate(translated["stations"]):
+            radius = visualize.radius_at(
+                solution, station_index, time, translated
+            )
+            assert xlim[0] <= station["x"] - radius
+            assert xlim[1] >= station["x"] + radius
+            assert ylim[0] <= station["y"] - radius
+            assert ylim[1] >= station["y"] + radius
+
+    with pytest.raises(ValueError, match="finite display times"):
+        visualize._snapshot_bounds(translated, solution, ())
+
+
+def test_panel_layers_and_status_use_canonical_run_record():
+    instance = _instance()
+    solution = _solution("minmax")
+    plan = {
+        "instance_id": "inst-a",
+        "algorithm": "greedy",
+        "objective": "minmax",
+    }
+    record = {
+        "status": "COMPLETED",
+        "result": {
+            "feasible": True,
+            "solver_result": {
+                "optimality_status": "FEASIBLE",
+                "peak_cost": 23.0,
+            },
+        },
+        "verification": {"kind": "EMPIRICAL", "passed": True},
+    }
+    bounds = visualize._snapshot_bounds(instance, solution, (0.0, 1.0, 2.0))
+    figure, axis = visualize.plt.subplots()
+    visualize._draw_panel(
+        axis, instance, solution, record, plan, 0.5, bounds,
+        show_trajectories=True,
+        point_label_policy="supports",
+        show_support_connectors=False,
+    )
+
+    assert axis.get_xlim() == pytest.approx(bounds["xlim"])
+    assert axis.get_ylim() == pytest.approx(bounds["ylim"])
+    assert axis.get_aspect() == 1.0
+    assert len(axis.patches) == 2
+    assert len(axis.lines) == 2
+    assert [text.get_text() for text in axis.texts] == ["P1/S0", "P0/S1"]
+    title = visualize._snapshot_title(instance, record, plan, "run-1")
+    assert "COMPLETED" in title
+    assert "verified=True (EMPIRICAL)" in title
+    assert "optimality=FEASIBLE" in title
+    visualize.plt.close(figure)
+
+
 def test_legacy_animation_parser_keeps_joint_objective_vector(tmp_path):
     instance = _instance()
     instance_path = tmp_path / "instance.json"
@@ -207,6 +282,18 @@ def test_generates_all_objectives_triptychs_comparison_rows_and_gifs(
     assert vector["snapshots"]["rendering_parameters"]["actual_times"] == [
         0.0, 1.0, 2.0
     ]
+    settings = vector["snapshots"]["rendering_parameters"]
+    assert settings["renderer_version"] == visualize.RENDERER_VERSION
+    assert settings["spatial_bounds_policy"].startswith("one square")
+    assert settings["trajectory_visibility"] == "visible"
+    assert settings["point_label_policy"] == "supports"
+    assert settings["support_connector_policy"] == "hidden"
+    assert settings["layout_method"] == "reserved-gridspec"
+    assert settings["output_format"] == "png"
+    assert result["renderer_version"] == visualize.RENDERER_VERSION
+    assert result["rendering_policy"]["opacity"]["coverage_disk"] == (
+        visualize.DISK_ALPHA
+    )
     html_path = experiment / next(
         sheet["path"] for sheet in result["comparison_sheets"]
         if sheet["path"].endswith("minsum.html")
@@ -215,7 +302,17 @@ def test_generates_all_objectives_triptychs_comparison_rows_and_gifs(
     assert "TIME_LIMIT" in sheet_html
     assert "τ=0.5" in sheet_html
     for row in result["slots"]:
-        assert (experiment / row["snapshots"]["triptych"]["path"]).is_file()
+        panel_path = experiment / row["snapshots"]["panels"][0]["path"]
+        panel_image = visualize.plt.imread(panel_path)
+        panel_dimensions = row["snapshots"]["panels"][0]["image_dimensions"]
+        assert panel_image.shape[1] == panel_dimensions["width"]
+        assert panel_image.shape[0] == panel_dimensions["height"]
+        triptych_path = experiment / row["snapshots"]["triptych"]["path"]
+        assert triptych_path.is_file()
+        image = visualize.plt.imread(triptych_path)
+        dimensions = row["snapshots"]["triptych"]["image_dimensions"]
+        assert image.shape[1] == dimensions["width"]
+        assert image.shape[0] == dimensions["height"]
     assert visualize.audit(experiment)["rendered_slots"] == 3
 
 
