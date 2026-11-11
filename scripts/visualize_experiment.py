@@ -9,12 +9,15 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import shutil
 import struct
+import subprocess
 import sys
 import tempfile
 import textwrap
 from typing import Any
+import zlib
 
 import matplotlib
 
@@ -51,6 +54,7 @@ from kdc_tools.storage import (  # noqa: E402
 TIME_FRACTIONS = (0.0, 0.5, 1.0)
 OBJECTIVES = ("minmax", "minsum", "minmaxsum")
 RENDERER_VERSION = 2
+PUBLICATION_RENDERER_VERSION = 2
 SPATIAL_PADDING_FRACTION = 0.08
 TRAJECTORY_ALPHA = 0.20
 TRAJECTORY_LINE_WIDTH = 0.65
@@ -67,6 +71,21 @@ RUN_STATES = {
     "TIMED_OUT", "INVALID", "CANCELLED", "ABANDONED", "SKIPPED",
 }
 STATION_COLORS = plt.get_cmap("tab10")
+PUBLICATION_DPI = 600
+PUBLICATION_PANEL_SIZE = (3.4, 3.4)
+PUBLICATION_TRIPTYCH_SIZE = (7.1, 3.15)
+PUBLICATION_TIMES = (
+    ("tau-0", 0.0, "t = 0"),
+    ("tau-0.5", 0.5, "t = T/2"),
+    ("tau-1", 1.0, "t = T"),
+)
+PUBLICATION_TRAJECTORY_COLOR = "#737b83"
+PUBLICATION_TRAJECTORY_ALPHA = 0.38
+PUBLICATION_TRAJECTORY_LINE_WIDTH = 0.55
+PUBLICATION_DISK_ALPHA = 0.14
+PUBLICATION_DISK_LINE_WIDTH = 0.65
+PUBLICATION_MARKER_EDGE_COLOR = "#20252a"
+PUBLICATION_MARKER_EDGE_WIDTH = 0.45
 
 
 def _contained(experiment: Path, target: Path) -> Path:
@@ -95,6 +114,222 @@ def _artifact(experiment: Path, path: Path, kind: str) -> dict[str, Any]:
         "size_bytes": resolved.stat().st_size,
         "sha256": sha256_file(resolved),
     }
+
+
+def _pdf_streams_and_metadata(
+    contents: bytes, *, path: Path | None = None
+) -> tuple[list[bytes], bytes]:
+    location = f": {path}" if path is not None else ""
+    streams: list[bytes] = []
+    metadata = bytearray(contents)
+    cursor = 0
+    while True:
+        match = re.search(rb"\bstream\r?\n", contents[cursor:])
+        if match is None:
+            break
+        token_start = cursor + match.start()
+        stream_start = cursor + match.end()
+        dictionary_start = contents.rfind(b"<<", 0, token_start)
+        dictionary_end = contents.rfind(b">>", dictionary_start, token_start)
+        if dictionary_start < 0 or dictionary_end < dictionary_start:
+            raise ValueError(f"publication PDF has an invalid stream dictionary{location}")
+        dictionary = contents[dictionary_start:dictionary_end + 2]
+        length_match = re.search(rb"/Length\b\s+(\d+)\b", dictionary)
+        if length_match is None:
+            raise ValueError(
+                f"publication PDF stream has no byte length{location}"
+            )
+        length = int(length_match.group(1))
+        reference_match = re.match(
+            rb"/Length\b\s+\d+\s+\d+\s+R\b",
+            dictionary[length_match.start():],
+        )
+        if reference_match is not None:
+            object_match = re.search(
+                rb"(?m)(?:^|\n)"
+                + re.escape(length_match.group(1))
+                + rb"\s+\d+\s+obj\s*\r?\n\s*(\d+)\s*\r?\nendobj\b",
+                contents,
+            )
+            if object_match is None:
+                raise ValueError(
+                    f"publication PDF stream length reference is invalid{location}"
+                )
+            length = int(object_match.group(1))
+        stream_end = stream_start + length
+        terminator = re.match(rb"\r?\nendstream\b", contents[stream_end:])
+        if terminator is None:
+            raise ValueError(f"publication PDF stream length is invalid{location}")
+        stream = contents[stream_start:stream_end]
+        if b"/FlateDecode" in dictionary:
+            try:
+                stream = zlib.decompress(stream)
+            except zlib.error as error:
+                raise ValueError(
+                    f"publication PDF has an invalid compressed stream{location}"
+                ) from error
+        streams.append(stream)
+        metadata[stream_start:stream_end] = b" " * length
+        cursor = stream_end + terminator.end()
+    return streams, bytes(metadata)
+
+
+def _validate_pdf_bytes(contents: bytes, *, path: Path | None = None) -> None:
+    location = f": {path}" if path is not None else ""
+    if (
+        len(contents) < 500
+        or not contents.startswith(b"%PDF-")
+        or b"%%EOF" not in contents[-2048:]
+    ):
+        raise ValueError(f"Matplotlib produced a malformed PDF{location}")
+    streams, metadata = _pdf_streams_and_metadata(contents, path=path)
+    if re.search(rb"/Subtype\s*/Image\b", metadata):
+        raise ValueError(
+            f"publication PDF contains raster image content{location}"
+        )
+    if b"/FontFile2" not in metadata and b"/FontFile3" not in metadata:
+        raise ValueError(f"publication PDF has no embedded font{location}")
+    pages = re.search(
+        rb"/Type\s*/Pages\b[^>]*?/Count\s+(\d+)", metadata, re.DOTALL
+    )
+    page_objects = re.findall(rb"/Type\s*/Page\b", metadata)
+    if pages is None or pages.group(1) != b"1" or len(page_objects) != 1:
+        raise ValueError(f"publication PDF must contain exactly one page{location}")
+    media_boxes = re.findall(
+        rb"/MediaBox\s*\[([^\]]+)\]", metadata
+    )
+    if len(media_boxes) != 1:
+        raise ValueError(f"publication PDF has invalid page dimensions{location}")
+    try:
+        media_box = [float(value) for value in media_boxes[0].split()]
+    except ValueError as error:
+        raise ValueError(
+            f"publication PDF has invalid page dimensions{location}"
+        ) from error
+    if len(media_box) != 4 or not all(math.isfinite(value) for value in media_box):
+        raise ValueError(f"publication PDF has invalid page dimensions{location}")
+    vector_operators = {
+        operator: sum(stream.count(operator) for stream in streams)
+        for operator in (b" m\n", b" l\n", b" c\n")
+    }
+    if any(count < 5 for count in vector_operators.values()):
+        raise ValueError(
+            f"publication PDF has insufficient vector geometry{location}"
+        )
+
+
+def _validate_publication_figure_text(figure: Any) -> None:
+    from matplotlib.text import Text
+
+    forbidden = (
+        "run_", "experiment_", "feasible=", "verified=", "optimality=",
+        "runtime=", "algorithm=", "backend=", "lower_bound",
+        "upper_bound", "gap=",
+    )
+    for artist in figure.findobj(match=Text):
+        text = artist.get_text()
+        normalized = text.lower()
+        if any(value in normalized for value in forbidden) or re.search(
+            r"\bP\d+\s*/\s*S\d+\b", text, re.IGNORECASE
+        ):
+            raise ValueError(
+                f"publication figure contains prohibited text: {text!r}"
+            )
+
+
+def _validate_pdf_pages_with_ghostscript(
+    paths: list[Path], script_path: Path
+) -> None:
+    executable = shutil.which("gs")
+    if executable is None:
+        raise ValueError(
+            "Ghostscript is required to validate staged publication PDFs"
+        )
+    commands = ["%!PS-Adobe-3.0"]
+    for path in paths:
+        literal = str(path.resolve())
+        if any(character in literal for character in ("\n", "\r")):
+            raise ValueError(f"PDF path cannot be safely inspected: {path}")
+        literal = literal.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+        commands.append(
+            f"({literal}) (r) file runpdfbegin pdfpagecount = runpdfend"
+        )
+    commands.append("quit")
+    script_path.write_text("\n".join(commands) + "\n", encoding="ascii")
+    try:
+        result = subprocess.run(
+            [
+                executable, "-q", "-dNOSAFER", "-dNODISPLAY",
+                "-f", str(script_path),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=3600,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        raise ValueError(f"Ghostscript could not validate staged PDFs: {error}") from error
+    page_counts = result.stdout.split()
+    if len(page_counts) != len(paths) or any(
+        page_count != "1" for page_count in page_counts
+    ):
+        raise ValueError(
+            "Ghostscript found a staged PDF with other than exactly one page"
+        )
+
+
+def _station_identity(station: dict[str, Any]) -> str:
+    """Return a stable color key independent of station-list iteration order."""
+    identity = [
+        station.get("id"),
+        float(station["x"]),
+        float(station["y"]),
+    ]
+    return json.dumps(identity, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def _publication_station_colors(
+    stations: list[dict[str, Any]],
+) -> dict[str, tuple[float, float, float, float]]:
+    identities = sorted({_station_identity(station) for station in stations})
+    palette = plt.get_cmap("turbo", max(1, len(identities)))
+    colors = {
+        identity: tuple(float(channel) for channel in palette(index))
+        for index, identity in enumerate(identities)
+    }
+    return {
+        _station_identity(station): colors[_station_identity(station)]
+        for station in stations
+    }
+
+
+def _publication_legend_handles() -> list[Line2D]:
+    return [
+        Line2D(
+            [], [], color=PUBLICATION_TRAJECTORY_COLOR, linestyle="--",
+            linewidth=PUBLICATION_TRAJECTORY_LINE_WIDTH, label="Trajectory",
+        ),
+        Line2D(
+            [], [], marker="o", linestyle="None", markersize=6,
+            markerfacecolor="#b5bbc0", markeredgecolor=PUBLICATION_MARKER_EDGE_COLOR,
+            label="Coverage disk",
+        ),
+        Line2D(
+            [], [], marker="^", linestyle="None", markersize=5.5,
+            markerfacecolor="#727b83", markeredgecolor=PUBLICATION_MARKER_EDGE_COLOR,
+            label="Station",
+        ),
+        Line2D(
+            [], [], marker="o", linestyle="None", markersize=4.5,
+            markerfacecolor="#727b83", markeredgecolor=PUBLICATION_MARKER_EDGE_COLOR,
+            label="Point (owner color)",
+        ),
+        Line2D(
+            [], [], marker="D", linestyle="None", markersize=5,
+            markerfacecolor="none", markeredgecolor="#343a40",
+            label="Support point",
+        ),
+    ]
 
 
 def _read_plan(experiment: Path) -> list[dict[str, Any]]:
@@ -289,6 +524,438 @@ def _snapshot_bounds(
         "ylim": (center_y - half_span, center_y + half_span),
         "padding_fraction": padding_fraction,
         "maximum_radius": max_radius,
+    }
+
+
+def _publication_state(
+    instance: dict[str, Any],
+    solution: dict[str, Any],
+    time: float,
+) -> dict[str, Any]:
+    interval = _interval_at(solution, time)
+    positions = [
+        position_at(instance, point_index, time)
+        for point_index in range(len(instance["trajectories"]))
+    ]
+    if any(not all(math.isfinite(value) for value in position)
+           for position in positions):
+        raise ValueError(f"trajectory position is non-finite at t={time:g}")
+    supports = interval.get(
+        "supporting_point", interval.get("supporting_points")
+    )
+    owners = interval.get("assigned_points")
+    if not isinstance(supports, list) or len(supports) != len(instance["stations"]):
+        raise ValueError(f"solution has invalid supports at t={time:g}")
+    if not isinstance(owners, list) or len(owners) != len(instance["trajectories"]):
+        raise ValueError(f"solution has invalid assignments at t={time:g}")
+    normalized_supports = [int(support) for support in supports]
+    normalized_owners = [int(owner) for owner in owners]
+    if any(
+        support < -1 or support >= len(positions)
+        for support in normalized_supports
+    ):
+        raise ValueError(f"solution has an invalid support index at t={time:g}")
+    if any(
+        owner < 0 or owner >= len(instance["stations"])
+        for owner in normalized_owners
+    ):
+        raise ValueError(f"solution has an invalid station assignment at t={time:g}")
+    radii = [
+        float(radius_at(solution, station_index, time, instance))
+        for station_index in range(len(instance["stations"]))
+    ]
+    if any(not math.isfinite(radius) or radius < 0.0 for radius in radii):
+        raise ValueError(f"solution has an invalid coverage radius at t={time:g}")
+    return {
+        "positions": positions,
+        "supports": normalized_supports,
+        "owners": normalized_owners,
+        "radii": radii,
+    }
+
+
+def _draw_publication_panel(
+    axis: Any,
+    instance: dict[str, Any],
+    state: dict[str, Any],
+    bounds: dict[str, Any],
+    station_colors: dict[str, tuple[float, float, float, float]],
+    *,
+    panel_label: str,
+    show_trajectories: bool,
+    show_support_connectors: bool,
+) -> None:
+    stations = instance["stations"]
+    trajectories = instance["trajectories"]
+    positions = state["positions"]
+    supports = state["supports"]
+    owners = state["owners"]
+    axis.set_facecolor("white")
+    axis.set_xlim(*bounds["xlim"])
+    axis.set_ylim(*bounds["ylim"])
+    axis.set_aspect("equal", adjustable="box")
+    axis.set_xlabel("x", fontsize=8, labelpad=2)
+    axis.set_ylabel("y", fontsize=8, labelpad=2)
+    axis.set_title(panel_label, fontsize=8.5, pad=4)
+    axis.tick_params(axis="both", labelsize=7, length=2.5, width=0.55, pad=2)
+    axis.grid(True, linestyle=":", linewidth=0.35, alpha=0.25, color="#77818a")
+    axis.set_axisbelow(True)
+    for spine in axis.spines.values():
+        spine.set_linewidth(0.65)
+        spine.set_color("#424a50")
+
+    if show_trajectories:
+        for trajectory in trajectories:
+            waypoints = trajectory["waypoints"]
+            xs = [float(point["x"]) for point in waypoints]
+            ys = [float(point["y"]) for point in waypoints]
+            if not all(math.isfinite(value) for value in (*xs, *ys)):
+                raise ValueError("trajectory contains a non-finite waypoint")
+            axis.plot(
+                xs, ys, linestyle=(0, (3, 2)), color=PUBLICATION_TRAJECTORY_COLOR,
+                alpha=PUBLICATION_TRAJECTORY_ALPHA,
+                linewidth=PUBLICATION_TRAJECTORY_LINE_WIDTH, zorder=1,
+            )
+
+    for station_index, station in enumerate(stations):
+        color = station_colors[_station_identity(station)]
+        center = (float(station["x"]), float(station["y"]))
+        radius = state["radii"][station_index]
+        axis.add_patch(Circle(
+            center, radius, facecolor=color, edgecolor=color,
+            alpha=PUBLICATION_DISK_ALPHA,
+            linewidth=PUBLICATION_DISK_LINE_WIDTH, zorder=2,
+        ))
+        axis.scatter(
+            [center[0]], [center[1]], marker="^", s=34, color=[color],
+            edgecolors=PUBLICATION_MARKER_EDGE_COLOR,
+            linewidths=PUBLICATION_MARKER_EDGE_WIDTH, zorder=4,
+        )
+
+    for point_index, (x, y) in enumerate(positions):
+        owner_station = stations[owners[point_index]]
+        color = station_colors[_station_identity(owner_station)]
+        axis.scatter(
+            [x], [y], marker="o", s=19, color=[color],
+            edgecolors=PUBLICATION_MARKER_EDGE_COLOR,
+            linewidths=PUBLICATION_MARKER_EDGE_WIDTH, zorder=5,
+        )
+
+    station_order = sorted(
+        range(len(stations)),
+        key=lambda index: _station_identity(stations[index]),
+    )
+    supports_by_point: dict[int, list[int]] = {}
+    for station_index in station_order:
+        support = supports[station_index]
+        if support >= 0:
+            supports_by_point.setdefault(support, []).append(station_index)
+    for support, station_indices in supports_by_point.items():
+        for rank, station_index in enumerate(station_indices):
+            point_x, point_y = positions[support]
+            station = stations[station_index]
+            station_x, station_y = float(station["x"]), float(station["y"])
+            color = station_colors[_station_identity(station)]
+            if show_support_connectors:
+                axis.plot(
+                    [station_x, point_x], [station_y, point_y],
+                    color=color, linewidth=0.65, alpha=0.65, zorder=3,
+                )
+            # Nested outlines preserve every station-to-support association when
+            # several stations share one supporting moving point.
+            axis.scatter(
+                [point_x], [point_y], marker="D", s=48 + 4 * rank,
+                facecolors="none", edgecolors=[color], linewidths=1.0,
+                zorder=6 + rank * 0.001,
+            )
+
+
+def _build_publication_panel(
+    instance: dict[str, Any],
+    state: dict[str, Any],
+    bounds: dict[str, Any],
+    station_colors: dict[str, tuple[float, float, float, float]],
+    *,
+    panel_label: str,
+    show_trajectories: bool,
+    show_support_connectors: bool,
+    dpi: int,
+) -> Any:
+    figure = plt.figure(
+        figsize=PUBLICATION_PANEL_SIZE, dpi=dpi, facecolor="white"
+    )
+    grid = figure.add_gridspec(2, 1, height_ratios=(16, 3), hspace=0.5)
+    axis = figure.add_subplot(grid[0])
+    legend_axis = figure.add_subplot(grid[1])
+    legend_axis.set_axis_off()
+    _draw_publication_panel(
+        axis, instance, state, bounds, station_colors,
+        panel_label=panel_label,
+        show_trajectories=show_trajectories,
+        show_support_connectors=show_support_connectors,
+    )
+    legend_axis.legend(
+        handles=_publication_legend_handles(), loc="center",
+        ncol=2, fontsize=6.2, frameon=False, handlelength=1.25,
+        columnspacing=0.7, handletextpad=0.3, labelspacing=0.3,
+    )
+    figure.subplots_adjust(left=0.19, right=0.98, top=0.90, bottom=0.045)
+    return figure
+
+
+def _build_publication_triptych(
+    instance: dict[str, Any],
+    states: list[dict[str, Any]],
+    bounds: dict[str, Any],
+    station_colors: dict[str, tuple[float, float, float, float]],
+    *,
+    show_trajectories: bool,
+    show_support_connectors: bool,
+    dpi: int,
+) -> Any:
+    figure = plt.figure(
+        figsize=PUBLICATION_TRIPTYCH_SIZE, dpi=dpi, facecolor="white"
+    )
+    grid = figure.add_gridspec(
+        2, 3, height_ratios=(18, 1.4), hspace=0.02, wspace=0.27
+    )
+    axes = [figure.add_subplot(grid[0, index]) for index in range(3)]
+    legend_axis = figure.add_subplot(grid[1, :])
+    legend_axis.set_axis_off()
+    panel_labels = ("(a)  t = 0", "(b)  t = T/2", "(c)  t = T")
+    for axis, state, panel_label in zip(axes, states, panel_labels):
+        _draw_publication_panel(
+            axis, instance, state, bounds, station_colors,
+            panel_label=panel_label,
+            show_trajectories=show_trajectories,
+            show_support_connectors=show_support_connectors,
+        )
+    legend_axis.legend(
+        handles=_publication_legend_handles(), loc="center", ncol=5,
+        fontsize=6.5, frameon=False, handlelength=1.55,
+        columnspacing=1.1, handletextpad=0.4,
+    )
+    figure.subplots_adjust(left=0.075, right=0.99, top=0.94, bottom=0.13)
+    return figure
+
+
+def _save_publication_figure(
+    experiment: Path,
+    figure: Any,
+    png_path: Path,
+    pdf_path: Path,
+    *,
+    dpi: int,
+    formats: tuple[str, ...],
+    figure_type: str,
+    temporal_state: str,
+    source_solution_sha256: str,
+    rendering_configuration: dict[str, Any],
+) -> dict[str, Any]:
+    physical_size = tuple(float(value) for value in figure.get_size_inches())
+    png_record: dict[str, Any] | None = None
+    pdf_record: dict[str, Any] | None = None
+    try:
+        _validate_publication_figure_text(figure)
+        if "png" in formats:
+            from io import BytesIO
+
+            buffer = BytesIO()
+            with matplotlib.rc_context({"savefig.bbox": None}):
+                figure.savefig(
+                    buffer, format="png", dpi=dpi, facecolor="white",
+                    transparent=False,
+                )
+            payload = buffer.getvalue()
+            if len(payload) < 24 or payload[:8] != b"\x89PNG\r\n\x1a\n":
+                raise ValueError(f"Matplotlib produced an invalid PNG: {png_path}")
+            width, height = struct.unpack(">II", payload[16:24])
+            if width <= 0 or height <= 0:
+                raise ValueError(f"Matplotlib produced an empty PNG: {png_path}")
+            _write_bytes(experiment, png_path, payload)
+            png_record = {
+                **_artifact(experiment, png_path, "publication-snapshot-png"),
+                "path": png_path.relative_to(experiment).as_posix(),
+                "figure_type": figure_type,
+                "temporal_state": temporal_state,
+                "image_dimensions": {"width": width, "height": height},
+                "dpi": dpi,
+                "physical_dimensions_inches": {
+                    "width": physical_size[0], "height": physical_size[1],
+                },
+                "renderer_version": PUBLICATION_RENDERER_VERSION,
+                "rendering_configuration": rendering_configuration,
+                "source_solution_sha256": source_solution_sha256,
+            }
+        if "pdf" in formats:
+            from io import BytesIO
+
+            buffer = BytesIO()
+            with matplotlib.rc_context({
+                "font.family": "DejaVu Sans",
+                "pdf.fonttype": 42,
+                "pdf.use14corefonts": False,
+                "ps.fonttype": 42,
+                "text.usetex": False,
+                "savefig.bbox": None,
+            }):
+                figure.savefig(
+                    buffer, format="pdf", dpi=dpi, facecolor="white",
+                    metadata={"Creator": "KineticDiskCover publication renderer"},
+                )
+            payload = buffer.getvalue()
+            _validate_pdf_bytes(payload, path=pdf_path)
+            _write_bytes(experiment, pdf_path, payload)
+            pdf_record = {
+                **_artifact(experiment, pdf_path, "publication-snapshot-pdf"),
+                "path": pdf_path.relative_to(experiment).as_posix(),
+                "figure_type": figure_type,
+                "temporal_state": temporal_state,
+                "physical_dimensions_inches": {
+                    "width": physical_size[0], "height": physical_size[1],
+                },
+                "renderer_version": PUBLICATION_RENDERER_VERSION,
+                "rendering_configuration": rendering_configuration,
+                "source_solution_sha256": source_solution_sha256,
+                "vector_geometry": True,
+                "embedded_font_family": "DejaVu Sans",
+            }
+    finally:
+        plt.close(figure)
+    if png_record is None or pdf_record is None:
+        raise ValueError("publication snapshots require both PNG and PDF outputs")
+    return {
+        **png_record,
+        "png_path": png_record["path"],
+        "pdf_path": pdf_record["path"],
+        "pdf": pdf_record,
+    }
+
+
+def _render_publication_solution_images(
+    experiment: Path,
+    instance: dict[str, Any],
+    solution: dict[str, Any],
+    plan: dict[str, Any],
+    run_id: str,
+    dpi: int,
+    source_solution_sha256: str,
+    *,
+    show_trajectories: bool = True,
+    show_support_connectors: bool = False,
+) -> dict[str, Any]:
+    if dpi <= 0:
+        raise ValueError("publication DPI must be positive")
+    if not isinstance(source_solution_sha256, str) or len(source_solution_sha256) != 64:
+        raise ValueError("publication rendering requires a SHA-256 solution checksum")
+    _validate_solution_for_instance(solution, instance)
+    t_end = float(instance["T_end"])
+    if not math.isfinite(t_end) or t_end <= 0:
+        raise ValueError("instance horizon must be finite and positive")
+    stations = instance["stations"]
+    if not stations:
+        raise ValueError("publication snapshots require at least one station")
+    for station in stations:
+        if not math.isfinite(float(station["x"])) or not math.isfinite(
+            float(station["y"])
+        ):
+            raise ValueError("station coordinates must be finite")
+    for trajectory in instance["trajectories"]:
+        for waypoint in trajectory["waypoints"]:
+            if not math.isfinite(float(waypoint["x"])) or not math.isfinite(
+                float(waypoint["y"])
+            ):
+                raise ValueError("trajectory contains a non-finite waypoint")
+    station_colors = _publication_station_colors(stations)
+    actual_times = tuple(fraction * t_end for fraction in TIME_FRACTIONS)
+    states = [
+        _publication_state(instance, solution, time) for time in actual_times
+    ]
+    bounds = _snapshot_bounds(instance, solution, actual_times)
+    normalized_colors = {
+        identity: [round(channel, 8) for channel in color]
+        for identity, color in station_colors.items()
+    }
+    configuration = {
+        "renderer": "publication",
+        "renderer_version": PUBLICATION_RENDERER_VERSION,
+        "dpi": dpi,
+        "formats": ["png", "pdf"],
+        "individual_panel_size_inches": list(PUBLICATION_PANEL_SIZE),
+        "triptych_size_inches": list(PUBLICATION_TRIPTYCH_SIZE),
+        "normalized_times": list(TIME_FRACTIONS),
+        "actual_times": list(actual_times),
+        "spatial_bounds": {
+            "xlim": list(bounds["xlim"]),
+            "ylim": list(bounds["ylim"]),
+            "padding_fraction": bounds["padding_fraction"],
+        },
+        "axis_aspect": "equal",
+        "trajectory_visibility": "visible" if show_trajectories else "hidden",
+        "support_connectors": (
+            "visible" if show_support_connectors else "hidden"
+        ),
+        "point_labels": "none",
+        "station_color_policy": (
+            "discrete turbo palette keyed by stable station id and coordinates"
+        ),
+        "station_colors": normalized_colors,
+        "coverage_disk_alpha": PUBLICATION_DISK_ALPHA,
+        "trajectory_alpha": PUBLICATION_TRAJECTORY_ALPHA,
+        "pdf_font_family": "DejaVu Sans",
+        "pdf_fonttype": 42,
+    }
+    instance_id = _safe_filename(str(plan["instance_id"]))
+    algorithm = _safe_filename(str(plan["algorithm"]))
+    objective = _safe_filename(str(plan["objective"]))
+    directory = (
+        experiment / "snapshots" / instance_id / objective / algorithm / run_id
+    )
+    panels = []
+    for index, (stem, _fraction, panel_label) in enumerate(PUBLICATION_TIMES):
+        figure = _build_publication_panel(
+            instance, states[index], bounds, station_colors,
+            panel_label=panel_label,
+            show_trajectories=show_trajectories,
+            show_support_connectors=show_support_connectors,
+            dpi=dpi,
+        )
+        panels.append(_save_publication_figure(
+            experiment, figure, directory / f"{stem}.png",
+            directory / f"{stem}.pdf", dpi=dpi, formats=("png", "pdf"),
+            figure_type="individual-panel",
+            temporal_state=panel_label,
+            source_solution_sha256=source_solution_sha256,
+            rendering_configuration=configuration,
+        ))
+    triptych_figure = _build_publication_triptych(
+        instance, states, bounds, station_colors,
+        show_trajectories=show_trajectories,
+        show_support_connectors=show_support_connectors,
+        dpi=dpi,
+    )
+    triptych = _save_publication_figure(
+        experiment, triptych_figure, directory / "three-time.png",
+        directory / "three-time.pdf", dpi=dpi, formats=("png", "pdf"),
+        figure_type="three-panel-composite",
+        temporal_state="t = 0, T/2, T",
+        source_solution_sha256=source_solution_sha256,
+        rendering_configuration=configuration,
+    )
+    return {
+        "triptych": triptych,
+        "panels": panels,
+        "rendering_parameters": {
+            **configuration,
+            "image_dimensions": {
+                "individual_panel": panels[0]["image_dimensions"],
+                "triptych": triptych["image_dimensions"],
+            },
+            "physical_dimensions_inches": {
+                "individual_panel": list(PUBLICATION_PANEL_SIZE),
+                "triptych": list(PUBLICATION_TRIPTYCH_SIZE),
+            },
+        },
     }
 
 
@@ -1060,7 +1727,9 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
     }
     indexed_paths: list[dict[str, Any]] = []
 
-    def check_artifact(item: dict[str, Any], *, png: bool = False) -> None:
+    def check_artifact(
+        item: dict[str, Any], *, png: bool = False, pdf: bool = False
+    ) -> None:
         path = _contained(experiment, experiment / item["path"])
         if (not path.is_file() or path.stat().st_size != item["size_bytes"]
                 or sha256_file(path) != item["sha256"]):
@@ -1073,16 +1742,36 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
 
                 with Image.open(path) as image:
                     dimensions = image.size
+                    image_format = image.format
+                    image_dpi = image.info.get("dpi")
                     image.verify()
                 expected = item.get("image_dimensions", {})
-                if image.format != "PNG" or (
+                if image_format != "PNG" or (
                     expected and dimensions != (
                         expected.get("width"), expected.get("height")
                     )
                 ):
                     missing.append(f"{item['path']} (invalid PNG metadata)")
+                expected_dpi = item.get("dpi")
+                if expected_dpi is not None and (
+                    image_dpi is None
+                    or len(image_dpi) != 2
+                    or any(
+                        not math.isclose(
+                            float(axis_dpi), float(expected_dpi),
+                            rel_tol=0.005,
+                        )
+                        for axis_dpi in image_dpi
+                    )
+                ):
+                    missing.append(f"{item['path']} (invalid PNG DPI metadata)")
             except (OSError, ValueError) as error:
                 missing.append(f"{item['path']} (invalid PNG: {error})")
+        if pdf:
+            try:
+                _validate_pdf_bytes(path.read_bytes(), path=path)
+            except (OSError, ValueError) as error:
+                missing.append(f"{item['path']} (invalid PDF: {error})")
 
     for slot in payload.get("slots", []):
         if slot["generation_status"] == "FAILED":
@@ -1100,6 +1789,8 @@ def audit(experiment_dir: str | Path) -> dict[str, Any]:
         if snapshot:
             for item in [snapshot["triptych"], *snapshot["panels"]]:
                 check_artifact(item, png=True)
+                if item.get("pdf"):
+                    check_artifact(item["pdf"], pdf=True)
         if slot.get("animation"):
             check_artifact(slot["animation"])
         if slot["generation_status"] != "GENERATED" and not slot.get(
@@ -1303,6 +1994,7 @@ def _validate_staged_png(path: Path, artifact: dict[str, Any]) -> None:
     with Image.open(path) as image:
         image_format = image.format
         dimensions = image.size
+        image_dpi = image.info.get("dpi")
         image.verify()
     expected = artifact.get("image_dimensions", {})
     if image_format != "PNG" or min(dimensions) < 100:
@@ -1311,6 +2003,113 @@ def _validate_staged_png(path: Path, artifact: dict[str, Any]) -> None:
         expected.get("width"), expected.get("height")
     ):
         raise ValueError(f"staged snapshot dimensions mismatch: {path}")
+    expected_dpi = artifact.get("dpi")
+    if expected_dpi is not None and (
+        image_dpi is None
+        or len(image_dpi) != 2
+        or any(
+            not math.isclose(
+                float(axis_dpi), float(expected_dpi), rel_tol=0.005
+            )
+            for axis_dpi in image_dpi
+        )
+    ):
+        raise ValueError(f"staged snapshot DPI metadata mismatch: {path}")
+
+
+def _validate_staged_pdf(path: Path, artifact: dict[str, Any]) -> None:
+    if not path.is_file() or path.stat().st_size != artifact["size_bytes"]:
+        raise ValueError(f"staged PDF is missing or has the wrong size: {path}")
+    if sha256_file(path) != artifact["sha256"]:
+        raise ValueError(f"staged PDF checksum mismatch: {path}")
+    contents = path.read_bytes()
+    _validate_pdf_bytes(contents, path=path)
+    media_box = re.search(rb"/MediaBox\s*\[([^\]]+)\]", contents)
+    physical_size = artifact.get("physical_dimensions_inches", {})
+    if media_box is None or not physical_size:
+        raise ValueError(f"staged PDF has no expected physical size: {path}")
+    points = [float(value) for value in media_box.group(1).split()]
+    expected_width = float(physical_size["width"]) * 72.0
+    expected_height = float(physical_size["height"]) * 72.0
+    if (
+        not math.isclose(points[2] - points[0], expected_width, abs_tol=0.02)
+        or not math.isclose(points[3] - points[1], expected_height, abs_tol=0.02)
+    ):
+        raise ValueError(f"staged PDF physical dimensions mismatch: {path}")
+
+
+def _validate_external_backup(
+    experiment: Path, backup_dir: str | Path
+) -> dict[str, Any]:
+    backup = Path(backup_dir).resolve()
+    repository = ROOT.resolve()
+    if backup.is_relative_to(repository) or backup.is_relative_to(experiment):
+        raise ValueError("snapshot backup must be outside the repository")
+    if not backup.is_dir() or backup.stat().st_dev != experiment.stat().st_dev:
+        raise ValueError(
+            "snapshot backup must exist on the experiment's filesystem"
+        )
+    inventory_path = backup / "backup_sha256.json"
+    if not inventory_path.is_file():
+        raise ValueError(f"snapshot backup checksum inventory is missing: {inventory_path}")
+    inventory = read_json(inventory_path)
+    if inventory.get("experiment_id") != experiment.name:
+        raise ValueError("snapshot backup belongs to a different experiment")
+    files = inventory.get("files")
+    if not isinstance(files, list):
+        raise ValueError("snapshot backup checksum inventory is invalid")
+    by_path: dict[str, dict[str, Any]] = {}
+    for item in files:
+        if not isinstance(item, dict) or not isinstance(item.get("path"), str):
+            raise ValueError("snapshot backup checksum inventory has an invalid entry")
+        relative = Path(item["path"])
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ValueError("snapshot backup inventory contains an unsafe path")
+        key = relative.as_posix()
+        if key in by_path:
+            raise ValueError(f"snapshot backup has a duplicate path: {key}")
+        source = backup / "payload" / relative
+        if (
+            not source.is_file()
+            or source.stat().st_size != item.get("size_bytes")
+            or sha256_file(source) != item.get("sha256")
+        ):
+            raise ValueError(f"snapshot backup checksum mismatch: {key}")
+        by_path[key] = item
+
+    required_paths = {
+        path.relative_to(experiment).as_posix()
+        for path in (experiment / "snapshots").rglob("*")
+        if path.is_file() and path.suffix.lower() == ".png"
+    }
+    for relative in (
+        "reports/visualization_manifest.json",
+        "reports/visualization_report.md",
+        "reports/snapshot_regeneration_report.md",
+        "artifacts.json",
+    ):
+        if (experiment / relative).is_file():
+            required_paths.add(relative)
+    missing = required_paths - by_path.keys()
+    if missing:
+        raise ValueError(
+            "snapshot backup is incomplete: " + ", ".join(sorted(missing)[:10])
+        )
+    return {
+        "path": str(backup),
+        "inventory_path": str(inventory_path),
+        "inventory_sha256": sha256_file(inventory_path),
+        "file_count": len(files),
+        "snapshot_pngs": sum(
+            name.startswith("snapshots/") and name.lower().endswith(".png")
+            for name in by_path
+        ),
+        "snapshot_pdfs": sum(
+            name.startswith("snapshots/") and name.lower().endswith(".pdf")
+            for name in by_path
+        ),
+        "paths": set(by_path),
+    }
 
 
 def _replace_file_atomically(source: Path, target: Path) -> None:
@@ -1326,12 +2125,15 @@ def _replace_file_atomically(source: Path, target: Path) -> None:
 def regenerate_snapshots(
     experiment_dir: str | Path,
     *,
-    dpi: int = 90,
+    dpi: int = PUBLICATION_DPI,
+    formats: tuple[str, ...] = ("png", "pdf"),
     show_trajectories: bool = True,
-    point_label_policy: str = "supports",
+    point_label_policy: str = "none",
     show_support_connectors: bool = False,
+    staging_parent: str | Path | None = None,
+    backup_dir: str | Path | None = None,
 ) -> dict[str, Any]:
-    """Safely replace only snapshot PNGs from existing validated run artifacts."""
+    """Safely replace static publication snapshots from validated run artifacts."""
     experiment = Path(experiment_dir).resolve()
     if not experiment.is_dir():
         raise ValueError(f"experiment directory does not exist: {experiment}")
@@ -1357,8 +2159,32 @@ def regenerate_snapshots(
     plan_keys = {str(entry["run_key"]) for entry in plan}
     if len(old_by_key) != len(plan) or set(old_by_key) != plan_keys:
         raise ValueError("visualization manifest slots do not match immutable run plan")
-    if dpi <= 0 or point_label_policy not in {"none", "supports", "all"}:
+    normalized_formats = tuple(
+        sorted({str(value).strip().lower() for value in formats})
+    )
+    if dpi <= 0 or point_label_policy != "none":
         raise ValueError("invalid snapshot rendering settings")
+    if normalized_formats != ("pdf", "png"):
+        raise ValueError(
+            "publication snapshots require both PNG and PDF formats"
+        )
+    if backup_dir is None:
+        raise ValueError(
+            "snapshot regeneration requires a verified external backup directory"
+        )
+    backup_info = _validate_external_backup(experiment, backup_dir)
+    staging_parent_path = Path(
+        staging_parent if staging_parent is not None else tempfile.gettempdir()
+    ).resolve()
+    if (
+        not staging_parent_path.is_dir()
+        or staging_parent_path.is_relative_to(ROOT.resolve())
+        or staging_parent_path.stat().st_dev != experiment.stat().st_dev
+    ):
+        raise ValueError(
+            "snapshot staging directory must be outside the repository and "
+            "on the experiment's filesystem"
+        )
 
     attempts = _load_attempts(experiment)
     rows, instances = _snapshot_only_rows(experiment, plan, attempts)
@@ -1381,22 +2207,74 @@ def regenerate_snapshots(
                 f"for {row['plan']['run_key']}"
             )
 
+    manifest_png_paths = {
+        item["path"]
+        for slot in old_slots
+        if isinstance(slot.get("snapshots"), dict)
+        for item in [
+            slot["snapshots"]["triptych"],
+            *slot["snapshots"]["panels"],
+        ]
+    }
+    existing_png_paths = {
+        path.relative_to(experiment).as_posix()
+        for path in (experiment / "snapshots").rglob("*.png")
+        if path.is_file()
+    }
+    if manifest_png_paths != existing_png_paths:
+        raise ValueError(
+            "existing PNG paths do not exactly match visualization manifest"
+        )
+    expected_pdf_paths: set[str] = set()
+    for row in eligible:
+        entry = row["plan"]
+        run_id = str(row["record"]["run_id"])
+        snapshot_dir = (
+            Path("snapshots") / _safe_filename(str(entry["instance_id"]))
+            / _safe_filename(str(entry["objective"]))
+            / _safe_filename(str(entry["algorithm"])) / run_id
+        )
+        expected_pdf_paths.update(
+            (snapshot_dir / Path(name).with_suffix(".pdf")).as_posix()
+            for name in (
+                "tau-0.png", "tau-0.5.png", "tau-1.png", "three-time.png"
+            )
+        )
+    existing_pdf_paths = {
+        path.relative_to(experiment).as_posix()
+        for path in (experiment / "snapshots").rglob("*.pdf")
+        if path.is_file()
+    }
+    if not existing_pdf_paths.issubset(expected_pdf_paths):
+        raise ValueError(
+            "existing PDF paths include artifacts outside the planned snapshot set"
+        )
+    unbacked_existing_pdfs = existing_pdf_paths - backup_info["paths"]
+    if unbacked_existing_pdfs:
+        raise ValueError(
+            "existing PDF snapshots are missing from the external backup: "
+            + ", ".join(sorted(unbacked_existing_pdfs)[:10])
+        )
+
     stage_root = Path(tempfile.mkdtemp(
-        prefix=f".{experiment.name}.snapshot-stage-", dir=experiment.parent
+        prefix=f".{experiment.name}.snapshot-stage-",
+        dir=staging_parent_path,
     )).resolve()
     backup_root = stage_root / "backup"
     backup_root.mkdir()
     png_replacements: list[tuple[Path, Path, dict[str, Any]]] = []
+    pdf_replacements: list[tuple[Path, Path, dict[str, Any]]] = []
+    artifact_replacements: list[tuple[Path, Path, dict[str, Any]]] = []
+    completed = False
     try:
         new_snapshots: dict[str, dict[str, Any]] = {}
         for row in eligible:
             entry = row["plan"]
             run_id = str(row["record"]["run_id"])
-            rendered = _render_solution_images(
-                stage_root, row["instance"], row["solution"], row["record"],
-                entry, run_id, dpi,
+            rendered = _render_publication_solution_images(
+                stage_root, row["instance"], row["solution"],
+                entry, run_id, dpi, row["source_solution_sha256"],
                 show_trajectories=show_trajectories,
-                point_label_policy=point_label_policy,
                 show_support_connectors=show_support_connectors,
             )
             expected_dir = Path("snapshots") / _safe_filename(
@@ -1405,9 +2283,7 @@ def regenerate_snapshots(
                 str(entry["algorithm"])
             ) / run_id
             items = [*rendered["panels"], rendered["triptych"]]
-            expected_names = [
-                "tau-0.png", "tau-0.5.png", "tau-1.png", "three-time.png"
-            ]
+            expected_names = ["tau-0.png", "tau-0.5.png", "tau-1.png", "three-time.png"]
             mapped_items = []
             for item, filename in zip(items, expected_names):
                 expected_relative = (expected_dir / filename).as_posix()
@@ -1420,9 +2296,30 @@ def regenerate_snapshots(
                 target = _contained(experiment, experiment / expected_relative)
                 if not target.is_file():
                     raise ValueError(f"existing snapshot to replace is missing: {target}")
-                mapped = {**item, "path": expected_relative}
+                pdf_item = item["pdf"]
+                expected_pdf = (expected_dir / Path(filename).with_suffix(".pdf")).as_posix()
+                staged_pdf = stage_root / pdf_item["path"]
+                if pdf_item["path"] != expected_pdf:
+                    raise ValueError(
+                        f"renderer produced unexpected PDF path: {pdf_item['path']}"
+                    )
+                _validate_staged_pdf(staged_pdf, pdf_item)
+                pdf_target = _contained(experiment, experiment / expected_pdf)
+                mapped_pdf = {**pdf_item, "path": expected_pdf}
+                mapped = {
+                    **item,
+                    "path": expected_relative,
+                    "png_path": expected_relative,
+                    "pdf_path": expected_pdf,
+                    "pdf": mapped_pdf,
+                }
                 mapped_items.append(mapped)
                 png_replacements.append((staged_path, target, mapped))
+                pdf_replacements.append((staged_pdf, pdf_target, mapped_pdf))
+                artifact_replacements.extend([
+                    (staged_path, target, mapped),
+                    (staged_pdf, pdf_target, mapped_pdf),
+                ])
             new_snapshots[str(entry["run_key"])] = {
                 "triptych": mapped_items[3],
                 "panels": mapped_items[:3],
@@ -1438,6 +2335,29 @@ def regenerate_snapshots(
             raise ValueError("staged PNG set differs from validated renderable slots")
         if len(png_replacements) != len(eligible) * 4:
             raise ValueError("staged output count is not four PNGs per eligible slot")
+        staged_pdfs = sorted(
+            path.relative_to(stage_root).as_posix()
+            for path in (stage_root / "snapshots").rglob("*.pdf")
+        )
+        expected_pdfs = sorted(item[2]["path"] for item in pdf_replacements)
+        if staged_pdfs != expected_pdfs:
+            raise ValueError("staged PDF set differs from validated renderable slots")
+        if len(pdf_replacements) != len(eligible) * 4:
+            raise ValueError("staged output count is not four PDFs per eligible slot")
+        png_targets = [target for _, target, _ in png_replacements]
+        pdf_targets = [target for _, target, _ in pdf_replacements]
+        if (
+            len(set(png_targets)) != len(png_targets)
+            or len(set(pdf_targets)) != len(pdf_targets)
+            or set(png_targets) & set(pdf_targets)
+        ):
+            raise ValueError("snapshot destinations contain duplicate paths")
+        if stage_root.is_relative_to(experiment / "snapshots"):
+            raise ValueError("temporary staging files are inside snapshots")
+        _validate_pdf_pages_with_ghostscript(
+            [staged for staged, _, _ in pdf_replacements],
+            stage_root / "pdf-validation.ps",
+        )
 
         updated_manifest = json.loads(json.dumps(old_manifest))
         slot_lookup = {slot["run_key"]: slot for slot in updated_manifest["slots"]}
@@ -1468,38 +2388,50 @@ def regenerate_snapshots(
             raise ValueError("a previously generated slot has no animation artifact")
         updated_manifest.update({
             "renderer_version": RENDERER_VERSION,
+            "publication_renderer_version": PUBLICATION_RENDERER_VERSION,
             "generated_solution_snapshots": len(eligible),
             "generated_snapshot_files": len(png_replacements),
+            "generated_snapshot_pdfs": len(pdf_replacements),
             "ineligible_slots": len(rows) - len(eligible),
             "failed_slots": 0,
             "rendering_policy": {
                 **updated_manifest.get("rendering_policy", {}),
+                "renderer": "publication",
                 "renderer_version": RENDERER_VERSION,
+                "publication_renderer_version": PUBLICATION_RENDERER_VERSION,
                 "visualization_schema_version": 1,
                 "normalized_times": list(TIME_FRACTIONS),
                 "time_conversion": "t = tau * T_end",
                 "dpi": dpi,
-                "output_format": "png",
-                "layout_method": "reserved-gridspec",
+                "formats": ["png", "pdf"],
+                "output_format": "PNG and vector PDF",
+                "layout_method": "publication gridspec with shared triptych legend",
                 "trajectory_visibility": (
                     "visible" if show_trajectories else "hidden"
                 ),
-                "point_label_policy": point_label_policy,
+                "point_label_policy": "none",
                 "support_connector_policy": (
                     "visible" if show_support_connectors else "hidden"
                 ),
+                "station_color_policy": (
+                    "discrete turbo palette keyed by stable station id and coordinates"
+                ),
+                "pdf_font_family": "DejaVu Sans",
+                "pdf_fonttype": 42,
+                "individual_panel_size_inches": list(PUBLICATION_PANEL_SIZE),
+                "triptych_size_inches": list(PUBLICATION_TRIPTYCH_SIZE),
                 "opacity": {
-                    "trajectory": TRAJECTORY_ALPHA,
-                    "coverage_disk": DISK_ALPHA,
-                    "support_connector": SUPPORT_CONNECTOR_ALPHA,
+                    "trajectory": PUBLICATION_TRAJECTORY_ALPHA,
+                    "coverage_disk": PUBLICATION_DISK_ALPHA,
+                    "support_connector": 0.65,
                 },
                 "line_widths": {
-                    "trajectory": TRAJECTORY_LINE_WIDTH,
-                    "coverage_disk_outline": DISK_LINE_WIDTH,
-                    "support_connector": SUPPORT_LINE_WIDTH,
-                    "support_marker_outline": SUPPORT_MARKER_LINE_WIDTH,
-                    "moving_point_outline": POINT_MARKER_LINE_WIDTH,
-                    "station_marker_outline": STATION_MARKER_LINE_WIDTH,
+                    "trajectory": PUBLICATION_TRAJECTORY_LINE_WIDTH,
+                    "coverage_disk_outline": PUBLICATION_DISK_LINE_WIDTH,
+                    "support_connector": 0.65,
+                    "support_marker_outline": 1.0,
+                    "moving_point_outline": PUBLICATION_MARKER_EDGE_WIDTH,
+                    "station_marker_outline": PUBLICATION_MARKER_EDGE_WIDTH,
                 },
                 "spatial_bounds_policy": (
                     "one square padded extent over station centers, trajectory "
@@ -1520,6 +2452,7 @@ def regenerate_snapshots(
             f"- Slots in run plan: {len(plan)}",
             f"- Solutions with snapshots: {len(eligible)}",
             f"- Regenerated snapshot PNGs: {len(png_replacements)}",
+            f"- Regenerated publication PDFs: {len(pdf_replacements)}",
             f"- Per-solution animations (unchanged): {updated_manifest['generated_animations']}",
             f"- Ineligible slots: {len(rows) - len(eligible)}",
             "- Rendering failures: 0",
@@ -1556,24 +2489,38 @@ def regenerate_snapshots(
             ineligible_lines.append(f"| `{escaped_reason}` | {count} |")
         regeneration_text = "\n".join([
             "# Snapshot regeneration report", "",
+            f"- Repository: `{ROOT}`",
             f"- Target experiment ID: `{experiment.name}`",
             f"- Renderer version: `{RENDERER_VERSION}`",
             f"- Source code revision (Git HEAD): `{current_revision}`",
             f"- Renderer source SHA-256 (working tree): `{renderer_sha256}`",
             f"- Completed at (UTC): `{datetime.now(timezone.utc).isoformat()}`",
+            f"- Original snapshot PNGs: {backup_info['snapshot_pngs']}",
+            f"- Original snapshot PDFs: {backup_info['snapshot_pdfs']}",
             f"- Planned slots: {len(plan)}",
             f"- Renderable solutions: {len(eligible)}",
             f"- PNGs regenerated: {len(png_replacements)}",
+            f"- PDFs regenerated: {len(pdf_replacements)}",
             f"- Ineligible slots: {len(rows) - len(eligible)}",
+            f"- External backup: `{backup_info['path']}`",
+            f"- Backup files checksum-verified: {backup_info['file_count']}",
+            f"- Backup inventory SHA-256: `{backup_info['inventory_sha256']}`",
             "- Rendering failures: 0",
-            "- PNG validation: all staged images decoded with Pillow; dimensions, "
+            "- PNG validation: staged images decoded with Pillow; dimensions, DPI, "
             "sizes, checksums, output paths and four-file-per-slot coverage verified.",
+            "- PDF validation: one page per file; MediaBox matched configured "
+            "dimensions; vector path operators, embedded DejaVu Sans fonts, and "
+            "absence of raster image objects were checked; Ghostscript opened every PDF.",
             "- Solver execution, calibration, run-plan creation and animation "
             "generation: not performed.",
             "- Solver run records, results, serialized solutions, traces, aggregates, "
             "tables and source inputs: not modified.",
-            "- Visualization manifest, report, global artifact index and snapshot "
-            "figure status: refreshed transactionally.",
+            "- Only the visualization manifest/report, snapshot regeneration report, "
+            "artifact index, and snapshot PNG/PDF files were updated.",
+            "- Snapshot-specific figure-status metadata and all other reports were "
+            "left unchanged.",
+            "- Other experiments, comparison HTML pages, and animation files were "
+            "left unchanged.",
             "",
             "## Ineligible planned slots",
             "",
@@ -1585,10 +2532,11 @@ def regenerate_snapshots(
             "",
             f"- Panels: {len(eligible) * 3}; triptychs: {len(eligible)}.",
             f"- Expected and decoded PNGs: {len(png_replacements)}.",
+            f"- Expected and validated vector PDFs: {len(pdf_replacements)}.",
             "- Comparison sheets retained in place; their existing relative PNG links "
             "continue to target the replaced files.",
-            "- Existing final smoke20 audit remains FAIL if unrelated solver-result "
-            "integrity failures persist; snapshot status is reported separately.",
+            "- No solver, benchmark, calibration, experiment pipeline, or animation "
+            "was executed.",
         ]) + "\n"
 
         # Back up every destination before replacement; metadata is published only
@@ -1597,183 +2545,43 @@ def regenerate_snapshots(
         for path in (
             visualization_path, report_path, regeneration_path,
             experiment / "artifacts.json",
-            experiment / "figures" / "figure_status.json",
-            experiment / "figures" / "REPORT.md",
-            experiment / "reports" / "final_smoke20_audit.json",
-            experiment / "reports" / "final_smoke20_audit.md",
         ):
             mutable_payloads[path] = path.read_bytes() if path.is_file() else None
         backup_files: dict[Path, Path] = {}
-        for target in [target for _, target, _ in png_replacements]:
+        for target in [target for _, target, _ in artifact_replacements]:
+            if not target.is_file():
+                continue
             backup = backup_root / target.relative_to(experiment)
             backup.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(target, backup)
             backup_files[target] = backup
 
-        replaced_pngs: list[Path] = []
+        replaced_artifacts: list[tuple[Path, Path]] = []
         try:
-            for staged, target, _item in png_replacements:
+            for staged, target, _item in artifact_replacements:
+                replaced_artifacts.append((staged, target))
                 _replace_file_atomically(staged, target)
-                replaced_pngs.append(target)
             write_derived_json(visualization_path, updated_manifest)
             write_derived_bytes(report_path, report_text.encode("utf-8"))
             write_derived_bytes(regeneration_path, regeneration_text.encode("utf-8"))
-
-            from report_experiment import _snapshot_figure_status
-
-            figure_status_path = experiment / "figures" / "figure_status.json"
-            figure_status = read_json(figure_status_path)
-            figure_rows = figure_status.get("figures", [])
-            index_experiment_artifacts(experiment)
-            snapshot_status = _snapshot_figure_status(experiment)
-            for index, item in enumerate(figure_rows):
-                if item.get("figure") == "three_time_solution_figures":
-                    figure_rows[index] = snapshot_status
-                    break
-            else:
-                figure_rows.append(snapshot_status)
-            write_derived_json(figure_status_path, figure_status)
-            figure_report_path = experiment / "figures" / "REPORT.md"
-            figure_report = figure_report_path.read_text(encoding="utf-8")
-            figure_status_line = (
-                f"| three_time_solution_figures | "
-                f"{snapshot_status['generation_status']} |"
-            )
-            figure_report = __import__("re").sub(
-                r"\| three_time_solution_figures \| [A-Z_]+ \|",
-                figure_status_line, figure_report,
-            )
-            write_derived_bytes(
-                figure_report_path, figure_report.encode("utf-8")
-            )
-
-            audit_json_path = experiment / "reports" / "final_smoke20_audit.json"
-            if audit_json_path.is_file():
-                final_audit = read_json(audit_json_path)
-                validation = final_audit.get("validation_results", {})
-                figure_check = validation.get("figure_files", {})
-                details = figure_check.get("details", {})
-                details["stale_three_time_status"] = False
-                details["three_time_status"] = snapshot_status["generation_status"]
-                not_generated = details.get("not_generated", [])
-                details["not_generated"] = [
-                    item for item in not_generated
-                    if item.get("figure") != "three_time_solution_figures"
-                ]
-                figure_check["status"] = "PASS"
-                figure_check["details"] = details
-                validation["figure_files"] = figure_check
-                visualization_check = validation.get("visualization_artifacts", {})
-                visualization_details = visualization_check.get("details", {})
-                visualization_details.update({
-                    "renderable": len(eligible),
-                    "triptychs": len(eligible),
-                    "snapshot_panels": len(eligible) * 3,
-                    "snapshot_pngs": len(png_replacements),
-                    "invalid_files": [],
-                })
-                visualization_check["details"] = visualization_details
-                validation["visualization_artifacts"] = visualization_check
-                final_audit["validation_results"] = validation
-                final_audit["critical_errors"] = [
-                    item for item in final_audit.get("critical_errors", [])
-                    if item.get("check") != "stale_figure_status"
-                ]
-                final_audit["observed_counts"]["triptychs"] = len(eligible)
-                final_audit["observed_counts"]["snapshot_panels"] = len(eligible) * 3
-                final_audit["observed_counts"]["snapshot_pngs"] = len(png_replacements)
-                final_audit["snapshot_regeneration"] = {
-                    "status": "PASS",
-                    "renderer_version": RENDERER_VERSION,
-                    "renderable": len(eligible),
-                    "pngs_regenerated": len(png_replacements),
-                    "triptychs_validated": len(eligible),
-                    "solver_execution": False,
-                }
-                remaining_failures = [
-                    item for item in final_audit.get("validation_results", {}).values()
-                    if isinstance(item, dict) and item.get("status") == "FAIL"
-                ]
-                final_audit["audit_status"] = (
-                    "FAIL" if remaining_failures or final_audit["critical_errors"]
-                    else "PASS"
-                )
-                final_audit["audited_at"] = utc_now()
-                write_derived_json(audit_json_path, final_audit)
-
-                audit_md_path = experiment / "reports" / "final_smoke20_audit.md"
-                audit_md = audit_md_path.read_text(encoding="utf-8")
-                audit_md = audit_md.replace(
-                    "- **stale_figure_status**: "
-                    "\"three-time figures marked NOT_GENERATED although triptychs exist\"\n",
-                    "",
-                )
-                audit_md = audit_md.replace(
-                    "- **Audit status:** FAIL",
-                    f"- **Audit status:** {final_audit['audit_status']}",
-                    1,
-                )
-                audit_md += (
-                    "\n## Snapshot regeneration re-audit\n\n"
-                    f"- Snapshot-specific audit: **PASS** — {len(eligible)} "
-                    f"renderable solutions, {len(eligible) * 3} panels, "
-                    f"{len(eligible)} triptychs, and {len(png_replacements)} "
-                    "decoded and checksummed PNGs.\n"
-                    "- `three_time_solution_figures` is now "
-                    f"`{snapshot_status['generation_status']}` based on validated "
-                    "visualization-manifest artifacts.\n"
-                    "- Solver results were not rerun or rewritten. The overall "
-                    f"audit remains **{final_audit['audit_status']}** due only to "
-                    "any unrelated pre-existing failures retained above.\n"
-                    "- Detailed rendering-only evidence: "
-                    "[snapshot regeneration report](snapshot_regeneration_report.md).\n"
-                )
-                write_derived_bytes(
-                    audit_md_path, audit_md.encode("utf-8")
-                )
 
             index_experiment_artifacts(experiment)
             final_audit_result = audit(experiment)
             if final_audit_result["rendered_slots"] != len(eligible):
                 raise ValueError("post-replacement visualization audit count mismatch")
-            artifact_index_path = experiment / "artifacts.json"
-            indexed_count = len(read_json(
-                artifact_index_path, schema_name="artifact_manifest"
-            )["artifacts"])
-            audit_json_path = experiment / "reports" / "final_smoke20_audit.json"
-            if audit_json_path.is_file():
-                final_audit = read_json(audit_json_path)
-                final_audit["validation_results"]["artifact_index"]["details"][
-                    "indexed"
-                ] = indexed_count
-                final_audit["observed_counts"]["indexed_artifacts"] = indexed_count
-                final_audit["observed_counts"]["tracked_in_experiment"] = (
-                    indexed_count + 1
-                )
-                write_derived_json(audit_json_path, final_audit)
-                audit_md_path = experiment / "reports" / "final_smoke20_audit.md"
-                audit_md = audit_md_path.read_text(encoding="utf-8")
-                audit_md = __import__("re").sub(
-                    r"Artifact index entries \d+;",
-                    f"Artifact index entries {indexed_count};",
-                    audit_md,
-                )
-                audit_md = __import__("re").sub(
-                    r"and \d+ in this experiment\.",
-                    f"and {indexed_count + 1} in this experiment.",
-                    audit_md,
-                    count=1,
-                )
-                write_derived_bytes(audit_md_path, audit_md.encode("utf-8"))
-                index_experiment_artifacts(experiment)
-                final_audit_result = audit(experiment)
         except BaseException:
-            for target in reversed(replaced_pngs):
-                backup = backup_files[target]
-                restore = stage_root / "restore" / target.relative_to(experiment)
-                restore.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(backup, restore)
-                _replace_file_atomically(restore, target)
+            for staged, target in reversed(replaced_artifacts):
+                if target.is_file() and not staged.exists():
+                    staged.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(target, staged)
+                backup = backup_files.get(target)
+                if backup is None:
+                    target.unlink(missing_ok=True)
+                else:
+                    restore = stage_root / "restore" / target.relative_to(experiment)
+                    restore.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(backup, restore)
+                    _replace_file_atomically(restore, target)
             for path, contents in mutable_payloads.items():
                 if contents is None:
                     path.unlink(missing_ok=True)
@@ -1781,19 +2589,30 @@ def regenerate_snapshots(
                     write_derived_bytes(path, contents)
             raise
 
-        index_experiment_artifacts(experiment)
+        completed = True
         return {
             "experiment_id": experiment.name,
             "planned_slots": len(plan),
             "renderable_solutions": len(eligible),
             "regenerated_pngs": len(png_replacements),
+            "regenerated_pdfs": len(pdf_replacements),
             "ineligible_slots": len(rows) - len(eligible),
             "ineligible_reasons": ineligible_reasons,
-            "renderer_version": RENDERER_VERSION,
+            "renderer_version": PUBLICATION_RENDERER_VERSION,
             "audit": final_audit_result,
         }
     finally:
-        shutil.rmtree(stage_root)
+        if completed:
+            shutil.rmtree(stage_root)
+
+
+def _parse_publication_formats(value: str) -> tuple[str, ...]:
+    formats = [part.strip().lower() for part in value.split(",") if part.strip()]
+    if len(formats) != len(set(formats)) or set(formats) != {"png", "pdf"}:
+        raise ValueError(
+            "--formats must specify both png and pdf exactly once"
+        )
+    return tuple(sorted(formats))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1801,18 +2620,34 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--experiment", required=True)
     parser.add_argument("--fps", type=int, default=12)
     parser.add_argument("--frames", type=int, default=48)
-    parser.add_argument("--dpi", type=int, default=90)
+    parser.add_argument("--dpi", type=int)
+    parser.add_argument(
+        "--formats",
+        default="png,pdf",
+        help="publication snapshot formats; both png and pdf are required",
+    )
     parser.add_argument("--hide-trajectories", action="store_true")
     parser.add_argument(
         "--point-labels", choices=("none", "supports", "all"),
-        default="supports",
+        default=None,
     )
     parser.add_argument("--show-support-connectors", action="store_true")
+    parser.add_argument(
+        "--staging-parent",
+        help="existing directory outside the repository on the experiment filesystem",
+    )
+    parser.add_argument(
+        "--backup-dir",
+        help="verified external backup directory required for snapshots-only replacement",
+    )
     parser.add_argument("--audit", action="store_true")
     parser.add_argument(
         "--snapshots-only",
         action="store_true",
-        help="safely regenerate static PNG snapshots without animations or solvers",
+        help=(
+            "safely regenerate publication PNG/PDF snapshots without animations "
+            "or solvers"
+        ),
     )
     parser.add_argument(
         "--replace-existing",
@@ -1822,6 +2657,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.audit:
+            if args.snapshots_only or args.replace_existing:
+                raise ValueError("--audit cannot be combined with snapshot replacement")
             report = audit(args.experiment)
             print(json.dumps(report, sort_keys=True))
         elif args.snapshots_only:
@@ -1829,21 +2666,39 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError(
                     "--snapshots-only requires explicit --replace-existing"
                 )
+            if not args.backup_dir:
+                raise ValueError(
+                    "--snapshots-only requires a verified external --backup-dir"
+                )
+            point_label_policy = args.point_labels or "none"
+            if point_label_policy != "none":
+                raise ValueError(
+                    "publication snapshots do not support point ownership labels"
+                )
             report = regenerate_snapshots(
                 args.experiment,
-                dpi=args.dpi,
+                dpi=args.dpi if args.dpi is not None else PUBLICATION_DPI,
+                formats=_parse_publication_formats(args.formats),
                 show_trajectories=not args.hide_trajectories,
-                point_label_policy=args.point_labels,
+                point_label_policy=point_label_policy,
                 show_support_connectors=args.show_support_connectors,
+                staging_parent=args.staging_parent,
+                backup_dir=args.backup_dir,
             )
             print(json.dumps(report, sort_keys=True))
-        elif args.replace_existing:
-            raise ValueError("--replace-existing is only valid with --snapshots-only")
+        elif args.replace_existing or args.backup_dir or args.staging_parent:
+            raise ValueError(
+                "--replace-existing, --backup-dir, and --staging-parent "
+                "are only valid with --snapshots-only"
+            )
+        elif args.formats != "png,pdf":
+            raise ValueError("--formats is only valid with --snapshots-only")
         else:
             report = generate(
-                args.experiment, fps=args.fps, frames=args.frames, dpi=args.dpi,
+                args.experiment, fps=args.fps, frames=args.frames,
+                dpi=args.dpi if args.dpi is not None else 90,
                 show_trajectories=not args.hide_trajectories,
-                point_label_policy=args.point_labels,
+                point_label_policy=args.point_labels or "supports",
                 show_support_connectors=args.show_support_connectors,
             )
             print(json.dumps({

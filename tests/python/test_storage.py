@@ -84,15 +84,32 @@ def test_experiment_artifact_index_checksums_files_and_excludes_itself(tmp_path)
     artifact = experiment / "reports" / "summary.md"
     artifact.parent.mkdir()
     artifact.write_text("summary\n", encoding="utf-8")
+    (experiment / "snapshots").mkdir()
+    (experiment / "snapshots" / "figure.png").write_bytes(b"png")
+    (experiment / "snapshots" / "figure.pdf").write_bytes(b"pdf")
 
     index_path = index_experiment_artifacts(experiment)
     index = read_json(index_path, schema_name="artifact_manifest")
-    assert index["artifacts"] == [{
-        "path": "reports/summary.md",
-        "sha256": sha256_file(artifact),
-        "size_bytes": artifact.stat().st_size,
-        "media_type": "text/plain",
-    }]
+    assert index["artifacts"] == [
+        {
+            "path": "reports/summary.md",
+            "sha256": sha256_file(artifact),
+            "size_bytes": artifact.stat().st_size,
+            "media_type": "text/markdown",
+        },
+        {
+            "path": "snapshots/figure.pdf",
+            "sha256": sha256_file(experiment / "snapshots" / "figure.pdf"),
+            "size_bytes": 3,
+            "media_type": "application/pdf",
+        },
+        {
+            "path": "snapshots/figure.png",
+            "sha256": sha256_file(experiment / "snapshots" / "figure.png"),
+            "size_bytes": 3,
+            "media_type": "image/png",
+        },
+    ]
 
 
 def test_experiment_artifact_index_rejects_paths_that_escape_root(tmp_path):

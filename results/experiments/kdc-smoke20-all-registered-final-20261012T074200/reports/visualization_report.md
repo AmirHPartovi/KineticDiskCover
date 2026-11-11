@@ -8,6 +8,7 @@
 - Slots in run plan: 660
 - Solutions with snapshots: 502
 - Regenerated snapshot PNGs: 2008
+- Regenerated publication PDFs: 2008
 - Per-solution animations (unchanged): 502
 - Ineligible slots: 158
 - Rendering failures: 0

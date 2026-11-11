@@ -58,6 +58,18 @@ TEST_CASE("CliArgs: parses --key value") {
   REQUIRE(std::abs(args.get_double("gap", 0.0) - 0.001) < 1e-12);
 }
 
+TEST_CASE("CliArgs: accepts negative numeric literals as flag values") {
+  char arg0[] = "prog";
+  char arg1[] = "--gap";
+  char arg2[] = "-0.001";
+  char arg3[] = "--threads";
+  char arg4[] = "-2";
+  char* argv[] = {arg0, arg1, arg2, arg3, arg4};
+  const auto args = kdc::CliArgs::parse(5, argv);
+  REQUIRE(std::abs(args.get_double("gap", 0.0) + 0.001) < 1e-12);
+  REQUIRE(args.get_int("threads", 0) == -2);
+}
+
 TEST_CASE("CliArgs: parses boolean flags") {
   char arg0[] = "prog";
   char arg1[] = "--verify";

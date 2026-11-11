@@ -89,6 +89,27 @@ also require feasibility and continuous verification. Raw integrity reports
 retain timeout and failure counts. Empirical ratios are not theoretical
 approximation guarantees.
 
+To regenerate only the static publication snapshots of an existing experiment,
+without running solvers or recreating animations, use the explicit replacement
+mode:
+
+```bash
+python3 scripts/visualize_experiment.py \
+  --experiment results/experiments/EXPERIMENT_ID \
+  --snapshots-only --replace-existing \
+  --formats png,pdf --dpi 600 --point-labels none \
+  --staging-parent /path/outside/repository \
+  --backup-dir /path/to/verified/external-backup
+```
+
+This mode validates the existing run plan and serialized solutions, then
+replaces the four established PNG paths per renderable run and adds matching
+vector PDFs. It updates the visualization manifest and artifact index while
+leaving comparison pages and animations in place; staged outputs are validated
+before replacement. It requires a checksum-verified external backup on the
+same filesystem and keeps failed staging output for inspection; unrelated
+figure-status and experiment-audit reports are not modified.
+
 ## Prerequisites
 
 * CMake 3.20 or newer.

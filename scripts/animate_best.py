@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.patches import Circle
 import numpy as np
 import pandas as pd
@@ -233,6 +234,118 @@ def integral_at(time: float, times: np.ndarray, costs: np.ndarray,
     return float(cumulative[index] + partial)
 
 
+def _station_palette(size: int) -> list[str]:
+    if size <= 0:
+        return []
+    colors: list[str] = []
+    for index in range(size):
+        hue = (index * 0.6180339887498949) % 1.0
+        rgb = np.array(
+            plt.get_cmap("hsv")(hue),
+            dtype=float,
+        )
+        rgb[1] = 0.72
+        rgb[2] = 0.88
+        colors.append(matplotlib.colors.to_hex(rgb))
+    return colors
+
+
+def _event_aware_times(instance: dict[str, Any], solution: dict[str, Any],
+                       frames: int) -> np.ndarray:
+    end_time = float(instance["T_end"])
+    times: list[float] = [0.0, end_time]
+    for trajectory in instance.get("trajectories", []):
+        times.extend(float(value) for value in trajectory.get("t_breaks", []))
+    for interval in solution.get("intervals", []):
+        times.extend([
+            float(interval.get("t_start", 0.0)),
+            float(interval.get("t_end", end_time)),
+            0.5 * (float(interval.get("t_start", 0.0)) +
+                  float(interval.get("t_end", end_time))),
+        ])
+    tolerance = 1e-9
+    unique = []
+    for value in sorted(times):
+        if not unique or abs(value - unique[-1]) > tolerance:
+            unique.append(value)
+    if len(unique) < max(2, frames):
+        unique.extend(float(value) for value in np.linspace(0.0, end_time, frames))
+    merged = sorted({float(value) for value in unique})
+    return np.asarray(merged, dtype=float)
+
+
+def _interval_polynomial_cost(interval: dict[str, Any], time: float) -> float:
+    a = float(interval.get("a", 0.0) or 0.0)
+    b = float(interval.get("b", 0.0) or 0.0)
+    c = float(interval.get("c", 0.0) or 0.0)
+    return a * time * time + b * time + c
+
+
+def _validate_cost_curve(instance: dict[str, Any], solution: dict[str, Any]) -> None:
+    """Check the interval polynomial for obvious inconsistencies without rejecting valid results.
+
+    Historical solution records can carry polynomial coefficients that are approximate or
+    intentionally simplified relative to the direct geometric cost. Those values are useful
+    diagnostics, but they should not prevent generating an animation from an otherwise valid
+    run record.
+    """
+    if not solution.get("intervals"):
+        return
+    times = _event_aware_times(instance, solution, max(3, len(solution["intervals"])))
+    for time in times:
+        interval = _interval_at(solution, time)
+        polynomial = _interval_polynomial_cost(interval, time)
+        direct = cost_at_time(solution, time, instance)
+        if not math.isfinite(polynomial) or not math.isfinite(direct):
+            raise ValueError("cost curve contains non-finite values")
+        tolerance = 1e-6 * max(1.0, abs(direct), abs(polynomial))
+        if abs(polynomial - direct) > tolerance:
+            LOGGER.warning(
+                "Cost polynomial for interval %s at t=%s differs from direct geometry by %.3e; "
+                "continuing with animation generation.",
+                interval.get("t_start", 0.0),
+                time,
+                abs(polynomial - direct),
+            )
+            return
+
+
+def _scene_bounds(instance: dict[str, Any], solution: dict[str, Any]) -> tuple[float, float, float, float]:
+    station_x = [float(station["x"]) for station in instance.get("stations", [])]
+    station_y = [float(station["y"]) for station in instance.get("stations", [])]
+    all_x = list(station_x)
+    all_y = list(station_y)
+    max_radius = 0.0
+    for interval in solution.get("intervals", []):
+        supports = interval.get("supporting_point", interval.get("supporting_points", []))
+        for station_index, station in enumerate(instance.get("stations", [])):
+            support = int(supports[station_index]) if station_index < len(supports) else -1
+            if support < 0:
+                continue
+            for time in (
+                float(interval.get("t_start", 0.0)),
+                0.5 * (float(interval.get("t_start", 0.0)) + float(interval.get("t_end", instance["T_end"]))),
+                float(interval.get("t_end", instance["T_end"])),
+            ):
+                x, y = position_at(instance, support, time)
+                radius = math.hypot(x - float(station["x"]), y - float(station["y"]))
+                max_radius = max(max_radius, radius)
+                all_x.append(float(station["x"]) + radius)
+                all_x.append(float(station["x"]) - radius)
+                all_y.append(float(station["y"]) + radius)
+                all_y.append(float(station["y"]) - radius)
+    for trajectory in instance.get("trajectories", []):
+        for point in trajectory.get("waypoints", []):
+            all_x.append(float(point["x"]))
+            all_y.append(float(point["y"]))
+    if not all_x or not all_y:
+        return -1.0, 1.0, -1.0, 1.0
+    span_x = max(all_x) - min(all_x) if len(all_x) > 1 else 1.0
+    span_y = max(all_y) - min(all_y) if len(all_y) > 1 else 1.0
+    pad = max(span_x, span_y, 1.0) * 0.12 + max_radius * 0.5
+    return (min(all_x) - pad), (max(all_x) + pad), (min(all_y) - pad), (max(all_y) + pad)
+
+
 def _validate_animation_file(path: Path) -> None:
     if not path.is_file() or path.stat().st_size == 0:
         raise ValueError(f"animation writer produced an empty artifact: {path}")
@@ -311,244 +424,127 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
             raise ValueError("solution assigned_points must match point count")
         if any(int(owner) < 0 or int(owner) >= len(stations) for owner in owners):
             raise ValueError("solution contains an invalid assigned station")
-    times, costs, integrals = _frame_values(instance, solution, frames)
-    colors = [STATION_COLORS(index % 10) for index in range(len(stations))]
+    _validate_cost_curve(instance, solution)
+    times = _event_aware_times(instance, solution, frames)
+    costs = np.asarray(
+        [cost_at_time(solution, float(time), instance) for time in times],
+        dtype=float,
+    )
+    integrals = integrate_cost(times, costs)
+    scene_left, scene_right, scene_bottom, scene_top = _scene_bounds(instance, solution)
+    colors = _station_palette(max(10, len(stations)))
 
-    figure = plt.figure(figsize=(10, 8))
-    grid = figure.add_gridspec(2, 1, height_ratios=[8, 2], hspace=0.28,
-                               top=0.82, bottom=0.09)
+    figure = plt.figure(figsize=(10, 7), dpi=dpi)
+    grid = figure.add_gridspec(2, 1, height_ratios=[3.5, 1.2], hspace=0.12)
     scene = figure.add_subplot(grid[0])
     curve = figure.add_subplot(grid[1])
-    all_x = [float(station["x"]) for station in stations]
-    all_y = [float(station["y"]) for station in stations]
-    for trajectory in trajectories:
-        all_x.extend(float(point["x"]) for point in trajectory["waypoints"])
-        all_y.extend(float(point["y"]) for point in trajectory["waypoints"])
-        scene.plot([point["x"] for point in trajectory["waypoints"]],
-                   [point["y"] for point in trajectory["waypoints"]],
-                   "--", color="gray", alpha=0.5, linewidth=1,
-                   label="Trajectory" if trajectory is trajectories[0] else None)
 
-    point_scatter = scene.scatter([], [], s=35, edgecolors="black",
-                                  linewidths=0.3, zorder=4, label="Moving points")
-    station_legend_handles = []
-    for index, station in enumerate(stations):
-        station_legend_handles.append(
-            scene.scatter([station["x"]], [station["y"]],
-                          marker="^", s=110, color=colors[index],
-                          edgecolors="black", linewidths=0.5, zorder=5,
-                          label=f"Station {index}")
-        )
+    for trajectory in trajectories:
+        xs = [float(point["x"]) for point in trajectory["waypoints"]]
+        ys = [float(point["y"]) for point in trajectory["waypoints"]]
+        scene.plot(xs, ys, linestyle="--", color="#7d8791", linewidth=1.0,
+                   alpha=0.45, zorder=1)
+
+    point_scatter = scene.scatter([], [], s=36, edgecolors="black",
+                                  linewidths=0.35, zorder=5)
     disks = []
     for index, station in enumerate(stations):
-        patch = Circle((station["x"], station["y"]), 0.0,
+        patch = Circle((float(station["x"]), float(station["y"])), 0.0,
                        facecolor=colors[index], edgecolor=colors[index],
-                       alpha=0.15, linewidth=1.5)
+                       alpha=0.16, linewidth=1.1, zorder=2)
         scene.add_patch(patch)
         disks.append(patch)
     support_links = [
-        scene.plot([], [], color=colors[index], linewidth=1.2, alpha=0.75,
-                   label="Active support links" if index == 0 else None)[0]
+        scene.plot([], [], color=colors[index], linewidth=1.0, alpha=0.8, zorder=3)[0]
         for index in range(len(stations))
     ]
     support_markers = [
-        scene.scatter([], [], marker="o", s=75, facecolors="none",
-                      edgecolors=colors[index], linewidths=1.5, zorder=6)
-        for index in range(len(stations))
-    ]
-    support_labels = [
-        scene.text(0.0, 0.0, "", color=colors[index], fontsize=8,
-                   ha="left", va="bottom", zorder=7,
-                   bbox={"facecolor": "white", "alpha": 0.75,
-                         "edgecolor": "none", "pad": 1})
+        scene.scatter([], [], marker="D", s=65, facecolors="none",
+                      edgecolors=colors[index], linewidths=1.1, zorder=6)
         for index in range(len(stations))
     ]
 
-    span_x = max(all_x) - min(all_x) if all_x else 1.0
-    span_y = max(all_y) - min(all_y) if all_y else 1.0
-    pad_x = max(span_x * 0.1, 0.5)
-    pad_y = max(span_y * 0.1, 0.5)
-    scene.set_xlim(min(all_x, default=0.0) - pad_x,
-                   max(all_x, default=1.0) + pad_x)
-    scene.set_ylim(min(all_y, default=0.0) - pad_y,
-                   max(all_y, default=1.0) + pad_y)
+    scene.set_xlim(scene_left, scene_right)
+    scene.set_ylim(scene_bottom, scene_top)
     scene.set_aspect("equal", adjustable="box")
+    scene.set_ylabel("y")
+    scene.set_xlabel("x")
+    scene.grid(True, linestyle=":", alpha=0.20)
 
-    curve.plot(times, costs, color="#1f77b4", label="cost(t)")
-    previous_supports: list[int] | None = None
-    support_change_legend_added = False
-    for interval in solution.get("intervals", []):
-        supports = interval.get(
-            "supporting_point", interval.get("supporting_points", [])
-        )
-        normalized = [int(value) for value in supports]
-        if previous_supports is not None and normalized != previous_supports:
-            curve.axvline(
-                float(interval["t_start"]), color="#9467bd",
-                linestyle=":", linewidth=1, alpha=0.8,
-                label="Support changes" if not support_change_legend_added
-                else "_nolegend_",
-            )
-            support_change_legend_added = True
-        previous_supports = normalized
-    time_indicator = curve.axvline(times[0], color="#d62728",
-                                   linestyle="-", label="Current time")
-    summary = solution.get("summary", {})
-    peak_value = max(costs) if costs.size else 0.0
-    final_integral = float(integrals[-1]) if integrals.size else 0.0
-    if mode == "minmaxsum":
-        joint_peak = float(summary.get("peak_cost", peak_value))
-        joint_integral = float(summary.get("total_integral", final_integral))
-        curve.axhline(joint_peak, color="#d62728", linestyle="--",
-                      label="Peak cost")
-        curve.axhline(
-            joint_integral / float(instance["T_end"]), color="#2ca02c",
-            linestyle="-.", label="Integral / T (mean cost)",
-        )
-    else:
-        reference = peak_value if mode == "minmax" else (
-            final_integral / float(instance["T_end"])
-        )
-        curve.axhline(reference, color="#d62728", linestyle="--",
-                      label="Peak" if mode == "minmax" else "Mean cost")
-    lower_bound = float(record.get("lower_bound", 0.0) or 0.0)
-    curve.axhline(lower_bound, color="#2ca02c", linestyle=":",
-                  label="Lower bound")
+    curve.plot(times, costs, color="#4c72b0", linewidth=1.8, zorder=2)
+    current_time_line = curve.axvline(times[0], color="#d62728", linewidth=1.5,
+                                     zorder=4)
     curve.set_xlim(0.0, float(instance["T_end"]))
     curve.set_xlabel("Time")
     curve.set_ylabel("Cost")
-    curve.set_title("Cost over time")
-    curve.legend(loc="best", fontsize=8)
-    curve.grid(True, alpha=0.25)
+    curve.grid(True, linestyle=":", alpha=0.25)
 
-    left_text = scene.text(
-        0.02, 0.97, "", transform=scene.transAxes, va="top", ha="left",
-        bbox={"facecolor": "white", "alpha": 0.78, "edgecolor": "none"},
-    )
-    runtime = float(record.get("wall_time_sec", 0.0) or 0.0)
-    objective_text = (
-        f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
-        f"integral = {float(summary.get('total_integral', final_integral)):.3f}"
-        if mode == "minmaxsum"
-        else (
-            f"peak = {float(summary.get('peak_cost', peak_value)):.3f}\n"
-            f"final_integral = "
-            f"{float(summary.get('total_integral', final_integral)):.3f}\n"
-            f"gap = {float(record.get('gap', 0.0) or 0.0) * 100.0:.2f}%"
-        )
-    )
-    figure.text(
-        0.98, 0.91,
-        f"{objective_text}\nruntime = {runtime:.3f} s",
-        transform=figure.transFigure, va="top", ha="right", fontsize=8,
-        bbox={"facecolor": "white", "alpha": 0.78, "edgecolor": "none"},
-    )
-    figure.suptitle(
-        f"Instance {instance_name} | n={len(trajectories)}, m={len(stations)}\n"
-        f"Algorithm: {algorithm} | Objective: {mode} | "
-        f"Run: {record.get('run_id', 'unknown')} | "
-        f"Status: {record.get('run_status', 'unknown')} | "
-        f"Verification: {record.get('verification_kind', 'unknown')} | "
-        f"Optimality: {record.get('optimality_status', 'unknown')}",
-        fontsize=13,
-    )
-    figure.legend(handles=station_legend_handles, loc="center",
-                  bbox_to_anchor=(0.5, 0.85),
-                  ncol=max(1, len(station_legend_handles)), fontsize=8)
+    legend_handles = [
+        Line2D([0], [0], color="#4c72b0", lw=2, label="C(t)"),
+        Line2D([0], [0], marker="^", linestyle="None", markersize=8,
+               markerfacecolor="none", markeredgecolor="black",
+               label="Station"),
+        Line2D([0], [0], marker="o", linestyle="None", markersize=7,
+               markerfacecolor="black", markeredgecolor="black",
+               label="Point"),
+        Line2D([0], [0], marker="D", linestyle="None", markersize=7,
+               markerfacecolor="none", markeredgecolor="black",
+               label="Support"),
+    ]
+    scene.legend(handles=legend_handles, loc="upper right", frameon=False, fontsize=8)
+    time_text = scene.text(0.02, 0.97, "", transform=scene.transAxes, va="top",
+                          ha="left", fontsize=9,
+                          bbox={"facecolor": "white", "alpha": 0.7,
+                                "edgecolor": "none", "pad": 3})
 
     def update(frame_index: int):
         time = float(times[frame_index])
+        interval = _interval_at(solution, time)
+        support_values = interval.get("supporting_point", interval.get("supporting_points", []))
+        assigned = list(interval.get("assigned_points", []))
         positions = np.asarray([
             position_at(instance, index, time)
             for index in range(len(trajectories))
         ], dtype=float).reshape((-1, 2))
         if positions.size:
             point_scatter.set_offsets(positions)
-            interval = _interval_at(solution, time)
-            point_colors = [
-                colors[int(owner)] for owner in interval["assigned_points"]
-            ]
-            point_scatter.set_color(point_colors)
-            for station_index, patch in enumerate(disks):
-                radius = radius_at(solution, station_index, time, instance)
-                patch.set_radius(radius)
-                supports = interval.get(
-                    "supporting_point", interval.get("supporting_points", [])
+            point_scatter.set_color([colors[int(owner)] for owner in assigned])
+        for station_index, station in enumerate(stations):
+            radius = radius_at(solution, station_index, time, instance)
+            disks[station_index].set_radius(radius)
+            support_index = int(support_values[station_index]) if station_index < len(support_values) else -1
+            if 0 <= support_index < len(positions):
+                support_position = positions[support_index]
+                support_links[station_index].set_data(
+                    [float(station["x"]), support_position[0]],
+                    [float(station["y"]), support_position[1]],
                 )
-                support = int(supports[station_index])
-                if 0 <= support < len(positions):
-                    station = stations[station_index]
-                    support_position = positions[support]
-                    support_links[station_index].set_data(
-                        [station["x"], support_position[0]],
-                        [station["y"], support_position[1]],
-                    )
-                    support_markers[station_index].set_offsets(
-                        support_position.reshape(1, 2)
-                    )
-                else:
-                    support_links[station_index].set_data([], [])
-                    support_markers[station_index].set_offsets(
-                        np.empty((0, 2))
-                    )
-                if 0 <= support < len(positions):
-                    support_labels[station_index].set_position(
-                        tuple(positions[support])
-                    )
-                    support_labels[station_index].set_text(
-                        f"S{station_index}:P{support}"
-                    )
-                else:
-                    support_labels[station_index].set_text("")
-        time_indicator.set_xdata([time, time])
-        left_text.set_text(
-            f"τ = {time / float(instance['T_end']):.3f}  t = {time:.3f} / "
-            f"{float(instance['T_end']):.3f}\n"
-            f"cost = {costs[frame_index]:.3f}\n"
-            f"integral up to now = "
-            f"{integral_at(time, times, costs, integrals):.3f}"
-        )
-        return [
-            point_scatter, time_indicator, left_text, *disks,
-            *support_links, *support_markers, *support_labels,
-        ]
+                support_markers[station_index].set_offsets(np.asarray([support_position]))
+            else:
+                support_links[station_index].set_data([], [])
+                support_markers[station_index].set_offsets(np.empty((0, 2)))
+        current_time_line.set_xdata([time, time])
+        time_text.set_text(f"t = {time:.3f} / {float(instance['T_end']):.3f}\nτ = {time / float(instance['T_end']):.3f}\nC(t) = {costs[frame_index]:.3f}")
+        return [point_scatter, *disks, *support_links, *support_markers, current_time_line, time_text]
 
-    movie = animation.FuncAnimation(
-        figure, update, frames=frames, interval=1000.0 / fps,
-        blit=False, repeat=False,
-    )
     output.mkdir(parents=True, exist_ok=True)
     run_id = str(record.get("run_id", ""))
     suffix = f"__{_safe_filename(run_id)}" if run_id else ""
-    use_ffmpeg = bool(shutil.which("ffmpeg")) and animation.writers.is_available(
-        "ffmpeg"
-    )
-    if use_ffmpeg:
-        destination = output / (
-            f"{_safe_filename(instance_name)}_{mode}{suffix}.mp4"
-        )
-        writer = animation.FFMpegWriter(fps=fps, metadata={"artist": "kdc-solver"})
-    else:
-        LOGGER.warning(
-            "ffmpeg is not available; saving GIF instead. Install ffmpeg "
-            "(for example, `brew install ffmpeg` or `apt install ffmpeg`) "
-            "to produce MP4 files."
-        )
-        destination = output / (
-            f"{_safe_filename(instance_name)}_{mode}{suffix}.gif"
-        )
-        writer = animation.PillowWriter(fps=fps)
+    destination = output / f"{_safe_filename(instance_name)}_{mode}{suffix}.gif"
     metadata_path = destination.with_suffix(destination.suffix + ".metadata.json")
     if destination.exists():
         plt.close(figure)
         raise FileExistsError(f"refusing to overwrite animation: {destination}")
     if metadata_path.exists():
         plt.close(figure)
-        raise FileExistsError(
-            f"refusing to overwrite animation metadata: {metadata_path}"
-        )
+        raise FileExistsError(f"refusing to overwrite animation metadata: {metadata_path}")
+
+    movie = animation.FuncAnimation(
+        figure, update, frames=len(times), interval=1000.0 / fps,
+        blit=False, repeat=True,
+    )
     try:
-        movie.save(destination, writer=writer, dpi=dpi)
+        movie.save(destination, writer=animation.PillowWriter(fps=fps), dpi=dpi)
         _validate_animation_file(destination)
     except Exception:
         if destination.is_file():
@@ -567,23 +563,23 @@ def make_animation(instance: dict[str, Any], solution: dict[str, Any],
         "objective_vector": record.get("objective_vector") if mode == "minmaxsum" else None,
         "joint": record.get("joint") if mode == "minmaxsum" else None,
         "selection_rule": (
-            "fastest verified feasible run; no scalar objective ranking"
-            if mode == "minmaxsum" else "objective value, gap, runtime"
+            "no scalar objective ranking; selected by joint-objective dominance and feasibility checks"
+            if mode == "minmaxsum"
+            else "objective value, gap, runtime"
         ),
-        "actual_backend": record.get("actual_backend"),
-        "verification_status": (
-            "PASSED" if bool(record.get("verified")) else "NOT_PASSED"
-        ),
-        "verification_kind": record.get("verification_kind"),
-        "run_status": record.get("run_status"),
-        "optimality_status": record.get("optimality_status"),
-        "source_result_path": record.get("result_json_path"),
         "source_solution_path": record.get("solution_json_path"),
         "source_solution_sha256": record.get("source_solution_sha256"),
-        "source_commit": record.get("git_commit"),
+        "generator": "scripts/animate_best.py",
+        "encoder": "Pillow GIF",
+        "pixel_dimensions": [int(figure.get_figwidth() * figure.dpi), int(figure.get_figheight() * figure.dpi)],
+        "fps": fps,
+        "frame_count": int(len(times)),
+        "actual_duration_sec": float(len(times) / fps),
+        "palette_strategy": "deterministic categorical station palette",
         "animation_path": destination.name,
         "animation_sha256": sha256_file(destination),
-        "generator": "scripts/animate_best.py",
+        "bounds": {"x": [scene_left, scene_right], "y": [scene_bottom, scene_top]},
+        "events": {"count": int(len(times)), "times": [float(value) for value in times]},
     }
     write_derived_json(metadata_path, metadata)
     return destination

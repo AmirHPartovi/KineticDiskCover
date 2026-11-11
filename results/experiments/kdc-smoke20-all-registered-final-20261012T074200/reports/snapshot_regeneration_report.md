@@ -1,19 +1,29 @@
 # Snapshot regeneration report
 
+- Repository: `/Users/amirpartovi/Desktop/Codes/KineticDiskCover`
 - Target experiment ID: `kdc-smoke20-all-registered-final-20261012T074200`
 - Renderer version: `2`
-- Source code revision (Git HEAD): `e3ebc62443410975c261748d97a64300ac87f51e`
-- Renderer source SHA-256 (working tree): `306156c578945fb327084903a16ea8bd9137f9852368d85d806392c88802f19f`
-- Completed at (UTC): `2026-10-13T19:05:50.434379+00:00`
+- Source code revision (Git HEAD): `68b0d81370682dd32ce75c3105707f49fc547aef`
+- Renderer source SHA-256 (working tree): `4044ee63439d2d64f316566f8b2f72359183f35dc10a450612a776fa62285023`
+- Completed at (UTC): `2026-11-06T03:40:54.305415+00:00`
+- Original snapshot PNGs: 2008
+- Original snapshot PDFs: 2008
 - Planned slots: 660
 - Renderable solutions: 502
 - PNGs regenerated: 2008
+- PDFs regenerated: 2008
 - Ineligible slots: 158
+- External backup: `/Users/amirpartovi/Desktop/Codes/KineticDiskCover.snapshot-backups/kdc-smoke20-all-registered-final-20261012T074200-pre-layout-correction`
+- Backup files checksum-verified: 4020
+- Backup inventory SHA-256: `adad6a570ea5c6f29cc00fadb2cd49c149a5d88df5b9107f1528e2bfb3525ff7`
 - Rendering failures: 0
-- PNG validation: all staged images decoded with Pillow; dimensions, sizes, checksums, output paths and four-file-per-slot coverage verified.
+- PNG validation: staged images decoded with Pillow; dimensions, DPI, sizes, checksums, output paths and four-file-per-slot coverage verified.
+- PDF validation: one page per file; MediaBox matched configured dimensions; vector path operators, embedded DejaVu Sans fonts, and absence of raster image objects were checked; Ghostscript opened every PDF.
 - Solver execution, calibration, run-plan creation and animation generation: not performed.
 - Solver run records, results, serialized solutions, traces, aggregates, tables and source inputs: not modified.
-- Visualization manifest, report, global artifact index and snapshot figure status: refreshed transactionally.
+- Only the visualization manifest/report, snapshot regeneration report, artifact index, and snapshot PNG/PDF files were updated.
+- Snapshot-specific figure-status metadata and all other reports were left unchanged.
+- Other experiments, comparison HTML pages, and animation files were left unchanged.
 
 ## Ineligible planned slots
 
@@ -25,14 +35,6 @@
 
 - Panels: 1506; triptychs: 502.
 - Expected and decoded PNGs: 2008.
-- Comparison sheets verified: 60/60 retained; all 3,012 existing relative PNG links resolve to nonempty regenerated files.
-- Global artifact index: refreshed; 21,591 entries match the current files and checksums.
-- Snapshot figure status: `GENERATED` for 502 verified triptychs; the stale status contradiction is cleared.
-- Existing final smoke20 audit remains FAIL if unrelated solver-result integrity failures persist; snapshot status is reported separately.
-
-## Visual review
-
-- Contact sheet (outside the source tree): `/var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-smoke20-visual-review-1a17dk83/contact-sheet.png`; it combines three actual dense rd100 triptychs (MinMax, MinSum, MinMaxSum; 37 trajectories and 25 stations) and one separately labeled translated-coordinate regression fixture.
-- Inspected the contact sheet and each actual objective triptych at full resolution. All three panels retain a common scale; status, verification and objective metadata remain visible; shared legend stays outside the geometry.
-- Remaining trade-off: support-point labels are still numerous on dense 25-station cases and overlap locally, but are substantially fewer than labels for every moving point. Coverage disks overlap where the solution geometry overlaps. The translated fixture preserves the spatial arrangement and uses offset axis notation.
-- PNG validation failures: none.
+- Expected and validated vector PDFs: 2008.
+- Comparison sheets retained in place; their existing relative PNG links continue to target the replaced files.
+- No solver, benchmark, calibration, experiment pipeline, or animation was executed.

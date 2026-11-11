@@ -3,12 +3,45 @@
 #include "kdc/logging.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace kdc {
+namespace {
+
+bool is_negative_numeric_literal(const std::string& value) {
+  if (value.empty() || value == "-") {
+    return false;
+  }
+  if (value[0] != '-') {
+    return false;
+  }
+
+  const char* start = value.c_str();
+  char* end = nullptr;
+  const double number = std::strtod(start, &end);
+  static_cast<void>(number);
+  return end != start && *end == '\0';
+}
+
+bool is_next_arg_value(const char* candidate) {
+  if (candidate == nullptr || candidate[0] == '\0') {
+    return false;
+  }
+  if (candidate[0] != '-') {
+    return true;
+  }
+  if (std::string(candidate) == "--") {
+    return false;
+  }
+  return is_negative_numeric_literal(candidate);
+}
+
+}  // namespace
+
 CliArgs CliArgs::parse(int argc, char** argv) {
   CliArgs result;
   for (int index = 1; index < argc; ++index) {
@@ -27,7 +60,7 @@ CliArgs CliArgs::parse(int argc, char** argv) {
     std::string value;
     if (separator != std::string::npos) {
       value = flag_value.substr(separator + 1U);
-    } else if (index + 1 < argc && argv[index + 1][0] != '-') {
+    } else if (index + 1 < argc && is_next_arg_value(argv[index + 1])) {
       value = argv[++index];
     }
     result.flags_[std::move(key)] = std::move(value);

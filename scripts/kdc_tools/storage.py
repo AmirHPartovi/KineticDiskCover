@@ -455,14 +455,24 @@ def _artifact_records(run_dir: Path) -> list[dict[str, Any]]:
             "path": relative,
             "sha256": sha256_file(path),
             "size_bytes": path.stat().st_size,
-            "media_type": (
-                "application/json" if path.suffix == ".json"
-                else "text/csv" if path.suffix == ".csv"
-                else "application/jsonl" if path.suffix == ".jsonl"
-                else "text/plain"
-            ),
+            "media_type": _artifact_media_type(path),
         })
     return artifacts
+
+
+def _artifact_media_type(path: Path) -> str:
+    return {
+        ".json": "application/json",
+        ".jsonl": "application/jsonl",
+        ".csv": "text/csv",
+        ".tsv": "text/tab-separated-values",
+        ".md": "text/markdown",
+        ".html": "text/html",
+        ".png": "image/png",
+        ".pdf": "application/pdf",
+        ".gif": "image/gif",
+        ".mp4": "video/mp4",
+    }.get(path.suffix.lower(), "text/plain")
 
 
 def index_experiment_artifacts(experiment_dir: str | Path) -> Path:
@@ -483,12 +493,7 @@ def index_experiment_artifacts(experiment_dir: str | Path) -> Path:
             "path": relative,
             "sha256": sha256_file(resolved),
             "size_bytes": resolved.stat().st_size,
-            "media_type": (
-                "application/json" if resolved.suffix == ".json"
-                else "text/csv" if resolved.suffix == ".csv"
-                else "application/jsonl" if resolved.suffix == ".jsonl"
-                else "text/plain"
-            ),
+            "media_type": _artifact_media_type(resolved),
         })
     payload = {"schema_version": 1, "artifacts": artifacts}
     validate_document(payload, "artifact_manifest")

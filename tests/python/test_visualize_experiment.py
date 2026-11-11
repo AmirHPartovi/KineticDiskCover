@@ -1,6 +1,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 import sys
 
 import pytest
@@ -145,6 +146,41 @@ def _experiment(tmp_path, *, attempts=True):
     return experiment, records
 
 
+def _create_external_backup(experiment, backup_dir):
+    payload = backup_dir / "payload"
+    files = [
+        path for path in (experiment / "snapshots").rglob("*")
+        if path.is_file() and path.suffix.lower() in {".png", ".pdf"}
+    ]
+    files.extend(
+        experiment / relative
+        for relative in (
+            "reports/visualization_manifest.json",
+            "reports/visualization_report.md",
+            "reports/snapshot_regeneration_report.md",
+            "artifacts.json",
+        )
+        if (experiment / relative).is_file()
+    )
+    entries = []
+    for source in sorted(files):
+        relative = source.relative_to(experiment)
+        destination = payload / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        entries.append({
+            "path": relative.as_posix(),
+            "size_bytes": destination.stat().st_size,
+            "sha256": visualize.sha256_file(destination),
+        })
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    (backup_dir / "backup_sha256.json").write_text(
+        json.dumps({"experiment_id": experiment.name, "files": entries}),
+        encoding="utf-8",
+    )
+    return backup_dir
+
+
 def test_non_unit_horizon_boundary_and_changing_support_geometry():
     instance = _instance()
     solution = _solution("minmax")
@@ -232,6 +268,361 @@ def test_panel_layers_and_status_use_canonical_run_record():
     assert "verified=True (EMPIRICAL)" in title
     assert "optimality=FEASIBLE" in title
     visualize.plt.close(figure)
+
+
+def test_publication_palette_is_stable_and_distinct_above_twenty_stations():
+    stations = [
+        {"id": index, "x": float(index), "y": float(index % 3)}
+        for index in range(25)
+    ]
+
+    colors = visualize._publication_station_colors(stations)
+    reversed_colors = visualize._publication_station_colors(list(reversed(stations)))
+
+    assert colors == reversed_colors
+    assert len(set(colors.values())) == 25
+
+
+def test_publication_panel_preserves_geometry_and_shared_supports():
+    instance = _instance()
+    solution = _solution("minmax")
+    solution["intervals"][0]["supporting_point"] = [0, 0]
+    solution["intervals"][1]["supporting_point"] = [0, 0]
+    time = 0.5
+    state = visualize._publication_state(instance, solution, time)
+    bounds = visualize._snapshot_bounds(instance, solution, (0.0, 1.0, 2.0))
+    colors = visualize._publication_station_colors(instance["stations"])
+    figure, axis = visualize.plt.subplots()
+
+    visualize._draw_publication_panel(
+        axis, instance, state, bounds, colors,
+        panel_label="(b)  t = T/2",
+        show_trajectories=True,
+        show_support_connectors=False,
+    )
+
+    assert len(axis.patches) == 2
+    assert [patch.center for patch in axis.patches] == [
+        (0.0, 0.0), (4.0, 0.0)
+    ]
+    assert [patch.radius for patch in axis.patches] == pytest.approx(
+        [1.5, 2.5]
+    )
+    assert len(axis.lines) == 2
+    assert len(axis.collections) == 6  # 2 stations, 2 points, 2 support diamonds
+    assert axis.get_xlim() == pytest.approx(bounds["xlim"])
+    assert axis.get_ylim() == pytest.approx(bounds["ylim"])
+    assert axis.get_aspect() == 1.0
+    assert axis.get_title() == "(b)  t = T/2"
+    assert axis.get_xlabel() == "x"
+    assert axis.get_ylabel() == "y"
+    assert not axis.texts
+    support_colors = [
+        tuple(collection.get_edgecolors()[0])
+        for collection in axis.collections[-2:]
+    ]
+    expected_support_colors = [
+        colors[visualize._station_identity(station)]
+        for station in instance["stations"]
+    ]
+    assert support_colors == expected_support_colors
+    visualize.plt.close(figure)
+
+
+def test_publication_state_keeps_empty_station_radius_at_zero():
+    instance = _instance()
+    solution = _solution("minmax")
+    solution["intervals"][0]["supporting_point"] = [-1, 1]
+
+    state = visualize._publication_state(instance, solution, 0.5)
+
+    assert state["supports"] == [-1, 1]
+    assert state["radii"][0] == 0.0
+    assert state["radii"][1] == pytest.approx(1.5)
+
+
+def test_publication_figures_emit_print_sized_pngs_and_vector_pdfs(tmp_path):
+    instance = _instance()
+    solution = _solution("minmax")
+    plan = {
+        "instance_id": "inst-a",
+        "algorithm": "greedy",
+        "objective": "minmax",
+    }
+
+    rendered = visualize._render_publication_solution_images(
+        tmp_path, instance, solution, plan, "run-1", 600, "a" * 64
+    )
+
+    artifacts = [*rendered["panels"], rendered["triptych"]]
+    assert [Path(item["path"]).name for item in rendered["panels"]] == [
+        "tau-0.png", "tau-0.5.png", "tau-1.png"
+    ]
+    assert Path(rendered["triptych"]["path"]).name == "three-time.png"
+    assert [Path(item["pdf"]["path"]).name for item in artifacts] == [
+        "tau-0.pdf", "tau-0.5.pdf", "tau-1.pdf", "three-time.pdf"
+    ]
+    for item in artifacts:
+        image_path = tmp_path / item["path"]
+        pdf_path = tmp_path / item["pdf"]["path"]
+        from PIL import Image
+
+        with Image.open(image_path) as image:
+            assert image.info["dpi"] == pytest.approx((600, 600), rel=0.005)
+            assert image.size == (
+                round(item["physical_dimensions_inches"]["width"] * 600),
+                round(item["physical_dimensions_inches"]["height"] * 600),
+            )
+        pdf_bytes = pdf_path.read_bytes()
+        visualize._validate_pdf_bytes(pdf_bytes, path=pdf_path)
+        assert b"/Subtype /Image" not in pdf_bytes
+        assert b"/FontFile2" in pdf_bytes or b"/FontFile3" in pdf_bytes
+        assert item["source_solution_sha256"] == "a" * 64
+        assert item["pdf"]["vector_geometry"] is True
+    assert rendered["rendering_parameters"]["point_labels"] == "none"
+    assert rendered["rendering_parameters"]["renderer"] == "publication"
+    assert rendered["rendering_parameters"]["image_dimensions"]["individual_panel"][
+        "width"
+    ] == round(visualize.PUBLICATION_PANEL_SIZE[0] * 600)
+
+
+def test_pdf_stream_validation_respects_declared_lengths():
+    vector_content = (
+        b"0 0 m\n1 1 l\n1 1 1 2 2 2 c\n" * 20
+        + b">> stream\n"
+    )
+    compressor = visualize.zlib.compressobj(level=0)
+    compressed = compressor.compress(vector_content) + compressor.flush()
+    pdf = (
+        b"%PDF-1.4\n"
+        b"1 0 obj\n<< /Type /Pages /Count 1 >>\nendobj\n"
+        b"2 0 obj\n<< /Type /Page /MediaBox [0 0 10 10] >>\nendobj\n"
+        b"3 0 obj\n<< /FontFile2 4 0 R >>\nendobj\n"
+        + f"5 0 obj\n<< /Length {len(compressed)} /Filter /FlateDecode >>\n".encode()
+        + b"stream\n"
+        + compressed
+        + b"\nendstream\nendobj\n%%EOF\n"
+    )
+
+    visualize._validate_pdf_bytes(pdf)
+
+
+def test_publication_single_panel_legend_fits_and_clears_axis_label():
+    instance = _instance()
+    solution = _solution("minmax")
+    bounds = visualize._snapshot_bounds(instance, solution, (0.0, 1.0, 2.0))
+    state = visualize._publication_state(instance, solution, 0.0)
+    figure = visualize._build_publication_panel(
+        instance, state, bounds,
+        visualize._publication_station_colors(instance["stations"]),
+        panel_label="t = 0",
+        show_trajectories=True,
+        show_support_connectors=False,
+        dpi=100,
+    )
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    axis, legend_axis = figure.axes
+    legend = legend_axis.get_legend()
+    legend_bounds = legend.get_window_extent(renderer)
+    figure_bounds = figure.bbox
+    x_label_bounds = axis.xaxis.label.get_window_extent(renderer)
+    title_bounds = axis.title.get_window_extent(renderer)
+
+    assert title_bounds.y1 < figure_bounds.y1
+    assert legend_bounds.x0 >= figure_bounds.x0
+    assert legend_bounds.y0 >= figure_bounds.y0
+    assert legend_bounds.x1 <= figure_bounds.x1
+    assert legend_bounds.y1 <= figure_bounds.y1
+    assert not legend_bounds.overlaps(x_label_bounds)
+    assert [text.get_text() for text in legend.get_texts()] == [
+        "Trajectory", "Coverage disk", "Station", "Point (owner color)",
+        "Support point",
+    ]
+    assert all(text.get_fontsize() >= 6 for text in legend.get_texts())
+    visualize.plt.close(figure)
+
+
+def test_snapshots_only_cli_replaces_only_publication_artifacts(
+    tmp_path, monkeypatch, capsys
+):
+    experiment, records = _experiment(tmp_path)
+    instance_sha256 = visualize.sha256_file(experiment / "input" / "inst-a.json")
+    for attempts in records.values():
+        attempts[0]["input_sha256"] = instance_sha256
+    figures = experiment / "figures"
+    figures.mkdir()
+    (figures / "figure_status.json").write_text(
+        json.dumps({"figures": []}), encoding="utf-8"
+    )
+    (figures / "REPORT.md").write_text(
+        "| Figure | Status |\n|---|---|\n", encoding="utf-8"
+    )
+    (experiment / "reports" / "final_smoke20_audit.json").write_text(
+        '{"audit_status":"FAIL"}\n', encoding="utf-8"
+    )
+    (experiment / "reports" / "final_smoke20_audit.md").write_text(
+        "# Existing audit\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(visualize, "_load_attempts", lambda _root: records)
+
+    def fake_animation(_instance, _solution, record, output, _objective, **_kwargs):
+        output.mkdir(parents=True, exist_ok=True)
+        path = output / f"{record['run_id']}.gif"
+        path.write_bytes(b"GIF89a")
+        return path
+
+    monkeypatch.setattr(visualize, "make_animation", fake_animation)
+    initial = visualize.generate(experiment, fps=2, frames=3, dpi=40)
+    backup_dir = _create_external_backup(experiment, tmp_path / "backup")
+    protected_reports = {
+        path: path.read_bytes()
+        for path in (
+            figures / "figure_status.json",
+            figures / "REPORT.md",
+            experiment / "reports" / "final_smoke20_audit.json",
+            experiment / "reports" / "final_smoke20_audit.md",
+        )
+    }
+    html_before = {
+        sheet["path"]: visualize.sha256_file(experiment / sheet["path"])
+        for sheet in initial["comparison_sheets"]
+    }
+    animations_before = {
+        slot["animation"]["path"]: visualize.sha256_file(
+            experiment / slot["animation"]["path"]
+        )
+        for slot in initial["slots"]
+    }
+
+    status = visualize.main([
+        "--experiment", str(experiment),
+        "--snapshots-only",
+        "--replace-existing",
+        "--formats", "pdf,png",
+        "--dpi", "80",
+        "--point-labels", "none",
+        "--staging-parent", str(tmp_path),
+        "--backup-dir", str(backup_dir),
+    ])
+
+    assert status == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result["regenerated_pngs"] == 12
+    assert result["regenerated_pdfs"] == 12
+    assert visualize.audit(experiment)["rendered_slots"] == 3
+    updated = visualize.read_json(
+        experiment / "reports" / "visualization_manifest.json"
+    )
+    assert updated["publication_renderer_version"] == (
+        visualize.PUBLICATION_RENDERER_VERSION
+    )
+    assert updated["generated_snapshot_pdfs"] == 12
+    for slot in updated["slots"]:
+        if not slot.get("snapshots"):
+            continue
+        for item in [slot["snapshots"]["triptych"], *slot["snapshots"]["panels"]]:
+            assert (experiment / item["path"]).is_file()
+            assert (experiment / item["pdf"]["path"]).is_file()
+            assert item["source_solution_sha256"] == slot["source_solution_sha256"]
+    for path, digest in html_before.items():
+        assert visualize.sha256_file(experiment / path) == digest
+    for path, digest in animations_before.items():
+        assert visualize.sha256_file(experiment / path) == digest
+    assert {path: path.read_bytes() for path in protected_reports} == protected_reports
+    assert not list(tmp_path.glob(f".{experiment.name}.snapshot-stage-*"))
+    index = visualize.read_json(
+        experiment / "artifacts.json", schema_name="artifact_manifest"
+    )
+    media_types = {item["path"]: item["media_type"] for item in index["artifacts"]}
+    assert media_types["snapshots/inst-a/minmax/greedy/run-minmax/tau-0.pdf"] == (
+        "application/pdf"
+    )
+
+
+def test_snapshots_only_rolls_back_artifacts_and_metadata_on_failure(
+    tmp_path, monkeypatch, capsys
+):
+    experiment, records = _experiment(tmp_path)
+    instance_sha256 = visualize.sha256_file(experiment / "input" / "inst-a.json")
+    for attempts in records.values():
+        attempts[0]["input_sha256"] = instance_sha256
+    figures = experiment / "figures"
+    figures.mkdir()
+    (figures / "figure_status.json").write_text(
+        json.dumps({"figures": []}), encoding="utf-8"
+    )
+    (figures / "REPORT.md").write_text(
+        "| Figure | Status |\n|---|---|\n", encoding="utf-8"
+    )
+    (experiment / "reports" / "final_smoke20_audit.json").write_text(
+        '{"audit_status":"FAIL"}\n', encoding="utf-8"
+    )
+    (experiment / "reports" / "final_smoke20_audit.md").write_text(
+        "# Existing audit\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(visualize, "_load_attempts", lambda _root: records)
+
+    def fake_animation(_instance, _solution, record, output, _objective, **_kwargs):
+        output.mkdir(parents=True, exist_ok=True)
+        path = output / f"{record['run_id']}.gif"
+        path.write_bytes(b"GIF89a")
+        return path
+
+    monkeypatch.setattr(visualize, "make_animation", fake_animation)
+    initial = visualize.generate(experiment, fps=2, frames=3, dpi=40)
+    backup_dir = _create_external_backup(experiment, tmp_path / "backup")
+    tracked_paths = [
+        experiment / "reports" / "visualization_manifest.json",
+        experiment / "reports" / "visualization_report.md",
+        experiment / "artifacts.json",
+        figures / "figure_status.json",
+        figures / "REPORT.md",
+        experiment / "reports" / "final_smoke20_audit.json",
+        experiment / "reports" / "final_smoke20_audit.md",
+    ]
+    before_metadata = {path: path.read_bytes() for path in tracked_paths}
+    before_snapshots = {
+        experiment / artifact["path"]: visualize.sha256_file(
+            experiment / artifact["path"]
+        )
+        for slot in initial["slots"]
+        if slot.get("snapshots")
+        for artifact in [slot["snapshots"]["triptych"], *slot["snapshots"]["panels"]]
+    }
+
+    def fail_audit(_experiment):
+        raise ValueError("injected post-replacement audit failure")
+
+    monkeypatch.setattr(visualize, "audit", fail_audit)
+    status = visualize.main([
+        "--experiment", str(experiment),
+        "--snapshots-only",
+        "--replace-existing",
+        "--formats", "png,pdf",
+        "--dpi", "80",
+        "--staging-parent", str(tmp_path),
+        "--backup-dir", str(backup_dir),
+    ])
+
+    assert status == 1
+    assert "injected post-replacement audit failure" in capsys.readouterr().err
+    assert {path: path.read_bytes() for path in tracked_paths} == before_metadata
+    assert {
+        path: visualize.sha256_file(path) for path in before_snapshots
+    } == before_snapshots
+    assert not list((experiment / "snapshots").rglob("*.pdf"))
+    failed_stages = list(tmp_path.glob(f".{experiment.name}.snapshot-stage-*"))
+    assert failed_stages
+    assert list((failed_stages[0] / "snapshots").rglob("*.pdf"))
+
+
+def test_publication_format_validation_requires_both_formats():
+    assert visualize._parse_publication_formats("pdf,png") == ("pdf", "png")
+    with pytest.raises(ValueError, match="both png and pdf"):
+        visualize._parse_publication_formats("png")
+    with pytest.raises(ValueError, match="exactly once"):
+        visualize._parse_publication_formats("png,pdf,pdf")
 
 
 def test_legacy_animation_parser_keeps_joint_objective_vector(tmp_path):
