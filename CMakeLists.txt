@@ -251,6 +251,8 @@ configure_file(include/kdc/kont_build_config.hpp.in
                @ONLY)
 
 include(FetchContent)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET "mpfr>=4.0")
 set(BUILD_TESTING OFF CACHE BOOL "Disable tests in fetched dependencies" FORCE)
 set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(CATCH_BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -290,7 +292,8 @@ list(APPEND KDC_SOURCES
 list(REMOVE_DUPLICATES KDC_SOURCES)
 list(REMOVE_ITEM KDC_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 add_library(kdc-core ${KDC_SOURCES})
-target_link_libraries(kdc-core PUBLIC Eigen3::Eigen nlohmann_json::nlohmann_json spdlog::spdlog)
+target_link_libraries(kdc-core PUBLIC Eigen3::Eigen nlohmann_json::nlohmann_json
+  spdlog::spdlog PkgConfig::MPFR)
 target_include_directories(kdc-core PUBLIC
   include "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_compile_definitions(kdc-core PRIVATE
