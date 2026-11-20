@@ -30,6 +30,8 @@ struct GlobalBoundUbSnapshotPieceV1 {
   double start{0.0};
   double end{0.0};
   std::vector<double> station_radii;
+  double time_origin{0.0};
+  std::vector<TemporalQuadraticFunctionV2> station_q;
 };
 
 struct GlobalBoundUbSnapshotLeafV1 {
@@ -37,13 +39,15 @@ struct GlobalBoundUbSnapshotLeafV1 {
   double start{0.0};
   double end{0.0};
   double ub_value{0.0};
+  std::uint32_t program_schema_version{1};
+  std::string program_provenance;
   std::vector<int> assignment;
   std::vector<GlobalBoundUbSnapshotPieceV1> pieces;
   std::vector<std::string> certificate_ids;
 };
 
 struct GlobalBoundUbSnapshotV1 {
-  std::uint32_t schema_version{1};
+  std::uint32_t schema_version{2};
   std::uint64_t partition_version{0};
   double global_ub{0.0};
   GlobalBoundIdentityV1 identity;

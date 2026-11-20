@@ -33,6 +33,43 @@ bool roots_too_close(double lhs, double rhs) {
   return std::abs(lhs - rhs) <=
          kRootRelativeTolerance * scale;
 }
+
+Weight evaluate_local(
+    const QuadraticFunctionV1& polynomial,
+    double local_time) {
+  return (polynomial.a * local_time + polynomial.b) *
+             local_time +
+         polynomial.c;
+}
+
+Weight integrate_local(
+    const QuadraticFunctionV1& polynomial,
+    double duration) {
+  const long double width = duration;
+  const long double value =
+      static_cast<long double>(polynomial.a) *
+          width * width * width / 3.0L +
+      static_cast<long double>(polynomial.b) *
+          width * width / 2.0L +
+      static_cast<long double>(polynomial.c) * width;
+  return static_cast<Weight>(value);
+}
+
+Weight round_up_nonnegative(long double value) {
+  if (!std::isfinite(value) || value < 0.0L) {
+    return std::numeric_limits<Weight>::infinity();
+  }
+  if (value == 0.0L) {
+    return 0.0;
+  }
+  Weight result = static_cast<Weight>(value);
+  if (static_cast<long double>(result) < value) {
+    result = std::nextafter(
+        result, std::numeric_limits<Weight>::infinity());
+  }
+  return std::nextafter(
+      result, std::numeric_limits<Weight>::infinity());
+}
 }
 
 WeightedUpperEnvelope::WeightedUpperEnvelope(
@@ -203,86 +240,50 @@ Weight WeightedUpperEnvelope::integrate_polynomial(
   return std::max(Weight{0.0}, integral);
 }
 
-UpperEnvelopePieceResultV1
-WeightedUpperEnvelope::integrate_station_segment(
-    const std::vector<int>& assigned_points,
-    int station,
+std::vector<UpperEnvelopePieceResultV1>
+WeightedUpperEnvelope::integrate_common_segment(
+    const std::vector<int>& assigned_station,
     double segment_start,
     double segment_end) const {
-  UpperEnvelopePieceResultV1 piece;
-  piece.start = segment_start;
-  piece.end = segment_end;
-  piece.active_point = -1;
-
-  if (assigned_points.empty()) {
-    piece.integral = 0.0;
-    return piece;
-  }
-
-  std::vector<QuadraticFunctionV1> functions;
-  functions.reserve(assigned_points.size());
-  for (const int point : assigned_points) {
-    if (point < 0 ||
-        point >= instance_.n) {
-      throw std::invalid_argument(
-          "upper envelope assignment contains invalid point");
+  struct AssignedPolynomial {
+    int point;
+    QuadraticFunctionV1 function;
+  };
+  std::vector<std::vector<AssignedPolynomial>> functions(
+      static_cast<WeightIndex>(instance_.m));
+  for (int point = 0; point < instance_.n; ++point) {
+    const int station =
+        assigned_station[static_cast<WeightIndex>(point)];
+    if (station < 0) {
+      continue;
     }
-    const auto coefficient =
-        geometry_.coefficients(
-            static_cast<WeightIndex>(point),
-            static_cast<WeightIndex>(station),
-            segment_start,
-            segment_end);
-    functions.push_back(
-        {coefficient.a,
-         coefficient.b,
-         coefficient.c});
+    const auto coefficient = geometry_.coefficients(
+        static_cast<WeightIndex>(point),
+        static_cast<WeightIndex>(station),
+        segment_start,
+        segment_end);
+    functions[static_cast<WeightIndex>(station)].push_back(
+        {point,
+         {coefficient.a, coefficient.b, coefficient.c}});
   }
-
-  if (functions.size() == 1U) {
-    piece.integral =
-        integrate_polynomial(
-            functions.front(),
-            segment_start,
-            segment_end);
-    piece.active_point = assigned_points.front();
-    piece.active_station = station;
-    piece.station_radii.assign(
-        static_cast<WeightIndex>(instance_.m),
-        0.0);
-    const Weight radius =
-        std::sqrt(std::max(
-            Weight{0.0},
-            polynomial_at(functions.front(),
-                          segment_start)));
-    piece.station_radii[
-        static_cast<WeightIndex>(station)] =
-        std::sqrt(
-            std::max(
-                Weight{0.0},
-                polynomial_at(
-                    functions.front(),
-                    segment_end)));
-    return piece;
-  }
-
   std::vector<double> roots;
-  for (WeightIndex first = 0U;
-       first < functions.size();
-       ++first) {
-    for (WeightIndex second = first + 1U;
-         second < functions.size();
-         ++second) {
+  for (const auto& station_functions : functions) {
+    for (WeightIndex first = 0U;
+         first < station_functions.size();
+         ++first) {
+      for (WeightIndex second = first + 1U;
+           second < station_functions.size();
+           ++second) {
       QuadraticFunctionV1 difference;
       difference.a =
-          functions[first].a -
-          functions[second].a;
+          station_functions[first].function.a -
+          station_functions[second].function.a;
       difference.b =
-          functions[first].b -
-          functions[second].b;
+          station_functions[first].function.b -
+          station_functions[second].function.b;
       difference.c =
-          functions[first].c -
-          functions[second].c;
+          station_functions[first].function.c -
+          station_functions[second].function.c;
       if (difference.a == 0.0 &&
           difference.b == 0.0 &&
           difference.c == 0.0) {
@@ -304,6 +305,7 @@ WeightedUpperEnvelope::integrate_station_segment(
             root <= segment_end) {
           roots.push_back(root);
         }
+      }
       }
     }
   }
@@ -334,8 +336,7 @@ WeightedUpperEnvelope::integrate_station_segment(
   cuts.erase(std::unique(cuts.begin(), cuts.end()),
              cuts.end());
 
-  Weight sum = 0.0;
-  int active_point = -1;
+  std::vector<UpperEnvelopePieceResultV1> pieces;
   for (WeightIndex cut = 0U;
        cut + 1U < cuts.size();
        ++cut) {
@@ -344,63 +345,70 @@ WeightedUpperEnvelope::integrate_station_segment(
     if (sub_end <= sub_start) {
       continue;
     }
+    UpperEnvelopePieceResultV1 piece;
+    piece.start = sub_start;
+    piece.end = sub_end;
+    piece.time_origin = sub_start;
+    piece.station_q.resize(
+        static_cast<WeightIndex>(instance_.m));
+    piece.station_radii.assign(
+        static_cast<WeightIndex>(instance_.m), 0.0);
     const double midpoint =
         sub_start +
         (sub_end - sub_start) / 2.0;
-    Weight maximum =
-        -std::numeric_limits<Weight>::infinity();
-    int selected = -1;
-    for (WeightIndex index = 0U;
-         index < functions.size();
-         ++index) {
-      const Weight value =
-          polynomial_at(functions[index], midpoint);
-      if (value > maximum ||
-          (value == maximum &&
-           assigned_points[index] < selected)) {
-        maximum = value;
-        selected = assigned_points[index];
+    for (WeightIndex station = 0U;
+         station < functions.size();
+         ++station) {
+      const auto& station_functions = functions[station];
+      if (station_functions.empty()) {
+        continue;
       }
-    }
-    if (selected < 0) {
-      throw std::runtime_error(
-          "upper envelope has no active function");
-    }
-    for (WeightIndex index = 0U;
-         index < functions.size();
-         ++index) {
-      if (assigned_points[index] == selected) {
-        const Weight integral =
-            integrate_polynomial(
-                functions[index],
-                sub_start,
-                sub_end);
-        sum += integral;
-        active_point = selected;
-        break;
+      const AssignedPolynomial* active = nullptr;
+      Weight maximum =
+          -std::numeric_limits<Weight>::infinity();
+      for (const auto& candidate : station_functions) {
+        const Weight value =
+            polynomial_at(candidate.function, midpoint);
+        if (value > maximum ||
+            (value == maximum &&
+             (active == nullptr ||
+              candidate.point < active->point))) {
+          maximum = value;
+          active = &candidate;
+        }
       }
+      if (active == nullptr) {
+        throw std::runtime_error(
+            "upper envelope has no active function");
+      }
+      const auto& absolute = active->function;
+      auto& local = piece.station_q[station];
+      local.a = absolute.a;
+      local.b = 2.0 * absolute.a * sub_start + absolute.b;
+      local.c = polynomial_at(absolute, sub_start);
+      if (!finite_polynomial(local)) {
+        throw std::runtime_error(
+            "serialized upper-envelope polynomial is non-finite");
+      }
+      Weight maximum_q = std::max(
+          evaluate_local(local, 0.0),
+          evaluate_local(local, sub_end - sub_start));
+      if (local.a != 0.0) {
+        const Weight vertex = -local.b / (2.0 * local.a);
+        if (vertex > 0.0 &&
+            vertex < sub_end - sub_start) {
+          maximum_q = std::max(maximum_q,
+                               evaluate_local(local, vertex));
+        }
+      }
+      piece.station_radii[station] =
+          std::sqrt(std::max(Weight{0.0}, maximum_q));
+      piece.integral += integrate_local(
+          local, sub_end - sub_start);
     }
+    pieces.push_back(std::move(piece));
   }
-  piece.integral = sum;
-  piece.active_point = active_point;
-  piece.active_station = station;
-  piece.station_radii.assign(
-      static_cast<WeightIndex>(instance_.m),
-      0.0);
-  Weight radius_squared = 0.0;
-  for (const double cut : cuts) {
-    for (WeightIndex index = 0U;
-         index < functions.size();
-         ++index) {
-      radius_squared =
-          std::max(radius_squared,
-                   polynomial_at(functions[index], cut));
-    }
-  }
-  piece.station_radii[
-      static_cast<WeightIndex>(station)] =
-      std::sqrt(std::max(Weight{0.0}, radius_squared));
-  return piece;
+  return pieces;
 }
 
 Weight WeightedUpperEnvelope::d_plus_fallback(
@@ -436,10 +444,11 @@ Weight WeightedUpperEnvelope::d_plus_fallback(
       station_sum += station_max;
     }
   }
-  const double pi =
-      std::acos(-1.0);
+  const long double pi =
+      std::acos(-1.0L);
   const Weight result =
-      pi * delta * station_sum;
+      round_up_nonnegative(
+          pi * delta * station_sum);
   if (!std::isfinite(result) ||
       result < 0.0) {
     throw std::overflow_error(
@@ -505,7 +514,7 @@ UpperEnvelopeResultV1 WeightedUpperEnvelope::solve(
         collect_interval_breaks(
             interval_start,
             interval_end);
-    Weight direct_total = 0.0;
+    long double direct_program_cost = 0.0L;
     for (WeightIndex cut = 0U;
          cut + 1U < cuts.size();
          ++cut) {
@@ -514,33 +523,26 @@ UpperEnvelopeResultV1 WeightedUpperEnvelope::solve(
       if (sub_end <= sub_start) {
         continue;
       }
-      for (int station = 0;
-           station < instance_.m;
-           ++station) {
-        std::vector<int> assigned_points;
-        for (int point = 0;
-             point < instance_.n;
-             ++point) {
-          if (assigned_station[point] == station) {
-            assigned_points.push_back(point);
-          }
+      const auto pieces = integrate_common_segment(
+          assigned_station, sub_start, sub_end);
+      for (const auto& piece : pieces) {
+        const long double width =
+            static_cast<long double>(piece.end) - piece.start;
+        for (const auto& q : piece.station_q) {
+          direct_program_cost +=
+              static_cast<long double>(q.a) *
+                  width * width * width / 3.0L +
+              static_cast<long double>(q.b) *
+                  width * width / 2.0L +
+              static_cast<long double>(q.c) * width;
         }
-        const auto piece =
-            integrate_station_segment(
-                assigned_points,
-                station,
-                sub_start,
-                sub_end);
-        direct_total += piece.integral;
         result.pieces.push_back(piece);
       }
     }
-    const double pi =
-        std::acos(-1.0);
-    direct_total = pi * direct_total;
-    result.direct_integral = direct_total;
+    result.direct_integral = round_up_nonnegative(
+        std::acos(-1.0L) * direct_program_cost);
     result.direct_valid =
-        std::isfinite(direct_total);
+        std::isfinite(result.direct_integral);
   } catch (const std::exception& error) {
     result.direct_valid = false;
     result.status =

@@ -33,10 +33,12 @@ struct QuadraticFunctionV1 {
 struct UpperEnvelopePieceResultV1 {
   double start{0.0};
   double end{0.0};
+  double time_origin{0.0};
   Weight integral{0.0};
   int active_point{-1};
   int active_station{-1};
   std::vector<Weight> station_radii;
+  std::vector<QuadraticFunctionV1> station_q;
 };
 
 struct UpperEnvelopeResultV1 {
@@ -81,9 +83,8 @@ class WeightedUpperEnvelope {
       double interval_start,
       double interval_end) const;
 
-  UpperEnvelopePieceResultV1 integrate_station_segment(
-      const std::vector<int>& assigned_points,
-      int station,
+  std::vector<UpperEnvelopePieceResultV1> integrate_common_segment(
+      const std::vector<int>& assigned_station,
       double segment_start,
       double segment_end) const;
 

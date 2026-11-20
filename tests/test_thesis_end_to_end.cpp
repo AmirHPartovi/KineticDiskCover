@@ -266,7 +266,7 @@ TEST_CASE("A D-plus heuristic remains UB-only and invalid inherited assignment i
           kdc::IntervalEvaluatorStatusV1::INCOMPLETE);
 }
 
-TEST_CASE("LP dual candidate is below exhaustive reference optimum") {
+TEST_CASE("LP dual diagnostic is below reference but is not an official LB") {
   const auto matrix = kdc::WeightMatrix::from_rows(
       {{2.0, 1.0}, {1.0, 2.0}});
   const double pi = std::acos(-1.0);
@@ -275,10 +275,12 @@ TEST_CASE("LP dual candidate is below exhaustive reference optimum") {
       {0.5 * pi, 0.5 * pi},
       {0.26 * pi, 0.5 * pi, 0.5 * pi, 0.26 * pi});
 
-  REQUIRE(dual.valid);
-  REQUIRE(dual.directed_lower_bound.has_value());
-  REQUIRE(*dual.directed_lower_bound > 0.0);
-  REQUIRE(*dual.directed_lower_bound <=
+  REQUIRE_FALSE(dual.valid);
+  REQUIRE(dual.numerical_diagnostic_valid);
+  REQUIRE_FALSE(dual.directed_lower_bound.has_value());
+  REQUIRE(dual.numerical_diagnostic_lower_bound.has_value());
+  REQUIRE(*dual.numerical_diagnostic_lower_bound > 0.0);
+  REQUIRE(*dual.numerical_diagnostic_lower_bound <=
           brute_force_minimum(matrix));
 }
 

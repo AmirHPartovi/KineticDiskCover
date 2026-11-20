@@ -566,19 +566,32 @@ TEST_CASE("Greedy Weighted Heuristic is feasible and UB-only") {
   REQUIRE(*zero_result.feasible_primal_cost == 0.0);
 }
 
-TEST_CASE("Weighted LP dual validation accepts a feasible dual certificate") {
+TEST_CASE("Weighted LP dual validation is numerical-only without certification") {
   kdc::WeightMatrix one(1U, 1U, {1.0});
   std::vector<kdc::Weight> y_one{std::acos(-1.0)};
   std::vector<kdc::Weight> z_one{std::acos(-1.0)};
   const auto dual_one =
       kdc::validate_weighted_lp_dual(one, y_one, z_one);
 
-  REQUIRE(dual_one.valid);
-  REQUIRE(dual_one.certificate.present);
-  REQUIRE(dual_one.certificate.independently_validated);
-  REQUIRE(dual_one.directed_lower_bound.has_value());
-  REQUIRE(weights_close(*dual_one.directed_lower_bound,
+  REQUIRE_FALSE(dual_one.valid);
+  REQUIRE(dual_one.numerical_diagnostic_valid);
+  REQUIRE_FALSE(dual_one.certificate.present);
+  REQUIRE_FALSE(dual_one.certificate.independently_validated);
+  REQUIRE_FALSE(dual_one.directed_lower_bound.has_value());
+  REQUIRE(dual_one.numerical_diagnostic_lower_bound.has_value());
+  REQUIRE(weights_close(*dual_one.numerical_diagnostic_lower_bound,
                         std::acos(-1.0)));
+  REQUIRE(dual_one.arithmetic ==
+          kdc::WeightedArithmeticModeV1::DOUBLE);
+  const auto requested_interval_mode =
+      kdc::validate_weighted_lp_dual(
+          one, y_one, z_one,
+          kdc::WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL);
+  REQUIRE(requested_interval_mode.numerical_diagnostic_valid);
+  REQUIRE_FALSE(requested_interval_mode.valid);
+  REQUIRE_FALSE(requested_interval_mode.certificate.present);
+  REQUIRE_FALSE(
+      requested_interval_mode.certificate.independently_validated);
 
   kdc::WeightMatrix equal_two =
       kdc::WeightMatrix::from_rows({{1.0}, {1.0}});
@@ -589,9 +602,11 @@ TEST_CASE("Weighted LP dual validation accepts a feasible dual certificate") {
   const auto dual_two =
       kdc::validate_weighted_lp_dual(
           equal_two, y_two, z_two);
-  REQUIRE(dual_two.valid);
-  REQUIRE(dual_two.directed_lower_bound.has_value());
-  REQUIRE(weights_close(*dual_two.directed_lower_bound,
+  REQUIRE_FALSE(dual_two.valid);
+  REQUIRE(dual_two.numerical_diagnostic_valid);
+  REQUIRE_FALSE(dual_two.directed_lower_bound.has_value());
+  REQUIRE(dual_two.numerical_diagnostic_lower_bound.has_value());
+  REQUIRE(weights_close(*dual_two.numerical_diagnostic_lower_bound,
                         std::acos(-1.0)));
 }
 
@@ -608,7 +623,7 @@ TEST_CASE("Weighted LP dual validation rejects unfeasible and degenerate duals")
   const auto negative =
       kdc::validate_weighted_lp_dual(
           matrix, y, negative_z);
-  REQUIRE_FALSE(negative.valid);
+  REQUIRE_FALSE(negative.numerical_diagnostic_valid);
   REQUIRE_FALSE(negative.certificate.independently_validated);
   REQUIRE_FALSE(negative.directed_lower_bound.has_value());
 
@@ -627,9 +642,28 @@ TEST_CASE("Weighted LP dual validation rejects unfeasible and degenerate duals")
   const auto zero_dual =
       kdc::validate_weighted_lp_dual(
           zero, zero_y, zero_z);
-  REQUIRE(zero_dual.valid);
-  REQUIRE(zero_dual.directed_lower_bound.has_value());
-  REQUIRE(*zero_dual.directed_lower_bound == 0.0);
+  REQUIRE_FALSE(zero_dual.valid);
+  REQUIRE(zero_dual.numerical_diagnostic_valid);
+  REQUIRE_FALSE(zero_dual.directed_lower_bound.has_value());
+  REQUIRE(zero_dual.numerical_diagnostic_lower_bound.has_value());
+  REQUIRE(*zero_dual.numerical_diagnostic_lower_bound == 0.0);
+}
+
+TEST_CASE("Numerical LP dual diagnostic cannot become an evaluator LB") {
+  const kdc::WeightMatrix matrix =
+      kdc::WeightMatrix::from_rows({{1.0}});
+  const auto diagnostic = kdc::validate_weighted_lp_dual(
+      matrix, {std::acos(-1.0)}, {std::acos(-1.0)});
+  const auto relaxation = kdc::adapt_weighted_relaxation_certificate(
+      diagnostic.directed_lower_bound,
+      diagnostic.certificate,
+      diagnostic.arithmetic);
+
+  REQUIRE(diagnostic.numerical_diagnostic_valid);
+  REQUIRE_FALSE(relaxation.independently_validated_lower_bound.has_value());
+  REQUIRE(relaxation.lower_bound_validity ==
+          kdc::WeightedBoundValidityV1::INVALID);
+  REQUIRE_FALSE(relaxation.certificate.independently_validated);
 }
 
 TEST_CASE("LP Relaxation runs diagnostically without an official LB") {

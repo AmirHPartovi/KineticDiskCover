@@ -158,7 +158,10 @@ TemporalSplittingPolicy::attempt_split(
   }
 
   std::optional<std::vector<int>> inherited_assignment;
-  if (parent.ub_piecewise_program.has_value()) {
+  if (parent.ub_piecewise_program_v2.has_value()) {
+    inherited_assignment =
+        parent.ub_piecewise_program_v2->point_assignment;
+  } else if (parent.ub_piecewise_program.has_value()) {
     inherited_assignment =
         parent.ub_piecewise_program->point_assignment;
   }
@@ -193,6 +196,8 @@ TemporalSplittingPolicy::attempt_split(
 
   if (!left_result.assignment.has_value() ||
       !right_result.assignment.has_value() ||
+      !left_result.program_v2.has_value() ||
+      !right_result.program_v2.has_value() ||
       !std::isfinite(left_result.upper_bound) ||
       !std::isfinite(right_result.upper_bound)) {
     partition.freeze_leaf(
@@ -275,104 +280,16 @@ TemporalSplittingPolicy::attempt_split(
     right_ub.arithmetic =
         TemporalBoundArithmeticV1::FAST_DOUBLE;
 
-    TemporalPiecewiseProgramV1 left_program;
-    left_program.point_assignment =
-        *left_result.assignment;
-    if (left_result.upper_method ==
-        IntervalUpperMethodV1::DIRECT_UPPER_ENVELOPE) {
-      for (const auto& piece :
-           left_result.envelope.pieces) {
-        TemporalRadiusPieceV1 radius_piece;
-        radius_piece.start = piece.start;
-        radius_piece.end = piece.end;
-        radius_piece.station_radii =
-            piece.station_radii;
-        left_program.pieces.push_back(radius_piece);
-      }
-    } else {
-      const auto distances =
-          geometry_.bounds_on(
-              parent.start, midpoint).upper.matrix;
-      TemporalRadiusPieceV1 radius_piece;
-      radius_piece.start = parent.start;
-      radius_piece.end = midpoint;
-      radius_piece.station_radii.assign(
-          static_cast<std::size_t>(instance_.m),
-          0.0);
-      for (int station = 0; station < instance_.m; ++station) {
-        Weight maximum_squared_distance = 0.0;
-        for (int point = 0; point < instance_.n; ++point) {
-          if ((*left_result.assignment)[
-                  static_cast<std::size_t>(point)] == station) {
-            maximum_squared_distance =
-                std::max(
-                    maximum_squared_distance,
-                    distances.weight(
-                        static_cast<WeightIndex>(station),
-                        static_cast<WeightIndex>(point)));
-          }
-        }
-        radius_piece.station_radii[
-            static_cast<std::size_t>(station)] =
-            std::sqrt(maximum_squared_distance);
-      }
-      left_program.pieces.push_back(radius_piece);
-    }
-
-    TemporalPiecewiseProgramV1 right_program;
-    right_program.point_assignment =
-        *right_result.assignment;
-    if (right_result.upper_method ==
-        IntervalUpperMethodV1::DIRECT_UPPER_ENVELOPE) {
-      for (const auto& piece :
-           right_result.envelope.pieces) {
-        TemporalRadiusPieceV1 radius_piece;
-        radius_piece.start = piece.start;
-        radius_piece.end = piece.end;
-        radius_piece.station_radii =
-            piece.station_radii;
-        right_program.pieces.push_back(radius_piece);
-      }
-    } else {
-      const auto distances =
-          geometry_.bounds_on(
-              midpoint, parent.end).upper.matrix;
-      TemporalRadiusPieceV1 radius_piece;
-      radius_piece.start = midpoint;
-      radius_piece.end = parent.end;
-      radius_piece.station_radii.assign(
-          static_cast<std::size_t>(instance_.m),
-          0.0);
-      for (int station = 0; station < instance_.m; ++station) {
-        Weight maximum_squared_distance = 0.0;
-        for (int point = 0; point < instance_.n; ++point) {
-          if ((*right_result.assignment)[
-                  static_cast<std::size_t>(point)] == station) {
-            maximum_squared_distance =
-                std::max(
-                    maximum_squared_distance,
-                    distances.weight(
-                        static_cast<WeightIndex>(station),
-                        static_cast<WeightIndex>(point)));
-          }
-        }
-        radius_piece.station_radii[
-            static_cast<std::size_t>(station)] =
-            std::sqrt(maximum_squared_distance);
-      }
-      right_program.pieces.push_back(radius_piece);
-    }
-
-    partition.set_leaf_bounds(
+    partition.set_leaf_bounds_v2(
         left_id,
         left_lb,
         left_ub,
-        left_program);
-    partition.set_leaf_bounds(
+        left_result.program_v2);
+    partition.set_leaf_bounds_v2(
         right_id,
         right_lb,
         right_ub,
-        right_program);
+        right_result.program_v2);
   } catch (const std::exception& error) {
     if (left_id != 0 &&
         right_id != 0) {

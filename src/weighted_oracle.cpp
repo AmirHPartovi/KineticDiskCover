@@ -649,20 +649,13 @@ WeightedLPDualValidationV1 validate_weighted_lp_dual(
     const std::vector<Weight>& y,
     const std::vector<Weight>& z,
     WeightedArithmeticModeV1 arithmetic) {
+  (void)arithmetic;
   WeightedLPDualValidationV1 validation;
-  if (arithmetic !=
-      WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL) {
-    validation.valid = false;
-    validation.reason =
-        "dual feasibility requires conservative interval arithmetic";
-    return validation;
-  }
-  validation.arithmetic =
-      WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL;
+  validation.arithmetic = WeightedArithmeticModeV1::DOUBLE;
   validation.certificate.arithmetic =
-      WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL;
+      WeightedArithmeticModeV1::DOUBLE;
   validation.certificate.method =
-      "conservative-directed-lp-dual";
+      "numerical-lp-dual-diagnostic";
 
   const WeightIndex m = matrix.station_count();
   const WeightIndex n = matrix.point_count();
@@ -690,7 +683,7 @@ WeightedLPDualValidationV1 validate_weighted_lp_dual(
     }
   }
 
-  bool constraints_valid = true;
+  bool constraints_numerically_satisfied = true;
   for (WeightIndex i = 0U; i < m; ++i) {
     long double z_station_sum = 0.0L;
     for (WeightIndex j = 0U; j < n; ++j) {
@@ -711,7 +704,7 @@ WeightedLPDualValidationV1 validate_weighted_lp_dual(
           std::max(max_residual,
                    residual_double);
       if (residual > 0.0L) {
-        constraints_valid = false;
+        constraints_numerically_satisfied = false;
       }
     }
     const long double pi =
@@ -726,7 +719,7 @@ WeightedLPDualValidationV1 validate_weighted_lp_dual(
         std::max(max_residual,
                  station_residual_double);
     if (station_residual > 0.0L) {
-      constraints_valid = false;
+      constraints_numerically_satisfied = false;
     }
   }
 
@@ -735,35 +728,30 @@ WeightedLPDualValidationV1 validate_weighted_lp_dual(
     lower_objective_long +=
         static_cast<long double>(y_value);
   }
-  const double lower_objective =
-      lower_objective_long == 0.0L
-          ? 0.0
-          : std::nextafter(
-                static_cast<double>(lower_objective_long),
-                -std::numeric_limits<double>::infinity());
-
   validation.max_constraint_residual = max_residual;
-  validation.valid = constraints_valid;
-  if (!constraints_valid) {
-    validation.directed_lower_bound.reset();
+  validation.valid = false;
+  validation.certificate.present = false;
+  validation.certificate.independently_validated = false;
+  if (!constraints_numerically_satisfied) {
+    validation.numerical_diagnostic_valid = false;
     validation.reason =
-        "one or more dual constraints fail conservative residual checks";
+        "one or more dual constraints fail the floating-point diagnostic";
   } else {
-    if (!std::isfinite(lower_objective) ||
-        lower_objective < 0.0) {
-      validation.valid = false;
+    const double diagnostic_objective =
+        static_cast<double>(lower_objective_long);
+    if (!std::isfinite(diagnostic_objective) ||
+        diagnostic_objective < 0.0) {
+      validation.numerical_diagnostic_valid = false;
+      validation.reason =
+        "numerical dual objective is not finite/nonnegative";
+    } else {
+      validation.numerical_diagnostic_valid = true;
+      validation.numerical_diagnostic_lower_bound =
+        diagnostic_objective;
       validation.directed_lower_bound.reset();
       validation.reason =
-        "directed dual objective is not finite/nonnegative";
-    } else {
-      validation.directed_lower_bound = lower_objective;
-      validation.reason = "dual feasible with conservative residual checks";
-      validation.certificate.present = true;
-      validation.certificate.independently_validated = true;
-      validation.certificate.method =
-          "conservative-directed-lp-dual";
-      validation.certificate.arithmetic =
-          WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL;
+        "numerically feasible dual diagnostic only; no lower-bound "
+        "certificate issued because validated arithmetic is unavailable";
     }
   }
   return validation;

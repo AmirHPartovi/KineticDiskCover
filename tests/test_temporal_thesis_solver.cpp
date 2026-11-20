@@ -2,6 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -77,14 +78,15 @@ TEST_CASE("Temporal thesis solver executes a small synthetic split") {
               "validated arithmetic is unavailable") !=
           std::string::npos);
   REQUIRE(result.leaves.size() == result.leaf_count);
-  REQUIRE(result.global_bounds.ub_current.value ==
-          std::numeric_limits<double>::infinity());
-  REQUIRE_FALSE(result.global_bounds.ub_current.valid);
+  REQUIRE(std::isfinite(result.global_bounds.ub_current.value));
+  REQUIRE(result.global_bounds.ub_current.valid);
+  REQUIRE(result.global_bounds.ub_best.has_value());
+  REQUIRE(result.global_bounds.ub_best->snapshot.complete);
   REQUIRE(result.leaves.size() == 2U);
   for (const auto& leaf : result.leaves) {
     REQUIRE(leaf.ub.validity ==
             kdc::TemporalBoundValidityV1::NUMERICALLY_UNBOUNDED);
-    REQUIRE(leaf.ub_piecewise_program.has_value());
+    REQUIRE(leaf.ub_piecewise_program_v2.has_value());
   }
 }
 
@@ -136,7 +138,7 @@ TEST_CASE("Temporal thesis solver returns time-limit before leaf evaluation") {
   REQUIRE(result.leaves.front().lb.value == 0.0);
   REQUIRE(result.leaves.front().ub.value ==
           std::numeric_limits<double>::infinity());
-  REQUIRE_FALSE(result.leaves.front().ub_piecewise_program.has_value());
+  REQUIRE_FALSE(result.leaves.front().ub_piecewise_program_v2.has_value());
 }
 
 TEST_CASE("Temporal thesis solver enforces the per-Oracle time limit") {
@@ -154,7 +156,7 @@ TEST_CASE("Temporal thesis solver enforces the per-Oracle time limit") {
   REQUIRE(result.leaves.size() == 1U);
   REQUIRE(result.leaves.front().freeze_reason ==
           "ORACLE_TIME_LIMIT");
-  REQUIRE_FALSE(result.leaves.front().ub_piecewise_program.has_value());
+  REQUIRE_FALSE(result.leaves.front().ub_piecewise_program_v2.has_value());
 }
 
 TEST_CASE("Temporal thesis solver enforces Oracle-call cap before evaluation") {

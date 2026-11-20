@@ -280,6 +280,22 @@ void TemporalPartition::set_leaf_bounds(
   found->second.lb = lb;
   found->second.ub = ub;
   found->second.ub_piecewise_program = program;
+  found->second.ub_piecewise_program_v2.reset();
+}
+
+void TemporalPartition::set_leaf_bounds_v2(
+    TemporalLeafId id,
+    const TemporalBoundRecordV1& lb,
+    const TemporalBoundRecordV1& ub,
+    const std::optional<TemporalPiecewiseProgramV2>& program) {
+  auto found = partition_.find(id);
+  if (found == partition_.end()) {
+    throw std::out_of_range("temporal leaf id not found");
+  }
+  found->second.lb = lb;
+  found->second.ub = ub;
+  found->second.ub_piecewise_program.reset();
+  found->second.ub_piecewise_program_v2 = program;
   const auto validation = validate();
   if (!validation.valid) {
     throw std::invalid_argument(

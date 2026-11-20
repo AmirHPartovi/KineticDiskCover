@@ -1,4 +1,5 @@
 #include "kdc/io.hpp"
+#include "kdc/interval_evaluator.hpp"
 #include "kdc/model_a_snapshot_verifier.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -77,11 +78,12 @@ std::string fixture_hash(const Instance& instance) {
 
 Instance make_instance(
     std::vector<Trajectory> trajectories,
-    std::vector<Station> stations = {{17, Point(0.0, 0.0)}}) {
+    std::vector<Station> stations = {{17, Point(0.0, 0.0)}},
+    double horizon = 1.0) {
   Instance instance;
   instance.id = 1;
   instance.name = "snapshot-verifier-fixture";
-  instance.T_end = 1.0;
+  instance.T_end = horizon;
   instance.n = static_cast<int>(trajectories.size());
   instance.m = static_cast<int>(stations.size());
   instance.trajectories = std::move(trajectories);
@@ -162,6 +164,56 @@ TestArtifacts write_artifacts(
   return artifacts;
 }
 
+TestArtifacts write_v2_artifacts(
+    const Instance& instance,
+    const TemporalPiecewiseProgramV2& program,
+    double leaf_ub) {
+  static std::atomic<unsigned long long> sequence{0U};
+  const auto id = sequence.fetch_add(1U);
+  TestArtifacts artifacts;
+  artifacts.instance_path =
+      "/tmp/kdc-model-a-verifier-v2-instance-" +
+      std::to_string(id) + ".json";
+  artifacts.history_path =
+      "/tmp/kdc-model-a-verifier-v2-history-" +
+      std::to_string(id) + ".json";
+  DatasetReader::write_json(instance, artifacts.instance_path);
+
+  GlobalBoundIdentityV1 identity;
+  identity.instance_hash = fixture_hash(instance);
+  identity.solver_identity = "verifier-test-solver";
+  identity.config_identity = "verifier-test-config";
+  identity.numeric_backend = "FAST_DOUBLE";
+  identity.verifier_state = "not-verified";
+  GlobalBoundHistory history(identity);
+
+  TemporalBoundRecordV1 lb;
+  lb.value = 0.0;
+  lb.validity = TemporalBoundValidityV1::VALID;
+  lb.method = "TEST_ZERO_LB";
+  lb.certificate_id = "test-lb-certificate";
+  lb.provenance = "nonnegative objective";
+  lb.arithmetic = TemporalBoundArithmeticV1::EXACT_RATIONAL;
+
+  TemporalBoundRecordV1 ub;
+  ub.value = leaf_ub;
+  ub.validity = TemporalBoundValidityV1::VALID;
+  ub.method = "TEST_PROGRAM_UB";
+  ub.certificate_id = "test-ub-certificate";
+  ub.provenance = "serialized quadratic program integral";
+  ub.arithmetic = TemporalBoundArithmeticV1::FAST_DOUBLE;
+
+  TemporalPartition partition(0.0, instance.T_end);
+  partition.set_leaf_bounds_v2(1U, lb, ub, program);
+  const auto updated = history.update(partition, 1U);
+  if (!updated.ub_best.has_value()) {
+    throw std::runtime_error(
+        "V2 fixture did not produce a serializable UB snapshot");
+  }
+  history.serialize(artifacts.history_path);
+  return artifacts;
+}
+
 Trajectory trajectory(
     std::vector<double> times,
     std::vector<Point> points) {
@@ -177,6 +229,48 @@ ModelASnapshotVerificationResultV1 verify(
   auto artifacts = write_artifacts(instance, program, ub);
   return ModelASnapshotVerifier::verify_files(
       artifacts.instance_path, artifacts.history_path, mode);
+}
+
+ModelASnapshotVerificationResultV1 verify_v2(
+    const Instance& instance,
+    const TemporalPiecewiseProgramV2& program,
+    double ub) {
+  auto artifacts = write_v2_artifacts(instance, program, ub);
+  return ModelASnapshotVerifier::verify_files(
+      artifacts.instance_path, artifacts.history_path,
+      ModelASnapshotVerificationModeV1::FAST_FLOAT);
+}
+
+void require_evaluator_program_is_verified(
+    const Instance& instance,
+    const std::vector<int>& assignment,
+    double start,
+    double end) {
+  IntervalEvaluator evaluator(instance);
+  IntervalEvaluatorConfigV1 config;
+  const auto evaluated = evaluator.evaluate(
+      start, end, assignment, config);
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  REQUIRE(evaluated.program_v2->schema_version == 2U);
+  REQUIRE(evaluated.program_v2->point_assignment == assignment);
+  REQUIRE(evaluated.envelope.direct_integral ==
+          evaluated.upper_bound);
+  const auto result =
+      verify_v2(instance, *evaluated.program_v2, evaluated.upper_bound);
+  INFO("status="
+       << model_a_snapshot_verification_status_name_v1(result.status)
+       << ", violation="
+       << (result.first_violation.has_value()
+               ? result.first_violation->code + ": " +
+                     result.first_violation->message
+               : "none")
+       << ", verifier UB=" << result.stored_ub
+       << ", cost upper=" << result.cost_upper_endpoint);
+  REQUIRE(result.continuous_coverage_valid);
+  REQUIRE(result.stored_ub == evaluated.upper_bound);
+  REQUIRE(result.cost_upper_check_valid);
+  REQUIRE(result.cost_upper_endpoint == evaluated.upper_bound);
 }
 }  // namespace
 
@@ -265,8 +359,18 @@ TEST_CASE("Verifier splits at active-envelope equality near an endpoint") {
       {0, 0}, {radius_piece(0.0, 1.0, {1.0})});
   const auto result = verify(instance, program);
 
+  INFO("status="
+       << model_a_snapshot_verification_status_name_v1(result.status)
+       << ", violation="
+       << (result.first_violation.has_value()
+               ? result.first_violation->code + ": " +
+                     result.first_violation->message
+               : "none"));
   REQUIRE(result.status ==
-          ModelASnapshotVerificationStatusV1::NUMERIC_PASS);
+          ModelASnapshotVerificationStatusV1::INDETERMINATE);
+  REQUIRE(result.first_violation.has_value());
+  REQUIRE(result.first_violation->code ==
+          "COVERAGE_SIGN_INDETERMINATE");
   REQUIRE(result.envelope_equality_points_checked >= 1U);
 }
 
@@ -296,6 +400,13 @@ TEST_CASE("Verifier handles simultaneous trajectory breakpoints") {
       {0, 0}, {radius_piece(0.0, 1.0, {1.0})});
   const auto result = verify(instance, program);
 
+  INFO("status="
+       << model_a_snapshot_verification_status_name_v1(result.status)
+       << ", violation="
+       << (result.first_violation.has_value()
+               ? result.first_violation->code + ": " +
+                     result.first_violation->message
+               : "none"));
   REQUIRE(result.status ==
           ModelASnapshotVerificationStatusV1::NUMERIC_PASS);
   REQUIRE(result.continuous_coverage_valid);
@@ -379,6 +490,130 @@ TEST_CASE("Verifier checks station-empty radius and stored UB upper endpoint") {
   REQUIRE(ub_result.status == ModelASnapshotVerificationStatusV1::FAIL);
   REQUIRE(ub_result.first_violation->code ==
           "LEAF_UB_BELOW_COST_UPPER_ENDPOINT");
+}
+
+TEST_CASE("Legacy V1 history loads constant-radius pieces unchanged") {
+  const Instance instance = make_instance({
+      trajectory({0.0, 1.0},
+                 {Point(0.0, 0.0), Point(0.5, 0.0)})});
+  const auto program = make_program(
+      {0}, {radius_piece(0.0, 1.0, {1.0})});
+  auto artifacts = write_artifacts(instance, program, 4.0);
+  Json history;
+  {
+    std::ifstream input(artifacts.history_path);
+    REQUIRE(input.good());
+    input >> history;
+  }
+  auto& snapshot = history["ub_history"][0]["snapshot"];
+  snapshot["schema_version"] = 1;
+  auto& leaf = snapshot["leaves"][0];
+  leaf.erase("program_schema_version");
+  leaf.erase("program_provenance");
+  for (auto& piece : leaf["pieces"]) {
+    piece.erase("time_origin");
+    piece.erase("station_q");
+  }
+  {
+    std::ofstream output(artifacts.history_path);
+    REQUIRE(output.good());
+    output << history.dump(2) << '\n';
+  }
+
+  const auto result = ModelASnapshotVerifier::verify_files(
+      artifacts.instance_path, artifacts.history_path,
+      ModelASnapshotVerificationModeV1::FAST_FLOAT);
+  REQUIRE(result.status == ModelASnapshotVerificationStatusV1::NUMERIC_PASS);
+  REQUIRE(result.continuous_coverage_valid);
+  REQUIRE(result.stored_ub == 4.0);
+}
+
+TEST_CASE("SUP-PROG-001 V2 program reproduces p(t)=(t,0)") {
+  const Instance instance = make_instance({
+      trajectory({0.0, 1.0},
+                 {Point(0.0, 0.0), Point(1.0, 0.0)})});
+  IntervalEvaluator evaluator(instance);
+  const auto evaluated =
+      evaluator.evaluate(0.0, 1.0, std::vector<int>{0}, {});
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  REQUIRE(std::abs(evaluated.upper_bound -
+                   std::acos(-1.0) / 3.0) < 1e-14);
+  require_evaluator_program_is_verified(
+      instance, {0}, 0.0, 1.0);
+}
+
+TEST_CASE("SUP-PROG-002 V2 program reproduces p(t)=(1-t,0)") {
+  const Instance instance = make_instance({
+      trajectory({0.0, 1.0},
+                 {Point(1.0, 0.0), Point(0.0, 0.0)})});
+  IntervalEvaluator evaluator(instance);
+  const auto evaluated =
+      evaluator.evaluate(0.0, 1.0, std::vector<int>{0}, {});
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  REQUIRE(std::abs(evaluated.upper_bound -
+                   std::acos(-1.0) / 3.0) < 1e-14);
+  require_evaluator_program_is_verified(
+      instance, {0}, 0.0, 1.0);
+}
+
+TEST_CASE("SUP-PROG-003 V2 program splits at an active upper-envelope switch") {
+  const Instance instance = make_instance({
+      trajectory({0.0, 1.0},
+                 {Point(0.0, 0.0), Point(1.0, 0.0)}),
+      trajectory({0.0, 1.0},
+                 {Point(1.0, 0.0), Point(0.0, 0.0)})});
+  IntervalEvaluator evaluator(instance);
+  const auto evaluated =
+      evaluator.evaluate(0.0, 1.0, std::vector<int>{0, 0}, {});
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  REQUIRE(evaluated.program_v2->pieces.size() == 2U);
+  REQUIRE(evaluated.program_v2->pieces[0].end == 0.5);
+  REQUIRE(evaluated.program_v2->pieces[1].start == 0.5);
+  REQUIRE(std::abs(evaluated.upper_bound -
+                   7.0 * std::acos(-1.0) / 12.0) < 1e-14);
+  require_evaluator_program_is_verified(
+      instance, {0, 0}, 0.0, 1.0);
+}
+
+TEST_CASE("SUP-PROG-004 V2 program serializes zero functions for empty stations") {
+  const Instance instance = make_instance(
+      {trajectory({0.0, 1.0},
+                  {Point(0.0, 0.0), Point(1.0, 0.0)})},
+      {{17, Point(0.0, 0.0)}, {23, Point(5.0, 0.0)}});
+  IntervalEvaluator evaluator(instance);
+  const auto evaluated =
+      evaluator.evaluate(0.0, 1.0, std::vector<int>{0}, {});
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  for (const auto& piece : evaluated.program_v2->pieces) {
+    REQUIRE(piece.station_q[1].a == 0.0);
+    REQUIRE(piece.station_q[1].b == 0.0);
+    REQUIRE(piece.station_q[1].c == 0.0);
+  }
+  require_evaluator_program_is_verified(
+      instance, {0}, 0.0, 1.0);
+}
+
+TEST_CASE("SUP-PROG-005 V2 support switch exactly at a trajectory interval boundary") {
+  const Instance instance = make_instance(
+      {trajectory({0.0, 0.5},
+                  {Point(0.0, 0.0), Point(0.5, 0.0)}),
+       trajectory({0.0, 0.5},
+                  {Point(1.0, 0.0), Point(0.5, 0.0)})},
+      {{17, Point(0.0, 0.0)}},
+      0.5);
+  IntervalEvaluator evaluator(instance);
+  const auto evaluated =
+      evaluator.evaluate(0.0, 0.5, std::vector<int>{0, 0}, {});
+  REQUIRE(evaluated.status == IntervalEvaluatorStatusV1::COMPLETE);
+  REQUIRE(evaluated.program_v2.has_value());
+  REQUIRE(evaluated.program_v2->pieces.size() == 1U);
+  REQUIRE(evaluated.program_v2->pieces.front().end == 0.5);
+  require_evaluator_program_is_verified(
+      instance, {0, 0}, 0.0, 0.5);
 }
 
 TEST_CASE("Verifier refuses validated success without validated backend") {

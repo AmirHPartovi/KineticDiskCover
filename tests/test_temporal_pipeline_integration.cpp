@@ -84,7 +84,16 @@ TEST_CASE("Temporal interval B&B uses its own versioned benchmark schema") {
   REQUIRE(result.temporal_result_v2.at("final").at("UB_valid") == false);
   REQUIRE(result.temporal_result_v2.at("final").at("status") ==
           "INCOMPLETE");
-  REQUIRE(result.temporal_result_v2.at("incumbent_snapshot").is_null());
+  REQUIRE(result.temporal_result_v2.at("incumbent_snapshot").is_object());
+  const auto& snapshot =
+      result.temporal_result_v2.at("incumbent_snapshot");
+  REQUIRE(snapshot.at("schema_version") == 2);
+  REQUIRE_FALSE(snapshot.at("leaves").empty());
+  REQUIRE(snapshot.at("leaves").front().at("program_schema_version") == 2);
+  REQUIRE_FALSE(
+      snapshot.at("leaves").front().at("pieces").empty());
+  REQUIRE(snapshot.at("leaves").front().at("pieces").front()
+              .contains("station_q"));
   REQUIRE_FALSE(result.failed);
   REQUIRE_FALSE(result.feasible);
   REQUIRE(result.temporal_result_v2.at("final").contains("LB_valid"));

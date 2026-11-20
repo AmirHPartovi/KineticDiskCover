@@ -21,12 +21,18 @@ bool conservative_arithmetic(
 }
 
 double sum_down(double lhs, double rhs) {
+  if (lhs == 0.0) {
+    return rhs;
+  }
   return std::nextafter(
       lhs + rhs,
       -std::numeric_limits<double>::infinity());
 }
 
 double sum_up(double lhs, double rhs) {
+  if (lhs == 0.0) {
+    return rhs;
+  }
   return std::nextafter(
       lhs + rhs,
       std::numeric_limits<double>::infinity());
@@ -57,10 +63,12 @@ bool complete_snapshot(
   for (const auto& entry :
        partition.partition()) {
     const IntervalRecordV1& leaf = entry.second;
-    if (leaf.ub.validity !=
-            TemporalBoundValidityV1::VALID ||
+    if ((leaf.ub.validity != TemporalBoundValidityV1::VALID &&
+         leaf.ub.validity !=
+             TemporalBoundValidityV1::NUMERICALLY_UNBOUNDED) ||
         !std::isfinite(leaf.ub.value) ||
-        !leaf.ub_piecewise_program.has_value()) {
+        (!leaf.ub_piecewise_program.has_value() &&
+         !leaf.ub_piecewise_program_v2.has_value())) {
       return false;
     }
   }
@@ -85,15 +93,29 @@ GlobalBoundUbSnapshotV1 make_snapshot(
     snapshot_leaf.start = leaf.start;
     snapshot_leaf.end = leaf.end;
     snapshot_leaf.ub_value = leaf.ub.value;
-    if (leaf.ub.certificate_id.empty()) {
-      snapshot.complete = false;
-    } else {
+    if (!leaf.ub.certificate_id.empty()) {
       snapshot_leaf.certificate_ids.push_back(
           leaf.ub.certificate_id);
     }
-    if (leaf.ub_piecewise_program.has_value()) {
+    if (leaf.ub_piecewise_program_v2.has_value()) {
+      const auto& program = *leaf.ub_piecewise_program_v2;
+      snapshot_leaf.program_schema_version = 2;
+      snapshot_leaf.program_provenance = program.provenance;
+      snapshot_leaf.assignment = program.point_assignment;
+      for (const auto& piece : program.pieces) {
+        GlobalBoundUbSnapshotPieceV1 snapshot_piece;
+        snapshot_piece.start = piece.start;
+        snapshot_piece.end = piece.end;
+        snapshot_piece.time_origin = piece.time_origin;
+        snapshot_piece.station_q = piece.station_q;
+        snapshot_leaf.pieces.push_back(std::move(snapshot_piece));
+      }
+    } else if (leaf.ub_piecewise_program.has_value()) {
       const auto& program =
           *leaf.ub_piecewise_program;
+      snapshot_leaf.program_schema_version = 1;
+      snapshot_leaf.program_provenance =
+          "V1 constant-radius program";
       snapshot_leaf.assignment =
           program.point_assignment;
       for (const auto& piece :
@@ -125,13 +147,24 @@ Json snapshot_to_json(
       pieces.push_back({
           {"start", piece.start},
           {"end", piece.end},
-          {"station_radii", piece.station_radii}});
+          {"station_radii", piece.station_radii},
+          {"time_origin", piece.time_origin},
+          {"station_q", [&piece]() {
+             Json values = Json::array();
+             for (const auto& q : piece.station_q) {
+               values.push_back(
+                   {{"a", q.a}, {"b", q.b}, {"c", q.c}});
+             }
+             return values;
+           }()}});
     }
     leaves.push_back({
         {"leaf_id", leaf.leaf_id},
         {"start", leaf.start},
         {"end", leaf.end},
         {"ub", leaf.ub_value},
+        {"program_schema_version", leaf.program_schema_version},
+        {"program_provenance", leaf.program_provenance},
         {"assignment", leaf.assignment},
         {"pieces", pieces},
         {"certificate_ids", leaf.certificate_ids}});
@@ -192,6 +225,11 @@ GlobalBoundUbSnapshotV1 snapshot_from_json(
           leaf_json.value("end", 0.0);
       leaf.ub_value =
           leaf_json.value("ub", 0.0);
+      leaf.program_schema_version =
+          leaf_json.value("program_schema_version", 1U);
+      leaf.program_provenance =
+          leaf_json.value("program_provenance",
+                          "V1 constant-radius program");
       leaf.assignment =
           leaf_json.value("assignment",
                           std::vector<int>{});
@@ -209,6 +247,16 @@ GlobalBoundUbSnapshotV1 snapshot_from_json(
           piece.station_radii =
               piece_json.value("station_radii",
                                std::vector<double>{});
+          piece.time_origin =
+              piece_json.value("time_origin", 0.0);
+          if (piece_json.contains("station_q")) {
+            for (const auto& q_json : piece_json.at("station_q")) {
+              piece.station_q.push_back({
+                  q_json.value("a", 0.0),
+                  q_json.value("b", 0.0),
+                  q_json.value("c", 0.0)});
+            }
+          }
           leaf.pieces.push_back(piece);
         }
       }
@@ -300,10 +348,14 @@ GlobalBoundHistory::update(
   for (const auto& entry :
        partition.partition()) {
     const IntervalRecordV1& leaf = entry.second;
-    if (leaf.ub.validity ==
-            TemporalBoundValidityV1::VALID &&
-        conservative_arithmetic(leaf.ub.arithmetic) &&
-        std::isfinite(leaf.ub.value)) {
+    const bool finite_program_ub =
+        (leaf.ub.validity == TemporalBoundValidityV1::VALID ||
+         leaf.ub.validity ==
+             TemporalBoundValidityV1::NUMERICALLY_UNBOUNDED) &&
+        std::isfinite(leaf.ub.value) &&
+        (leaf.ub_piecewise_program.has_value() ||
+         leaf.ub_piecewise_program_v2.has_value());
+    if (finite_program_ub) {
       ub_sum =
           sum_up(ub_sum, leaf.ub.value);
       if (!leaf.ub.certificate_id.empty()) {
@@ -345,7 +397,7 @@ GlobalBoundHistory::update(
       ub_entry.certificate_ids =
           ub_certificates;
       ub_entry.provenance =
-          "conservative leaf UB sum";
+          "sum of complete program-backed leaf UBs";
       ub_entry.sequence = sequence_;
       ub_entry.snapshot = snapshot;
       ub_history_.push_back(ub_entry);

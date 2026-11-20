@@ -100,15 +100,26 @@ nlohmann::json snapshot_json(const GlobalBoundUbSnapshotV1& snapshot) {
       for (const double radius : piece.station_radii) {
         radii.push_back(finite_json(radius));
       }
+      nlohmann::json station_q = nlohmann::json::array();
+      for (const auto& q : piece.station_q) {
+        station_q.push_back({
+            {"a", finite_json(q.a)},
+            {"b", finite_json(q.b)},
+            {"c", finite_json(q.c)}});
+      }
       pieces.push_back({{"start", finite_json(piece.start)},
                         {"end", finite_json(piece.end)},
-                        {"station_radii", std::move(radii)}});
+                        {"station_radii", std::move(radii)},
+                        {"time_origin", finite_json(piece.time_origin)},
+                        {"station_q", std::move(station_q)}});
     }
     leaves.push_back(
         {{"leaf_id", leaf.leaf_id},
          {"start", finite_json(leaf.start)},
          {"end", finite_json(leaf.end)},
          {"ub_value", finite_json(leaf.ub_value)},
+         {"program_schema_version", leaf.program_schema_version},
+         {"program_provenance", leaf.program_provenance},
          {"assignment", leaf.assignment},
          {"pieces", std::move(pieces)},
          {"certificate_ids", leaf.certificate_ids}});

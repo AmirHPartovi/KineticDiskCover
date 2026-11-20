@@ -63,6 +63,26 @@ struct TemporalPiecewiseProgramV1 {
   std::vector<TemporalRadiusPieceV1> pieces;
 };
 
+struct TemporalQuadraticFunctionV2 {
+  double a{0.0};
+  double b{0.0};
+  double c{0.0};
+};
+
+struct TemporalQuadraticPieceV2 {
+  double start{0.0};
+  double end{0.0};
+  double time_origin{0.0};
+  std::vector<TemporalQuadraticFunctionV2> station_q;
+};
+
+struct TemporalPiecewiseProgramV2 {
+  std::uint32_t schema_version{2};
+  std::vector<int> point_assignment;
+  std::vector<TemporalQuadraticPieceV2> pieces;
+  std::string provenance;
+};
+
 struct TemporalOracleCallSummaryV1 {
   std::uint32_t schema_version{1};
   std::uint64_t exact_calls{0};
@@ -95,6 +115,8 @@ struct IntervalRecordV1 {
   TemporalBoundRecordV1 ub;
   std::optional<TemporalPiecewiseProgramV1>
       ub_piecewise_program;
+  std::optional<TemporalPiecewiseProgramV2>
+      ub_piecewise_program_v2;
 
   double lambda_upper{0.0};
   std::optional<WeightMatrix> dminus;
@@ -148,6 +170,11 @@ class TemporalPartition {
       const TemporalBoundRecordV1& lb,
       const TemporalBoundRecordV1& ub,
       const std::optional<TemporalPiecewiseProgramV1>& program);
+  void set_leaf_bounds_v2(
+      TemporalLeafId id,
+      const TemporalBoundRecordV1& lb,
+      const TemporalBoundRecordV1& ub,
+      const std::optional<TemporalPiecewiseProgramV2>& program);
 
   TemporalPartitionValidationV1 validate() const;
 

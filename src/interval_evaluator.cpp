@@ -231,10 +231,56 @@ IntervalEvaluatorResultV1 IntervalEvaluator::evaluate(
       result.upper_method =
           IntervalUpperMethodV1::DIRECT_UPPER_ENVELOPE;
       result.upper_bound = upper.direct_integral;
+      TemporalPiecewiseProgramV2 program;
+      program.point_assignment = *result.assignment;
+      program.provenance =
+          "FAST_DOUBLE upper envelope; polynomial program serialized";
+      for (const auto& source_piece : upper.pieces) {
+        TemporalQuadraticPieceV2 piece;
+        piece.start = source_piece.start;
+        piece.end = source_piece.end;
+        piece.time_origin = source_piece.time_origin;
+        piece.station_q.reserve(source_piece.station_q.size());
+        for (const auto& q : source_piece.station_q) {
+          piece.station_q.push_back({q.a, q.b, q.c});
+        }
+        program.pieces.push_back(std::move(piece));
+      }
+      result.program_v2 = std::move(program);
     } else if (upper.d_plus_fallback_valid) {
       result.upper_method =
           IntervalUpperMethodV1::DPLUS_FALLBACK;
       result.upper_bound = upper.d_plus_fallback_integral;
+      const auto upper_bounds =
+          geometry_.bounds_on(interval_start, interval_end)
+              .upper.matrix;
+      TemporalPiecewiseProgramV2 program;
+      program.point_assignment = *result.assignment;
+      program.provenance =
+          "FAST_DOUBLE D-plus fallback; constant squared-radius program";
+      TemporalQuadraticPieceV2 piece;
+      piece.start = interval_start;
+      piece.end = interval_end;
+      piece.time_origin = interval_start;
+      piece.station_q.assign(
+          static_cast<std::size_t>(instance_.m), {});
+      for (int station = 0; station < instance_.m; ++station) {
+        double maximum_squared_distance = 0.0;
+        for (int point = 0; point < instance_.n; ++point) {
+          if ((*result.assignment)[static_cast<std::size_t>(point)] ==
+              station) {
+            maximum_squared_distance = std::max(
+                maximum_squared_distance,
+                upper_bounds.weight(
+                    static_cast<WeightIndex>(station),
+                    static_cast<WeightIndex>(point)));
+          }
+        }
+        piece.station_q[static_cast<std::size_t>(station)].c =
+            maximum_squared_distance;
+      }
+      program.pieces.push_back(std::move(piece));
+      result.program_v2 = std::move(program);
     } else {
       result.upper_method =
           IntervalUpperMethodV1::NONE;
@@ -246,6 +292,13 @@ IntervalEvaluatorResultV1 IntervalEvaluator::evaluate(
           upper.failure_reason.empty()
               ? "no valid direct or D+ fallback UB"
               : upper.failure_reason;
+    }
+    if (!result.program_v2.has_value()) {
+      result.status = IntervalEvaluatorStatusV1::INCOMPLETE;
+      result.failure_reason =
+          "upper-bound value has no matching serialized program";
+      result.upper_bound =
+          std::numeric_limits<Weight>::infinity();
     }
   } else {
     result.status =

@@ -292,75 +292,59 @@ bool valid_assignment(
       });
 }
 
-TemporalPiecewiseProgramV1 make_program(
-    const Instance& instance,
-    const WeightedGeometry& geometry,
-    double start,
-    double end,
+TemporalPiecewiseProgramV2 make_program(
     const IntervalEvaluatorResultV1& evaluated) {
   if (!evaluated.assignment.has_value() ||
-      !valid_assignment(instance, *evaluated.assignment)) {
+      !evaluated.program_v2.has_value() ||
+      evaluated.program_v2->point_assignment !=
+          *evaluated.assignment) {
     throw std::invalid_argument(
-        "cannot construct a program without a complete assignment");
+        "cannot construct a V2 program without an assignment and serialized q");
   }
+  return *evaluated.program_v2;
+}
 
-  TemporalPiecewiseProgramV1 program;
-  program.point_assignment = *evaluated.assignment;
-  if (evaluated.upper_method ==
-      IntervalUpperMethodV1::DIRECT_UPPER_ENVELOPE) {
-    for (const auto& piece : evaluated.envelope.pieces) {
-      if (piece.station_radii.size() !=
-          static_cast<std::size_t>(instance.m)) {
-        throw std::invalid_argument(
-            "direct envelope piece has an invalid station vector");
-      }
-      TemporalRadiusPieceV1 radius_piece;
-      radius_piece.start = piece.start;
-      radius_piece.end = piece.end;
-      radius_piece.station_radii = piece.station_radii;
-      program.pieces.push_back(std::move(radius_piece));
-    }
-  } else if (evaluated.upper_method ==
-             IntervalUpperMethodV1::DPLUS_FALLBACK) {
-    const WeightMatrix upper =
-        geometry.bounds_on(start, end).upper.matrix;
-    TemporalRadiusPieceV1 radius_piece;
-    radius_piece.start = start;
-    radius_piece.end = end;
-    radius_piece.station_radii.assign(
-        static_cast<std::size_t>(instance.m), 0.0);
-    for (int station = 0; station < instance.m; ++station) {
-      Weight maximum_squared_distance = 0.0;
-      for (int point = 0; point < instance.n; ++point) {
-        if (program.point_assignment[
-                static_cast<std::size_t>(point)] == station) {
-          maximum_squared_distance =
-              std::max(
-                  maximum_squared_distance,
-                  upper.weight(
-                      static_cast<WeightIndex>(station),
-                      static_cast<WeightIndex>(point)));
-        }
-      }
-      radius_piece.station_radii[
-          static_cast<std::size_t>(station)] =
-          std::sqrt(maximum_squared_distance);
-    }
-    program.pieces.push_back(std::move(radius_piece));
-  } else {
-    throw std::invalid_argument(
-        "interval evaluation did not produce a program method");
-  }
-
+bool program_covers_interval(
+    const TemporalPiecewiseProgramV2& program,
+    double start,
+    double end,
+    int station_count) {
   if (program.pieces.empty()) {
-    TemporalRadiusPieceV1 empty_program_piece;
-    empty_program_piece.start = start;
-    empty_program_piece.end = end;
-    empty_program_piece.station_radii.assign(
-        static_cast<std::size_t>(instance.m), 0.0);
-    program.pieces.push_back(std::move(empty_program_piece));
+    return false;
   }
-  return program;
+  std::vector<std::pair<double, double>> pieces;
+  pieces.reserve(program.pieces.size());
+  for (const auto& piece : program.pieces) {
+    if (!std::isfinite(piece.start) ||
+        !std::isfinite(piece.end) ||
+        piece.end <= piece.start ||
+        piece.start < start ||
+        piece.end > end ||
+        piece.station_q.size() !=
+            static_cast<std::size_t>(station_count)) {
+      return false;
+    }
+    if (!std::all_of(
+            piece.station_q.begin(),
+            piece.station_q.end(),
+            [](const TemporalQuadraticFunctionV2& q) {
+              return std::isfinite(q.a) &&
+                     std::isfinite(q.b) &&
+                     std::isfinite(q.c);
+            })) {
+      return false;
+    }
+    pieces.emplace_back(piece.start, piece.end);
+  }
+  std::sort(pieces.begin(), pieces.end());
+  double covered_until = start;
+  for (const auto& piece : pieces) {
+    if (piece.first > covered_until) {
+      return false;
+    }
+    covered_until = std::max(covered_until, piece.second);
+  }
+  return covered_until == end;
 }
 
 bool program_covers_interval(
@@ -380,10 +364,8 @@ bool program_covers_interval(
         piece.start < start ||
         piece.end > end ||
         piece.station_radii.size() !=
-            static_cast<std::size_t>(station_count)) {
-      return false;
-    }
-    if (!std::all_of(
+            static_cast<std::size_t>(station_count) ||
+        !std::all_of(
             piece.station_radii.begin(),
             piece.station_radii.end(),
             [](double radius) {
@@ -457,8 +439,7 @@ void store_evaluated_leaf(
     double start,
     double end,
     const IntervalEvaluatorResultV1& evaluated,
-    const Instance& instance,
-    const WeightedGeometry& geometry) {
+    const Instance& instance) {
   TemporalBoundRecordV1 lb;
   if (evaluated.final_lb.valid &&
       evaluated.final_lb.trivial) {
@@ -479,13 +460,12 @@ void store_evaluated_leaf(
 
   TemporalBoundRecordV1 ub =
       absent_upper_bound("no complete feasible program");
-  std::optional<TemporalPiecewiseProgramV1> program;
+  std::optional<TemporalPiecewiseProgramV2> program;
   if (evaluated.assignment.has_value() &&
       std::isfinite(evaluated.upper_bound) &&
       evaluated.upper_bound >= 0.0 &&
       evaluated.upper_method != IntervalUpperMethodV1::NONE) {
-    auto candidate_program =
-        make_program(instance, geometry, start, end, evaluated);
+    auto candidate_program = make_program(evaluated);
     if (!valid_assignment(instance,
                           candidate_program.point_assignment) ||
         !program_covers_interval(
@@ -507,7 +487,7 @@ void store_evaluated_leaf(
     program = std::move(candidate_program);
   }
 
-  partition.set_leaf_bounds(id, lb, ub, program);
+  partition.set_leaf_bounds_v2(id, lb, ub, program);
 }
 
 std::string freeze_summary(const TemporalPartition& partition) {
@@ -661,17 +641,37 @@ bool snapshot_structure_valid(
         !valid_assignment(instance, leaf->assignment)) {
       return false;
     }
-    TemporalPiecewiseProgramV1 program;
-    program.point_assignment = leaf->assignment;
-    for (const auto& piece : leaf->pieces) {
-      TemporalRadiusPieceV1 radius_piece;
-      radius_piece.start = piece.start;
-      radius_piece.end = piece.end;
-      radius_piece.station_radii = piece.station_radii;
-      program.pieces.push_back(std::move(radius_piece));
-    }
-    if (!program_covers_interval(
-            program, leaf->start, leaf->end, instance.m)) {
+    if (leaf->program_schema_version == 1U) {
+      TemporalPiecewiseProgramV1 program;
+      program.point_assignment = leaf->assignment;
+      for (const auto& piece : leaf->pieces) {
+        TemporalRadiusPieceV1 radius_piece;
+        radius_piece.start = piece.start;
+        radius_piece.end = piece.end;
+        radius_piece.station_radii = piece.station_radii;
+        program.pieces.push_back(std::move(radius_piece));
+      }
+      if (!program_covers_interval(
+              program, leaf->start, leaf->end, instance.m)) {
+        return false;
+      }
+    } else if (leaf->program_schema_version == 2U) {
+      if (leaf->program_provenance.empty()) {
+        return false;
+      }
+      TemporalPiecewiseProgramV2 program;
+      program.point_assignment = leaf->assignment;
+      program.provenance = leaf->program_provenance;
+      for (const auto& piece : leaf->pieces) {
+        program.pieces.push_back({
+            piece.start, piece.end, piece.time_origin,
+            piece.station_q});
+      }
+      if (!program_covers_interval(
+              program, leaf->start, leaf->end, instance.m)) {
+        return false;
+      }
+    } else {
       return false;
     }
     previous_end = leaf->end;
@@ -970,10 +970,9 @@ TemporalThesisResultV1 TemporalThesisSolver::solve_impl(
           leaf.start,
           leaf.end,
           evaluated,
-          instance_,
-          *geometry);
+          instance_);
       const auto& stored = partition.leaf(id);
-      if (!stored.ub_piecewise_program.has_value() ||
+      if (!stored.ub_piecewise_program_v2.has_value() ||
           stored.ub.validity ==
               TemporalBoundValidityV1::ABSENT) {
         partition.freeze_leaf(id, "ORACLE_FAIL");
@@ -1085,7 +1084,7 @@ TemporalThesisResultV1 TemporalThesisSolver::solve_impl(
 
     const IntervalRecordV1 parent = partition.leaf(next);
     const bool inherited =
-        parent.ub_piecewise_program.has_value();
+        parent.ub_piecewise_program_v2.has_value();
     const std::uint64_t calls_per_child =
         maximum_oracle_calls_for_evaluation(
             active_evaluator_config, inherited);
@@ -1170,11 +1169,11 @@ TemporalThesisResultV1 TemporalThesisSolver::solve_impl(
           ub.provenance =
               "complete feasible program; FAST_DOUBLE, not certified";
         }
-        partition.set_leaf_bounds(
+        partition.set_leaf_bounds_v2(
             child_id,
             lb,
             ub,
-            child.ub_piecewise_program);
+            child.ub_piecewise_program_v2);
       }
       keep_running = update_history();
       continue;

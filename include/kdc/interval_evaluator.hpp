@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kdc/solver_budget.hpp"
+#include "kdc/temporal_partition.hpp"
 #include "kdc/types.hpp"
 #include "kdc/weighted_geometry.hpp"
 #include "kdc/weighted_lipschitz.hpp"
@@ -76,6 +77,7 @@ struct IntervalEvaluatorResultV1 {
   Weight upper_bound{
       std::numeric_limits<Weight>::infinity()};
   std::optional<std::vector<int>> assignment;
+  std::optional<TemporalPiecewiseProgramV2> program_v2;
   UpperEnvelopeResultV1 envelope;
   LipschitzLocalLowerBoundV1 lipschitz_detail;
   std::string failure_reason;

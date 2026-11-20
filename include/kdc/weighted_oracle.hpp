@@ -116,11 +116,14 @@ struct WeightedRelaxationOracleResultV1 {
 
 struct WeightedLPDualValidationV1 {
   std::uint32_t schema_version{1};
+  // `valid` is retained for source compatibility and is always false until
+  // dual feasibility can be checked with a validated arithmetic backend.
   bool valid{false};
+  bool numerical_diagnostic_valid{false};
   std::optional<Weight> directed_lower_bound;
+  std::optional<Weight> numerical_diagnostic_lower_bound;
   std::optional<Weight> max_constraint_residual;
-  WeightedArithmeticModeV1 arithmetic{
-      WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL};
+  WeightedArithmeticModeV1 arithmetic{WeightedArithmeticModeV1::UNKNOWN};
   WeightedRelaxationCertificateV1 certificate;
   std::string reason;
 };
@@ -259,12 +262,13 @@ WeightedRelaxationOracleResultV1 adapt_weighted_relaxation_certificate(
 //      z_ij >= 0
 // y_j is free.
 //
-// The result is valid only with conservative directed residual arithmetic.
+// The current implementation returns only a numerical diagnostic. It never
+// issues a lower-bound certificate until validated arithmetic is available.
 WeightedLPDualValidationV1 validate_weighted_lp_dual(
     const WeightMatrix& matrix,
     const std::vector<Weight>& y,
     const std::vector<Weight>& z,
     WeightedArithmeticModeV1 arithmetic =
-        WeightedArithmeticModeV1::CONSERVATIVE_INTERVAL);
+        WeightedArithmeticModeV1::UNKNOWN);
 
 }  // namespace kdc

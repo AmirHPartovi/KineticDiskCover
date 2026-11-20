@@ -408,6 +408,13 @@ bool validate_snapshot_structure(
           "leaf assignment must contain exactly one station index per point",
           leaf.start, leaf.end);
     }
+    if (leaf.program_schema_version == 2U &&
+        leaf.program_provenance.empty()) {
+      return report_numerical_fail(
+          result, "MISSING_PROGRAM_PROVENANCE",
+          "V2 program must retain its construction provenance",
+          leaf.start, leaf.end);
+    }
     for (std::size_t point = 0;
          point < leaf.assignment.size();
          ++point) {
@@ -432,26 +439,62 @@ bool validate_snapshot_structure(
           !std::isfinite(piece.end) ||
           piece.start < leaf.start ||
           piece.end > leaf.end ||
-          piece.end <= piece.start ||
-          piece.station_radii.size() !=
-              static_cast<std::size_t>(instance.m)) {
+          piece.end <= piece.start) {
         return report_numerical_fail(
-            result, "INVALID_RADIUS_PIECE",
-            "radius piece interval or station vector is malformed",
+            result, "INVALID_PROGRAM_PIECE",
+            "program piece interval is malformed",
             piece.start, piece.end);
       }
-      for (std::size_t station = 0;
-           station < piece.station_radii.size();
-           ++station) {
-        const double radius = piece.station_radii[station];
-        if (!std::isfinite(radius) || radius < 0.0) {
+      if (leaf.program_schema_version == 1U) {
+        if (piece.station_radii.size() !=
+            static_cast<std::size_t>(instance.m)) {
           return report_numerical_fail(
-              result, "INVALID_STATION_RADIUS",
-              "radius must be finite and nonnegative",
-              piece.start, piece.end,
-              static_cast<int>(station),
-              instance.stations[station].id);
+              result, "INVALID_V1_RADIUS_VECTOR",
+              "V1 constant-radius pieces require one radius per station",
+              piece.start, piece.end);
         }
+        for (std::size_t station = 0;
+             station < piece.station_radii.size();
+             ++station) {
+          const double radius = piece.station_radii[station];
+          if (!std::isfinite(radius) || radius < 0.0) {
+            return report_numerical_fail(
+                result, "INVALID_STATION_RADIUS",
+                "V1 radius must be finite and nonnegative",
+                piece.start, piece.end,
+                static_cast<int>(station),
+                instance.stations[station].id);
+          }
+        }
+      } else if (leaf.program_schema_version == 2U) {
+        if (piece.station_q.size() !=
+                static_cast<std::size_t>(instance.m) ||
+            !std::isfinite(piece.time_origin)) {
+          return report_numerical_fail(
+              result, "INVALID_V2_Q_VECTOR",
+              "V2 piece requires a finite time origin and one q_i per station",
+              piece.start, piece.end);
+        }
+        for (std::size_t station = 0;
+             station < piece.station_q.size();
+             ++station) {
+          const auto& q = piece.station_q[station];
+          if (!std::isfinite(q.a) ||
+              !std::isfinite(q.b) ||
+              !std::isfinite(q.c)) {
+            return report_numerical_fail(
+                result, "NONFINITE_Q_COEFFICIENT",
+                "V2 squared-radius coefficients must be finite",
+                piece.start, piece.end,
+                static_cast<int>(station),
+                instance.stations[station].id);
+          }
+        }
+      } else {
+        return report_numerical_fail(
+            result, "UNSUPPORTED_PROGRAM_SCHEMA",
+            "snapshot leaf program schema is not supported",
+            piece.start, piece.end);
       }
       piece_intervals.emplace_back(piece.start, piece.end);
     }
@@ -676,21 +719,33 @@ bool run_numerical_checks(
         continue;
       }
       const Wide midpoint = start + (end - start) / 2.0L;
-      std::vector<Wide> radii(
+      const GlobalBoundUbSnapshotPieceV1* v2_piece = nullptr;
+      std::vector<Wide> v1_radii(
           static_cast<std::size_t>(instance.m), 0.0L);
       bool program_piece_covers = false;
       for (const auto& piece : leaf.pieces) {
-        if (midpoint < piece.start || midpoint > piece.end) {
+        if (piece.start > start || piece.end < end) {
           continue;
         }
         program_piece_covers = true;
-        for (std::size_t station = 0;
-             station < radii.size();
-             ++station) {
-          radii[station] =
-              std::max(radii[station],
-                       static_cast<Wide>(
-                           piece.station_radii[station]));
+        if (leaf.program_schema_version == 2U) {
+          if (v2_piece != nullptr) {
+            return report_numerical_fail(
+                result, "OVERLAPPING_V2_PROGRAM_PIECES",
+                "V2 program pieces overlap on an open subinterval",
+                static_cast<double>(start),
+                static_cast<double>(end));
+          }
+          v2_piece = &piece;
+        } else {
+          for (std::size_t station = 0;
+               station < v1_radii.size();
+               ++station) {
+            v1_radii[station] =
+                std::max(v1_radii[station],
+                         static_cast<Wide>(
+                             piece.station_radii[station]));
+          }
         }
       }
       if (!program_piece_covers) {
@@ -707,20 +762,79 @@ bool run_numerical_checks(
         station_is_empty[static_cast<std::size_t>(station)] = false;
       }
       for (std::size_t station = 0;
-           station < radii.size();
+           station < static_cast<std::size_t>(instance.m);
            ++station) {
-        const Wide radius = radii[station];
-        const Wide q = radius * radius;
-        if (!std::isfinite(radius) || !std::isfinite(q)) {
+        Quadratic q_local;
+        if (leaf.program_schema_version == 2U) {
+          const auto& stored = v2_piece->station_q[station];
+          const Wide shift =
+              start - static_cast<Wide>(v2_piece->time_origin);
+          q_local = {
+              static_cast<Wide>(stored.a),
+              2.0L * static_cast<Wide>(stored.a) * shift +
+                  static_cast<Wide>(stored.b),
+              evaluate(
+                  {static_cast<Wide>(stored.a),
+                   static_cast<Wide>(stored.b),
+                   static_cast<Wide>(stored.c)},
+                  shift)};
+        } else {
+          const Wide q = v1_radii[station] * v1_radii[station];
+          q_local = {0.0L, 0.0L, q};
+        }
+        const Wide width = end - start;
+        std::vector<Wide> q_candidates{
+            0.0L, width};
+        if (q_local.a != 0.0L) {
+          const Wide vertex =
+              -q_local.b / (2.0L * q_local.a);
+          if (vertex > 0.0L && vertex < width) {
+            q_candidates.push_back(vertex);
+          }
+        }
+        Wide q_min = std::numeric_limits<Wide>::infinity();
+        for (const Wide x : q_candidates) {
+          q_min = std::min(q_min, evaluate(q_local, x));
+        }
+        const Wide q_scale = std::max(
+            {1.0L,
+             std::abs(evaluate(q_local, 0.0L)),
+             std::abs(evaluate(q_local, width))});
+        const Wide q_tolerance =
+            32.0L *
+            std::numeric_limits<Wide>::epsilon() * q_scale;
+        if (!std::isfinite(q_min)) {
           return report_numerical_fail(
-              result, "NONFINITE_RADIUS_FUNCTION",
-              "q_i(t)=r_i(t)^2 is not finite",
+              result, "NONFINITE_Q_FUNCTION",
+              "q_i(t) is not finite on a program subinterval",
               static_cast<double>(start),
               static_cast<double>(end),
               static_cast<int>(station),
               instance.stations[station].id);
         }
-        if (station_is_empty[station] && q != 0.0L) {
+        if (q_min < -q_tolerance) {
+          return report_numerical_fail(
+              result, "NEGATIVE_Q_FUNCTION",
+              "q_i(t) is negative inside the program subinterval",
+              static_cast<double>(start),
+              static_cast<double>(end),
+              static_cast<int>(station),
+              instance.stations[station].id);
+        }
+        if (q_min < 0.0L) {
+          set_violation(
+              result, "Q_SIGN_INDETERMINATE",
+              "q_i(t) is within floating-point ambiguity of zero",
+              ModelASnapshotVerificationStatusV1::INDETERMINATE,
+              static_cast<double>(start),
+              static_cast<double>(end),
+              static_cast<int>(station),
+              instance.stations[station].id);
+          return false;
+        }
+        if (station_is_empty[station] &&
+            (q_local.a != 0.0L || q_local.b != 0.0L ||
+             q_local.c != 0.0L)) {
           all_empty_stations_zero = false;
           return report_numerical_fail(
               result, "EMPTY_STATION_NONZERO_RADIUS",
@@ -731,7 +845,9 @@ bool run_numerical_checks(
               instance.stations[station].id);
         }
         leaf_cost +=
-            q * (end - start);
+            q_local.a * width * width * width / 3.0L +
+            q_local.b * width * width / 2.0L +
+            q_local.c * width;
 
         for (std::size_t point = 0;
              point < leaf.assignment.size();
@@ -753,17 +869,21 @@ bool run_numerical_checks(
               distance_polynomial(
                   instance, point, station, segment,
                   segment_start);
+          const Wide distance_shift = start - segment_start;
+          const Quadratic distance_local{
+              distance.a,
+              2.0L * distance.a * distance_shift +
+                  distance.b,
+              evaluate(distance, distance_shift)};
           const Quadratic difference{
-              -distance.a,
-              -distance.b,
-              q - distance.c};
-          const Wide s0 = start - segment_start;
-          const Wide s1 = end - segment_start;
-          std::vector<Wide> candidates{s0, s1};
+              q_local.a - distance_local.a,
+              q_local.b - distance_local.b,
+              q_local.c - distance_local.c};
+          std::vector<Wide> candidates{0.0L, width};
           if (difference.a != 0.0L) {
             const Wide vertex =
                 -difference.b / (2.0L * difference.a);
-            if (vertex > s0 && vertex < s1) {
+            if (vertex > 0.0L && vertex < width) {
               candidates.push_back(vertex);
             }
           }
@@ -774,9 +894,11 @@ bool run_numerical_checks(
                 minimum, evaluate(difference, candidate));
           }
           const Wide scale = std::max(
-              {1.0L, std::abs(q),
-               std::abs(evaluate(distance, s0)),
-               std::abs(evaluate(distance, s1))});
+              {1.0L,
+               std::abs(evaluate(q_local, 0.0L)),
+               std::abs(evaluate(q_local, width)),
+               std::abs(evaluate(distance_local, 0.0L)),
+               std::abs(evaluate(distance_local, width))});
           const Wide tolerance =
               32.0L *
               std::numeric_limits<Wide>::epsilon() * scale;
@@ -868,8 +990,7 @@ bool run_numerical_checks(
   result.cost_upper_endpoint =
       round_up_nonnegative(global_integral);
   result.cost_enclosure_validated = false;
-  if (snapshot.global_ub <
-      round_up_nonnegative(leaf_ub_sum)) {
+  if (static_cast<Wide>(snapshot.global_ub) < leaf_ub_sum) {
     set_violation(
         result, "GLOBAL_UB_BELOW_LEAF_UB_SUM",
         "snapshot global UB does not dominate the independently "
@@ -947,7 +1068,8 @@ ModelASnapshotVerifier::verify_files(
         ModelASnapshotVerificationStatusV1::FAIL);
     return result;
   }
-  if (snapshot.schema_version != 1U ||
+  if ((snapshot.schema_version != 1U &&
+       snapshot.schema_version != 2U) ||
       !snapshot.complete ||
       snapshot.partition_version != entry.partition_version ||
       snapshot.global_ub != entry.value ||
@@ -972,10 +1094,11 @@ ModelASnapshotVerifier::verify_files(
   }
   std::set<std::string> leaf_certificates;
   for (const auto& leaf : snapshot.leaves) {
-    if (leaf.certificate_ids.empty()) {
+    if (leaf.certificate_ids.empty() &&
+        leaf.program_schema_version == 1U) {
       set_violation(
           result, "MISSING_LEAF_CERTIFICATE",
-          "snapshot leaf has no UB certificate reference",
+          "legacy V1 snapshot leaf has no UB certificate reference",
           ModelASnapshotVerificationStatusV1::FAIL,
           leaf.start, leaf.end);
       return result;

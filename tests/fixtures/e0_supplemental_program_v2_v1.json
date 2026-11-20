@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "suite_id": "e0-supplemental-program-v2-v1",
+  "dataset_class": "supplemental_synthetic_not_thesis_generated",
+  "cases": [
+    {
+      "case_id": "SUP-PROG-001",
+      "source_reference": "Chapter 5 upper-envelope integral contract; supplemental synthetic case, not an original thesis X/EC instance",
+      "stations": [{"id": 17, "center": [0.0, 0.0]}],
+      "horizon": [0.0, 1.0],
+      "trajectories": [{"breakpoints": [0.0, 1.0], "waypoints": [[0.0, 0.0], [1.0, 0.0]]}],
+      "assignment": [0],
+      "expected": {
+        "continuous_coverage": true,
+        "serialized_program_cost_equals_ub": true,
+        "integral": "pi/3",
+        "active_switches": []
+      },
+      "sha256": "86d05cc6f3a4f7a29e66685fc1dfc280c5c63b8a6d3406cf84032def43fa1438"
+    },
+    {
+      "case_id": "SUP-PROG-002",
+      "source_reference": "Chapter 5 upper-envelope integral contract; supplemental synthetic case, not an original thesis X/EC instance",
+      "stations": [{"id": 17, "center": [0.0, 0.0]}],
+      "horizon": [0.0, 1.0],
+      "trajectories": [{"breakpoints": [0.0, 1.0], "waypoints": [[1.0, 0.0], [0.0, 0.0]]}],
+      "assignment": [0],
+      "expected": {
+        "continuous_coverage": true,
+        "serialized_program_cost_equals_ub": true,
+        "integral": "pi/3",
+        "active_switches": []
+      },
+      "sha256": "409b9b0e4c1a803701ed4aa3391e97efdc1462bbd5b779d0ec23b3c4d616e78a"
+    },
+    {
+      "case_id": "SUP-PROG-003",
+      "source_reference": "Chapter 5 pairwise-polynomial upper-envelope contract; supplemental synthetic case, not an original thesis X/EC instance",
+      "stations": [{"id": 17, "center": [0.0, 0.0]}],
+      "horizon": [0.0, 1.0],
+      "trajectories": [
+        {"breakpoints": [0.0, 1.0], "waypoints": [[0.0, 0.0], [1.0, 0.0]]},
+        {"breakpoints": [0.0, 1.0], "waypoints": [[1.0, 0.0], [0.0, 0.0]]}
+      ],
+      "assignment": [0, 0],
+      "expected": {
+        "continuous_coverage": true,
+        "serialized_program_cost_equals_ub": true,
+        "integral": "7*pi/12",
+        "active_switches": [0.5]
+      },
+      "sha256": "b2d69a909b755189c30df0961f8f1d58ff0f03aca9468c110f359031dc055230"
+    },
+    {
+      "case_id": "SUP-PROG-004",
+      "source_reference": "Chapter 5 empty-station convention; supplemental synthetic case, not an original thesis X/EC instance",
+      "stations": [
+        {"id": 17, "center": [0.0, 0.0]},
+        {"id": 23, "center": [5.0, 0.0]}
+      ],
+      "horizon": [0.0, 1.0],
+      "trajectories": [{"breakpoints": [0.0, 1.0], "waypoints": [[0.0, 0.0], [1.0, 0.0]]}],
+      "assignment": [0],
+      "expected": {
+        "continuous_coverage": true,
+        "serialized_program_cost_equals_ub": true,
+        "integral": "pi/3",
+        "empty_station_q": [0.0, 0.0, 0.0]
+      },
+      "sha256": "d8c5286cd2ea2e2d5feb5350a115b377e8fde0950c0f0bb7c808a6abbc73e428"
+    },
+    {
+      "case_id": "SUP-PROG-005",
+      "source_reference": "Chapter 5 trajectory-breakpoint and boundary-ownership contracts; supplemental synthetic case, not an original thesis X/EC instance",
+      "stations": [{"id": 17, "center": [0.0, 0.0]}],
+      "horizon": [0.0, 0.5],
+      "trajectories": [
+        {"breakpoints": [0.0, 0.5], "waypoints": [[0.0, 0.0], [0.5, 0.0]]},
+        {"breakpoints": [0.0, 0.5], "waypoints": [[1.0, 0.0], [0.5, 0.0]]}
+      ],
+      "assignment": [0, 0],
+      "expected": {
+        "continuous_coverage": true,
+        "serialized_program_cost_equals_ub": true,
+        "integral": "7*pi/24",
+        "active_switches": [0.5],
+        "program_piece_count": 1
+      },
+      "sha256": "6f425d99867f76a305e78e646c84def4d8cbbdacf03c2635e0e85da57fb7fc31"
+    }
+  ]
+}
