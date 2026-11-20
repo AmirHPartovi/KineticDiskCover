@@ -11,6 +11,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
+from kdc_tools import experiment_run_manifest  # noqa: E402
 from kdc_tools.storage import validate_run_directory  # noqa: E402
 
 SPEC = importlib.util.spec_from_file_location(
@@ -303,6 +304,16 @@ def test_parallel_solver_workers_write_isolated_valid_run_packages(
     solver = tmp_path / "solver"
     solver.touch()
     monkeypatch.setattr(run_batch_limited, "SOLVER", solver)
+    monkeypatch.setattr(
+        experiment_run_manifest,
+        "capture_local_git_state",
+        lambda _root: {
+            "commit": "deadbeef",
+            "dirty": False,
+            "status_sha256": "a" * 64,
+            "captured_at": "2026-01-01T00:00:00Z",
+        },
+    )
 
     class FakeProcess:
         def __init__(self, command, **_kwargs):

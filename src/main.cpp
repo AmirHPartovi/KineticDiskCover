@@ -48,6 +48,8 @@ void usage() {
          "[--exact-time-limit SEC] "
          "[--profile fast|exact-reference|debug] [--seed N] [--repeats N] "
          "[--algorithms all-fast|all-comparison|all-registered] "
+         "[--solver-method legacy|minsum-adaptive|temporal-interval-bnb|"
+         "b-grid|b-nn|b-static-hold|b-minmax] "
          "[--minsum-refinement-policy adaptive|sampled] "
          "[--verify-each-iteration] [--no-verify]\n"
       << "  compare   --algorithms a,b --dataset DIR --output DIR "
@@ -62,6 +64,8 @@ void usage() {
          "[--algorithms all-fast|all-comparison|all-registered|LIST] "
          "[--modes minmax|minsum|minmaxsum|both|all] "
          "[--parallel] [--threads N] "
+         "[--solver-method legacy|minsum-adaptive|temporal-interval-bnb|"
+         "b-grid|b-nn|b-static-hold|b-minmax] "
          "[--exact-reference ip-kont|branch-and-bound|auto] "
          "[--verify-each-iteration] [--no-verify]\n"
       << "            [--fast-time-limit SEC] [--exact-time-limit SEC]\n"
@@ -79,12 +83,19 @@ void command_help(const std::string& command) {
     std::cout << "Usage: kdc-solver benchmark --dataset DIR --output DIR "
                  "--mode both|minmax|minsum|minmaxsum [--parallel] [--threads N] "
                  "[--exact-reference ip-kont|branch-and-bound|auto] "
+                 "[--solver-method legacy|minsum-adaptive|"
+                 "temporal-interval-bnb|b-grid|b-nn|b-static-hold|b-minmax] "
                  "[--minsum-refinement-policy adaptive|sampled] "
                  "[--verify-each-iteration] [--no-verify]\n"
                  "  --parallel               Run instances concurrently\n"
                  "  --threads N              Worker threads (default: 1)\n"
                  "  --exact-reference        Select the exact backend used in the\n"
-                 "                          benchmark reference slot\n";
+                 "                          benchmark reference slot\n"
+                 "  --solver-method         Keep legacy path, run adaptive MinSum,\n"
+                 "                          or a Chapter 7 temporal baseline\n"
+                 "  temporal methods: temporal-interval-bnb, b-grid, b-nn,\n"
+                 "                   b-static-hold, b-minmax\n"
+                 "  --oracle-time-limit SEC Per-Oracle temporal limit\n";
   } else if (command == "compare") {
     std::cout << "Usage: kdc-solver compare --algorithms a,b --dataset DIR "
                  "--output DIR [--mode static|minmax|minsum]\n";
@@ -100,6 +111,8 @@ void command_help(const std::string& command) {
         << "  --output DIR         Required output directory\n"
         << "  --algorithms LIST    Comma-separated algorithm names (default: "
            "main benchmark set)\n"
+        << "  --solver-method      legacy|minsum-adaptive|"
+           "temporal-interval-bnb|b-grid|b-nn|b-static-hold|b-minmax\n"
         << "  --modes MODE         minmax|minsum|minmaxsum|both|all "
            "(default: both)\n"
         << "  --parallel           Run instances concurrently\n"
@@ -108,6 +121,7 @@ void command_help(const std::string& command) {
         << "  --fast-time-limit SEC Global limit for heuristic runs (default: 30)\n"
         << "  --exact-time-limit SEC Global limit for exact runs (default: 600)\n"
         << "  --exact-reference    ip-kont|branch-and-bound|auto (default: auto)\n"
+        << "  --oracle-time-limit SEC Per-Oracle temporal baseline limit\n"
         << "  --minsum-refinement-policy adaptive|sampled (default: adaptive)\n"
         << "  --minmax-budget-fraction F (default: 0.5)\n"
         << "  --minsum-budget-fraction F (default: 0.5)\n"
@@ -316,6 +330,8 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
   config.dataset_dir = args.get("dataset");
   config.output_dir = args.get("output");
   config.algorithm_names = split_csv(args.get("algorithms"));
+  config.solver_method = kdc::pipeline_solver_method_from_string(
+      args.get("solver-method", "legacy"));
   config.profile = kdc::benchmark_profile_from_string(
       args.get("profile", "exact-reference"));
   config.seed = static_cast<unsigned>(std::stoul(args.get("seed", "42")));
@@ -330,6 +346,38 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
       "fast-time-limit", config.fast_time_limit_sec);
   config.exact_time_limit_sec = args.get_double(
       "exact-time-limit", config.exact_time_limit_sec);
+  config.temporal_config.execution.oracle_time_limit_seconds =
+      args.get_double("oracle-time-limit",
+                      config.temporal_config.execution
+                          .oracle_time_limit_seconds);
+  config.temporal_baseline_config.global_time_limit_seconds =
+      config.fast_time_limit_sec;
+  config.temporal_baseline_config.oracle_time_limit_seconds =
+      args.get_double("oracle-time-limit",
+                      config.temporal_baseline_config
+                          .oracle_time_limit_seconds);
+  config.temporal_config.execution.delta_min =
+      args.get_double("delta-min",
+                      config.temporal_config.execution.delta_min);
+  config.temporal_config.execution.max_leaves =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-leaves", std::to_string(
+                                     config.temporal_config.execution
+                                         .max_leaves))));
+  config.temporal_config.execution.max_oracle_calls =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-oracle-calls", std::to_string(
+                                           config.temporal_config.execution
+                                               .max_oracle_calls))));
+  config.temporal_baseline_config.max_oracle_calls =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-oracle-calls", std::to_string(
+                                           config.temporal_baseline_config
+                                               .max_oracle_calls))));
+  config.temporal_config.epsilon_abs =
+      args.get_double("epsilon-abs", config.temporal_config.epsilon_abs);
+  config.temporal_config.epsilon_rel =
+      args.get_double("epsilon-rel", config.temporal_config.epsilon_rel);
   config.verify_each_iteration = args.has("verify-each-iteration");
   config.minmaxsum_cfg.minmax_budget_fraction =
       args.get_double("minmax-budget-fraction", 0.5);
@@ -362,6 +410,14 @@ kdc::BenchmarkConfig parse_benchmark_args(int argc, char** argv) {
       mode != "minmaxsum") {
     throw std::invalid_argument(
         "benchmark mode must be both, minmax, minsum, or minmaxsum");
+  }
+  if ((kdc::is_temporal_solver_method(config.solver_method) ||
+       config.solver_method ==
+           kdc::PipelineSolverMethod::MINSUM_ADAPTIVE) &&
+      (config.both_objectives ||
+       config.objective != kdc::ObjectiveType::MIN_SUM)) {
+    throw std::invalid_argument(
+        "--solver-method requires --mode minsum");
   }
   if (config.exact_reference != "auto" &&
       config.exact_reference != "ip-kont" &&
@@ -684,9 +740,43 @@ int handle_batch(int argc, char** argv) {
   }
   config.exact_reference = args.get("exact-reference", config.exact_reference);
   config.algorithm_names = split_csv(args.get("algorithms"));
+  config.solver_method = kdc::pipeline_solver_method_from_string(
+      args.get("solver-method", "legacy"));
   config.per_ip_time_limit_sec = args.get_double("time-limit", 60.0);
   config.fast_time_limit_sec = args.get_double("fast-time-limit", 30.0);
   config.exact_time_limit_sec = args.get_double("exact-time-limit", 600.0);
+  config.temporal_config.execution.oracle_time_limit_seconds =
+      args.get_double("oracle-time-limit",
+                      config.temporal_config.execution
+                          .oracle_time_limit_seconds);
+  config.temporal_baseline_config.global_time_limit_seconds =
+      config.fast_time_limit_sec;
+  config.temporal_baseline_config.oracle_time_limit_seconds =
+      args.get_double("oracle-time-limit",
+                      config.temporal_baseline_config
+                          .oracle_time_limit_seconds);
+  config.temporal_config.execution.delta_min =
+      args.get_double("delta-min",
+                      config.temporal_config.execution.delta_min);
+  config.temporal_config.execution.max_leaves =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-leaves", std::to_string(
+                                     config.temporal_config.execution
+                                         .max_leaves))));
+  config.temporal_config.execution.max_oracle_calls =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-oracle-calls", std::to_string(
+                                           config.temporal_config.execution
+                                               .max_oracle_calls))));
+  config.temporal_baseline_config.max_oracle_calls =
+      static_cast<std::uint64_t>(std::stoull(
+          args.get("max-oracle-calls", std::to_string(
+                                           config.temporal_baseline_config
+                                               .max_oracle_calls))));
+  config.temporal_config.epsilon_abs =
+      args.get_double("epsilon-abs", config.temporal_config.epsilon_abs);
+  config.temporal_config.epsilon_rel =
+      args.get_double("epsilon-rel", config.temporal_config.epsilon_rel);
   config.brute_force_max_assignments = static_cast<std::uint64_t>(
       std::stoull(args.get("brute-force-max-assignments", "100000")));
   const std::string minsum_policy =
@@ -729,6 +819,14 @@ int handle_batch(int argc, char** argv) {
   if (config.objectives.empty()) {
     throw std::invalid_argument(
         "--modes must be minmax, minsum, minmaxsum, both, or all");
+  }
+  if ((kdc::is_temporal_solver_method(config.solver_method) ||
+       config.solver_method ==
+           kdc::PipelineSolverMethod::MINSUM_ADAPTIVE) &&
+      (config.objectives.size() != 1U ||
+       config.objectives.front() != kdc::ObjectiveType::MIN_SUM)) {
+    throw std::invalid_argument(
+        "--solver-method requires --modes minsum");
   }
   if (config.exact_reference != "auto" &&
       config.exact_reference != "ip-kont" &&

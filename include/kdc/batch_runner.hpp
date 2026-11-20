@@ -7,6 +7,9 @@
 #include "kdc/objective.hpp"
 #include "kdc/result_status.hpp"
 #include "kdc/solver_interface.hpp"
+#include "kdc/pipeline_solver.hpp"
+#include "kdc/temporal_baselines.hpp"
+#include "kdc/temporal_thesis_solver.hpp"
 #include "kdc/types.hpp"
 
 #include <string>
@@ -21,6 +24,9 @@
 namespace kdc {
 
 struct BatchRunRecord {
+  std::string solver_method{"legacy"};
+  nlohmann::json temporal_result_v2 = nullptr;
+  nlohmann::json temporal_baseline_result_v1 = nullptr;
   std::string instance_name;
   std::string algorithm_name;
   std::string algorithm_category;
@@ -144,6 +150,9 @@ struct BatchRunConfig {
   MinMaxSumSolver::Config minmaxsum_config;
   std::string experiment_id;
   std::string actual_backend;
+  PipelineSolverMethod solver_method{PipelineSolverMethod::LEGACY};
+  TemporalThesisConfigV2 temporal_config;
+  TemporalBaselineConfigV1 temporal_baseline_config;
 };
 
 class BatchRunner {

@@ -223,6 +223,7 @@ def run_one(
     save_solutions: bool,
     save_traces: bool,
     skip_reason: dict[str, str] | None = None,
+    manifest_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Reserve, execute, validate and finalize exactly one solver invocation."""
     backend_identity = (
@@ -350,6 +351,7 @@ def run_one(
             },
             provenance={"solver_version": "unknown", "platform": platform.platform()},
             source_commit=None,
+            manifest_context=manifest_context,
         )
         return {
             "run_id": run_id,
@@ -562,6 +564,7 @@ def run_one(
             "platform": platform.platform(),
         },
         source_commit=row.get("git_commit") if row else None,
+        manifest_context=manifest_context,
     )
     return {
         "run_id": run_id,
@@ -635,6 +638,41 @@ def _build_plan(
         canonical = source_path.read_bytes()
         input_sha = hashlib.sha256(canonical).hexdigest()
         provenance_row = source_provenance.get((source_path.parent.name, source_path.stem))
+        lifecycle_source = (
+            provenance_row.get("lifecycle", provenance_row)
+            if provenance_row else {}
+        )
+        if not isinstance(lifecycle_source, dict):
+            lifecycle_source = {}
+        manifest_context = {
+            "generator_version": (
+                provenance_row.get("generator_version", "UNRESOLVED")
+                if provenance_row else "UNRESOLVED"
+            ),
+            "registry_version": (
+                provenance_row.get("registry_version", "UNRESOLVED")
+                if provenance_row else "UNRESOLVED"
+            ),
+            "prng": (
+                provenance_row.get("prng", "UNRESOLVED")
+                if provenance_row else "UNRESOLVED"
+            ),
+            "input_lifecycle": {
+                name: lifecycle_source.get(name)
+                for name in ("designed", "generated", "validated")
+            },
+            "build": {
+                "compiler": backend_manifest.get("compiler", "UNRESOLVED"),
+                "compiler_version": backend_manifest.get(
+                    "compiler_version", "UNRESOLVED"
+                ),
+                "build_type": backend_manifest.get("build_type", "UNRESOLVED"),
+                "libraries": backend_manifest.get("library_versions", {}),
+            },
+        }
+        for field in ("numeric_mode", "model_regime", "algorithm_version"):
+            if provenance_row and field in provenance_row:
+                manifest_context[field] = provenance_row[field]
         source_sha = (
             str(provenance_row["source_sha256"])
             if provenance_row and provenance_row.get("source_sha256")
@@ -773,6 +811,7 @@ def _build_plan(
                         "repeat": repeat,
                         "seed": seed,
                         "config": config,
+                        "manifest_context": manifest_context,
                         "skip_reason": skip_reason,
                     }
     plan.sort(key=lambda entry: (
@@ -1293,6 +1332,7 @@ def main(argv: list[str] | None = None) -> int:
             save_solutions=item["save_solutions"],
             save_traces=item["save_traces"],
             skip_reason=item["skip_reason"],
+            manifest_context=item["manifest_context"],
         ) for item in pending]
         for completed, future in enumerate(as_completed(futures), start=1):
             try:

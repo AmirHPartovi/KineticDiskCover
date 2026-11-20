@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/thesis_generated_instance_v1.schema.json",
+  "title": "Version 1 content-addressed Chapter 7 dataset instance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "metadata", "instance"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instance_id",
+        "family",
+        "cell_id",
+        "replicate",
+        "n",
+        "m",
+        "s",
+        "T",
+        "K",
+        "numeric_mode",
+        "seed",
+        "generator_version",
+        "prng_version",
+        "parent",
+        "source",
+        "distribution_transform",
+        "sha256"
+      ],
+      "properties": {
+        "instance_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "family": {
+          "enum": ["F1", "F2", "F3", "F4", "F5", "F6", "F7",
+                   "S1", "S2", "S3", "X", "EC", "1D"]
+        },
+        "cell_id": { "type": "string", "minLength": 1 },
+        "replicate": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "n": { "type": "integer", "minimum": 1 },
+        "m": { "type": "integer", "minimum": 1 },
+        "s": { "type": "integer", "minimum": 0 },
+        "T": { "type": "number", "exclusiveMinimum": 0 },
+        "K": { "type": "integer", "minimum": 1 },
+        "numeric_mode": { "enum": ["FLOAT64", "BINARY_2_NEG_8"] },
+        "seed": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 18446744073709551615 },
+            { "type": "null" }
+          ]
+        },
+        "generator_version": { "type": "string", "minLength": 1 },
+        "prng_version": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "parent": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "source": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "distribution_transform": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "instance": { "type": "object" }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

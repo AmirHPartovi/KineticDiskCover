@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kineticdiskcover.dev/schemas/thesis_dataset_generator_spec_v1.schema.json",
+  "title": "Version 1 Chapter 7 dataset generator specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "spec_id",
+    "source",
+    "generation_status",
+    "common",
+    "families",
+    "counts",
+    "output_policy"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "spec_id": { "const": "thesis-chapter-7-datasets-v1" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pdf", "chapter_source", "chapter"],
+      "properties": {
+        "pdf": { "type": "string", "minLength": 1 },
+        "chapter_source": { "type": "string", "minLength": 1 },
+        "chapter": { "const": 7 }
+      }
+    },
+    "generation_status": {
+      "enum": ["READY", "PARTIALLY_READY", "BLOCKED_NO_REPRODUCIBLE_FAMILY"]
+    },
+    "common": {
+      "type": "object",
+      "required": [
+        "reference_scale",
+        "trajectory_contract",
+        "random_stream_contract",
+        "numeric_modes",
+        "serialization"
+      ],
+      "properties": {
+        "reference_scale": { "type": "object" },
+        "trajectory_contract": { "type": "object" },
+        "random_stream_contract": { "type": "object" },
+        "numeric_modes": { "type": "object" },
+        "serialization": { "type": "object" }
+      }
+    },
+    "families": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "F1", "F2", "F3", "F4", "F5", "F6", "F7",
+        "S1", "S2", "S3", "X", "EC", "1D"
+      ],
+      "properties": {
+        "F1": { "$ref": "#/$defs/family" },
+        "F2": { "$ref": "#/$defs/family" },
+        "F3": { "$ref": "#/$defs/family" },
+        "F4": { "$ref": "#/$defs/family" },
+        "F5": { "$ref": "#/$defs/family" },
+        "F6": { "$ref": "#/$defs/family" },
+        "F7": { "$ref": "#/$defs/family" },
+        "S1": { "$ref": "#/$defs/family" },
+        "S2": { "$ref": "#/$defs/family" },
+        "S3": { "$ref": "#/$defs/family" },
+        "X": { "$ref": "#/$defs/family" },
+        "EC": { "$ref": "#/$defs/family" },
+        "1D": { "$ref": "#/$defs/family" }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "unconditional",
+        "conditional_1d",
+        "source_evidence",
+        "family_allocation"
+      ],
+      "properties": {
+        "unconditional": { "type": "object" },
+        "conditional_1d": { "type": "object" },
+        "source_evidence": { "type": "object" },
+        "family_allocation": { "type": "object" }
+      }
+    },
+    "output_policy": {
+      "type": "object",
+      "required": [
+        "source_canonical_path",
+        "implementation_root",
+        "implementation_path_template",
+        "digest_basis",
+        "create_only"
+      ],
+      "properties": {
+        "source_canonical_path": { "type": "string" },
+        "implementation_root": { "type": "string" },
+        "implementation_path_template": { "type": "string" },
+        "digest_basis": { "type": "string" },
+        "create_only": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "family": {
+      "type": "object",
+      "required": [
+        "source_reference",
+        "planned_memberships",
+        "planned_unique_files",
+        "generation_status",
+        "parameters",
+        "distribution",
+        "transform",
+        "unresolved_fields"
+      ],
+      "properties": {
+        "source_reference": { "type": "string", "minLength": 1 },
+        "planned_memberships": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "planned_unique_files": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "shared_memberships": { "type": "integer", "minimum": 0 },
+        "generation_status": { "enum": ["READY", "BLOCKED", "DISABLED"] },
+        "parameters": { "type": "object" },
+        "distribution": {},
+        "transform": {},
+        "unresolved_fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -24,6 +24,10 @@ SCHEMA_FILES = {
     "run_record": "run_record.schema.json",
     "run_status": "run_status.schema.json",
     "trace_event": "trace_event.schema.json",
+    "thesis_dataset_generator_spec_v1":
+        "thesis_dataset_generator_spec_v1.schema.json",
+    "thesis_generated_instance_v1":
+        "thesis_generated_instance_v1.schema.json",
     "verification": "verification.schema.json",
 }
 

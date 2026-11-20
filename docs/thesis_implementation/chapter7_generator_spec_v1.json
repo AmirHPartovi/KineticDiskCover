@@ -1,0 +1,528 @@
+{
+  "schema_version": 1,
+  "spec_id": "thesis-chapter-7-datasets-v1",
+  "source": {
+    "pdf": "MScThesisPersian/main.pdf",
+    "chapter_source": "MScThesisPersian/Chapters/07_experimental_protocol.tex",
+    "chapter": 7
+  },
+  "generation_status": "BLOCKED_NO_REPRODUCIBLE_FAMILY",
+  "common": {
+    "reference_scale": {
+      "n": 20,
+      "m": 5,
+      "s": 2,
+      "T": 1,
+      "source_reference": "Section 7.2.1, Table 7.4"
+    },
+    "trajectory_contract": {
+      "initial_point_and_station_domain": "[0,1]^2",
+      "initial_point_and_station_domain_closed": true,
+      "horizon_T": 1,
+      "motion": "continuous piecewise-linear",
+      "continuity_at_breakpoints": "The next piece starts at the continuous extension of the previous piece.",
+      "outside_domain_behavior": "Do not clip or reflect trajectories after time zero.",
+      "breakpoint_deduplication": "A repeated breakpoint is retained once.",
+      "K_definition": "K = |B| + 1, where B is the set of distinct internal breakpoints across all trajectories.",
+      "continuous_mode_typical_K": "K is generally n*s+1 when all internal breakpoints are distinct.",
+      "binary_mode_K": "Recompute after quantization and merge equal breakpoints; record the realized K.",
+      "short_initial_intervals": "Handle by the thesis FROZEN contract; do not merge by floating-point tolerance."
+    },
+    "random_stream_contract": {
+      "master_seed_symbol": "G_maj",
+      "mix64": {
+        "x1": "(x XOR (x >> 30)) * 0xBF58476D1CE4E5B9 mod 2^64",
+        "x2": "(x1 XOR (x1 >> 27)) * 0x94D049BB133111EB mod 2^64",
+        "mix": "x2 XOR (x2 >> 31)"
+      },
+      "seed_flow": {
+        "initial_state": "z_0 = mix(G_maj)",
+        "recurrence": "z_(k+1) = mix((z_k + c_k) mod 2^64)",
+        "sample_seed": "z_6",
+        "c_components_in_order": [
+          "generator subversion",
+          "numeric family code",
+          "n",
+          "m",
+          "s",
+          "replicate index rho"
+        ],
+        "D1_extra_component": "D1 additionally requires an independent source identifier component."
+      },
+      "general_draw_order": [
+        "latent family variables, such as cluster centers or shared directions",
+        "initial point positions and point perturbations",
+        "station centers",
+        "breakpoint times",
+        "velocities in point-index then segment-index order"
+      ],
+      "rejection_sampling": "Resample only the component violating its domain constraint, then continue from the same random stream. The resulting conditional distribution is part of the generator.",
+      "PRNG_name_and_version": "UNRESOLVED",
+      "uniform_integer_to_real_transform": "UNRESOLVED",
+      "normal_distribution_algorithm_and_version": "UNRESOLVED",
+      "family_numeric_codes": "UNRESOLVED",
+      "generator_subversion": "UNRESOLVED",
+      "master_seed_value_or_schedule": "UNRESOLVED",
+      "replicate_index_base": "UNRESOLVED",
+      "exact_F2_F3_F4_draw_order": "UNRESOLVED"
+    },
+    "numeric_modes": {
+      "FLOAT64": {
+        "storage": "IEEE-754 binary64",
+        "coordinate_rounding": "No additional quantization specified."
+      },
+      "BINARY_2_NEG_8": {
+        "quantum": "2^-8",
+        "rounding": "nearest, ties to even",
+        "fields_rounded": ["coordinates", "velocities", "breakpoint_times"],
+        "post_rounding_breakpoint_handling": "Merge repeated breakpoints and recalculate K."
+      },
+      "negative_zero_normalization": "UNRESOLVED"
+    },
+    "serialization": {
+      "encoding": "UTF-8",
+      "key_order": "lexicographic",
+      "line_ending": "LF",
+      "number_format": "round-trip",
+      "nonfinite_numbers": "forbidden",
+      "schema_version": "The thesis does not pin a dataset schema version; this registry uses version 1.",
+      "family_instance_id_pattern": "<family>-<cell>-r<replicate>",
+      "replicate_padding_and_case_normalization": "UNRESOLVED",
+      "source_canonical_file_path": "UNRESOLVED"
+    }
+  },
+  "families": {
+    "F1": {
+      "source_reference": "Section 7.2.1, Table 7.4; Section 7.2.4",
+      "planned_memberships": 10,
+      "planned_unique_files": 10,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10
+      },
+      "distribution": {
+        "initial_points": "Independent uniform samples in [0,1]^2.",
+        "station_centers": "Independent uniform samples in [0,1]^2.",
+        "velocity_components": "For each point and segment, Normal(0, 0.3^2).",
+        "breakpoint_time_distribution": "UNRESOLVED"
+      },
+      "transform": {
+        "trajectory": "Continuous piecewise-linear; do not clip or reflect outside [0,1]^2.",
+        "point_or_station_reordering": "None specified; stable array order is required."
+      },
+      "unresolved_fields": [
+        "PRNG name/version and uniform/normal transforms",
+        "master seed and replicate index base",
+        "family numeric code and generator subversion",
+        "breakpoint-time distribution and exact draw order",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F2": {
+      "source_reference": "Section 7.2.1, Table 7.4",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "cluster_count": 3,
+        "cluster_sizes": [7, 7, 6]
+      },
+      "distribution": {
+        "cluster_centers": "Three uniformly sampled centers.",
+        "point_positions": "Gaussian around cluster centers with sigma 0.05.",
+        "station_centers": "One station at each cluster center and two uniformly sampled stations.",
+        "motion": "Common cluster drift Normal(0, 0.2^2 I_2), plus independent point noise with sigma 0.1."
+      },
+      "transform": {
+        "domain_rejection": "The general rejection rule applies; exact component-level behavior is UNRESOLVED.",
+        "breakpoint_times": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Individual F2 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and uniform/normal transforms",
+        "master seed, family code, generator subversion, and replicate index base",
+        "exact cluster-center and point draw order",
+        "exact interpretation and per-segment draw order of drift and point noise",
+        "breakpoint-time distribution",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F3": {
+      "source_reference": "Section 7.2.1, Table 7.4 and its following F3 clarification",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "point_grid": {
+          "x": [0, "1/4", "1/2", "3/4", 1],
+          "y": [0, "1/3", "2/3", 1]
+        },
+        "station_subgrid": {
+          "x": [0, "1/2", 1],
+          "y": [0, "1/3"]
+        }
+      },
+      "distribution": {
+        "point_jitter": "Independent Normal(0, 0.01^2) coordinate jitter.",
+        "station_selection": "Use the first five locations of the six-point 2x3 subgrid in row-major order.",
+        "station_jitter": "Normal(0, 0.01^2) jitter with rejection in the unit square.",
+        "common_direction": "Theta is Uniform(0, 2*pi).",
+        "scalar_speed": "Independent Normal(0.3, 0.05^2); negative values are allowed.",
+        "shared_breakpoints": "Each pair (j, j+10) shares two breakpoints; each shared time is drawn once and assigned to both paths.",
+        "candidate_breakpoint_set": [0, "1/4", "1/2", "3/4", 1]
+      },
+      "transform": {
+        "point_jitter_domain": "Reject and resample invalid points in the unit square.",
+        "array_order": "The text specifies row-major order for the first-five subgrid locations.",
+        "breakpoint_selection_from_candidates": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Individual F3 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and uniform/normal transforms",
+        "master seed, family code, generator subversion, and replicate index base",
+        "exact point and station rejection/draw order",
+        "which candidate times are selected as the two internal breakpoints",
+        "assignment of the two groups to direction signs and complete velocity draw order",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F4": {
+      "source_reference": "Section 7.2.1, Table 7.4 and its following F4 clarification",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "group_sizes": [10, 10],
+        "origin": [0.5, 0.5],
+        "u1": ["1/sqrt(2)", "1/sqrt(2)"],
+        "negative_u2": ["-1/sqrt(2)", "1/sqrt(2)"]
+      },
+      "distribution": {
+        "point_offsets": "Lambda is Uniform(-0.35, 0.35) along two intersecting directions from the origin.",
+        "station_centers": "Uniform in [0.3,0.7]^2.",
+        "speed": "Normal(0.35, 0.05^2) along the group direction."
+      },
+      "transform": {
+        "trajectory": "Paths may leave the unit square after time zero; do not clip them.",
+        "breakpoint_times": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Individual F4 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and uniform/normal transforms",
+        "master seed, family code, generator subversion, and replicate index base",
+        "mapping of groups to direction vectors and complete point ordering",
+        "breakpoint-time distribution",
+        "exact normal speed sampling and segment interpretation",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F5": {
+      "source_reference": "Section 7.2.1, Table 7.4 and its following F5/F6 clarification",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "parent_family": "F1",
+        "velocity_multiplier": 0.1
+      },
+      "distribution": {
+        "inherited": "Exactly the positions, station centers, and breakpoints of the corresponding parent F1 record.",
+        "velocity": "F1 base velocities multiplied by 0.1."
+      },
+      "transform": {
+        "parent_identity": "The F1 parent identifier must be retained.",
+        "derived_seed": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Individual F5 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and F1 parent replay details",
+        "master seed, family code, generator subversion, and replicate index base",
+        "parent-to-child replicate identity rule",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F6": {
+      "source_reference": "Section 7.2.1, Table 7.4 and its following F5/F6 clarification",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "parent_family": "F1",
+        "velocity_multiplier": 3
+      },
+      "distribution": {
+        "inherited": "Exactly the positions, station centers, and breakpoints of the corresponding parent F1 record.",
+        "velocity": "F1 base velocities multiplied by 3."
+      },
+      "transform": {
+        "parent_identity": "The F1 parent identifier must be retained.",
+        "derived_seed": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Individual F6 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and F1 parent replay details",
+        "master seed, family code, generator subversion, and replicate index base",
+        "parent-to-child replicate identity rule",
+        "negative-zero normalization policy"
+      ]
+    },
+    "F7": {
+      "source_reference": "Section 7.2.1, Table 7.4 and its following F7 clarification",
+      "planned_memberships": null,
+      "planned_unique_files": null,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s": 2,
+        "T": 1,
+        "replicates": 10,
+        "duplicate_center_pairs": "floor(m/2)",
+        "unpaired_center_when_m_odd": true
+      },
+      "distribution": {
+        "motion": "Like F1."
+      },
+      "transform": {
+        "duplicate_centers": "Create exactly coincident center pairs; retain both station identities and array entries.",
+        "point_positions_and_breakpoints": "Like F1."
+      },
+      "unresolved_fields": [
+        "Individual F7 membership/unique-file allocation within the 70 planned F1-F7 records",
+        "PRNG name/version and F1 replay details",
+        "master seed, family code, generator subversion, and replicate index base",
+        "exact center-pair ordering and which F1 centers are duplicated",
+        "negative-zero normalization policy"
+      ]
+    },
+    "S1": {
+      "source_reference": "Section 7.2.2",
+      "planned_memberships": 50,
+      "planned_unique_files": 40,
+      "shared_memberships": 10,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n_values": [5, 10, 20, 40, 80],
+        "m": 5,
+        "s": 2,
+        "replicates_per_cell": 10,
+        "shared_cell": {"n": 20, "m": 5, "s": 2}
+      },
+      "distribution": "Use the F1 generator.",
+      "transform": {
+        "shared_cell": "Refer to the same ten F1 records at (n,m,s)=(20,5,2); do not regenerate or recount them as unique files."
+      },
+      "unresolved_fields": [
+        "All unresolved F1 PRNG, seed, breakpoint, serialization, and draw-order fields."
+      ]
+    },
+    "S2": {
+      "source_reference": "Section 7.2.2",
+      "planned_memberships": 50,
+      "planned_unique_files": 40,
+      "shared_memberships": 10,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m_values": [2, 3, 5, 10, 20],
+        "s": 2,
+        "replicates_per_cell": 10,
+        "shared_cell": {"n": 20, "m": 5, "s": 2}
+      },
+      "distribution": "Use the F1 generator.",
+      "transform": {
+        "shared_cell": "Refer to the same ten F1 records at (n,m,s)=(20,5,2); do not regenerate or recount them as unique files."
+      },
+      "unresolved_fields": [
+        "All unresolved F1 PRNG, seed, breakpoint, serialization, and draw-order fields."
+      ]
+    },
+    "S3": {
+      "source_reference": "Section 7.2.2",
+      "planned_memberships": 50,
+      "planned_unique_files": 40,
+      "shared_memberships": 10,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n": 20,
+        "m": 5,
+        "s_values": [0, 1, 2, 4, 8],
+        "replicates_per_cell": 10,
+        "shared_cell": {"n": 20, "m": 5, "s": 2}
+      },
+      "distribution": "Use the F1 generator.",
+      "transform": {
+        "shared_cell": "Refer to the same ten F1 records at (n,m,s)=(20,5,2); do not regenerate or recount them as unique files."
+      },
+      "unresolved_fields": [
+        "All unresolved F1 PRNG, seed, breakpoint, serialization, and draw-order fields."
+      ]
+    },
+    "X": {
+      "source_reference": "Section 7.2.4, planned dataset counts; Section 7.3.1",
+      "planned_memberships": 90,
+      "planned_unique_files": 90,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "n_values": [1, 2, 3, 4, 5, 6],
+        "m_values": [1, 2, 3],
+        "replicates_per_cell": 5,
+        "maximum_internal_breakpoints_per_trajectory": 2,
+        "maximum_assignments": 729
+      },
+      "distribution": "UNRESOLVED",
+      "transform": {
+        "purpose": "Small instances for brute-force/exact reference.",
+        "cell_and_replicate_id": "Use the thesis family-cell-replicate identity pattern; replicate index base is UNRESOLVED."
+      },
+      "unresolved_fields": [
+        "Distribution and geometric construction",
+        "Exact s per cell and breakpoint-time generation",
+        "PRNG, seeds, seed schedule, and replicate index base",
+        "Generator version, numeric family code, and draw order",
+        "Negative-zero normalization policy"
+      ]
+    },
+    "EC": {
+      "source_reference": "Section 7.2.4, Table 7.9",
+      "planned_memberships": 13,
+      "planned_unique_files": 13,
+      "generation_status": "BLOCKED",
+      "parameters": {
+        "replicates": "One deterministic case per identifier; no random replicate.",
+        "cases": [
+          {"id": "EC1", "construction": "n=m=1 and one segment.", "test": "Analytical cubic integral versus rational-path integration."},
+          {"id": "EC2", "construction": "m=1 and multiple points.", "test": "Upper envelope of squared distances and its roots."},
+          {"id": "EC3", "construction": "All velocities zero.", "test": "Reduction to T*f(0) and agreement with MILP/enumeration."},
+          {"id": "EC4", "construction": "Two identical trajectories.", "test": "Point-name permutation invariance and deterministic tie-break."},
+          {"id": "EC5", "construction": "Two exactly identical station centers.", "test": "Removing one duplicate preserves value; both must not be removed."},
+          {"id": "EC6", "construction": "A path lies on the bisector of two centers.", "test": "Equal-cost assignments and tie-break rule."},
+          {"id": "EC7", "construction": "A breakpoint occurs at 0 or T.", "test": "Absorb horizon-boundary breakpoints and prohibit zero-length intervals."},
+          {"id": "EC8", "construction": "An initial interval is shorter than Delta_min.", "test": "Freeze without losing its horizon contribution."},
+          {"id": "EC9", "construction": "A point passes through a center.", "test": "Zero distance; prohibit division by zero, NaN, or Inf."},
+          {"id": "EC10", "construction": "All trajectories are identical.", "test": "Agreement with one trajectory copy; no cost decrease from duplicate copies."},
+          {"id": "EC11", "construction": "Two globally optimal assignments exist.", "test": "Verify both programs; tie-break selects only the reported default."},
+          {"id": "EC12", "construction": "A quadratic vertex is near an interval boundary.", "test": "Find the extremum with interval separation/bisection."},
+          {"id": "EC13", "construction": "m>n and an extra station is duplicated.", "test": "Removing a duplicate preserves value; removing a nonduplicate is forbidden."}
+        ]
+      },
+      "distribution": "Deterministic, hand-constructed cases.",
+      "transform": {
+        "random_seed": "Not applicable.",
+        "exact_coordinates_and_per-case_n_m_s_T": "UNRESOLVED"
+      },
+      "unresolved_fields": [
+        "Exact coordinates and complete numeric parameters for all 13 cases",
+        "Any case-specific breakpoint and segment values not specified in the table",
+        "Canonical case identifiers beyond the EC1-EC13 labels if the thesis has a separate convention",
+        "Negative-zero normalization policy"
+      ]
+    },
+    "1D": {
+      "source_reference": "Section 7.2.3",
+      "planned_memberships": 15,
+      "planned_unique_files": 15,
+      "generation_status": "DISABLED",
+      "parameters": {
+        "candidate_source_instances": 3,
+        "motion_seeds_per_source": 5
+      },
+      "distribution": {
+        "static_geometry": "Take the first 25 points in original order from each candidate TSPLIB or CG:SHOP source instance.",
+        "normalization": "Translate by the minimum corner and uniformly scale by the inverse of the longest side into the unit square; preserve aspect ratios and distances.",
+        "stations": "Select five stations by farthest-point rule, breaking ties by smaller point index.",
+        "motion": "Use F1 motion with a dedicated 1D seed."
+      },
+      "transform": {
+        "source_names_and_ids": "UNRESOLVED",
+        "invalid_coordinates_or_zero_longest_side": "Document and omit the source instance.",
+        "license": "UNRESOLVED; do not generate or publish."
+      },
+      "unresolved_fields": [
+        "Exact three source files and source identifiers",
+        "Source versions, checksums, and licenses/redistribution permissions",
+        "Derivation and redistribution approval",
+        "F1 PRNG, seed, and motion-generation details"
+      ]
+    }
+  },
+  "counts": {
+    "unconditional": {
+      "planned_memberships": 323,
+      "planned_unique_files": 293,
+      "family_memberships": 70,
+      "family_unique_files": 70,
+      "scale_memberships": 150,
+      "small_exact_memberships": 90,
+      "boundary_memberships": 13,
+      "scale_unique_new_files": 120,
+      "scale_shared_memberships_with_F1": 30
+    },
+    "family_allocation": {
+      "F1": {"memberships": 10, "unique_files": 10},
+      "F2": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "F3": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "F4": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "F5": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "F6": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "F7": {"memberships": "UNRESOLVED", "unique_files": "UNRESOLVED"},
+      "total_F1_to_F7_memberships": 70,
+      "total_F1_to_F7_unique_files": 70
+    },
+    "conditional_1d": {
+      "planned_memberships": 15,
+      "planned_unique_files": 15,
+      "source_instances": 3,
+      "motion_replicates_per_source": 5,
+      "total_memberships_if_1d_enabled": 338,
+      "total_unique_files_if_1d_enabled": 308,
+      "activation": "Only after source, license, version, checksum, and derivation conditions are confirmed."
+    },
+    "source_evidence": {
+      "designed_unconditional_memberships": 323,
+      "designed_unconditional_unique_files": 293,
+      "generated_files_verified_in_thesis_package": 0,
+      "validated_files_verified_in_thesis_package": 0,
+      "files_used_in_registered_runs_verified_in_thesis_package": 0,
+      "meaning": "Designed counts are not counts of generated, validated, or executed files."
+    }
+  },
+  "output_policy": {
+    "source_canonical_path": "UNRESOLVED",
+    "implementation_root": "data/generated/thesis-ch7-v1",
+    "implementation_path_template": "sha256/{sha256_prefix}/{sha256}.json",
+    "digest_basis": "SHA-256 of UTF-8 canonical JSON for the complete record with metadata.sha256 omitted; the resulting digest is stored in metadata.sha256.",
+    "create_only": true,
+    "json_contract": "UTF-8, lexicographically sorted keys, LF final newline, round-trip numbers, and no NaN/Inf.",
+    "schema": "thesis_generated_instance_v1.schema.json"
+  }
+}

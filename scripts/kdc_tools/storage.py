@@ -281,6 +281,9 @@ def reserve_run(
     rerun_of: str | None = None,
 ) -> Path:
     """Reserve a run before execution and persist immutable request/input data."""
+    from .experiment_run_manifest import capture_local_git_state
+
+    git_state = capture_local_git_state(Path(__file__).resolve().parents[2])
     run_dir = create_run_directory(experiment_dir, run_id)
     write_json_create_only(
         run_dir,
@@ -319,6 +322,7 @@ def reserve_run(
         },
         schema_name="run_status",
     )
+    write_json_create_only(run_dir, "execution/git_snapshot.json", git_state)
     return run_dir
 
 
@@ -509,6 +513,7 @@ def finalize_run(
     backend: dict[str, Any],
     provenance: dict[str, Any],
     source_commit: str | None,
+    manifest_context: dict[str, Any] | None = None,
 ) -> Path:
     """Validate, checksum and finalize a reserved run as a create-only package."""
     if state not in {
@@ -596,9 +601,36 @@ def finalize_run(
         "artifacts": artifacts,
     }
     validate_document(record, "run_record")
+    from .experiment_run_manifest import (
+        create_run_manifest_snapshot,
+        write_run_manifest_snapshot,
+    )
+
+    git_snapshot_path = root / "execution" / "git_snapshot.json"
+    if not git_snapshot_path.is_file():
+        from .experiment_run_manifest import capture_local_git_state
+
+        git_state = capture_local_git_state(Path(__file__).resolve().parents[2])
+    else:
+        git_state = read_json(git_snapshot_path)
+    snapshot = create_run_manifest_snapshot(
+        run_root=root,
+        experiment_id=request["experiment_id"],
+        run_id=request["run_id"],
+        run_status=state,
+        request=request,
+        input_reference=input_reference,
+        result_document=result_document,
+        backend=backend,
+        provenance=provenance,
+        git_state=git_state,
+        known_artifacts=artifacts,
+        context=manifest_context,
+    )
     record_path = write_json_create_only(
         root, "run.json", record, schema_name="run_record"
     )
+    write_run_manifest_snapshot(root, snapshot)
     final_artifacts = _artifact_records(root) + [{
         "path": "run.json",
         "sha256": sha256_file(record_path),
@@ -816,6 +848,17 @@ def validate_run_directory(run_dir: str | Path, *, experiment_id: str | None = N
             raise ValueError(f"artifact checksum mismatch: {artifact['path']}")
         if path.stat().st_size != artifact["size_bytes"]:
             raise ValueError(f"artifact size mismatch: {artifact['path']}")
+    from .experiment_run_manifest import read_run_manifest_snapshots
+
+    snapshots = read_run_manifest_snapshots(root)
+    for snapshot in snapshots:
+        if (
+            snapshot["run_id"] != record["run_id"]
+            or snapshot["experiment_id"] != record["experiment_id"]
+            or snapshot["run_status"] != record["status"]
+            or snapshot["input"]["canonical_sha256"] != record["input_sha256"]
+        ):
+            raise ValueError("version 2 run manifest disagrees with the legacy run record")
     return record
 
 

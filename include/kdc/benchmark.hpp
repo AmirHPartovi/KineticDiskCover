@@ -7,6 +7,9 @@
 #include "kdc/objective.hpp"
 #include "kdc/result_status.hpp"
 #include "kdc/solver_interface.hpp"
+#include "kdc/pipeline_solver.hpp"
+#include "kdc/temporal_baselines.hpp"
+#include "kdc/temporal_thesis_solver.hpp"
 #include "kdc/types.hpp"
 #include <nlohmann/json.hpp>
 
@@ -37,6 +40,9 @@ struct BenchmarkConfig {
   bool measure_memory{true};
   bool verify_after{true};
   bool verify_each_iteration{false};
+  PipelineSolverMethod solver_method{PipelineSolverMethod::LEGACY};
+  TemporalThesisConfigV2 temporal_config;
+  TemporalBaselineConfigV1 temporal_baseline_config;
   bool parallel{false};
   int num_threads{1};
   MinMaxSolver::Config minmax_cfg;
@@ -50,6 +56,9 @@ struct BenchmarkConfig {
 };
 
 struct BenchmarkResult {
+  std::string solver_method{"legacy"};
+  nlohmann::json temporal_result_v2 = nullptr;
+  nlohmann::json temporal_baseline_result_v1 = nullptr;
   std::string instance_name;
   std::string algorithm_name{"exact-reference"};
   std::string algorithm_category{"exact"};

@@ -8,6 +8,7 @@
 #include "kdc/logging.hpp"
 #include "kdc/profiling.hpp"
 #include "kdc/static_solver_registry.hpp"
+#include "kdc/temporal_pipeline.hpp"
 #include "kdc/thread_pool.hpp"
 #include "kdc/verify.hpp"
 
@@ -15,6 +16,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -114,8 +116,52 @@ void ensure_parent_directory(const std::string& file_path) {
   }
 }
 
+bool is_temporal_method_name(const std::string& method) {
+  return method == "temporal-interval-bnb" ||
+         method == "b-grid" ||
+         method == "b-nn" ||
+         method == "b-static-hold" ||
+         method == "b-minmax";
+}
+
+bool is_bound_temporal_method_name(const std::string& method) {
+  return method == "temporal-interval-bnb" || method == "b-grid";
+}
+
 Json result_to_json(const BenchmarkResult& result) {
+  if (is_temporal_method_name(result.solver_method)) {
+    Json json{{"schema_version", 3},
+              {"solver_method", result.solver_method},
+              {"instance_name", result.instance_name},
+              {"algorithm_name", result.algorithm_name},
+              {"algorithm_category", result.algorithm_category},
+              {"n", result.n},
+              {"m", result.m},
+              {"objective", to_string(result.objective)},
+              {"repeat", result.repeat},
+              {"seed", result.seed},
+              {"wall_time_sec", result.wall_time_sec},
+              {"solve_time_sec", result.solve_time_sec},
+              {"cpu_time_sec", result.cpu_time_sec},
+              {"peak_memory_mb", result.peak_memory_mb},
+              {"global_time_limit_sec", result.global_time_limit_sec},
+              {"feasible", result.feasible},
+              {"verified", result.verified},
+              {"time_limited", result.time_limited},
+              {"failed", result.failed},
+              {"experiment_id", result.experiment_id},
+              {"configuration", result.configuration},
+              {"timestamp", result.timestamp}};
+    if (is_bound_temporal_method_name(result.solver_method)) {
+      json["temporal_result_v2"] = result.temporal_result_v2;
+    } else {
+      json["temporal_baseline_result_v1"] =
+          result.temporal_baseline_result_v1;
+    }
+    return json;
+  }
   return Json{{"schema_version", 2},
+              {"solver_method", result.solver_method},
               {"instance_name", result.instance_name},
               {"algorithm_name", result.algorithm_name},
               {"algorithm_category", result.algorithm_category},
@@ -313,6 +359,55 @@ Json result_to_json(const BenchmarkResult& result) {
 
 BenchmarkResult result_from_json(const Json& json) {
   BenchmarkResult result;
+  result.solver_method = json.value("solver_method", std::string("legacy"));
+  if (is_temporal_method_name(result.solver_method)) {
+    const bool bound_solver =
+        is_bound_temporal_method_name(result.solver_method);
+    const char* payload_key =
+        bound_solver ? "temporal_result_v2"
+                     : "temporal_baseline_result_v1";
+    const int payload_version = bound_solver ? 2 : 1;
+    if (json.value("schema_version", 0) != 3 ||
+        !json.contains(payload_key) ||
+        !json.at(payload_key).is_object() ||
+        json.at(payload_key).value("schema_version", 0) != payload_version) {
+      throw std::runtime_error(
+          "invalid temporal benchmark result schema");
+    }
+    result.instance_name = json.at("instance_name").get<std::string>();
+    result.algorithm_name = json.at("algorithm_name").get<std::string>();
+    result.algorithm_category =
+        json.value("algorithm_category", std::string("temporal"));
+    result.n = json.at("n").get<int>();
+    result.m = json.at("m").get<int>();
+    result.objective =
+        objective_from_string(json.at("objective").get<std::string>());
+    if (result.objective != ObjectiveType::MIN_SUM) {
+      throw std::runtime_error(
+          "temporal benchmark schema requires minsum objective");
+    }
+    result.repeat = json.value("repeat", 0);
+    result.seed = json.value("seed", 0U);
+    result.wall_time_sec = json.value("wall_time_sec", 0.0);
+    result.solve_time_sec = json.value("solve_time_sec", 0.0);
+    result.cpu_time_sec = json.value("cpu_time_sec", 0.0);
+    result.peak_memory_mb = json.value("peak_memory_mb", 0.0);
+    result.global_time_limit_sec =
+        json.value("global_time_limit_sec", 0.0);
+    result.feasible = json.value("feasible", false);
+    result.verified = json.value("verified", false);
+    result.time_limited = json.value("time_limited", false);
+    result.failed = json.value("failed", false);
+    result.experiment_id = json.value("experiment_id", std::string{});
+    result.configuration = json.value("configuration", Json::object());
+    if (bound_solver) {
+      result.temporal_result_v2 = json.at(payload_key);
+    } else {
+      result.temporal_baseline_result_v1 = json.at(payload_key);
+    }
+    result.timestamp = json.value("timestamp", std::string{});
+    return result;
+  }
   result.instance_name = json.at("instance_name").get<std::string>();
   result.algorithm_name =
       json.value("algorithm_name", std::string("exact-reference"));
@@ -531,6 +626,175 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
       config.num_repeats <= 0) {
     throw std::invalid_argument("benchmark received invalid instance/config");
   }
+  if (config.solver_method != PipelineSolverMethod::LEGACY &&
+      objective != ObjectiveType::MIN_SUM) {
+    throw std::invalid_argument(
+        "selected solver method requires the minsum objective");
+  }
+  if (is_temporal_solver_method(config.solver_method)) {
+    const auto wall_start = Clock::now();
+    const std::clock_t cpu_start = std::clock();
+    const double memory_before =
+        config.measure_memory ? get_peak_memory_mb() : 0.0;
+    BenchmarkResult benchmark;
+    benchmark.solver_method =
+        pipeline_solver_method_name(config.solver_method);
+    benchmark.instance_name =
+        instance.name.empty() ? std::to_string(instance.id) : instance.name;
+    benchmark.algorithm_name = benchmark.solver_method;
+    benchmark.algorithm_category =
+        is_temporal_bound_solver_method(config.solver_method)
+            ? "temporal"
+            : "temporal_baseline";
+    benchmark.repeat = config.repeat_index;
+    benchmark.n = instance.n;
+    benchmark.m = instance.m;
+    benchmark.objective = objective;
+    benchmark.seed = run_seed(config.seed, benchmark.instance_name,
+                              benchmark.solver_method, to_string(objective),
+                              benchmark.repeat);
+    benchmark.global_time_limit_sec = config.fast_time_limit_sec;
+    benchmark.verify_after = config.verify_after;
+    benchmark.verify_each_iteration = false;
+    benchmark.git_commit = KDC_GIT_COMMIT;
+    benchmark.compiler = __VERSION__;
+    benchmark.build_type = KDC_BUILD_TYPE;
+    benchmark.thread_count = config.parallel ? config.num_threads : 1;
+    benchmark.experiment_id = config.experiment_id;
+    benchmark.objective_value = std::numeric_limits<double>::quiet_NaN();
+    benchmark.upper_bound = std::numeric_limits<double>::infinity();
+    benchmark.configuration = {
+        {"solver_method", benchmark.solver_method},
+        {"resolved_solver_method", benchmark.solver_method},
+        {"objective", to_string(objective)},
+        {"profile", benchmark_profile_to_string(config.profile)},
+        {"global_time_limit_sec", config.fast_time_limit_sec}};
+
+    if (is_temporal_bound_solver_method(config.solver_method)) {
+      TemporalThesisConfigV2 temporal_config = config.temporal_config;
+      temporal_config.execution.global_time_limit_seconds =
+          config.fast_time_limit_sec;
+      temporal_config.execution.verify_snapshot = config.verify_after;
+      if (config.solver_method == PipelineSolverMethod::B_GRID) {
+        temporal_config.execution.split_selection =
+            TemporalLeafSelectionV1::LONGEST_INTERVAL;
+      }
+      IntervalEvaluatorConfigV1 evaluator_config;
+      evaluator_config.arithmetic =
+          IntervalEvaluatorArithmeticV1::FAST_DOUBLE;
+      TemporalThesisSolver temporal_solver(instance);
+      const TemporalThesisResultV2 temporal_result =
+          temporal_solver.solve_v2(evaluator_config, temporal_config);
+      benchmark.requested_backend = "not-applicable";
+      benchmark.selected_backend = "not-applicable";
+      benchmark.actual_backend = benchmark.solver_method;
+      benchmark.solver_name = "TemporalThesisSolver";
+      benchmark.temporal_result_v2 =
+          temporal_thesis_result_to_json(temporal_result);
+      benchmark.configuration.update({
+          {"oracle_time_limit_sec",
+           temporal_config.execution.oracle_time_limit_seconds},
+          {"delta_min", temporal_config.execution.delta_min},
+          {"max_leaves", temporal_config.execution.max_leaves},
+          {"max_oracle_calls",
+           temporal_config.execution.max_oracle_calls},
+          {"epsilon_abs", temporal_config.epsilon_abs},
+          {"epsilon_rel", temporal_config.epsilon_rel},
+          {"split_selection",
+           config.solver_method == PipelineSolverMethod::B_GRID
+               ? "LONGEST_INTERVAL"
+               : "PRIORITY"},
+          {"arithmetic", "FAST_DOUBLE"}});
+      const auto& final = temporal_result.final;
+      const auto& execution = temporal_result.execution;
+      benchmark.feasible =
+          final.UB_valid && std::isfinite(final.UB) &&
+          execution.global_bounds.ub_best.has_value() &&
+          execution.global_bounds.ub_best->snapshot.complete;
+      benchmark.verified = execution.verified;
+      benchmark.verification_kind = VerificationKind::NONE;
+      benchmark.verification_time_sec = final.verify_time_seconds;
+      benchmark.solve_time_sec = execution.elapsed_seconds;
+      benchmark.time_limited =
+          temporal_thesis_result_timed_out(temporal_result);
+      benchmark.failed = temporal_thesis_result_failed(temporal_result);
+    } else {
+      TemporalBaselineConfigV1 baseline_config =
+          config.temporal_baseline_config;
+      baseline_config.global_time_limit_seconds =
+          config.fast_time_limit_sec;
+      TemporalBaselineSolver baseline_solver(instance);
+      TemporalBaselineResultV1 baseline_result;
+      switch (config.solver_method) {
+        case PipelineSolverMethod::B_NN:
+          baseline_result = baseline_solver.solve_nn(baseline_config);
+          break;
+        case PipelineSolverMethod::B_STATIC_HOLD: {
+          ILPWeightedExactOracle exact_oracle(
+              &solver,
+              {baseline_config.oracle_time_limit_seconds, 0.0});
+          GreedyWeightedHeuristicOracle heuristic_oracle;
+          baseline_result = baseline_solver.solve_static_hold(
+              &exact_oracle, &heuristic_oracle, baseline_config);
+          benchmark.requested_backend = "ilp-weighted-exact";
+          benchmark.selected_backend = "ilp-weighted-exact";
+          benchmark.actual_backend = solver.name();
+          break;
+        }
+        case PipelineSolverMethod::B_MINMAX: {
+          ColumnMinimumWeightedMinMaxOracle minmax_oracle;
+          baseline_result =
+              baseline_solver.solve_minmax(minmax_oracle, baseline_config);
+          benchmark.requested_backend = minmax_oracle.name();
+          benchmark.selected_backend = minmax_oracle.name();
+          benchmark.actual_backend = minmax_oracle.name();
+          break;
+        }
+        default:
+          throw std::logic_error("unexpected temporal baseline method");
+      }
+      if (benchmark.requested_backend.empty()) {
+        benchmark.requested_backend = "not-applicable";
+        benchmark.selected_backend = "not-applicable";
+        benchmark.actual_backend = benchmark.solver_method;
+      }
+      benchmark.solver_name = benchmark.actual_backend;
+      benchmark.temporal_baseline_result_v1 =
+          temporal_baseline_result_to_json(baseline_result);
+      benchmark.configuration.update({
+          {"oracle_time_limit_sec",
+           baseline_config.oracle_time_limit_seconds},
+          {"max_oracle_calls", baseline_config.max_oracle_calls},
+          {"arithmetic", "FAST_FLOAT_ONLY"},
+          {"cost_role", baseline_result.cost_role}});
+      benchmark.feasible =
+          baseline_result.program_complete &&
+          baseline_result.program.complete &&
+          baseline_result.cost.has_value() &&
+          std::isfinite(*baseline_result.cost);
+      benchmark.verified = false;
+      benchmark.verification_kind = VerificationKind::NONE;
+      benchmark.time_limited =
+          baseline_result.status == TemporalBaselineStatusV1::TIME_LIMIT;
+      benchmark.failed =
+          baseline_result.status == TemporalBaselineStatusV1::FAILED ||
+          baseline_result.status == TemporalBaselineStatusV1::INDETERMINATE;
+      benchmark.num_ip_solves =
+          static_cast<int>(baseline_result.oracle_call_count);
+    }
+    benchmark.timeout = benchmark.time_limited;
+    benchmark.cpu_time_sec =
+        static_cast<double>(std::clock() - cpu_start) / CLOCKS_PER_SEC;
+    benchmark.wall_time_sec =
+        std::chrono::duration<double>(Clock::now() - wall_start).count();
+    benchmark.total_wall_time_sec = benchmark.wall_time_sec;
+    benchmark.peak_memory_mb =
+        config.measure_memory ? std::max(memory_before, get_peak_memory_mb())
+                              : 0.0;
+    benchmark.timestamp = timestamp_now();
+    static_cast<void>(solver);
+    return benchmark;
+  }
   const auto wall_start = Clock::now();
   const std::clock_t cpu_start = std::clock();
   const double memory_before =
@@ -567,6 +831,8 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
   SolverBudget budget(global_limit);
 
   BenchmarkResult benchmark;
+  benchmark.solver_method =
+      pipeline_solver_method_name(config.solver_method);
   KineticSolution computed_solution;
   benchmark.instance_name =
       instance.name.empty() ? std::to_string(instance.id) : instance.name;
@@ -604,6 +870,14 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
   benchmark.build_type = KDC_BUILD_TYPE;
   benchmark.experiment_id = config.experiment_id;
   benchmark.configuration = {
+      {"solver_method", pipeline_solver_method_name(config.solver_method)},
+      {"resolved_solver_method",
+       objective == ObjectiveType::MIN_SUM
+           ? (config.solver_method == PipelineSolverMethod::MINSUM_ADAPTIVE ||
+                      config.profile == BenchmarkProfile::FAST
+                  ? "minsum-adaptive"
+                  : "minsum-certified-bound")
+           : "static"},
       {"profile", benchmark_profile_to_string(config.profile)},
       {"algorithm", selected_backend},
       {"objective", to_string(objective)},
@@ -615,7 +889,9 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
       {"verify_after", benchmark.verify_after},
       {"refinement_policy",
        minsum_refinement_policy_to_string(
-           config.profile == BenchmarkProfile::FAST
+           config.solver_method ==
+                   PipelineSolverMethod::MINSUM_ADAPTIVE ||
+                   config.profile == BenchmarkProfile::FAST
                ? MinSumRefinementPolicy::HEURISTIC_ADAPTIVE
                : MinSumRefinementPolicy::CERTIFIED_BOUND)},
       {"handovers_enabled", benchmark.handovers_enabled},
@@ -623,7 +899,9 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
   benchmark.objective = objective;
   if (objective == ObjectiveType::MIN_SUM) {
     benchmark.minsum_refinement_policy =
-        config.minsum_cfg.refinement_policy;
+        config.solver_method == PipelineSolverMethod::MINSUM_ADAPTIVE
+            ? MinSumRefinementPolicy::HEURISTIC_ADAPTIVE
+            : config.minsum_cfg.refinement_policy;
   }
   if (objective == ObjectiveType::MIN_MAX) {
     auto solver_config = config.minmax_cfg;
@@ -738,7 +1016,11 @@ BenchmarkResult BenchmarkRunner::run_single(const Instance& instance,
     solver_config.verify_after = config.verify_after;
     solver_config.verify_each_iteration = config.verify_each_iteration;
     solver_config.global_time_limit_sec = global_limit;
-    if (config.profile == BenchmarkProfile::FAST) {
+    if (config.solver_method ==
+        PipelineSolverMethod::MINSUM_ADAPTIVE) {
+      solver_config.refinement_policy =
+          MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+    } else if (config.profile == BenchmarkProfile::FAST) {
       solver_config.refinement_policy =
           MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
     } else {
@@ -834,8 +1116,27 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
     throw std::runtime_error("benchmark dataset directory does not exist: " +
                              config.dataset_dir);
   }
-  const auto exact_decision = ExactReferenceSelector::resolve(
-      config.exact_reference, config.dataset_dir, config.output_dir);
+  const bool temporal_method =
+      is_temporal_solver_method(config.solver_method);
+  if ((temporal_method ||
+       config.solver_method == PipelineSolverMethod::MINSUM_ADAPTIVE) &&
+      (config.both_objectives ||
+       config.objective != ObjectiveType::MIN_SUM)) {
+    throw std::invalid_argument(
+        "selected solver method requires the minsum objective only");
+  }
+  ExactReferenceDecision exact_decision;
+  if (temporal_method) {
+    exact_decision.requested_backend = "not-applicable";
+    exact_decision.selected_backend = "not-applicable";
+    exact_decision.actual_backend =
+        pipeline_solver_method_name(config.solver_method);
+    exact_decision.selection_rule = "dedicated temporal solver dispatch";
+    exact_decision.valid = true;
+  } else {
+    exact_decision = ExactReferenceSelector::resolve(
+        config.exact_reference, config.dataset_dir, config.output_dir);
+  }
   if (!exact_decision.valid) {
     throw std::invalid_argument("benchmark exact-reference selection failed");
   }
@@ -856,7 +1157,10 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
   resolved_config.experiment_id =
       "kdc-" + timestamp_now() + "-seed" + std::to_string(config.seed);
   std::vector<std::string> algorithms;
-  if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
+  if (temporal_method) {
+    algorithms = {
+        pipeline_solver_method_name(config.solver_method)};
+  } else if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     algorithms = {exact_decision.selected_backend};
   } else if (config.profile == BenchmarkProfile::FAST) {
     algorithms = comparison_benchmark_algorithms(
@@ -865,7 +1169,7 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
     algorithms = comparison_benchmark_algorithms(
         exact_decision.selected_backend);
   }
-  if (!config.algorithm_names.empty()) {
+  if (!temporal_method && !config.algorithm_names.empty()) {
     algorithms.clear();
     const bool all_fast =
         std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
@@ -894,15 +1198,18 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
       }
     }
   }
-  if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
+  if (!temporal_method &&
+      config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     algorithms = {exact_decision.selected_backend};
   }
   const auto registered_algorithms = StaticSolverRegistry::list();
-  for (const auto& algorithm : algorithms) {
-    if (std::find(registered_algorithms.begin(), registered_algorithms.end(),
-                  algorithm) == registered_algorithms.end() ||
-        algorithm == "brute-force") {
-      throw std::invalid_argument("invalid benchmark algorithm: " + algorithm);
+  if (!temporal_method) {
+    for (const auto& algorithm : algorithms) {
+      if (std::find(registered_algorithms.begin(), registered_algorithms.end(),
+                    algorithm) == registered_algorithms.end() ||
+          algorithm == "brute-force") {
+        throw std::invalid_argument("invalid benchmark algorithm: " + algorithm);
+      }
     }
   }
   std::stable_sort(algorithms.begin(), algorithms.end(),
@@ -922,20 +1229,57 @@ void BenchmarkRunner::run_all(const BenchmarkConfig& config) {
       input >> calibration;
     }
   }
-  const Json experiment_manifest = make_experiment_manifest(
+  Json experiment_manifest = make_experiment_manifest(
       resolved_config.experiment_id, {}, config.dataset_dir,
       calibration.value("dataset_fingerprint", std::string{}), config.profile,
-      algorithms, config.exact_reference, exact_decision.actual_backend,
+      algorithms,
+      temporal_method ? "not-applicable" : config.exact_reference,
+      exact_decision.actual_backend,
       calibration, config.fast_time_limit_sec, config.exact_time_limit_sec,
       config.per_static_time_limit_sec, config.seed, config.num_repeats,
       minsum_refinement_policy_to_string(
           config.profile == BenchmarkProfile::FAST
-              ? MinSumRefinementPolicy::HEURISTIC_ADAPTIVE
+                  ? MinSumRefinementPolicy::HEURISTIC_ADAPTIVE
               : config.profile == BenchmarkProfile::EXACT_REFERENCE
                     ? MinSumRefinementPolicy::CERTIFIED_BOUND
                     : config.minsum_cfg.refinement_policy),
       config.profile == BenchmarkProfile::DEBUG || config.verify_each_iteration,
       true, true, "auto", config.parallel ? config.num_threads : 1);
+  experiment_manifest["solver_method"] =
+      pipeline_solver_method_name(config.solver_method);
+  experiment_manifest["resolved_solver_method"] =
+      temporal_method
+          ? pipeline_solver_method_name(config.solver_method)
+          : config.solver_method ==
+                    PipelineSolverMethod::MINSUM_ADAPTIVE
+                ? "minsum-adaptive"
+                : "legacy-static-pipeline";
+  if (temporal_method) {
+    if (is_temporal_bound_solver_method(config.solver_method)) {
+      experiment_manifest["temporal_solver_config"] = {
+          {"global_time_limit_sec", config.fast_time_limit_sec},
+          {"oracle_time_limit_sec",
+           config.temporal_config.execution.oracle_time_limit_seconds},
+          {"delta_min", config.temporal_config.execution.delta_min},
+          {"max_leaves", config.temporal_config.execution.max_leaves},
+          {"max_oracle_calls",
+           config.temporal_config.execution.max_oracle_calls},
+          {"epsilon_abs", config.temporal_config.epsilon_abs},
+          {"epsilon_rel", config.temporal_config.epsilon_rel},
+          {"split_selection",
+           config.solver_method == PipelineSolverMethod::B_GRID
+               ? "LONGEST_INTERVAL"
+               : "PRIORITY"}};
+    } else {
+      experiment_manifest["temporal_baseline_config"] = {
+          {"global_time_limit_sec", config.fast_time_limit_sec},
+          {"oracle_time_limit_sec",
+           config.temporal_baseline_config.oracle_time_limit_seconds},
+          {"max_oracle_calls",
+           config.temporal_baseline_config.max_oracle_calls},
+          {"arithmetic", "FAST_FLOAT_ONLY"}};
+    }
+  }
   write_experiment_manifest(manifest_path.string(), experiment_manifest);
   LOG_INFO("BenchmarkRunner: exact reference selected '{}' (actual={}, "
            "manifest={})",
@@ -1141,6 +1485,140 @@ void BenchmarkRunner::save_csv(const std::vector<BenchmarkResult>& results,
   std::ofstream output(path);
   if (!output) {
     throw std::runtime_error("cannot open benchmark CSV output: " + path);
+  }
+  const bool temporal_results =
+      !results.empty() &&
+      is_temporal_method_name(results.front().solver_method);
+  const bool bound_temporal_results =
+      temporal_results &&
+      is_bound_temporal_method_name(results.front().solver_method);
+  if (std::any_of(results.begin(), results.end(),
+                  [&results, temporal_results](const BenchmarkResult& result) {
+                    return is_temporal_method_name(result.solver_method) !=
+                               temporal_results ||
+                           (temporal_results &&
+                            result.solver_method !=
+                                results.front().solver_method);
+                  })) {
+    throw std::invalid_argument(
+        "benchmark CSV cannot mix legacy and temporal result schemas");
+  }
+  if (temporal_results) {
+    if (!bound_temporal_results) {
+      const auto method =
+          pipeline_solver_method_from_string(results.front().solver_method);
+      if (method == PipelineSolverMethod::B_NN) {
+        output << "instance_name,solver_method,status,program_complete,"
+                  "program_feasibility,cost,cost_role,cost_validity,"
+                  "assignment_switch_count,oracle_call_count,wall_time_sec\n";
+      } else if (method == PipelineSolverMethod::B_STATIC_HOLD) {
+        output << "instance_name,solver_method,status,program_complete,"
+                  "program_feasibility,cost,cost_role,cost_validity,"
+                  "static_termination,optimality_proved,objective_at_zero,"
+                  "oracle_call_count,wall_time_sec\n";
+      } else if (method == PipelineSolverMethod::B_MINMAX) {
+        output << "instance_name,solver_method,status,program_complete,"
+                  "program_feasibility,cost,cost_role,cost_validity,"
+                  "minmax_subproblem_count,optimal_subproblem_count,"
+                  "feasible_subproblem_count,oracle_call_count,wall_time_sec\n";
+      } else {
+        throw std::logic_error("unexpected temporal baseline CSV method");
+      }
+      const auto write_value = [&output](const Json& value) {
+        if (value.is_number()) {
+          output << value.get<double>();
+        }
+      };
+      for (const auto& result : results) {
+        const Json& baseline = result.temporal_baseline_result_v1;
+        output << csv_escape(result.instance_name) << ','
+               << csv_escape(result.solver_method) << ','
+               << baseline.at("status").get<std::string>() << ','
+               << baseline.at("program_complete").get<bool>() << ','
+               << baseline.at("program_feasibility").get<std::string>() << ',';
+        write_value(baseline.at("cost"));
+        output << ',' << baseline.at("cost_role").get<std::string>() << ','
+               << baseline.at("cost_validity").get<std::string>() << ',';
+        if (method == PipelineSolverMethod::B_NN) {
+          output << baseline.at("assignment_switch_count")
+                            .get<std::uint64_t>()
+                 << ','
+                 << baseline.at("oracle_call_count").get<std::uint64_t>()
+                 << ',' << result.wall_time_sec << '\n';
+        } else if (method == PipelineSolverMethod::B_STATIC_HOLD) {
+          const Json& static_solve = baseline.at("static_at_zero");
+          output << static_solve.at("termination").get<std::string>() << ','
+                 << static_solve.at("optimality_proved").get<bool>() << ',';
+          write_value(static_solve.at("objective_at_zero"));
+          output << ',' << baseline.at("oracle_call_count").get<std::uint64_t>()
+                 << ',' << result.wall_time_sec << '\n';
+        } else {
+          const Json& subproblems = baseline.at("minmax_subproblems");
+          std::uint64_t optimal = 0U;
+          std::uint64_t feasible = 0U;
+          for (const auto& subproblem : subproblems) {
+            const auto termination =
+                subproblem.at("termination").get<std::string>();
+            optimal += termination == "OPTIMAL" ? 1U : 0U;
+            feasible += termination == "FEASIBLE" ? 1U : 0U;
+          }
+          output << subproblems.size() << ',' << optimal << ',' << feasible
+                 << ',' << baseline.at("oracle_call_count")
+                                  .get<std::uint64_t>()
+                 << ',' << result.wall_time_sec << '\n';
+        }
+      }
+      if (!output) {
+        throw std::runtime_error(
+            "failed writing temporal baseline benchmark CSV: " + path);
+      }
+      return;
+    }
+    output << "instance_name,solver_method,algorithm_name,objective,n,m,"
+              "repeat,status,stop_reason,LB,LB_valid,UB,UB_valid,"
+              "absolute_gap,gamma_rep,gamma_cert,solve_time_sec,"
+              "verify_time_sec,wall_time_sec,leaf_count,oracle_call_count,"
+              "verified,verifier_status\n";
+    for (const auto& result : results) {
+      const Json& temporal = result.temporal_result_v2;
+      const Json final = temporal.at("final");
+      const Json execution = temporal.at("execution");
+      const auto write_value = [&output](const Json& value) {
+        if (value.is_number()) {
+          output << value.get<double>();
+        }
+      };
+      output << csv_escape(result.instance_name) << ','
+             << csv_escape(result.solver_method) << ','
+             << csv_escape(result.algorithm_name) << ','
+             << to_string(result.objective) << ',' << result.n << ','
+             << result.m << ',' << result.repeat << ','
+             << final.at("status").get<std::string>() << ','
+             << final.at("stop_reason").get<std::string>() << ',';
+      write_value(final.at("LB"));
+      output << ',' << final.at("LB_valid").get<bool>() << ',';
+      write_value(final.at("UB"));
+      output << ',' << final.at("UB_valid").get<bool>() << ',';
+      write_value(final.at("absolute_gap"));
+      output << ',';
+      write_value(final.at("gamma_rep"));
+      output << ',';
+      write_value(final.at("gamma_cert"));
+      output << ',';
+      write_value(final.at("solve_time_sec"));
+      output << ',';
+      write_value(final.at("verify_time_sec"));
+      output << ',' << result.wall_time_sec << ','
+             << execution.at("leaf_count").get<std::uint64_t>() << ','
+             << execution.at("oracle_call_count").get<std::uint64_t>() << ','
+             << execution.at("verified").get<bool>() << ','
+             << execution.at("verifier_status").get<std::string>() << '\n';
+    }
+    if (!output) {
+      throw std::runtime_error("failed writing temporal benchmark CSV: " +
+                               path);
+    }
+    return;
   }
   output << "instance_name,n,m,algorithm_name,algorithm_category,"
             "requested_backend,selected_backend,actual_backend,solver_name,"

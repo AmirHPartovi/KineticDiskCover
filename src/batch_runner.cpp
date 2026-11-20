@@ -15,6 +15,7 @@
 #include "kdc/solution_serializer.hpp"
 #include "kdc/static_solver_registry.hpp"
 #include "kdc/thread_pool.hpp"
+#include "kdc/temporal_pipeline.hpp"
 #include "kdc/trace.hpp"
 
 #include <nlohmann/json.hpp>
@@ -43,6 +44,18 @@ namespace kdc {
 namespace {
 using Json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
+
+bool is_temporal_method_name(const std::string& method) {
+  return method == "temporal-interval-bnb" ||
+         method == "b-grid" ||
+         method == "b-nn" ||
+         method == "b-static-hold" ||
+         method == "b-minmax";
+}
+
+bool is_bound_temporal_method_name(const std::string& method) {
+  return method == "temporal-interval-bnb" || method == "b-grid";
+}
 
 unsigned run_seed(unsigned base, const std::string& instance,
                   const std::string& algorithm, const std::string& objective,
@@ -95,7 +108,35 @@ class ScopedLogLevel {
 };
 
 Json record_json(const BatchRunRecord& record) {
+  if (is_temporal_method_name(record.solver_method)) {
+    return Json{{"schema_version", 4},
+                {"solver_method", record.solver_method},
+                {"instance_name", record.instance_name},
+                {"algorithm_name", record.algorithm_name},
+                {"algorithm_category", record.algorithm_category},
+                {"objective", record.objective},
+                {"n", record.n},
+                {"m", record.m},
+                {"repeat", record.repeat},
+                {"seed", record.seed},
+                {"wall_time_sec", record.wall_time_sec},
+                {"solve_time_sec", record.solve_time_sec},
+                {"cpu_time_sec", record.cpu_time_sec},
+                {"global_time_limit_sec", record.global_time_limit_sec},
+                {"feasible", record.feasible},
+                {"verified", record.verified},
+                {"time_limited", record.time_limited},
+                {"failed", record.failed},
+                {"error_message", record.error_message},
+                {"experiment_id", record.experiment_id},
+                {"configuration", record.configuration},
+                {"result_json_path", record.result_json_path},
+                {"temporal_result_v2", record.temporal_result_v2},
+                {"temporal_baseline_result_v1",
+                 record.temporal_baseline_result_v1}};
+  }
   return Json{{"schema_version", 3},
+              {"solver_method", record.solver_method},
               {"instance_name", record.instance_name},
               {"algorithm_name", record.algorithm_name},
               {"algorithm_category", record.algorithm_category},
@@ -515,10 +556,28 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
                                       const BatchRunConfig& config,
                                       int repeat) {
   BatchRunRecord record;
+  record.solver_method =
+      pipeline_solver_method_name(config.solver_method);
+  if (is_temporal_solver_method(config.solver_method)) {
+    if (is_temporal_bound_solver_method(config.solver_method)) {
+      record.temporal_result_v2 = temporal_thesis_failure_to_json(error);
+    } else {
+      const auto baseline =
+          config.solver_method == PipelineSolverMethod::B_NN
+              ? TemporalBaselineKindV1::B_NN
+          : config.solver_method == PipelineSolverMethod::B_STATIC_HOLD
+              ? TemporalBaselineKindV1::B_STATIC_HOLD
+              : TemporalBaselineKindV1::B_MINMAX;
+      record.temporal_baseline_result_v1 =
+          temporal_baseline_failure_to_json(baseline, error);
+    }
+  }
   record.instance_name = path.stem().string();
   record.algorithm_name = algorithm;
   record.algorithm_category =
-      algorithm == "brute-force"
+      is_temporal_solver_method(config.solver_method)
+          ? "temporal"
+          : algorithm == "brute-force"
           ? "diagnostic"
           : (algorithm == "ip-kont" || algorithm == "branch-and-bound")
                 ? (algorithm == config.selected_backend
@@ -571,10 +630,12 @@ BatchRunRecord failed_instance_record(const std::filesystem::path& path,
       sanitize_path_component(algorithm) /
       sanitize_path_component(record.objective);
   std::filesystem::create_directories(run_dir);
-  if (config.save_solutions) {
+  if (config.save_solutions &&
+      !is_temporal_solver_method(config.solver_method)) {
     record.solution_json_path = (run_dir / "solution.json").string();
   }
-  if (config.save_traces) {
+  if (config.save_traces &&
+      !is_temporal_solver_method(config.solver_method)) {
     record.trace_csv_path = (run_dir / "trace.csv").string();
     try {
       TraceWriter::write_csv({}, record.trace_csv_path);
@@ -646,6 +707,15 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   if (config.repeats <= 0) {
     throw std::invalid_argument("batch runner repeat count must be positive");
   }
+  const bool temporal_method =
+      is_temporal_solver_method(config.solver_method);
+  if ((temporal_method ||
+       config.solver_method == PipelineSolverMethod::MINSUM_ADAPTIVE) &&
+      (config.objectives.size() != 1U ||
+       config.objectives.front() != ObjectiveType::MIN_SUM)) {
+    throw std::invalid_argument(
+        "selected solver method requires only the minsum objective");
+  }
   if (config.objectives.empty()) {
     throw std::invalid_argument("batch runner requires at least one objective");
   }
@@ -702,9 +772,21 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
         "benchmark fragments must reuse an explicit experiment exact-reference "
         "decision, not calibrate independently");
   }
-  const auto exact_reference_decision =
-      ExactReferenceSelector::resolve(config.exact_reference,
-                                      config.instances_dir, config.output_dir);
+  ExactReferenceDecision exact_reference_decision;
+  if (temporal_method) {
+    exact_reference_decision.requested_backend = "not-applicable";
+    exact_reference_decision.selected_backend = "not-applicable";
+    exact_reference_decision.actual_backend =
+        pipeline_solver_method_name(config.solver_method);
+    exact_reference_decision.selection_rule =
+        "dedicated temporal solver dispatch";
+    exact_reference_decision.valid = true;
+  } else {
+    exact_reference_decision =
+        ExactReferenceSelector::resolve(config.exact_reference,
+                                        config.instances_dir,
+                                        config.output_dir);
+  }
   if (!exact_reference_decision.valid) {
     throw std::invalid_argument("exact-reference selection is invalid");
   }
@@ -730,7 +812,10 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   const bool wants_comparison =
       std::find(config.algorithm_names.begin(), config.algorithm_names.end(),
                 "all-comparison") != config.algorithm_names.end();
-  if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
+  if (temporal_method) {
+    algorithms = {
+        pipeline_solver_method_name(config.solver_method)};
+  } else if (config.profile == BenchmarkProfile::EXACT_REFERENCE) {
     algorithms = {exact_reference_decision.selected_backend};
   } else if (wants_all_registered || wants_all_legacy) {
     for (const auto& name : registered) {
@@ -764,7 +849,7 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       algorithms.begin(), algorithms.end(), [](const std::string& name) {
         return name == "ip-kont" || name == "branch-and-bound";
       }));
-  if (exact_count > 1 && !wants_all_registered) {
+  if (!temporal_method && exact_count > 1 && !wants_all_registered) {
     throw std::invalid_argument(
         "strict benchmark mode accepts exactly one exact backend; remove "
         "either ip-kont or branch-and-bound");
@@ -773,7 +858,8 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       algorithms.begin(), algorithms.end(), [](const std::string& name) {
         return name == "ip-kont" || name == "branch-and-bound";
       });
-  if (!wants_all_registered && config.strict_exact_reference &&
+  if (!temporal_method && !wants_all_registered &&
+      config.strict_exact_reference &&
       exact_position != algorithms.end() &&
       *exact_position != exact_reference_decision.selected_backend) {
     if (config.exact_reference == "ip-kont" &&
@@ -785,10 +871,12 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
           "decision; set --exact-reference to the requested backend");
     }
   }
-  if (config.strict_exact_reference && exact_position == algorithms.end()) {
+  if (!temporal_method && config.strict_exact_reference &&
+      exact_position == algorithms.end()) {
     algorithms.push_back(exact_reference_decision.selected_backend);
   }
-  if (wants_fast || wants_comparison || wants_default_selection) {
+  if (!temporal_method &&
+      (wants_fast || wants_comparison || wants_default_selection)) {
     algorithms = default_benchmark_algorithms(
         exact_reference_decision.selected_backend);
   }
@@ -801,7 +889,11 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
                      return algorithm_phase(lhs) < algorithm_phase(rhs);
                    });
   BatchRunConfig run_config = config;
-  if (run_config.profile == BenchmarkProfile::FAST) {
+  if (run_config.solver_method ==
+      PipelineSolverMethod::MINSUM_ADAPTIVE) {
+    run_config.minsum_refinement_policy =
+        MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+  } else if (run_config.profile == BenchmarkProfile::FAST) {
     run_config.minsum_refinement_policy =
         MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
     run_config.verify_after = true;
@@ -826,6 +918,13 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
   run_config.solver_version =
       run_config.native_kont ? exact_reference_decision.kont_version
                              : "not-applicable";
+  if (temporal_method) {
+    run_config.selected_backend = "not-applicable";
+    run_config.actual_backend =
+        pipeline_solver_method_name(config.solver_method);
+    run_config.native_kont = false;
+    run_config.fallback_used = false;
+  }
   if (run_config.experiment_id.empty()) {
     run_config.experiment_id = experiment_id_for(run_config);
   }
@@ -845,7 +944,8 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
       calibration.value("dataset_fingerprint", std::string{});
   Json manifest = make_experiment_manifest(
       run_config.experiment_id, {}, config.instances_dir, dataset_identity,
-      config.profile, algorithms, config.exact_reference,
+      config.profile, algorithms,
+      temporal_method ? "not-applicable" : config.exact_reference,
       exact_reference_decision.actual_backend, calibration,
       config.fast_time_limit_sec, config.exact_time_limit_sec,
       config.per_ip_time_limit_sec, config.seed, config.repeats,
@@ -853,6 +953,42 @@ void BatchRunner::run(const BatchRunConfig& config, ILPSolver* ilp) {
           run_config.minsum_refinement_policy),
       run_config.verify_each_iteration, run_config.verify_after, true, "auto",
       config.parallel ? config.num_threads : 1);
+  manifest["solver_method"] =
+      pipeline_solver_method_name(run_config.solver_method);
+  manifest["resolved_solver_method"] =
+      temporal_method
+          ? pipeline_solver_method_name(run_config.solver_method)
+          : run_config.solver_method ==
+                    PipelineSolverMethod::MINSUM_ADAPTIVE
+                ? "minsum-adaptive"
+                : "legacy-static-pipeline";
+  if (temporal_method) {
+    if (is_temporal_bound_solver_method(run_config.solver_method)) {
+      manifest["temporal_solver_config"] = {
+          {"global_time_limit_sec", run_config.fast_time_limit_sec},
+          {"oracle_time_limit_sec",
+           run_config.temporal_config.execution.oracle_time_limit_seconds},
+          {"delta_min", run_config.temporal_config.execution.delta_min},
+          {"max_leaves", run_config.temporal_config.execution.max_leaves},
+          {"max_oracle_calls",
+           run_config.temporal_config.execution.max_oracle_calls},
+          {"epsilon_abs", run_config.temporal_config.epsilon_abs},
+          {"epsilon_rel", run_config.temporal_config.epsilon_rel},
+          {"split_selection",
+           run_config.solver_method == PipelineSolverMethod::B_GRID
+               ? "LONGEST_INTERVAL"
+               : "PRIORITY"},
+          {"arithmetic", "FAST_DOUBLE"}};
+    } else {
+      manifest["temporal_baseline_config"] = {
+          {"global_time_limit_sec", run_config.fast_time_limit_sec},
+          {"oracle_time_limit_sec",
+           run_config.temporal_baseline_config.oracle_time_limit_seconds},
+          {"max_oracle_calls",
+           run_config.temporal_baseline_config.max_oracle_calls},
+          {"arithmetic", "FAST_FLOAT_ONLY"}};
+    }
+  }
   write_experiment_manifest(manifest_path.string(), manifest);
 
   struct WorkItem {
@@ -993,11 +1129,17 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
                                        const BatchRunConfig& config,
                                        int repeat) {
   BatchRunRecord record;
+  record.solver_method =
+      pipeline_solver_method_name(config.solver_method);
   record.instance_name = instance.name.empty() ? std::to_string(instance.id)
                                                 : instance.name;
   record.algorithm_name = algorithm_name;
   record.algorithm_category =
-      algorithm_name == "brute-force"
+      is_temporal_solver_method(config.solver_method)
+          ? (is_temporal_bound_solver_method(config.solver_method)
+                 ? "temporal"
+                 : "temporal_baseline")
+          : algorithm_name == "brute-force"
           ? "diagnostic"
           : (algorithm_name == "ip-kont" ||
                      algorithm_name == "branch-and-bound"
@@ -1011,6 +1153,12 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       algorithm_name == "ip-kont" ? "KONT/COPT"
       : algorithm_name == "branch-and-bound" ? "branch-and-bound"
                                              : algorithm_name;
+  if (is_temporal_solver_method(config.solver_method)) {
+    record.requested_backend = "not-applicable";
+    record.selected_backend = "not-applicable";
+    record.actual_backend =
+        pipeline_solver_method_name(config.solver_method);
+  }
   record.native_kont = algorithm_name == "ip-kont";
   record.fallback_used = false;
   record.solver_version = record.native_kont ? config.solver_version
@@ -1042,6 +1190,14 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
   record.thread_count = config.parallel ? config.num_threads : 1;
   record.experiment_id = config.experiment_id;
   record.configuration = {
+      {"solver_method", record.solver_method},
+      {"resolved_solver_method",
+       is_temporal_solver_method(config.solver_method)
+           ? pipeline_solver_method_name(config.solver_method)
+           : config.solver_method ==
+                     PipelineSolverMethod::MINSUM_ADAPTIVE
+                 ? "minsum-adaptive"
+                 : "legacy-static-pipeline"},
       {"profile", benchmark_profile_to_string(config.profile)},
       {"algorithm", algorithm_name},
       {"objective", record.objective},
@@ -1059,6 +1215,33 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
        config.minmaxsum_config.minsum_budget_fraction},
       {"handovers_enabled", record.handovers_enabled},
       {"cache_policy", "auto"}};
+  if (is_temporal_solver_method(config.solver_method)) {
+    if (is_temporal_bound_solver_method(config.solver_method)) {
+      record.configuration["temporal_solver_config"] = {
+          {"global_time_limit_sec", record.global_time_limit_sec},
+          {"oracle_time_limit_sec",
+           config.temporal_config.execution.oracle_time_limit_seconds},
+          {"delta_min", config.temporal_config.execution.delta_min},
+          {"max_leaves", config.temporal_config.execution.max_leaves},
+          {"max_oracle_calls",
+           config.temporal_config.execution.max_oracle_calls},
+          {"epsilon_abs", config.temporal_config.epsilon_abs},
+          {"epsilon_rel", config.temporal_config.epsilon_rel},
+          {"split_selection",
+           config.solver_method == PipelineSolverMethod::B_GRID
+               ? "LONGEST_INTERVAL"
+               : "PRIORITY"},
+          {"arithmetic", "FAST_DOUBLE"}};
+    } else {
+      record.configuration["temporal_baseline_config"] = {
+          {"global_time_limit_sec", record.global_time_limit_sec},
+          {"oracle_time_limit_sec",
+           config.temporal_baseline_config.oracle_time_limit_seconds},
+          {"max_oracle_calls",
+           config.temporal_baseline_config.max_oracle_calls},
+          {"arithmetic", "FAST_FLOAT_ONLY"}};
+    }
+  }
   if (diagnostic) {
     record.configuration["diagnostic_category"] = "validation_diagnostic";
     record.configuration["max_assignments"] =
@@ -1071,9 +1254,15 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       (repeat == 0 ? "" : "/repeat-" + std::to_string(repeat)));
   std::filesystem::create_directories(run_dir);
   record.solution_json_path =
-      config.save_solutions ? (run_dir / "solution.json").string() : "";
+      config.save_solutions &&
+              !is_temporal_solver_method(config.solver_method)
+          ? (run_dir / "solution.json").string()
+          : "";
   record.trace_csv_path =
-      config.save_traces ? (run_dir / "trace.csv").string() : "";
+      config.save_traces &&
+              !is_temporal_solver_method(config.solver_method)
+          ? (run_dir / "trace.csv").string()
+          : "";
   record.result_json_path = (run_dir / "result.json").string();
 
   const auto wall_start = Clock::now();
@@ -1083,6 +1272,130 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       kont_solver != nullptr ? kont_solver->thread_execution_provenance()
                              : KontExecutionProvenance{};
   try {
+    if (is_temporal_solver_method(config.solver_method)) {
+      if (is_temporal_bound_solver_method(config.solver_method)) {
+        TemporalThesisConfigV2 temporal_config = config.temporal_config;
+        temporal_config.execution.global_time_limit_seconds =
+            record.global_time_limit_sec;
+        temporal_config.execution.verify_snapshot = config.verify_after;
+        if (config.solver_method == PipelineSolverMethod::B_GRID) {
+          temporal_config.execution.split_selection =
+              TemporalLeafSelectionV1::LONGEST_INTERVAL;
+        }
+        IntervalEvaluatorConfigV1 evaluator_config;
+        evaluator_config.arithmetic =
+            IntervalEvaluatorArithmeticV1::FAST_DOUBLE;
+        TemporalThesisSolver temporal_solver(instance);
+        const auto temporal_result =
+            temporal_solver.solve_v2(evaluator_config, temporal_config);
+        record.temporal_result_v2 =
+            temporal_thesis_result_to_json(temporal_result);
+        const auto& final = temporal_result.final;
+        const auto& execution = temporal_result.execution;
+        record.feasible =
+            final.UB_valid && std::isfinite(final.UB) &&
+            execution.global_bounds.ub_best.has_value() &&
+            execution.global_bounds.ub_best->snapshot.complete;
+        record.verified = execution.verified;
+        record.verification_kind = VerificationKind::NONE;
+        record.verification_time_sec = final.verify_time_seconds;
+        record.solve_time_sec = execution.elapsed_seconds;
+        record.time_limited =
+            temporal_thesis_result_timed_out(temporal_result);
+        record.failed = temporal_thesis_result_failed(temporal_result);
+        record.actual_backend = record.solver_method;
+        record.solver_name = "TemporalThesisSolver";
+        if (record.failed) {
+          record.error_message = execution.stop_reason;
+        }
+      } else {
+        TemporalBaselineConfigV1 baseline_config =
+            config.temporal_baseline_config;
+        baseline_config.global_time_limit_seconds =
+            record.global_time_limit_sec;
+        TemporalBaselineSolver baseline_solver(instance);
+        TemporalBaselineResultV1 baseline_result;
+        switch (config.solver_method) {
+          case PipelineSolverMethod::B_NN:
+            baseline_result = baseline_solver.solve_nn(baseline_config);
+            record.actual_backend = record.solver_method;
+            break;
+          case PipelineSolverMethod::B_STATIC_HOLD: {
+            std::unique_ptr<IWeightedExactOracle> exact_oracle =
+                ilp != nullptr
+                    ? std::make_unique<ILPWeightedExactOracle>(
+                          ilp,
+                          ILPWeightedExactOracle::Config{
+                              baseline_config.oracle_time_limit_seconds, 0.0})
+                    : WeightedOracleFactory::unavailable_exact();
+            auto heuristic_oracle =
+                WeightedOracleFactory::greedy_heuristic();
+            baseline_result = baseline_solver.solve_static_hold(
+                exact_oracle.get(), heuristic_oracle.get(), baseline_config);
+            record.requested_backend = "ilp-weighted-exact";
+            record.selected_backend = "ilp-weighted-exact";
+            record.actual_backend =
+                ilp != nullptr ? ilp->name() : "unavailable";
+            break;
+          }
+          case PipelineSolverMethod::B_MINMAX: {
+            ColumnMinimumWeightedMinMaxOracle minmax_oracle;
+            baseline_result =
+                baseline_solver.solve_minmax(minmax_oracle, baseline_config);
+            record.requested_backend = minmax_oracle.name();
+            record.selected_backend = minmax_oracle.name();
+            record.actual_backend = minmax_oracle.name();
+            break;
+          }
+          default:
+            throw std::logic_error(
+                "unexpected temporal baseline method");
+        }
+        if (record.requested_backend.empty()) {
+          record.requested_backend = "not-applicable";
+          record.selected_backend = "not-applicable";
+        }
+        record.solver_name = record.actual_backend;
+        record.temporal_baseline_result_v1 =
+            temporal_baseline_result_to_json(baseline_result);
+        record.feasible =
+            baseline_result.program_complete &&
+            baseline_result.program.complete &&
+            baseline_result.cost.has_value() &&
+            std::isfinite(*baseline_result.cost);
+        record.verified = false;
+        record.time_limited =
+            baseline_result.status == TemporalBaselineStatusV1::TIME_LIMIT;
+        record.failed =
+            baseline_result.status == TemporalBaselineStatusV1::FAILED ||
+            baseline_result.status == TemporalBaselineStatusV1::INDETERMINATE;
+        record.num_ip_solves =
+            static_cast<int>(baseline_result.oracle_call_count);
+        record.solve_time_sec =
+            std::chrono::duration<double>(Clock::now() - wall_start).count();
+        if (record.failed) {
+          record.error_message = baseline_result.failure_reason;
+        }
+        record.configuration["cost_role"] = baseline_result.cost_role;
+      }
+      record.timeout = record.time_limited;
+      record.objective_value =
+          std::numeric_limits<double>::quiet_NaN();
+      record.lower_bound = std::numeric_limits<double>::quiet_NaN();
+      record.upper_bound = std::numeric_limits<double>::quiet_NaN();
+      record.gap = std::numeric_limits<double>::quiet_NaN();
+      record.peak_memory_mb = BenchmarkRunner::get_peak_memory_mb();
+      record.wall_time_sec =
+          std::chrono::duration<double>(Clock::now() - wall_start).count();
+      record.total_wall_time_sec = record.wall_time_sec;
+      record.cpu_time_sec =
+          static_cast<double>(std::clock() - cpu_start) / CLOCKS_PER_SEC;
+      record.result_json_path = (run_dir / "result.json").string();
+      write_result(record);
+      static_cast<void>(ilp);
+      return record;
+    }
+
     auto solver = StaticSolverRegistry::create(algorithm_name, ilp);
     if (!solver) {
       throw std::runtime_error("unknown algorithm: " + algorithm_name);
@@ -1146,6 +1459,11 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
       solver_config.global_time_limit_sec = global_limit;
       solver_config.gap_target = config.gap_target;
       solver_config.refinement_policy = config.minsum_refinement_policy;
+      if (config.solver_method ==
+          PipelineSolverMethod::MINSUM_ADAPTIVE) {
+        solver_config.refinement_policy =
+            MinSumRefinementPolicy::HEURISTIC_ADAPTIVE;
+      }
       solver_config.verify_after = config.verify_after;
       solver_config.verify_each_iteration = config.verify_each_iteration;
       const auto result =
@@ -1314,6 +1632,24 @@ BatchRunRecord BatchRunner::run_single(const Instance& instance,
     }
   }
 
+  if (is_temporal_solver_method(config.solver_method)) {
+    if (is_temporal_bound_solver_method(config.solver_method) &&
+        record.temporal_result_v2.is_null()) {
+      record.temporal_result_v2 =
+          temporal_thesis_failure_to_json(record.error_message);
+    } else if (!is_temporal_bound_solver_method(config.solver_method) &&
+               record.temporal_baseline_result_v1.is_null()) {
+      const auto baseline =
+          config.solver_method == PipelineSolverMethod::B_NN
+              ? TemporalBaselineKindV1::B_NN
+          : config.solver_method == PipelineSolverMethod::B_STATIC_HOLD
+              ? TemporalBaselineKindV1::B_STATIC_HOLD
+              : TemporalBaselineKindV1::B_MINMAX;
+      record.temporal_baseline_result_v1 =
+          temporal_baseline_failure_to_json(baseline, record.error_message);
+    }
+  }
+
   if (kont_solver != nullptr) {
     const KontExecutionProvenance provenance =
         kont_solver->thread_execution_provenance();
@@ -1392,6 +1728,150 @@ void BatchRunner::save_master(const std::vector<BatchRunRecord>& records,
   if (!csv_output) {
     throw std::runtime_error("cannot open batch master CSV: " + csv_path);
   }
+  const bool temporal_results =
+      !records.empty() &&
+      is_temporal_method_name(records.front().solver_method);
+  const bool bound_temporal_results =
+      temporal_results &&
+      is_bound_temporal_method_name(records.front().solver_method);
+  if (std::any_of(records.begin(), records.end(),
+                  [&records, temporal_results](const BatchRunRecord& record) {
+                    return is_temporal_method_name(record.solver_method) !=
+                               temporal_results ||
+                           (temporal_results &&
+                            record.solver_method !=
+                                records.front().solver_method);
+                  })) {
+    throw std::invalid_argument(
+        "batch CSV cannot mix legacy and temporal result schemas");
+  }
+  if (temporal_results) {
+    if (!bound_temporal_results) {
+      const auto method =
+          pipeline_solver_method_from_string(records.front().solver_method);
+      if (method == PipelineSolverMethod::B_NN) {
+        csv_output << "instance_name,solver_method,status,program_complete,"
+                      "program_feasibility,cost,cost_role,cost_validity,"
+                      "assignment_switch_count,oracle_call_count,wall_time_sec\n";
+      } else if (method == PipelineSolverMethod::B_STATIC_HOLD) {
+        csv_output << "instance_name,solver_method,status,program_complete,"
+                      "program_feasibility,cost,cost_role,cost_validity,"
+                      "static_termination,optimality_proved,objective_at_zero,"
+                      "oracle_call_count,wall_time_sec\n";
+      } else if (method == PipelineSolverMethod::B_MINMAX) {
+        csv_output << "instance_name,solver_method,status,program_complete,"
+                      "program_feasibility,cost,cost_role,cost_validity,"
+                      "minmax_subproblem_count,optimal_subproblem_count,"
+                      "feasible_subproblem_count,oracle_call_count,wall_time_sec\n";
+      } else {
+        throw std::logic_error("unexpected temporal baseline CSV method");
+      }
+      const auto write_value = [&csv_output](const Json& value) {
+        if (value.is_number()) {
+          csv_output << value.get<double>();
+        }
+      };
+      for (const auto& record : records) {
+        const Json& baseline = record.temporal_baseline_result_v1;
+        csv_output << csv_escape(record.instance_name) << ','
+                   << csv_escape(record.solver_method) << ','
+                   << baseline.value("status", std::string{}) << ','
+                   << baseline.value("program_complete", false) << ','
+                   << baseline.value("program_feasibility", std::string{})
+                   << ',';
+        write_value(baseline.value("cost", Json(nullptr)));
+        csv_output << ','
+                   << baseline.value("cost_role", std::string{}) << ','
+                   << baseline.value("cost_validity", std::string{}) << ',';
+        if (method == PipelineSolverMethod::B_NN) {
+          csv_output
+              << baseline.value("assignment_switch_count", std::uint64_t{0})
+              << ','
+              << baseline.value("oracle_call_count", std::uint64_t{0}) << ','
+              << record.wall_time_sec << '\n';
+        } else if (method == PipelineSolverMethod::B_STATIC_HOLD) {
+          const Json stat =
+              baseline.value("static_at_zero", Json::object());
+          csv_output << stat.value("termination", std::string{}) << ','
+                     << stat.value("optimality_proved", false) << ',';
+          write_value(stat.value("objective_at_zero", Json(nullptr)));
+          csv_output << ','
+                     << baseline.value("oracle_call_count", std::uint64_t{0})
+                     << ',' << record.wall_time_sec << '\n';
+        } else {
+          const Json subproblems =
+              baseline.value("minmax_subproblems", Json::array());
+          std::uint64_t optimal = 0U;
+          std::uint64_t feasible = 0U;
+          for (const auto& subproblem : subproblems) {
+            const auto termination =
+                subproblem.value("termination", std::string{});
+            optimal += termination == "OPTIMAL" ? 1U : 0U;
+            feasible += termination == "FEASIBLE" ? 1U : 0U;
+          }
+          csv_output << subproblems.size() << ',' << optimal << ','
+                     << feasible << ','
+                     << baseline.value("oracle_call_count", std::uint64_t{0})
+                     << ',' << record.wall_time_sec << '\n';
+        }
+      }
+      if (!csv_output) {
+        throw std::runtime_error(
+            "failed writing temporal baseline master CSV: " + csv_path);
+      }
+      return;
+    }
+    csv_output
+        << "instance_name,solver_method,algorithm_name,objective,n,m,repeat,"
+           "status,stop_reason,LB,LB_valid,UB,UB_valid,absolute_gap,"
+           "gamma_rep,gamma_cert,solve_time_sec,verify_time_sec,wall_time_sec,"
+           "leaf_count,oracle_call_count,verified,verifier_status\n";
+    for (const auto& record : records) {
+      const Json& temporal = record.temporal_result_v2;
+      const Json final = temporal.value("final", Json::object());
+      const Json execution = temporal.value("execution", Json::object());
+      const auto write_value = [&csv_output](const Json& value) {
+        if (value.is_number()) {
+          csv_output << value.get<double>();
+        }
+      };
+      csv_output << csv_escape(record.instance_name) << ','
+                 << csv_escape(record.solver_method) << ','
+                 << csv_escape(record.algorithm_name) << ','
+                 << csv_escape(record.objective) << ',' << record.n << ','
+                 << record.m << ',' << record.repeat << ','
+                 << csv_escape(final.value("status", std::string{})) << ','
+                 << csv_escape(final.value("stop_reason", std::string{}))
+                 << ',';
+      write_value(final.value("LB", Json(nullptr)));
+      csv_output << ','
+                 << final.value("LB_valid", false) << ',';
+      write_value(final.value("UB", Json(nullptr)));
+      csv_output << ','
+                 << final.value("UB_valid", false) << ',';
+      write_value(final.value("absolute_gap", Json(nullptr)));
+      csv_output << ',';
+      write_value(final.value("gamma_rep", Json(nullptr)));
+      csv_output << ',';
+      write_value(final.value("gamma_cert", Json(nullptr)));
+      csv_output << ',';
+      write_value(final.value("solve_time_sec", Json(nullptr)));
+      csv_output << ',';
+      write_value(final.value("verify_time_sec", Json(nullptr)));
+      csv_output << ',' << record.wall_time_sec << ','
+                 << execution.value("leaf_count", std::uint64_t{0}) << ','
+                 << execution.value("oracle_call_count", std::uint64_t{0})
+                 << ',' << record.verified << ','
+                 << csv_escape(execution.value("verifier_status",
+                                               std::string{}))
+                 << '\n';
+    }
+    if (!csv_output) {
+      throw std::runtime_error("failed writing temporal batch CSV: " +
+                               csv_path);
+    }
+    return;
+  }
   csv_output
       << "instance_name,algorithm_name,algorithm_category,requested_backend,"
          "selected_backend,actual_backend,solver_name,kont_version,native_kont,"
@@ -1442,6 +1922,67 @@ void BatchRunner::write_summary(const std::vector<BatchRunRecord>& records,
   std::ofstream output(summary_path);
   if (!output) {
     throw std::runtime_error("cannot open batch summary: " + path);
+  }
+
+  const bool temporal_results =
+      !records.empty() &&
+      is_temporal_method_name(records.front().solver_method);
+  if (temporal_results) {
+    if (!is_bound_temporal_method_name(records.front().solver_method)) {
+      output << "# Temporal Baseline Batch Run Summary\n\n"
+             << "| Instance | Baseline | Status | Program | Cost | Cost role | "
+                "Wall time (s) |\n"
+             << "|---|---|---|:---:|---:|---|---:|\n";
+      for (const auto& record : records) {
+        const Json baseline = record.temporal_baseline_result_v1;
+        const Json cost = baseline.value("cost", Json(nullptr));
+        output << '|' << record.instance_name << '|' << record.solver_method
+               << '|' << baseline.value("status", std::string("FAILED"))
+               << '|' << (baseline.value("program_complete", false) ? "yes"
+                                                                     : "no")
+               << '|';
+        if (cost.is_number()) {
+          output << cost.get<double>();
+        } else {
+          output << "n/a";
+        }
+        output << '|' << baseline.value("cost_role", std::string{}) << '|'
+               << record.wall_time_sec << "|\n";
+      }
+      if (!output) {
+        throw std::runtime_error(
+            "failed writing temporal baseline batch summary: " + path);
+      }
+      return;
+    }
+    output << "# Temporal Batch Run Summary\n\n"
+           << "| Instance | Status | Stop reason | LB | UB | Wall time (s) | "
+              "Verified |\n"
+           << "|---|---|---|---:|---:|---:|:---:|\n";
+    for (const auto& record : records) {
+      const Json temporal = record.temporal_result_v2;
+      const Json final = temporal.value("final", Json::object());
+      output << '|' << record.instance_name << '|'
+             << final.value("status", std::string("INCOMPLETE")) << '|'
+             << final.value("stop_reason", std::string("INVALID_INPUT"))
+             << '|';
+      for (const char* bound : {"LB", "UB"}) {
+        const Json value = final.value(bound, Json(nullptr));
+        if (value.is_number()) {
+          output << value.get<double>();
+        } else {
+          output << "n/a";
+        }
+        output << '|';
+      }
+      output << record.wall_time_sec << '|'
+             << (record.verified ? "yes" : "no") << "|\n";
+    }
+    if (!output) {
+      throw std::runtime_error(
+          "failed writing temporal batch summary: " + path);
+    }
+    return;
   }
 
   const std::size_t successful =

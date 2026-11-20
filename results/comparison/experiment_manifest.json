@@ -11,26 +11,27 @@
   "calibration_decision_version": 4,
   "calibration_instances": [
     "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-12361885230125.json",
-    "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-12361887237416.json"
+    "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-12361887237416.json",
+    "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-6483828136541.json"
   ],
   "calibration_objectives": [
     "minmax",
     "minsum"
   ],
   "compiler": "Apple LLVM 17.0.0 (clang-1700.6.3.2)",
-  "compiler_flags": " ",
+  "compiler_flags": " -O3 -DNDEBUG",
   "compiler_id": "Clang",
   "dataset": {
     "fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
-    "identity": "57a6f717e4bc5fdb",
+    "identity": "79f447417fe1aed5",
     "path": "/var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T"
   },
   "dataset_dir": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs",
-  "dataset_fingerprint": "57a6f717e4bc5fdb",
+  "dataset_fingerprint": "79f447417fe1aed5",
   "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
-  "experiment_id": "kdc-comparison-1791775910549297-seed42",
+  "experiment_id": "kdc-comparison-1795150846992894-seed42",
   "fallback_used": false,
-  "git_commit": "f28b4e3866a51575ea47dddb3362694d84c6de25",
+  "git_commit": "9d0bb0a415b8e3bb5a58bb1621b10db7768b9273",
   "handovers_enabled": true,
   "hardware": {
     "architecture": "aarch64",
@@ -79,6 +80,24 @@
       "n": 5,
       "objective": "minsum",
       "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+    },
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-6483828136541.json",
+      "m": 2,
+      "n": 5,
+      "objective": "minmax",
+      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+    },
+    {
+      "accepted": false,
+      "backend": "ip-kont",
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-6483828136541.json",
+      "m": 2,
+      "n": 5,
+      "objective": "minsum",
+      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
     }
   ],
   "requested_backend": "auto",
@@ -123,8 +142,8 @@
       "objective": "minmax",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 2e-05,
-      "solver_runtime_sec": 1.6917e-05,
+      "runtime_sec": 2.2e-05,
+      "solver_runtime_sec": 1.7708e-05,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -142,8 +161,8 @@
       "objective": "minsum",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.2417e-05,
-      "solver_runtime_sec": 1.025e-05,
+      "runtime_sec": 1.3125e-05,
+      "solver_runtime_sec": 9.834e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -161,8 +180,8 @@
       "objective": "minmax",
       "objective_value": 24269.880926911967,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 9e-06,
-      "solver_runtime_sec": 7e-06,
+      "runtime_sec": 2.5167e-05,
+      "solver_runtime_sec": 2.1417e-05,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 24269.880926911967
@@ -180,11 +199,49 @@
       "objective": "minsum",
       "objective_value": 24269.880926911967,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 5.875e-06,
-      "solver_runtime_sec": 4.792e-06,
+      "runtime_sec": 1.1417e-05,
+      "solver_runtime_sec": 8.25e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 24269.880926911967
+    },
+    {
+      "accepted": true,
+      "backend": "branch-and-bound",
+      "calibration_kind": "static_solver_performance",
+      "feasible": true,
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-6483828136541.json",
+      "kinetic_optimality_proven": null,
+      "lower_bound": 33926.177605393124,
+      "m": 2,
+      "n": 5,
+      "objective": "minmax",
+      "objective_value": 33926.177605393124,
+      "optimality_status": "OPTIMAL",
+      "runtime_sec": 1.5917e-05,
+      "solver_runtime_sec": 1.275e-05,
+      "static_optimality_proven": true,
+      "time_limited": false,
+      "upper_bound": 33926.177605393124
+    },
+    {
+      "accepted": true,
+      "backend": "branch-and-bound",
+      "calibration_kind": "static_solver_performance",
+      "feasible": true,
+      "instance": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs/0_kdc-kinetic-comparison-6483828136541.json",
+      "kinetic_optimality_proven": null,
+      "lower_bound": 33926.177605393124,
+      "m": 2,
+      "n": 5,
+      "objective": "minsum",
+      "objective_value": 33926.177605393124,
+      "optimality_status": "OPTIMAL",
+      "runtime_sec": 1.2541e-05,
+      "solver_runtime_sec": 9.292e-06,
+      "static_optimality_proven": true,
+      "time_limited": false,
+      "upper_bound": 33926.177605393124
     }
   ],
   "time_limits": {
@@ -192,7 +249,7 @@
     "fast_global_sec": 30.0,
     "per_static_solve_sec": 60.0
   },
-  "timestamp": "2026-10-12T03:31:50Z",
+  "timestamp": "2026-11-20T05:00:46Z",
   "tolerances": {
     "comparison_relative": 1e-06,
     "verification_absolute": 1e-06

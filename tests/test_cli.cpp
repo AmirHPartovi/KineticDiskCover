@@ -5,6 +5,7 @@
 #include "kdc/solution_serializer.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <nlohmann/json.hpp>
 
 #include <chrono>
 #include <cmath>
@@ -143,4 +144,94 @@ TEST_CASE("CLI: unknown algorithm reports available solvers") {
   REQUIRE(text.find("nn") != std::string::npos);
   std::filesystem::remove(instance_path);
   std::filesystem::remove(log_path);
+}
+
+TEST_CASE("CLI help advertises temporal solver selection") {
+  const auto log_path = temp_path("-help.txt");
+  const std::string command =
+      shell_quote(KDC_SOLVER_EXECUTABLE) + " benchmark --help >" +
+      shell_quote(log_path.string()) + " 2>&1";
+  REQUIRE(std::system(command.c_str()) == 0);
+  const std::string output = [&] {
+    std::ifstream input(log_path);
+    return std::string(std::istreambuf_iterator<char>(input),
+                       std::istreambuf_iterator<char>());
+  }();
+  REQUIRE(output.find("temporal-interval-bnb") != std::string::npos);
+  REQUIRE(output.find("b-grid") != std::string::npos);
+  REQUIRE(output.find("b-nn") != std::string::npos);
+  REQUIRE(output.find("b-static-hold") != std::string::npos);
+  REQUIRE(output.find("b-minmax") != std::string::npos);
+  REQUIRE(output.find("--oracle-time-limit") != std::string::npos);
+  std::filesystem::remove(log_path);
+}
+
+TEST_CASE("CLI parses and resolves the temporal solver method") {
+  const auto root = temp_path("-temporal-run");
+  const auto dataset = root / "dataset";
+  const auto output_dir = root / "output";
+  std::filesystem::create_directories(dataset);
+  kdc::DatasetReader::write_json(
+      kdc::test::make_dummy_instance(3, 2, 17U),
+      (dataset / "tiny.json").string());
+  const auto log_path = root / "stdout.txt";
+  const std::string command =
+      shell_quote(KDC_SOLVER_EXECUTABLE) +
+      " benchmark --dataset " + shell_quote(dataset.string()) +
+      " --output " + shell_quote(output_dir.string()) +
+      " --mode minsum --profile fast --solver-method "
+      "temporal-interval-bnb --fast-time-limit 2 "
+      "--oracle-time-limit 1 --max-leaves 2 --delta-min 0.1 >" +
+      shell_quote(log_path.string()) + " 2>&1";
+  REQUIRE(std::system(command.c_str()) == 0);
+
+  std::ifstream result_input(output_dir / "json" / "benchmark.json");
+  const auto results = nlohmann::json::parse(result_input);
+  REQUIRE(results.size() == 1U);
+  REQUIRE(results.at(0).at("solver_method") == "temporal-interval-bnb");
+  REQUIRE(results.at(0).at("temporal_result_v2").at("schema_version") == 2);
+  REQUIRE(results.at(0).at("configuration").at("global_time_limit_sec") ==
+          2.0);
+  REQUIRE(results.at(0).at("configuration").at("oracle_time_limit_sec") ==
+          1.0);
+  std::ifstream manifest_input(output_dir / "experiment_manifest.json");
+  const auto manifest = nlohmann::json::parse(manifest_input);
+  REQUIRE(manifest.at("resolved_solver_method") == "temporal-interval-bnb");
+  std::filesystem::remove_all(root);
+}
+
+TEST_CASE("CLI dispatches B-nn through the benchmark pipeline") {
+  const auto root = temp_path("-b-nn-run");
+  const auto dataset = root / "dataset";
+  const auto output_dir = root / "output";
+  std::filesystem::create_directories(dataset);
+  kdc::DatasetReader::write_json(
+      kdc::test::make_dummy_instance(3, 2, 19U),
+      (dataset / "tiny.json").string());
+  const auto log_path = root / "stdout.txt";
+  const std::string command =
+      shell_quote(KDC_SOLVER_EXECUTABLE) +
+      " benchmark --dataset " + shell_quote(dataset.string()) +
+      " --output " + shell_quote(output_dir.string()) +
+      " --mode minsum --profile fast --solver-method b-nn "
+      "--fast-time-limit 2 --oracle-time-limit 1 >" +
+      shell_quote(log_path.string()) + " 2>&1";
+  REQUIRE(std::system(command.c_str()) == 0);
+
+  std::ifstream result_input(output_dir / "json" / "benchmark.json");
+  const auto results = nlohmann::json::parse(result_input);
+  REQUIRE(results.size() == 1U);
+  REQUIRE(results.dump().find("NaN") == std::string::npos);
+  REQUIRE(results.dump().find("Infinity") == std::string::npos);
+  REQUIRE(results.at(0).at("solver_method") == "b-nn");
+  REQUIRE(results.at(0).at("temporal_baseline_result_v1")
+              .at("schema_version") == 1);
+  REQUIRE(results.at(0).at("temporal_baseline_result_v1")
+              .at("baseline") == "B-nn");
+  REQUIRE(results.at(0).at("configuration").at("resolved_solver_method") ==
+          "b-nn");
+  std::ifstream manifest_input(output_dir / "experiment_manifest.json");
+  const auto manifest = nlohmann::json::parse(manifest_input);
+  REQUIRE(manifest.at("resolved_solver_method") == "b-nn");
+  std::filesystem::remove_all(root);
 }
