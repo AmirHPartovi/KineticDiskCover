@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="kdc-tests" errors="0" failures="0" skipped="0" tests="40257" hostname="tbd" time="1.013" timestamp="2026-11-20T04:56:45Z">
+    <properties>
+      <property name="random-seed" value="448214254"/>
+    </properties>
+    <testcase classname="kdc-tests.global" name="E6 factor IDs follow the Chapter 7 w-c-r bit order" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 reduction factor toggles only the two Chapter 7 reductions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 manifests allow pairing only with identical non-factor context" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 timer enforces Chapter 7 exclusive timing identities" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 timer rejects phases outside their declared accounting periods" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="All E6 configs retain the shared final-result semantics" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 block requires all eight valid runs with identical context" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 refuses semantically unvalidated feature outputs/warm-start assignment must be revalidated" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 refuses semantically unvalidated feature outputs/cache payload and claimed certificates must be revalidated" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 refuses semantically unvalidated feature outputs/reductions require proof and original-index reconstruction" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 refuses semantically unvalidated feature outputs/valid upper bound requires original-input assignment validation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 refuses semantically unvalidated feature outputs/disabled factors cannot affect the run" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 paired timing comparison requires matching manifests and semantics" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 paired timing comparison requires matching manifests and semantics/counts alone do not contribute a timing effect" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 paired timing comparison requires matching manifests and semantics/unpaired contexts cannot produce timing deltas" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 paired timing comparison requires matching manifests and semantics/identical configurations are not an ablation pair" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="E6 paired timing comparison requires matching manifests and semantics/invalid manifests cannot be compared" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Comparison: brute force matches IP on n=6 m=3" time="0.007" status="run">
+      <system-out>
+2026-11-20 08:26:44 [INFO] checks license for KONT v7.2.4 20250314
+2026-11-20 08:26:44 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-11-20 08:26:44 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+      </system-out>
+    </testcase>
+    <testcase classname="kdc-tests.global" name="Comparison: branch and bound matches IP on n=15 m=5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Comparison: greedy record has a valid bound" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Comparison: every built-in solver verifies on n=10 m=3" time="0.035" status="run"/>
+    <testcase classname="kdc-tests.global" name="Comparison: saves JSON and CSV results" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Comparison: paired Wilcoxon sanity" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: single instance single algorithm" time="0.006" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunConfig: defaults to a 60-second IP limit" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner persists MinMaxSum objective vectors" time="0.007" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: refuses to overwrite existing batch artifacts" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: multiple algorithms and modes" time="0.012" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: parallel matches sequential" time="0.013" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: handles missing instances directory" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BatchRunner: records errors and keeps processing" time="0.005" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark runner measures and persists results/single" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark runner measures and persists results/json save/load" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark runner measures and persists results/MinSum policy is persisted" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark runner measures and persists results/MinMaxSum persists a vector without a scalar objective" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark runner measures and persists results/memory" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark CLI workflow writes JSON and CSV outputs" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: matches IP on n=10 m=5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: matches IP on n=15 m=5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: lower bound is valid" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: optional LP bound preserves optimum" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: node limit returns feasible incumbent and bound" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: time limit is respected" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: returned solution covers all points" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BranchAndBound: registry and capability metadata" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: matches IP on n=6 m=3" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: matches IP on n=8 m=4" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: assignment cap is enforced" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: time limit is enforced" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: bounds equal exact cost" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: infeasible when m=0 and n>0" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: solution covers every point" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: radius and cost are consistent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="BruteForce: name, capability, and registry" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds sorted station-point disks/size" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds sorted station-point disks/ordering" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds sorted station-point disks/coverage nonempty" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds sorted station-point disks/CSR consistency" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds sorted station-point disks/coverage at t=0.5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CandidateSet builds large candidate sets efficiently" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Instance precompute preserves candidate identity and is scoped" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Optimized coverage matches distance-based reference on random inputs" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Optimized coverage handles ties, collinearity, and zero radii" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Squared coverage preserves the distance-space tolerance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Static IP objective matches reference coverage construction" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: parses --key=value" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: parses --key value" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: accepts negative numeric literals as flag values" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: parses boolean flags" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: returns defaults for absent flags" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CliArgs: preserves positional arguments" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="CLI: solve writes a serializable JSON solution" time="0.011" status="run"/>
+    <testcase classname="kdc-tests.global" name="CLI: unknown algorithm reports available solvers" time="0.009" status="run"/>
+    <testcase classname="kdc-tests.global" name="CLI help advertises temporal solver selection" time="0.008" status="run"/>
+    <testcase classname="kdc-tests.global" name="CLI parses and resolves the temporal solver method" time="0.011" status="run"/>
+    <testcase classname="kdc-tests.global" name="CLI dispatches B-nn through the benchmark pipeline" time="0.011" status="run"/>
+    <testcase classname="kdc-tests.global" name="ComparativeRunner: runs both objectives and verifies" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="ComparativeRunner: objective ratios are bounded for Mock solver" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="ComparativeRunner: writes JSON and CSV result files" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ComparativeRunner: run_all writes comparison outputs" time="0.003" status="run">
+      <system-out>
+Instance, algorithm, minmax peak, minsum integral, peak ratio, integral ratio
+random_n15_m4_seed1, ip-kont, 26462.8, 32682.9, 0.805623, 1.23641
+random_n15_m4_seed2, ip-kont, 18958.7, 18760.5, 1, 1
+random_n15_m4_seed3, ip-kont, 36293.2, 36089.9, 1, 1
+      </system-out>
+    </testcase>
+    <testcase classname="kdc-tests.global" name="ComparativeRunner: optionally serializes both kinetic solutions" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="AUTO calibrates exact backends on identical verified objectives" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="AUTO benchmark profile schedules exactly one exact backend" time="0.009" status="run"/>
+    <testcase classname="kdc-tests.global" name="strict benchmark rejects both exact backends before calibration" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="explicit KONT request fails instead of selecting a fallback" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: improves or matches NN on n=50 m=5" time="0.032" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: cost is no lower than IP optimum" time="0.024" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: deterministic with fixed seed" time="0.013" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: feasible" time="0.023" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: runs within limit on n=500 m=25" time="0.165" status="run"/>
+    <testcase classname="kdc-tests.global" name="GA: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Global bound current marks invalid LB as zero and UB infinite" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LB and UB history remain monotone for valid certificates" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LB and UB best can come from different partitions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Certificate invalidation removes LB and UB history values" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Infinite UB has no complete incumbent snapshot" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="UB snapshot serializes and deserializes" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: all points covered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: cost is within twice IP on n=50 m=5" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: lower bound is valid" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: performance on n=500 m=25" time="0.002" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: all tie-break modes produce valid solutions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: no duplicate stations" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: deterministic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="apply_integral_handovers: no handover for one station" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="apply_integral_handovers: integral is non-increasing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="apply_integral_handovers: preserves well-formedness" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="apply_integral_handovers: is idempotent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="apply_integral_handovers: result passes verification" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Interval evaluator stationary example gives trivial LB and zero UB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Interval evaluator moving example encloses reference integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Interval evaluator rejects reconciliation LB greater than UB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Interval evaluator reports validated backend unavailable" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/json round-trip" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/simple format" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/invalid json throws" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/invalid t_breaks throws" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/random deterministic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="DatasetReader handles JSON and simple datasets/generate_random bounds" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore solves quadratic equations robustly/quadratic roots" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore solves quadratic equations robustly/no real roots" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore solves quadratic equations robustly/linear case" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore solves quadratic equations robustly/degenerate quadratic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Event time comparison uses one scale-aware policy" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticFarthestTournament matches exhaustive support winners" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Non-transitive support tolerance cannot change tournament resolution" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Precomputed event geometry preserves breakpoint semantics" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Events exactly at first, interior, and last breakpoints are retained" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Precomputed handover sets match the reference derivation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="External handover challenges match exhaustive pair roots" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Local handover evaluation is differentially equivalent to global reference" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Local handover certification covers adversarial size and event families" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Local and global handover evaluation preserve extended solution state" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="Tournament handover extensions match global reference in both directions" time="0.015" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore finds support changes and resolves ties/support change simple" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore finds support changes and resolves ties/degeneracy" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore selects assigned supports for handovers/second furthest" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore selects assigned supports for handovers/handover simple" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticCore selects assigned supports for handovers/no handover if p3 == -1" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Exhaustive reference engine exposes deterministic diagnostics" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Tangent support equality is an event candidate but no transition" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Zero-duration support search emits no event" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic comparison: MinMax records are verified" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic comparison: MinSum records can be saved" time="0.003" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic comparison: invalid objective is rejected" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic solvers accept static solver adapters" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: improves or matches NN on n=50 m=5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: cost is no lower than IP optimum" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: first-improvement mode terminates" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: best-improvement mode terminates" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: deterministic with fixed seed" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: performance on n=500 m=25" time="0.020" status="run"/>
+    <testcase classname="kdc-tests.global" name="LocalSearch: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: lower bound is valid" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: cost is no lower than IP optimum" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: cost is within twice IP optimum" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: feasible and deterministic with fixed seed" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: returned supports cover every point" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: no duplicate stations" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="LPRounding: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver produces a verified kinetic solution/small" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver produces a verified kinetic solution/peak &lt;= nn peak" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver produces a verified kinetic solution/lb valid" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver produces a verified kinetic solution/gap nonincreasing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver verifies a moving instance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax solver updates the bound at a later peak time" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax exact refinement lowers a moving point's global peak" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum objective name parses and round trips" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum envelope jointly reports and dominates both components" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum exact zero components certify the simultaneous optimum" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum retains and verifies a sole feasible component/MinMax available, MinSum unavailable" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum retains and verifies a sole feasible component/MinSum available, MinMax unavailable" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum reports failure or time limit without a component/neither component has a feasible result" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum reports failure or time limit without a component/an already expired shared budget is not bypassed" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMaxSum budget fractions are explicit and exhaustive" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum heuristic-adaptive policy skips bound sampling" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum heuristic-adaptive refinement stops after stagnation patience" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum stops when improvement is below configured tolerance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum adaptive refinement is deterministic on a fixed instance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum returns a time-limited result when budget is already expired" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum sampled refinement estimates are not certified gaps" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum exact static solver does not certify kinetic optimality" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum solver produces a verified kinetic solution/small" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum solver produces a verified kinetic solution/int &lt;= minmax int" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum solver produces a verified kinetic solution/lb valid" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum solver produces a verified kinetic solution/gap nonincreasing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum solver verifies a moving instance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum NN extension transfers ownership at receiver entry" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: solves a trivial set-cover instance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: detects a row with no covering variable" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: works as a drop-in IPStaticSolver backend" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: works in MinMaxSolver pipeline" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: works in MinSumSolver pipeline" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: objective equals c transpose x" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Mock: claims optimal only for a zero-cost feasible incumbent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Independent snapshot verifier reloads artifacts and validates constant program" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier marks a near-boundary coverage sign indeterminate" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier catches a repeated tangency root with negative coverage" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier handles equal functions and duplicate trajectories" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier splits at active-envelope equality near an endpoint" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier handles zero distance and zero velocity" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier handles simultaneous trajectory breakpoints" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks coverage at a shared boundary using lower ownership" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks station-empty radius and stored UB upper endpoint" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier refuses validated success without validated backend" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier detects independently reloaded instance hash mismatch" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Parallel benchmark: sequential and concurrent objectives agree" time="0.008" status="run"/>
+    <testcase classname="kdc-tests.global" name="Parallel benchmark: thread pool respects configured concurrency" time="0.063" status="run"/>
+    <testcase classname="kdc-tests.global" name="Parallel benchmark: CLI flags activate concurrent mode" time="0.019" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: feasible" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: lower bound is valid" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: deterministic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: reverse delete does not increase cost" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: returned supports cover all points" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: no duplicate stations" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="PrimalDual: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Optional phase profiling records requested phases" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Result status enum values round-trip" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Static lower-bound provenance is explicit for every solver" time="0.018" status="run"/>
+    <testcase classname="kdc-tests.global" name="Static statuses distinguish infeasible, timed out, and failed" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Heuristic kinetic runs do not report certified gaps or optimality" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax does not infer a certified bound from feasibility" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="A timed-out exact child solve cannot make MinMax optimal" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark result statuses serialize and load compatibly" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: registry populated" time="0.058" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: registered algorithms run or report optional backend unavailable" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: min-max pipeline works with Mock" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: min-sum pipeline works with Mock" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: serializer roundtrip" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: markdown report is written" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SanityCheck: report aggregates correctly" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: valid solution" time="0.045" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: larger l is at least as good" time="0.039" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: lower bound is valid" time="0.026" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: deterministic" time="0.072" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: IP cells cost no worse than NN cells" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shifting: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: improves or matches NN" time="0.005" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: cost is no lower than IP optimum" time="0.004" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: deterministic with fixed seed" time="0.010" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: terminates within configured outer iterations" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: Metropolis acceptance follows exp(-delta/T)" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SA: registered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/quadratic coeffs" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/peak" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/peak evaluates quadratic vertices and closed-interval endpoints" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/independent MinMax peak consistency check" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/well formed" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/cost_at outside" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/numeric vs analytic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/extend well formed" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/extend splits at trajectory breakpoints" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/handover transfers the source support to a covering station" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/already-covered support transfers before the first interval" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/handover at the exact extension start is not deferred" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/combine idempotent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/combine minmax lowers peak" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/combine minsum lowers integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/combine handles no crossing and a touching root" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/peak_time finds global maxima across multiple intervals" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/MinSum combination uses the pointwise lower envelope" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/MinSum switches to a locally better candidate despite its integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/partial_extend keeps the full MinMax candidate through the shared domain" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KineticSolution computes and evaluates quadratic costs/MinMax refinement retains a candidate with a worse integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/inactive trajectory waypoints do not split emitted intervals" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/one station and one support has no event" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/support changes exactly at a trajectory breakpoint" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/support change strictly inside a trajectory segment" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/a tangent equality does not change the support" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/irrelevant trajectory waypoints are only internal scan breaks" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/simultaneous support changes are deterministic in both directions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/multiple equal candidates choose the lowest point id" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Kinetic extension represents only relevant support events/zero-duration extension emits no degenerate interval" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/a support change at 1e-12 is retained" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/a support change at 1e-10 is not skipped by a 1e-8 probe scale" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/forward and backward limits resolve opposite sides of a crossing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/second-order terms resolve equal distances and first derivatives" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/persistent equality uses the point-id tie and creates no events" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Support states use exact directional limits without time probes/a breakpoint uses its adjacent segments for each direction" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Handover and support change can coincide in the event trace" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Exact interval emission differentially matches global-breakpoint reference" time="0.043" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: round-trip minmax solution" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: round-trip minsum solution" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: round-trip handover ownership intervals" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: rejects non-well-formed solution" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: rejects mismatched instance dimensions" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: rejects invalid JSON" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: validation catches invalid support index" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: detects summary mismatch" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolutionSerializer: writes human-readable JSON" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="SolverBudget expiration is deterministic and monotone" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="A child static solve receives no more than remaining run time" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax timeout returns its last feasible incumbent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinSum timeout returns its initial feasible incumbent" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: builtins present and sorted" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: unknown name returns nullptr" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="KontSolver reports whether a generic solve used native or fallback" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: nn via registry matches direct nn" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: ip via registry matches direct ip" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: ip-kont rejects a non-native solver instance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: MinMax ILP overload remains compatible" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: MinSum accepts heuristic and ILP solvers" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: MinMax accepts heuristic static solver" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Registry: static solver capability flags" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Nearest-neighbor stationary assignment covers valid instances/feasible" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Nearest-neighbor stationary assignment covers valid instances/cost nonneg" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Nearest-neighbor stationary assignment matches a simple line/simple" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Nearest-neighbor stationary assignment matches a simple line/all points covered" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Nearest-neighbor stationary assignment scales to larger instances/performance" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP solver adapters solve small set-cover models/KONT solves small IP" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP solver adapters solve small set-cover models/KONT lower bound valid" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP solver adapters solve small set-cover models/DummyLP runs" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP solver reports an empty-station model infeasible/KONT infeasible" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Stationary IP solution is bounded by nearest-neighbor solution/IP &lt;= NN" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Stationary IP solution is bounded by nearest-neighbor solution/IP feasible" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Stationary IP solution is bounded by nearest-neighbor solution/lower bound" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Stationary IP solution is bounded by nearest-neighbor solution/status" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="B-nn splits at the exact nearest-station switch and ties by ID" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="B-static-hold distinguishes optimal-at-zero from a candidate" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="B-minmax uses per-interval D-plus radii without a MinSum claim" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Column MinMax oracle matches exhaustive assignments" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal partition constructs one P/Q leaf and covers domain" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Structural split replaces OPEN leaf and updates P/Q" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal split rejects endpoints and non-OPEN leaves" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="FROZEN leaves remain P and leave Q" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="FATHOMED requires finite valid equal LB and UB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Static validator rejects empty invalid and inconsistent P" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Q is always a subset of P and OPEN" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Benchmark preserves the existing adaptive MinSum path" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal interval B&amp;B uses its own versioned benchmark schema" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="B-grid selects the longest-interval temporal strategy" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Chapter 7 baselines use their versioned benchmark payloads" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal batch runs without an ILP backend and reports failures" time="0.006" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal baseline batch dispatch works without a static backend" time="0.005" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 applies absolute and relative gap rules" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 defines zero-UB metrics explicitly" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 refuses unsupported assurance and sampled bounds" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 preserves failures and rejects contradictions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 validates every status and stop-reason pairing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal result V2 accepts exact-zero and rejects negative tolerances" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver returns a separate V2 final schema" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Leaf priority uses gap, depth, length, and start tie key" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="B-grid selects longest leaf and ties by start then leaf ID" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Minimum-length guard freezes instead of splitting" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Shared trajectory breakpoint is never moved" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Successful split preserves parent until transaction and updates P/Q" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Structural rollback can restore parent P/Q" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Split policy freezes on missing child UB with ORACLE_FAIL" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Missing child LB does not prevent successful split" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Split policy freezes VERIFY_FAIL on LB-UB contradiction" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver executes a small synthetic split" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver starts from the common breakpoint partition" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver returns time-limit before leaf evaluation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver enforces the per-Oracle time limit" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Temporal thesis solver enforces Oracle-call cap before evaluation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Model A evaluation composes distance bounds, valid zero LB, and integral UB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="A D-plus heuristic remains UB-only and invalid inherited assignment is rejected" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LP dual candidate is below exhaustive reference optimum" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Partition validation catches an omitted leaf before aggregation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Serialized complete snapshot reloads and passes independent numerical verification" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Independent verifier rejects an upper bound rounded below program cost" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: executes a single task" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: executes many tasks" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: wait_idle waits for all submitted work" time="0.060" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: propagates task exceptions through futures" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: shutdown drains queued tasks" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ThreadPool: zero threads selects at least one worker" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="TraceWriter: CSV round-trip preserves values" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="TraceWriter reads the legacy seven-column format" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="TraceWriter: rejects malformed CSV" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax: trace rows and CSV are populated when enabled" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="MinMax: trace objective is at least its lower bound" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Point operations follow two-dimensional vector arithmetic/Point arithmetic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Trajectory interpolates positions on its time breaks/Trajectory position at t=0 and t=1" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Trajectory interpolates positions on its time breaks/Trajectory position at t=0.5" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Trajectory selects the interval containing a time/Trajectory segment_index" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Dummy instance generation scales to repeated medium instances" time="0.008" status="run"/>
+    <testcase classname="kdc-tests.global" name="Test utilities construct linear instances and compare solutions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks kinetic solutions/valid" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks kinetic solutions/invalid coverage" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks kinetic solutions/invalid integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Verifier checks kinetic solutions/empty solution" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="continuous verification detects violations between samples" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="continuous verification splits at trajectory breakpoints" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry extracts D(t) at stationary and moving times" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry interval bounds contain D(t) samples" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry handles vertex inside and outside" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry handles zero velocity and coefficient extraction" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry merges simultaneous breakpoint partition" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry handles breakpoint endpoints and one segment" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry preserves duplicate centers and station ids" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightedGeometry rejects inconsistent and discontinuous input" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Phi Lipschitz cone handles K-zero, u-zero and Delta-zero" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Phi Lipschitz cone branch boundary agrees" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Phi Lipschitz cone matches direct symmetric integral" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Lipschitz R and velocity enclosures are finite" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Lipschitz stationary velocity gives Lambda zero" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Lipschitz interval rejects breakpoint crossing" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Lipschitz local bound rejects heuristic midpoint sources" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted preprocessing flags are opt-in and retain matrix scope" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted preprocessing rejects invalid matrix-scope metadata" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted reductions preserve optimum on exhaustive small matrices" time="0.001" status="run"/>
+    <testcase classname="kdc-tests.global" name="Dominance mappings preserve station and point identity/station dominance maps removed choices to retained rows" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Dominance mappings preserve station and point identity/point dominance maps dominated points to a kept representative" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Radius caps and objective cut are exact matrix-level facts/radius caps include empty stations and empty point sets" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Radius caps and objective cut are exact matrix-level facts/objective cut is the maximum of column minima" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Validated assignment warm start rebuilds target radii and is not an LB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted solve cache keys every solve-affecting input" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Cached bounds retain validity and require certificate revalidation" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Cache rejects inconsistent assignment evidence and ambiguous keys" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Exact Oracle adapter separates reported and certified bounds" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Exact Oracle adapter recomputes primal cost from assignment" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Exact Oracle adapter rejects invalid assignments" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Heuristic Oracle result has only incumbent and recomputed cost" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Relaxation Oracle rejects an unverified or absent certificate" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Relaxation Oracle accepts only a finite independently validated LB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Unavailable Oracle factory respects cancellable budgets" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP Exact Weighted Oracle matches brute force on small matrices" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP Exact Weighted Oracle handles all-zero and empty dimensions" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="ILP Exact Weighted Oracle distinguishes termination cases" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Greedy Weighted Heuristic is feasible and UB-only" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted LP dual validation accepts a feasible dual certificate" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted LP dual validation rejects unfeasible and degenerate duals" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="LP Relaxation runs diagnostically without an official LB" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective matches m=1,n=1 formula" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective handles empty dimensions explicitly/empty m and n" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective handles empty dimensions explicitly/empty points with empty stations" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective handles empty dimensions explicitly/empty points with positive stations" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective handles empty dimensions explicitly/points but no stations" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Weighted objective handles zero weights and repeated rows" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Tie-breaking is separate from the objective value" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Multiple equal-cost optima are deterministic" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="WeightMatrix validates boundary dimensions and data" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Assignment validation and objective formula use ordered indexes" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Brute-force reference matches direct objective minima" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Upper envelope handles identical and constant polynomials" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Upper envelope handles root at interval boundary" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Upper envelope handles repeated and three-function equality" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Upper envelope handles empty station and affine/constant cases" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Upper envelope D-plus fallback remains available" time="0.000" status="run"/>
+    <testcase classname="kdc-tests.global" name="Validated upper envelope is unavailable" time="0.000" status="run"/>
+    <system-out>
+2026-11-20 08:26:44 [INFO] checks license for KONT v7.2.4 20250314
+2026-11-20 08:26:44 [INFO] uses license in specified folder: /Applications/kont72/bin
+2026-11-20 08:26:44 [ERROR] Invalid MAC address of license: 76:74:D1:0F:5A:19
+
+Instance, algorithm, minmax peak, minsum integral, peak ratio, integral ratio
+random_n15_m4_seed1, ip-kont, 26462.8, 32682.9, 0.805623, 1.23641
+random_n15_m4_seed2, ip-kont, 18958.7, 18760.5, 1, 1
+random_n15_m4_seed3, ip-kont, 36293.2, 36089.9, 1, 1
+    </system-out>
+    <system-err/>
+  </testsuite>
+</testsuites>

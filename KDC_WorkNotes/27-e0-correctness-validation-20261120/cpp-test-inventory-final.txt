@@ -1,0 +1,366 @@
+All available test cases:
+  E6 factor IDs follow the Chapter 7 w-c-r bit order
+  E6 reduction factor toggles only the two Chapter 7 reductions
+  E6 manifests allow pairing only with identical non-factor context
+  E6 timer enforces Chapter 7 exclusive timing identities
+  E6 timer rejects phases outside their declared accounting periods
+  All E6 configs retain the shared final-result semantics
+  E6 block requires all eight valid runs with identical context
+  E6 refuses semantically unvalidated feature outputs
+  E6 paired timing comparison requires matching manifests and semantics
+  Comparison: brute force matches IP on n=6 m=3
+  Comparison: branch and bound matches IP on n=15 m=5
+  Comparison: greedy record has a valid bound
+  Comparison: every built-in solver verifies on n=10 m=3
+  Comparison: saves JSON and CSV results
+  Comparison: paired Wilcoxon sanity
+  BatchRunner: single instance single algorithm
+  BatchRunConfig: defaults to a 60-second IP limit
+  BatchRunner persists MinMaxSum objective vectors
+  BatchRunner: refuses to overwrite existing batch artifacts
+  BatchRunner: multiple algorithms and modes
+  BatchRunner: parallel matches sequential
+  BatchRunner: handles missing instances directory
+  BatchRunner: records errors and keeps processing
+  Benchmark runner measures and persists results
+  Benchmark CLI workflow writes JSON and CSV outputs
+  BranchAndBound: matches IP on n=10 m=5
+  BranchAndBound: matches IP on n=15 m=5
+  BranchAndBound: lower bound is valid
+  BranchAndBound: optional LP bound preserves optimum
+  BranchAndBound: node limit returns feasible incumbent and bound
+  BranchAndBound: time limit is respected
+  BranchAndBound: returned solution covers all points
+  BranchAndBound: registry and capability metadata
+  BruteForce: matches IP on n=6 m=3
+  BruteForce: matches IP on n=8 m=4
+  BruteForce: assignment cap is enforced
+  BruteForce: time limit is enforced
+  BruteForce: bounds equal exact cost
+  BruteForce: infeasible when m=0 and n>0
+  BruteForce: solution covers every point
+  BruteForce: radius and cost are consistent
+  BruteForce: name, capability, and registry
+  CandidateSet builds sorted station-point disks
+  CandidateSet builds large candidate sets efficiently
+  Instance precompute preserves candidate identity and is scoped
+  Optimized coverage matches distance-based reference on random inputs
+  Optimized coverage handles ties, collinearity, and zero radii
+  Squared coverage preserves the distance-space tolerance
+  Static IP objective matches reference coverage construction
+  CliArgs: parses --key=value
+  CliArgs: parses --key value
+  CliArgs: accepts negative numeric literals as flag values
+  CliArgs: parses boolean flags
+  CliArgs: returns defaults for absent flags
+  CliArgs: preserves positional arguments
+  CLI: solve writes a serializable JSON solution
+  CLI: unknown algorithm reports available solvers
+  CLI help advertises temporal solver selection
+  CLI parses and resolves the temporal solver method
+  CLI dispatches B-nn through the benchmark pipeline
+  ComparativeRunner: runs both objectives and verifies
+  ComparativeRunner: objective ratios are bounded for Mock solver
+  ComparativeRunner: writes JSON and CSV result files
+  ComparativeRunner: run_all writes comparison outputs
+  ComparativeRunner: optionally serializes both kinetic solutions
+  AUTO calibrates exact backends on identical verified objectives
+  AUTO benchmark profile schedules exactly one exact backend
+  strict benchmark rejects both exact backends before calibration
+  explicit KONT request fails instead of selecting a fallback
+  GA: improves or matches NN on n=50 m=5
+  GA: cost is no lower than IP optimum
+  GA: deterministic with fixed seed
+  GA: feasible
+  GA: runs within limit on n=500 m=25
+  GA: registered
+  Global bound current marks invalid LB as zero and UB infinite
+  LB and UB history remain monotone for valid certificates
+  LB and UB best can come from different partitions
+  Certificate invalidation removes LB and UB history values
+  Infinite UB has no complete incumbent snapshot
+  UB snapshot serializes and deserializes
+  Greedy: all points covered
+  Greedy: cost is within twice IP on n=50 m=5
+  Greedy: lower bound is valid
+  Greedy: performance on n=500 m=25
+  Greedy: all tie-break modes produce valid solutions
+  Greedy: no duplicate stations
+  Greedy: deterministic
+  Greedy: registered
+  apply_integral_handovers: no handover for one station
+  apply_integral_handovers: integral is non-increasing
+  apply_integral_handovers: preserves well-formedness
+  apply_integral_handovers: is idempotent
+  apply_integral_handovers: result passes verification
+  Interval evaluator stationary example gives trivial LB and zero UB
+  Interval evaluator moving example encloses reference integral
+  Interval evaluator rejects reconciliation LB greater than UB
+  Interval evaluator reports validated backend unavailable
+  DatasetReader handles JSON and simple datasets
+  KineticCore solves quadratic equations robustly
+  Event time comparison uses one scale-aware policy
+  KineticFarthestTournament matches exhaustive support winners
+  Non-transitive support tolerance cannot change tournament resolution
+  Precomputed event geometry preserves breakpoint semantics
+  Events exactly at first, interior, and last breakpoints are retained
+  Precomputed handover sets match the reference derivation
+  External handover challenges match exhaustive pair roots
+  Local handover evaluation is differentially equivalent to global reference
+  Local handover certification covers adversarial size and event families
+  Local and global handover evaluation preserve extended solution state
+  Tournament handover extensions match global reference in both directions
+  KineticCore finds support changes and resolves ties
+  KineticCore selects assigned supports for handovers
+  Exhaustive reference engine exposes deterministic diagnostics
+  Tangent support equality is an event candidate but no transition
+  Zero-duration support search emits no event
+  Kinetic comparison: MinMax records are verified
+  Kinetic comparison: MinSum records can be saved
+  Kinetic comparison: invalid objective is rejected
+  Kinetic solvers accept static solver adapters
+  LocalSearch: improves or matches NN on n=50 m=5
+  LocalSearch: cost is no lower than IP optimum
+  LocalSearch: first-improvement mode terminates
+  LocalSearch: best-improvement mode terminates
+  LocalSearch: deterministic with fixed seed
+  LocalSearch: performance on n=500 m=25
+  LocalSearch: registered
+  LPRounding: lower bound is valid
+  LPRounding: cost is no lower than IP optimum
+  LPRounding: cost is within twice IP optimum
+  LPRounding: feasible and deterministic with fixed seed
+  LPRounding: returned supports cover every point
+  LPRounding: no duplicate stations
+  LPRounding: registered
+  MinMax solver produces a verified kinetic solution
+  MinMax solver verifies a moving instance
+  MinMax solver updates the bound at a later peak time
+  MinMax exact refinement lowers a moving point's global peak
+  MinMaxSum objective name parses and round trips
+  MinMaxSum envelope jointly reports and dominates both components
+  MinMaxSum exact zero components certify the simultaneous optimum
+  MinMaxSum retains and verifies a sole feasible component
+  MinMaxSum reports failure or time limit without a component
+  MinMaxSum budget fractions are explicit and exhaustive
+  MinSum heuristic-adaptive policy skips bound sampling
+  MinSum heuristic-adaptive refinement stops after stagnation patience
+  MinSum stops when improvement is below configured tolerance
+  MinSum adaptive refinement is deterministic on a fixed instance
+  MinSum returns a time-limited result when budget is already expired
+  MinSum sampled refinement estimates are not certified gaps
+  MinSum exact static solver does not certify kinetic optimality
+  MinSum solver produces a verified kinetic solution
+  MinSum solver verifies a moving instance
+  MinSum NN extension transfers ownership at receiver entry
+  Mock: solves a trivial set-cover instance
+  Mock: detects a row with no covering variable
+  Mock: works as a drop-in IPStaticSolver backend
+  Mock: works in MinMaxSolver pipeline
+  Mock: works in MinSumSolver pipeline
+  Mock: objective equals c transpose x
+  Mock: claims optimal only for a zero-cost feasible incumbent
+  Independent snapshot verifier reloads artifacts and validates constant
+  program
+  Verifier marks a near-boundary coverage sign indeterminate
+  Verifier catches a repeated tangency root with negative coverage
+  Verifier handles equal functions and duplicate trajectories
+  Verifier splits at active-envelope equality near an endpoint
+  Verifier handles zero distance and zero velocity
+  Verifier handles simultaneous trajectory breakpoints
+  Verifier checks coverage at a shared boundary using lower ownership
+  Verifier checks station-empty radius and stored UB upper endpoint
+  Verifier refuses validated success without validated backend
+  Verifier detects independently reloaded instance hash mismatch
+  Parallel benchmark: sequential and concurrent objectives agree
+  Parallel benchmark: thread pool respects configured concurrency
+  Parallel benchmark: CLI flags activate concurrent mode
+  PrimalDual: feasible
+  PrimalDual: lower bound is valid
+  PrimalDual: deterministic
+  PrimalDual: reverse delete does not increase cost
+  PrimalDual: returned supports cover all points
+  PrimalDual: no duplicate stations
+  PrimalDual: registered
+  Optional phase profiling records requested phases
+  Result status enum values round-trip
+  Static lower-bound provenance is explicit for every solver
+  Static statuses distinguish infeasible, timed out, and failed
+  Heuristic kinetic runs do not report certified gaps or optimality
+  MinMax does not infer a certified bound from feasibility
+  A timed-out exact child solve cannot make MinMax optimal
+  Benchmark result statuses serialize and load compatibly
+  SanityCheck: registry populated
+  SanityCheck: registered algorithms run or report optional backend unavailable
+  SanityCheck: min-max pipeline works with Mock
+  SanityCheck: min-sum pipeline works with Mock
+  SanityCheck: serializer roundtrip
+  SanityCheck: markdown report is written
+  SanityCheck: report aggregates correctly
+  Shifting: valid solution
+  Shifting: larger l is at least as good
+  Shifting: lower bound is valid
+  Shifting: deterministic
+  Shifting: IP cells cost no worse than NN cells
+  Shifting: registered
+  SA: improves or matches NN
+  SA: cost is no lower than IP optimum
+  SA: deterministic with fixed seed
+  SA: terminates within configured outer iterations
+  SA: Metropolis acceptance follows exp(-delta/T)
+  SA: registered
+  KineticSolution computes and evaluates quadratic costs
+  Kinetic extension represents only relevant support events
+  Support states use exact directional limits without time probes
+  Handover and support change can coincide in the event trace
+  Exact interval emission differentially matches global-breakpoint reference
+  SolutionSerializer: round-trip minmax solution
+  SolutionSerializer: round-trip minsum solution
+  SolutionSerializer: round-trip handover ownership intervals
+  SolutionSerializer: rejects non-well-formed solution
+  SolutionSerializer: rejects mismatched instance dimensions
+  SolutionSerializer: rejects invalid JSON
+  SolutionSerializer: validation catches invalid support index
+  SolutionSerializer: detects summary mismatch
+  SolutionSerializer: writes human-readable JSON
+  SolverBudget expiration is deterministic and monotone
+  A child static solve receives no more than remaining run time
+  MinMax timeout returns its last feasible incumbent
+  MinSum timeout returns its initial feasible incumbent
+  Registry: builtins present and sorted
+  Registry: unknown name returns nullptr
+  KontSolver reports whether a generic solve used native or fallback
+  Registry: nn via registry matches direct nn
+  Registry: ip via registry matches direct ip
+  Registry: ip-kont rejects a non-native solver instance
+  Registry: MinMax ILP overload remains compatible
+  Registry: MinSum accepts heuristic and ILP solvers
+  Registry: MinMax accepts heuristic static solver
+  Registry: static solver capability flags
+  Nearest-neighbor stationary assignment covers valid instances
+  Nearest-neighbor stationary assignment matches a simple line
+  Nearest-neighbor stationary assignment scales to larger instances
+  ILP solver adapters solve small set-cover models
+  ILP solver reports an empty-station model infeasible
+  Stationary IP solution is bounded by nearest-neighbor solution
+  B-nn splits at the exact nearest-station switch and ties by ID
+  B-static-hold distinguishes optimal-at-zero from a candidate
+  B-minmax uses per-interval D-plus radii without a MinSum claim
+  Column MinMax oracle matches exhaustive assignments
+  Temporal partition constructs one P/Q leaf and covers domain
+  Structural split replaces OPEN leaf and updates P/Q
+  Temporal split rejects endpoints and non-OPEN leaves
+  FROZEN leaves remain P and leave Q
+  FATHOMED requires finite valid equal LB and UB
+  Static validator rejects empty invalid and inconsistent P
+  Q is always a subset of P and OPEN
+  Benchmark preserves the existing adaptive MinSum path
+  Temporal interval B&B uses its own versioned benchmark schema
+  B-grid selects the longest-interval temporal strategy
+  Chapter 7 baselines use their versioned benchmark payloads
+  Temporal batch runs without an ILP backend and reports failures
+  Temporal baseline batch dispatch works without a static backend
+  Temporal result V2 applies absolute and relative gap rules
+  Temporal result V2 defines zero-UB metrics explicitly
+  Temporal result V2 refuses unsupported assurance and sampled bounds
+  Temporal result V2 preserves failures and rejects contradictions
+  Temporal result V2 validates every status and stop-reason pairing
+  Temporal result V2 accepts exact-zero and rejects negative tolerances
+  Temporal thesis solver returns a separate V2 final schema
+  Leaf priority uses gap, depth, length, and start tie key
+  B-grid selects longest leaf and ties by start then leaf ID
+  Minimum-length guard freezes instead of splitting
+  Midpoint collapse freezes the leaf without losing partition coverage
+  Shared trajectory breakpoint is never moved
+  Successful split preserves parent until transaction and updates P/Q
+  Structural rollback can restore parent P/Q
+  Split policy freezes on missing child UB with ORACLE_FAIL
+  Missing child LB does not prevent successful split
+  Split policy freezes VERIFY_FAIL on LB-UB contradiction
+  Temporal thesis solver executes a small synthetic split
+  Temporal thesis solver starts from the common breakpoint partition
+  Temporal thesis solver returns time-limit before leaf evaluation
+  Temporal thesis solver enforces the per-Oracle time limit
+  Temporal thesis solver enforces Oracle-call cap before evaluation
+  Model A evaluation composes distance bounds, valid zero LB, and integral UB
+  A D-plus heuristic remains UB-only and invalid inherited assignment is
+  rejected
+  LP dual candidate is below exhaustive reference optimum
+  Partition validation catches an omitted leaf before aggregation
+  Serialized complete snapshot reloads and passes independent numerical
+  verification
+  Independent verifier rejects an upper bound rounded below program cost
+  ThreadPool: executes a single task
+  ThreadPool: executes many tasks
+  ThreadPool: wait_idle waits for all submitted work
+  ThreadPool: propagates task exceptions through futures
+  ThreadPool: shutdown drains queued tasks
+  ThreadPool: zero threads selects at least one worker
+  TraceWriter: CSV round-trip preserves values
+  TraceWriter reads the legacy seven-column format
+  TraceWriter: rejects malformed CSV
+  MinMax: trace rows and CSV are populated when enabled
+  MinMax: trace gap is non-increasing
+  MinMax: trace objective is at least its lower bound
+  Point operations follow two-dimensional vector arithmetic
+  Trajectory interpolates positions on its time breaks
+  Trajectory selects the interval containing a time
+  Dummy instance generation scales to repeated medium instances
+  Test utilities construct linear instances and compare solutions
+  Verifier checks kinetic solutions
+  continuous verification detects violations between samples
+  continuous verification splits at trajectory breakpoints
+  WeightedGeometry extracts D(t) at stationary and moving times
+  WeightedGeometry interval bounds contain D(t) samples
+  WeightedGeometry handles vertex inside and outside
+  WeightedGeometry handles zero velocity and coefficient extraction
+  WeightedGeometry merges simultaneous breakpoint partition
+  WeightedGeometry handles breakpoint endpoints and one segment
+  WeightedGeometry preserves duplicate centers and station ids
+  WeightedGeometry rejects inconsistent and discontinuous input
+  Phi Lipschitz cone handles K-zero, u-zero and Delta-zero
+  Phi Lipschitz cone branch boundary agrees
+  Phi Lipschitz cone matches direct symmetric integral
+  Lipschitz R and velocity enclosures are finite
+  Lipschitz stationary velocity gives Lambda zero
+  Lipschitz interval rejects breakpoint crossing
+  Lipschitz local bound rejects heuristic midpoint sources
+  Weighted preprocessing flags are opt-in and retain matrix scope
+  Weighted preprocessing rejects invalid matrix-scope metadata
+  Weighted reductions preserve optimum on exhaustive small matrices
+  Dominance mappings preserve station and point identity
+  Radius caps and objective cut are exact matrix-level facts
+  Validated assignment warm start rebuilds target radii and is not an LB
+  Weighted solve cache keys every solve-affecting input
+  Cached bounds retain validity and require certificate revalidation
+  Cache rejects inconsistent assignment evidence and ambiguous keys
+  Exact Oracle adapter separates reported and certified bounds
+  Exact Oracle adapter recomputes primal cost from assignment
+  Exact Oracle adapter rejects invalid assignments
+  Heuristic Oracle result has only incumbent and recomputed cost
+  Relaxation Oracle rejects an unverified or absent certificate
+  Relaxation Oracle accepts only a finite independently validated LB
+  Unavailable Oracle factory respects cancellable budgets
+  ILP Exact Weighted Oracle matches brute force on small matrices
+  ILP Exact Weighted Oracle handles all-zero and empty dimensions
+  ILP Exact Weighted Oracle distinguishes termination cases
+  Greedy Weighted Heuristic is feasible and UB-only
+  Weighted LP dual validation accepts a feasible dual certificate
+  Weighted LP dual validation rejects unfeasible and degenerate duals
+  LP Relaxation runs diagnostically without an official LB
+  Weighted objective matches m=1,n=1 formula
+  Weighted objective handles empty dimensions explicitly
+  Weighted objective handles zero weights and repeated rows
+  Tie-breaking is separate from the objective value
+  Multiple equal-cost optima are deterministic
+  WeightMatrix validates boundary dimensions and data
+  Assignment validation and objective formula use ordered indexes
+  Brute-force reference matches direct objective minima
+  Upper envelope handles identical and constant polynomials
+  Upper envelope handles root at interval boundary
+  Upper envelope handles repeated and three-function equality
+  Upper envelope handles empty station and affine/constant cases
+  Upper envelope D-plus fallback remains available
+  Validated upper envelope is unavailable
+360 test cases
+
