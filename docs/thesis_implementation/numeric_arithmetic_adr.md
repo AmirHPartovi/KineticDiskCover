@@ -48,11 +48,16 @@ changing the existing dataset contract. A future exact-decimal input format
 must preserve and parse each raw JSON number token directly into MPFR before
 any conversion to `double`, and must use a versioned schema.
 
-Serialized MPFR endpoints are decimal **strings** produced with directed
-rounding. Re-importing the lower and upper strings rounds outward, so it
-cannot narrow the stored enclosure. The current decimal endpoint comparator
-supports exponent magnitudes up to one million; non-finite input values and
-non-finite arithmetic results are rejected.
+The API exposes MPFR endpoints as decimal **strings** produced with directed
+rounding and restores them through `from_decimal_bounds`. Re-importing the
+lower and upper strings rounds outward, so it cannot narrow the stored
+enclosure. `NumericInterval` does not currently have a JSON serializer or
+deserializer; callers that persist endpoints must store these values as JSON
+strings and restore them with `from_decimal_bounds`. Ordinary JSON numeric
+fields do not preserve arbitrary MPFR endpoints and must not be used for this
+purpose. The current decimal endpoint comparator supports exponent magnitudes
+up to one million; non-finite input values and non-finite arithmetic results
+are rejected.
 
 ## Backend investigation and selection
 
@@ -104,7 +109,7 @@ validated support; there is no automatic fallback to unvalidated arithmetic.
 | Square/square root | Sign-aware endpoint square; correctly rounded MPFR square root; negative domains rejected | Validated primitive |
 | Polynomial evaluation | Square-aware expanded interval evaluation for degree at most two | Validated interval enclosure; dependency may make it wide |
 | Interval ordering | Return LESS/GREATER only for disjoint ordered intervals; overlap remains explicit | Validated comparison |
-| Quadratic roots | Bisection with centered mean-value enclosures. Returned boxes conservatively cover every possible root; budget/depth limits are explicit. | Conservative root cover, **not** uniqueness or root-order proof |
+| Quadratic roots | Bisection with centered mean-value enclosures. Returned boxes conservatively cover every possible root; budget/depth limits are explicit. `CANDIDATE_COVER_ONLY` means only that no unresolved candidate box remains wider than the requested width; the legacy `COMPLETE_COVER` spelling is an alias. | Conservative candidate cover, **not** uniqueness, multiplicity, root-order, or event-completeness proof |
 | Polynomial integration | Outward interval evaluation of the exact quadratic antiderivative over finite binary64 endpoints | Validated enclosure for the supplied coefficient intervals and represented interval |
 | `pi` and summation | MPFR directed `pi`; aggregate interval addition with endpoint-directed rounding | Validated primitive |
 
@@ -116,11 +121,20 @@ snapshot verification have not been migrated to consume these enclosures.
 Accordingly, the current overall assurance for solver output remains
 `NUMERICAL_ONLY`; `CERTIFIED` must remain unavailable.
 
-The quadratic root routine deliberately returns conservative candidate
-regions, not one proven-isolating interval per distinct root. If active
-function order cannot be proved from disjoint root/comparison enclosures, the
-future envelope implementation must increase precision, compute a conservative
-integral bound, or report `INDETERMINATE`/not certified.
+The quadratic root routine takes one polynomial with interval coefficients
+over one interval. Discarded regions have an enclosure excluding zero;
+retained candidate regions cover possible roots, but may contain non-roots or
+multiple roots. `CANDIDATE_COVER_ONLY` only indicates that the retained boxes
+meet the requested width; the legacy `COMPLETE_COVER` name is an alias for
+the same non-certified status. It does not prove root uniqueness, distinguish
+a tangency from other roots, order roots of separate polynomials, or establish
+that all events relevant to an upper envelope have been found. Budget and
+precision exhaustion retain unresolved regions and report
+`BUDGET_EXHAUSTED` or `PRECISION_LIMIT`. No status from this API establishes
+temporal event completeness; no current solver or envelope caller uses it.
+If active-function order cannot be proved from disjoint root/comparison
+enclosures, a future envelope implementation must increase precision, compute
+a conservative integral bound, or report `INDETERMINATE`/not certified.
 
 ## Validation evidence and limitations
 
