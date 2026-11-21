@@ -101,6 +101,12 @@ validated support; there is no automatic fallback to unvalidated arithmetic.
 
 `include/kdc/numeric.hpp` and `src/numeric.cpp` provide:
 
+`NumericInterval` owns its two MPFR endpoints. It defines a copy constructor,
+a by-value assignment operator implemented with swap, and a destructor that
+clears both endpoints. It has no explicit move constructor or move assignment;
+rvalues use the available copy semantics, with no move optimization. Self-
+assignment is safe through the copy-and-swap implementation.
+
 | Operation | Enclosure method | Current assurance |
 |---|---|---|
 | Addition/subtraction | MPFR lower endpoint with `RNDD`, upper with `RNDU` | Validated primitive |
@@ -109,7 +115,7 @@ validated support; there is no automatic fallback to unvalidated arithmetic.
 | Square/square root | Sign-aware endpoint square; correctly rounded MPFR square root; negative domains rejected | Validated primitive |
 | Polynomial evaluation | Square-aware expanded interval evaluation for degree at most two | Validated interval enclosure; dependency may make it wide |
 | Interval ordering | Return LESS/GREATER only for disjoint ordered intervals; overlap remains explicit | Validated comparison |
-| Quadratic roots | Bisection with centered mean-value enclosures. Returned boxes conservatively cover every possible root; budget/depth limits are explicit. `CANDIDATE_COVER_ONLY` means only that no unresolved candidate box remains wider than the requested width; the legacy `COMPLETE_COVER` spelling is an alias. | Conservative candidate cover, **not** uniqueness, multiplicity, root-order, or event-completeness proof |
+| Quadratic roots | For exact singleton-zero coefficients, `IDENTICALLY_ZERO_ON_DOMAIN` returns exactly the full requested domain: every point there is a root, and width-based subdivision does not apply. Otherwise, bisection returns candidate boxes; `CANDIDATE_COVER_ONLY` means only that no unresolved box is wider than requested. The legacy `COMPLETE_COVER` spelling aliases that candidate status. `BUDGET_EXHAUSTED` and `PRECISION_LIMIT` retain unresolved regions explicitly. | None of these statuses proves isolated roots, uniqueness, root ordering, or upper-envelope event completeness |
 | Polynomial integration | Outward interval evaluation of the exact quadratic antiderivative over finite binary64 endpoints | Validated enclosure for the supplied coefficient intervals and represented interval |
 | `pi` and summation | MPFR directed `pi`; aggregate interval addition with endpoint-directed rounding | Validated primitive |
 
@@ -122,16 +128,24 @@ Accordingly, the current overall assurance for solver output remains
 `NUMERICAL_ONLY`; `CERTIFIED` must remain unavailable.
 
 The quadratic root routine takes one polynomial with interval coefficients
-over one interval. Discarded regions have an enclosure excluding zero;
-retained candidate regions cover possible roots, but may contain non-roots or
-multiple roots. `CANDIDATE_COVER_ONLY` only indicates that the retained boxes
-meet the requested width; the legacy `COMPLETE_COVER` name is an alias for
-the same non-certified status. It does not prove root uniqueness, distinguish
-a tangency from other roots, order roots of separate polynomials, or establish
-that all events relevant to an upper envelope have been found. Budget and
-precision exhaustion retain unresolved regions and report
-`BUDGET_EXHAUSTED` or `PRECISION_LIMIT`. No status from this API establishes
-temporal event completeness; no current solver or envelope caller uses it.
+over one interval. If and only if all three coefficients are exact singleton
+zero intervals, it returns `IDENTICALLY_ZERO_ON_DOMAIN` and exactly one
+interval equal to the entire requested domain. Every point in that interval
+is a root. The requested width does not apply: subdividing an identically-zero
+polynomial cannot produce isolated roots. For pairwise envelope differences,
+this case means the compared functions coincide throughout the domain, not
+that there is an ordinary finite root event.
+
+Otherwise, discarded regions have an enclosure excluding zero; retained
+candidate regions cover possible roots, but may include non-roots or multiple
+roots. `CANDIDATE_COVER_ONLY` indicates only that the retained boxes meet the
+requested width; the legacy `COMPLETE_COVER` name aliases that same
+non-certified status. `BUDGET_EXHAUSTED` means the box budget left unresolved
+regions; `PRECISION_LIMIT` means subdivision could not continue within the
+depth/representability limit. No status proves root uniqueness, distinguishes
+a tangency, orders roots of separate polynomials, or establishes that all
+upper-envelope events have been found. No current solver or envelope caller
+uses this API.
 If active-function order cannot be proved from disjoint root/comparison
 enclosures, a future envelope implementation must increase precision, compute
 a conservative integral bound, or report `INDETERMINATE`/not certified.

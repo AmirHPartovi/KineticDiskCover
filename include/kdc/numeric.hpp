@@ -81,17 +81,21 @@ class NumericInterval {
 
 enum class RootCoverStatus {
   // Candidate boxes meet the requested width; this does not isolate roots.
-  CANDIDATE_COVER_ONLY,
+  CANDIDATE_COVER_ONLY = 0,
   // Legacy spelling retained as an alias; this status is never certification.
   COMPLETE_COVER = CANDIDATE_COVER_ONLY,
-  BUDGET_EXHAUSTED,
-  PRECISION_LIMIT,
+  BUDGET_EXHAUSTED = 1,
+  PRECISION_LIMIT = 2,
+  // All points on the domain are roots; no isolated-root claim is made.
+  IDENTICALLY_ZERO_ON_DOMAIN = 3,
 };
 
 struct RootCoverResult {
   RootCoverStatus status{RootCoverStatus::CANDIDATE_COVER_ONLY};
-  // Boxes conservatively cover possible roots, but may include non-roots or
-  // multiple roots; this API proves neither uniqueness nor event ordering.
+  // For IDENTICALLY_ZERO_ON_DOMAIN this contains exactly the requested domain.
+  // Otherwise boxes conservatively cover possible roots, but may include
+  // non-roots or multiple roots; this API proves neither uniqueness nor
+  // event ordering.
   std::vector<NumericInterval> possible_roots;
 };
 

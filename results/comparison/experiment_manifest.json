@@ -4,7 +4,7 @@
     "nn",
     "branch-and-bound"
   ],
-  "availability_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback",
+  "availability_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback",
   "benchmark_profile": "FAST",
   "build_type": "Release",
   "cache_policy": "auto",
@@ -23,15 +23,15 @@
   "compiler_id": "Clang",
   "dataset": {
     "fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
-    "identity": "79f447417fe1aed5",
+    "identity": "fd91d0f20ccae37a",
     "path": "/var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T"
   },
   "dataset_dir": "/Users/amirpartovi/Desktop/Codes/KineticDiskCover/results/comparison/calibration-inputs",
-  "dataset_fingerprint": "79f447417fe1aed5",
+  "dataset_fingerprint": "fd91d0f20ccae37a",
   "dataset_fingerprint_algorithm": "FNV-1a-64 over sorted relative JSON paths and raw bytes",
-  "experiment_id": "kdc-comparison-1795150846992894-seed42",
+  "experiment_id": "kdc-comparison-1795190096703473-seed42",
   "fallback_used": false,
-  "git_commit": "9d0bb0a415b8e3bb5a58bb1621b10db7768b9273",
+  "git_commit": "d32708c4bcf223bfd47a4aeecf1d974433d5fd71",
   "handovers_enabled": true,
   "hardware": {
     "architecture": "aarch64",
@@ -52,7 +52,7 @@
       "m": 2,
       "n": 5,
       "objective": "minmax",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     },
     {
       "accepted": false,
@@ -61,7 +61,7 @@
       "m": 2,
       "n": 5,
       "objective": "minsum",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     },
     {
       "accepted": false,
@@ -70,7 +70,7 @@
       "m": 2,
       "n": 5,
       "objective": "minmax",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     },
     {
       "accepted": false,
@@ -79,7 +79,7 @@
       "m": 2,
       "n": 5,
       "objective": "minsum",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     },
     {
       "accepted": false,
@@ -88,7 +88,7 @@
       "m": 2,
       "n": 5,
       "objective": "minmax",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     },
     {
       "accepted": false,
@@ -97,7 +97,7 @@
       "m": 2,
       "n": 5,
       "objective": "minsum",
-      "rejection_reason": "Native KONT/COPT initialization failed (KONT/COPT initialization/model error (code 4): (LICENSE) Fail to create KONT environment with path); generic KontSolver used the built-in branch-and-bound fallback"
+      "rejection_reason": "Native KONT/COPT initialization failed (native KONT/COPT adapter could not be loaded: dlopen(/Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so, 0x0006): Library not loaded: @rpath/libkont_cpp.dylib\n  Referenced from: <8C145243-8EA8-3F83-88C6-64C37EE8231B> /Users/amirpartovi/Desktop/Codes/KineticDiskCover/build/libkdc-kont-native.so\n  Reason: no LC_RPATH's found); generic KontSolver used the built-in branch-and-bound fallback"
     }
   ],
   "requested_backend": "auto",
@@ -142,8 +142,8 @@
       "objective": "minmax",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 2.2e-05,
-      "solver_runtime_sec": 1.7708e-05,
+      "runtime_sec": 2.1042e-05,
+      "solver_runtime_sec": 1.65e-05,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -161,8 +161,8 @@
       "objective": "minsum",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.3125e-05,
-      "solver_runtime_sec": 9.834e-06,
+      "runtime_sec": 8.25e-06,
+      "solver_runtime_sec": 6.75e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -180,8 +180,8 @@
       "objective": "minmax",
       "objective_value": 24269.880926911967,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 2.5167e-05,
-      "solver_runtime_sec": 2.1417e-05,
+      "runtime_sec": 8.291e-06,
+      "solver_runtime_sec": 5.833e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 24269.880926911967
@@ -199,8 +199,8 @@
       "objective": "minsum",
       "objective_value": 24269.880926911967,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.1417e-05,
-      "solver_runtime_sec": 8.25e-06,
+      "runtime_sec": 6.459e-06,
+      "solver_runtime_sec": 5.167e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 24269.880926911967
@@ -218,8 +218,8 @@
       "objective": "minmax",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.5917e-05,
-      "solver_runtime_sec": 1.275e-05,
+      "runtime_sec": 1.1542e-05,
+      "solver_runtime_sec": 9.166e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -237,8 +237,8 @@
       "objective": "minsum",
       "objective_value": 33926.177605393124,
       "optimality_status": "OPTIMAL",
-      "runtime_sec": 1.2541e-05,
-      "solver_runtime_sec": 9.292e-06,
+      "runtime_sec": 9.667e-06,
+      "solver_runtime_sec": 7.875e-06,
       "static_optimality_proven": true,
       "time_limited": false,
       "upper_bound": 33926.177605393124
@@ -249,7 +249,7 @@
     "fast_global_sec": 30.0,
     "per_static_solve_sec": 60.0
   },
-  "timestamp": "2026-11-20T05:00:46Z",
+  "timestamp": "2026-11-20T15:54:56Z",
   "tolerances": {
     "comparison_relative": 1e-06,
     "verification_absolute": 1e-06

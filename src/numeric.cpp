@@ -564,6 +564,7 @@ RootCoverResult root_cover_quadratic(
   }
   if (identically_zero) {
     result.possible_roots.emplace_back(start, end, precision);
+    result.status = RootCoverStatus::IDENTICALLY_ZERO_ON_DOMAIN;
     return result;
   }
 

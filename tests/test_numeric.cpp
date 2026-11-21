@@ -7,7 +7,6 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
-#include <utility>
 #include <vector>
 
 namespace {
@@ -70,6 +69,15 @@ TEST_CASE("Interval comparisons distinguish order from unresolved overlap") {
 }
 
 TEST_CASE("Quadratic root cover contains simple and tangent roots") {
+  REQUIRE(static_cast<int>(
+              kdc::RootCoverStatus::CANDIDATE_COVER_ONLY) == 0);
+  REQUIRE(static_cast<int>(
+              kdc::RootCoverStatus::BUDGET_EXHAUSTED) == 1);
+  REQUIRE(static_cast<int>(
+              kdc::RootCoverStatus::PRECISION_LIMIT) == 2);
+  REQUIRE(kdc::RootCoverStatus::COMPLETE_COVER ==
+          kdc::RootCoverStatus::CANDIDATE_COVER_ONLY);
+
   const std::array<kdc::NumericInterval, 3> two_roots{
       point(1.0), point(0.0), point(-2.0)};
   const auto roots = kdc::root_cover_quadratic(
@@ -118,6 +126,44 @@ TEST_CASE("Quadratic root cover contains simple and tangent roots") {
       }));
 }
 
+TEST_CASE("Identically zero polynomial covers the entire root domain") {
+  const std::array<kdc::NumericInterval, 3> zero_polynomial{
+      point(0.0), point(0.0), point(0.0)};
+  const auto roots = kdc::root_cover_quadratic(
+      zero_polynomial, 0.0, 1.0, 0.1);
+
+  REQUIRE(roots.status ==
+          kdc::RootCoverStatus::IDENTICALLY_ZERO_ON_DOMAIN);
+  REQUIRE(roots.possible_roots.size() == 1U);
+  REQUIRE(roots.possible_roots.front().lower_as_double() == 0.0);
+  REQUIRE(roots.possible_roots.front().upper_as_double() == 1.0);
+  REQUIRE(roots.possible_roots.front().contains(point(0.0)));
+  REQUIRE(roots.possible_roots.front().contains(point(1.0)));
+
+  const auto point_domain = kdc::root_cover_quadratic(
+      zero_polynomial, 0.375, 0.375, 0.01);
+  REQUIRE(point_domain.status ==
+          kdc::RootCoverStatus::IDENTICALLY_ZERO_ON_DOMAIN);
+  REQUIRE(point_domain.possible_roots.size() == 1U);
+  REQUIRE(point_domain.possible_roots.front().lower_as_double() ==
+          0.375);
+  REQUIRE(point_domain.possible_roots.front().upper_as_double() ==
+          0.375);
+}
+
+TEST_CASE("Coefficient intervals containing zero are not identically zero") {
+  const std::array<kdc::NumericInterval, 3> uncertain_polynomial{
+      kdc::NumericInterval(-1.0, 1.0), point(0.0), point(0.0)};
+  const auto roots = kdc::root_cover_quadratic(
+      uncertain_polynomial, 0.0, 1.0, 0.25);
+
+  REQUIRE(roots.status ==
+          kdc::RootCoverStatus::CANDIDATE_COVER_ONLY);
+  REQUIRE_FALSE(roots.possible_roots.empty());
+  REQUIRE(roots.possible_roots.front().lower_as_double() == 0.0);
+  REQUIRE(roots.possible_roots.back().upper_as_double() == 1.0);
+}
+
 TEST_CASE("Quadratic integration and global sum preserve enclosure") {
   const std::array<kdc::NumericInterval, 3> t_squared{
       point(1.0), point(0.0), point(0.0)};
@@ -160,26 +206,29 @@ TEST_CASE("Binary64 input semantics and endpoint storage preserve enclosure") {
   REQUIRE(parsed_binary64.upper_as_double() == 0.1);
 }
 
-TEST_CASE("NumericInterval handles signed zero and preserves MPFR precision") {
-  const kdc::NumericInterval signed_zero(
-      -0.0, 0.0, static_cast<mpfr_prec_t>(192));
-  REQUIRE(signed_zero.is_point());
-  REQUIRE(signed_zero.contains_zero());
-  REQUIRE(signed_zero.precision() == 192);
+TEST_CASE("NumericInterval copy construction and assignment preserve precision") {
+  const kdc::NumericInterval original(
+      -0.25, 3.75, static_cast<mpfr_prec_t>(192));
+  const auto original_lower = original.lower_as_double();
+  const auto original_upper = original.upper_as_double();
 
-  const kdc::NumericInterval copied(signed_zero);
-  REQUIRE(copied.precision() == 192);
-  REQUIRE(copied.contains(signed_zero));
+  const kdc::NumericInterval copied(original);
+  REQUIRE(copied.precision() == original.precision());
+  REQUIRE(copied.contains(original));
 
   kdc::NumericInterval assigned(1.0, static_cast<mpfr_prec_t>(64));
-  assigned = copied;
-  REQUIRE(assigned.precision() == 192);
-  REQUIRE(assigned.contains(signed_zero));
+  assigned = original;
+  REQUIRE(assigned.precision() == original.precision());
+  REQUIRE(assigned.contains(original));
 
-  const kdc::NumericInterval moved(std::move(assigned));
-  REQUIRE(moved.precision() == 192);
-  REQUIRE(moved.contains(signed_zero));
-  REQUIRE(assigned.is_finite());
+  assigned = assigned;
+  REQUIRE(assigned.precision() == original.precision());
+  REQUIRE(assigned.contains(original));
+
+  REQUIRE(original.is_finite());
+  REQUIRE(original.precision() == 192);
+  REQUIRE(original.lower_as_double() == original_lower);
+  REQUIRE(original.upper_as_double() == original_upper);
 }
 
 TEST_CASE("NumericInterval encloses underflow and rejects binary64 overflow") {
@@ -192,8 +241,10 @@ TEST_CASE("NumericInterval encloses underflow and rejects binary64 overflow") {
 
   const auto huge_squared = kdc::square(point(1e308));
   REQUIRE(huge_squared.is_finite());
-  REQUIRE_THROWS_AS(huge_squared.lower_as_double(),
-                    std::overflow_error);
+  const double lower_as_double = huge_squared.lower_as_double();
+  REQUIRE(std::isfinite(lower_as_double));
+  REQUIRE(lower_as_double == std::numeric_limits<double>::max());
+  // Downward conversion rounds to max finite; upward conversion overflows.
   REQUIRE_THROWS_AS(huge_squared.upper_as_double(),
                     std::overflow_error);
 

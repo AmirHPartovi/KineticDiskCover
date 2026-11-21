@@ -100119,3 +100119,77 @@ ed continuous check on 23 intervals
 [2026-11-20 08:30:47.125] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
 [2026-11-20 08:30:47.125] [info] [minmax.cpp:467] MinMax: done. peak=20658.761036, certified_LB=20658.761036, gap=0.0000, iters=1, t=0.000s
 [2026-11-20 08:30:47.126] [info] [benchmark.cpp:1437] Benchmark: 3 results saved.
+[2026-11-20 19:24:56.333] [info] [io.cpp:137] read_json: loaded 8 points, 3 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-cli-845959746583-instance.json
+[2026-11-20 19:24:56.333] [info] [minmax.cpp:110] MinMax: start n=8, m=3, T=1
+[2026-11-20 19:24:56.333] [info] [candidate.cpp:199] InstancePrecompute: built 24 candidates
+[2026-11-20 19:24:56.334] [info] [stationary.cpp:264] NN: cost=7725.472213, feasible=true, active_stations=1
+[2026-11-20 19:24:56.334] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-11-20 19:24:56.334] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.000000, peak=7725.472213, LB=0.000000, gap=7725.4722
+[2026-11-20 19:24:56.334] [info] [stationary.cpp:264] NN: cost=7725.472213, feasible=true, active_stations=1
+[2026-11-20 19:24:56.334] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-11-20 19:24:56.334] [info] [solution.cpp:1026] extend: 0 intervals over [0, 0]
+[2026-11-20 19:24:56.334] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-11-20 19:24:56.334] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-11-20 19:24:56.334] [info] [solution.cpp:1097] combine: 1 intervals
+[2026-11-20 19:24:56.334] [info] [minmax.cpp:384] MinMax: combined solution did not improve peak, stopping
+[2026-11-20 19:24:56.334] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-11-20 19:24:56.334] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-11-20 19:24:56.334] [info] [minmax.cpp:467] MinMax: done. peak=7725.472213, certified_LB=0.000000, gap=7725.4722, iters=1, t=0.000s
+[2026-11-20 19:24:56.334] [info] [solution_serializer.cpp:133] SolutionSerializer: wrote 855 bytes to /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-cli-845959765375-solution.json
+[2026-11-20 19:24:56.353] [info] [io.cpp:137] read_json: loaded 3 points, 2 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-cli-846320244666-unknown-instance.json
+[2026-11-20 19:24:56.353] [error] [static_solver_registry.cpp:61] StaticSolverRegistry: unknown solver 'bogus'
+[2026-11-20 19:24:56.382] [info] [benchmark.cpp:1287] BenchmarkRunner: exact reference selected 'not-applicable' (actual=temporal-interval-bnb, manifest=)
+[2026-11-20 19:24:56.382] [info] [io.cpp:137] read_json: loaded 3 points, 2 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-cli-846354157208-temporal-run/dataset/tiny.json
+[2026-11-20 19:24:56.383] [info] [benchmark.cpp:1437] Benchmark: 1 results saved.
+[2026-11-20 19:24:56.394] [info] [benchmark.cpp:1287] BenchmarkRunner: exact reference selected 'not-applicable' (actual=b-nn, manifest=)
+[2026-11-20 19:24:56.394] [info] [io.cpp:137] read_json: loaded 3 points, 2 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-cli-846368093166-b-nn-run/dataset/tiny.json
+[2026-11-20 19:24:56.395] [info] [benchmark.cpp:1437] Benchmark: 1 results saved.
+[2026-11-20 19:24:56.829] [warning] [kont_solver.cpp:951] KONT: native initialization failed; generic KontSolver used the built-in fallback
+[2026-11-20 19:24:56.829] [info] [kont_solver.cpp:971] KONT: status=OPTIMAL, obj=1.000000, lb=1.000000, gap=0.0000, t=0.000s
+[2026-11-20 19:24:56.829] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed1.json
+[2026-11-20 19:24:56.829] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed2.json
+[2026-11-20 19:24:56.829] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed3.json
+[2026-11-20 19:24:56.830] [info] [exact_reference_selector.cpp:594] ExactReferenceSelector: requested=auto selected=branch-and-bound actual=branch-and-bound KONT/COPT available=false
+[2026-11-20 19:24:56.830] [info] [benchmark.cpp:1287] BenchmarkRunner: exact reference selected 'branch-and-bound' (actual=branch-and-bound, manifest=/var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/results/experiment_manifest.json)
+[2026-11-20 19:24:56.830] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed1.json
+[2026-11-20 19:24:56.830] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed2.json
+[2026-11-20 19:24:56.830] [info] [io.cpp:137] read_json: loaded 15 points, 4 stations from /var/folders/w5/1mkrqmbs53lg9vy__m6vlyhh0000gn/T/kdc-parallel-cli-846800342458/dataset/random_n15_m4_seed3.json
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:110] MinMax: start n=15, m=4, T=1
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:110] MinMax: start n=15, m=4, T=1
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:199] InstancePrecompute: built 60 candidates
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:199] InstancePrecompute: built 60 candidates
+[2026-11-20 19:24:56.831] [info] [stationary.cpp:264] NN: cost=25529.618310, feasible=true, active_stations=2
+[2026-11-20 19:24:56.831] [info] [stationary.cpp:264] NN: cost=18563.549251, feasible=true, active_stations=3
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:345] build_coverage: nnz=480
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:345] build_coverage: nnz=480
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:416] BnB: cost=15471.006780170 LB=15471.006780170 nodes=16 t=0.0002s
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:416] BnB: cost=10679.245680169 LB=10679.245680169 nodes=16 t=0.0002s
+[2026-11-20 19:24:56.831] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:202] MinMax iter 1: t_max=1.000000, peak=10816.500985, LB=10679.245680, gap=0.0129
+[2026-11-20 19:24:56.831] [info] [stationary.cpp:264] NN: cost=18958.689708, feasible=true, active_stations=3
+[2026-11-20 19:24:56.831] [info] [solution.cpp:1026] extend: 2 intervals over [0, 1]
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.000000, peak=15471.006780, LB=15471.006780, gap=0.0000
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 2 intervals
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:345] build_coverage: nnz=480
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:467] MinMax: done. peak=15471.006780, certified_LB=15471.006780, gap=0.0000, iters=1, t=0.000s
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:110] MinMax: start n=15, m=4, T=1
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:199] InstancePrecompute: built 60 candidates
+[2026-11-20 19:24:56.831] [info] [stationary.cpp:264] NN: cost=34978.592205, feasible=true, active_stations=3
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:416] BnB: cost=10816.500985291 LB=10816.500985291 nodes=16 t=0.0002s
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:255] MinMax: no improvement at t_max, stopping
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-11-20 19:24:56.831] [info] [candidate.cpp:345] build_coverage: nnz=480
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:467] MinMax: done. peak=10816.500985, certified_LB=10816.500985, gap=0.0000, iters=1, t=0.001s
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:303] BnB: configured gap target reached
+[2026-11-20 19:24:56.831] [info] [branch_and_bound_solver.cpp:416] BnB: cost=20658.761035671 LB=20658.761035671 nodes=25 t=0.0002s
+[2026-11-20 19:24:56.831] [info] [solution.cpp:1026] extend: 1 intervals over [0, 1]
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:202] MinMax iter 1: t_max=0.000000, peak=20658.761036, LB=20658.761036, gap=0.0000
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1037] Verifier: starting certified continuous check on 1 intervals
+[2026-11-20 19:24:56.831] [info] [verify.cpp:1117] Verifier: kind=certified_continuous, coverage_ok=true, supporting_points_ok=true, cost_consistent_ok=true, integral_consistent_ok=true, assignment_consistent_ok=true
+[2026-11-20 19:24:56.831] [info] [minmax.cpp:467] MinMax: done. peak=20658.761036, certified_LB=20658.761036, gap=0.0000, iters=1, t=0.000s
+[2026-11-20 19:24:56.832] [info] [benchmark.cpp:1437] Benchmark: 3 results saved.
